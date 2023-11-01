@@ -1,0 +1,14 @@
+{
+  "name": "wifiapctrl",
+  "version-string": "1",
+  "dependencies": [
+    {
+      "name": "grpc",
+      "host": true
+    },
+    {
+      "name": "protobuf",
+      "host": false
+    }
+  ]
+}
