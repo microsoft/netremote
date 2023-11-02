@@ -1,7 +1,8 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-include(cmake/vcpkg.cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+include(vcpkg)
 
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
 
@@ -27,13 +28,17 @@ set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 include(CheckPIESupported)
 include(CTest)
 include(GNUInstallDirs)
+include(grpc)
+include(protoc)
 
 # Enable verbose output until project is bootstrapped.
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Pull in external dependencies.
+# Look for protobuf-config.cmake.
+set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(gRPC CONFIG REQUIRED)
-find_package(protobuf CONFIG REQUIRED)
+find_package(Protobuf CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 # Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
@@ -102,3 +107,6 @@ endif()
 if (CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
   add_compile_definitions(_FORTIFY_SOURCE=2)
 endif()
+
+add_subdirectory(protocol)
+add_subdirectory(src)
