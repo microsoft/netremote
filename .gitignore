@@ -1,11 +1,12 @@
 # VS and VSCode
 .vs
 .vscode/settings.json
+bin/
+obj/
 
 # CMake
 build/
 out/
-
 # vcpkg
 vcpkg_installed*/
 /vcpkg/
