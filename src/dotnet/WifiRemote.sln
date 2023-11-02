@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiRemoteService", "WifiRemoteService\WifiRemoteService.csproj", "{D56170AB-FFA2-435C-8B46-C1517D0873A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiRemoteClient", "WifiRemoteClient\WifiRemoteClient.csproj", "{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiRemoteClientUnitTest", "WifiRemoteClientUnitTest\WifiRemoteClientUnitTest.csproj", "{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{D56170AB-FFA2-435C-8B46-C1517D0873A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D56170AB-FFA2-435C-8B46-C1517D0873A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D56170AB-FFA2-435C-8B46-C1517D0873A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

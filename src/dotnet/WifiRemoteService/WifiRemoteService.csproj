@@ -16,7 +16,6 @@
     <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiRemoteService.proto">
       <Link>Protos\WifiRemoteService.proto</Link>
     </Protobuf>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
