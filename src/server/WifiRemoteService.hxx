@@ -6,7 +6,7 @@
 
 namespace Microsoft::Wifi::Remote::Service
 {
-class WifiRemoteServiceImpl : public WifiRemoteService::Service
+class WifiRemoteService : public WifiRemote::Service
 {
     virtual ::grpc::Status GetWifiApControl(::grpc::ServerContext* context, const ::Microsoft::Wifi::Remote::Request* request, ::Microsoft::Wifi::Remote::Response* response) override;
 };

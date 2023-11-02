@@ -25,5 +25,5 @@ message Response
 {
     MessageHeader Header = 1;
     string RequestId = 2;
-    optional bytes Response = 3;
+    optional bytes Payload = 3;
 }
