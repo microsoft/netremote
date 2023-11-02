@@ -1,5 +1,5 @@
 
-set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto)
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/microsoft/wifi/test)
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set(PROTO_FILES
     ${PROTO_DIR}/WifiApControl.proto

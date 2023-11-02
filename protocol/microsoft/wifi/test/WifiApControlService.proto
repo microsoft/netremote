@@ -1,0 +1,12 @@
+
+syntax = "proto3";
+
+package Microsoft.Wifi.Test.ApControl.Service;
+
+import "WifiCore.proto";
+import "WifiApControl.proto";
+
+service WifiApControlService
+{
+    rpc GetWifiApControl (Microsoft.Wifi.Test.ApControl.Request) returns (Microsoft.Wifi.Test.ApControl.Response) {}
+}
