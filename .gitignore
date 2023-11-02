@@ -1,0 +1,11 @@
+# VS and VSCode
+.vs
+.vscode/settings.json
+
+# CMake
+build/
+out/
+
+# vcpkg
+vcpkg_installed*/
+/vcpkg/

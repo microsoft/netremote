@@ -1,0 +1,12 @@
+{
+  "name": "wifiremote",
+  "version-string": "1",
+  "dependencies": [
+    {
+      "name": "grpc",
+      "host": true
+    },
+    "protobuf",
+    "catch2"
+  ]
+}

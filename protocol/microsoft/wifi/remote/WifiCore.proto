@@ -1,0 +1,11 @@
+
+syntax = "proto3";
+
+package Microsoft.Wifi;
+
+enum RadioBand
+{
+    RadioBandUnknown = 0;
+    RadioBand2400MHz = 1;
+    RadioBand5000MHz = 2;
+}

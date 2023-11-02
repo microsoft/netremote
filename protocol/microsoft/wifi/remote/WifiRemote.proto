@@ -1,0 +1,29 @@
+
+syntax = "proto3";
+
+package Microsoft.Wifi.Remote;
+
+message MessageHeader
+{
+    uint32 Length = 1;
+}
+
+message Request
+{
+    enum Type
+    {
+        Basic = 0;
+    }
+
+    optional MessageHeader Header = 1;
+    string Id = 2;
+    optional Type RequestType = 3;
+    optional bytes Payload = 4;
+}
+
+message Response
+{
+    MessageHeader Header = 1;
+    string RequestId = 2;
+    optional bytes Response = 3;
+}
