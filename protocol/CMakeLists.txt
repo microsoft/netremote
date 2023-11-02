@@ -7,18 +7,23 @@ set(PROTO_FILES
     ${PROTO_DIR}/WifiRemoteService.proto
 )
 
-add_library(wifiremote-protocol ${PROTO_FILES})
+add_library(wifiremote-protocol STATIC "")
+
+target_sources(wifiremote-protocol
+    PRIVATE
+        ${PROTO_FILES}
+)
+
+target_include_directories(wifiremote-protocol
+    PUBLIC
+        "$<BUILD_INTERFACE:${PROTO_DIR_BINARY}>"
+)
 
 target_link_libraries(wifiremote-protocol
     PUBLIC
         protobuf::libprotobuf
         gRPC::grpc
         gRPC::grpc++
-)
-
-target_include_directories(wifiremote-protocol
-    PUBLIC
-        "$<BUILD_INTERFACE:${PROTO_DIR_BINARY}>"
 )
 
 protobuf_generate(TARGET wifiremote-protocol
