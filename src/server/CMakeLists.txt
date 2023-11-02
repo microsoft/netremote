@@ -1,14 +1,14 @@
 
-add_executable(wifiapctrl-server "")
+add_executable(wifiremote-server "")
 
-target_sources(wifiapctrl-server
+target_sources(wifiremote-server
     PRIVATE
         Main.cxx
-        WifiApControlServiceImpl.hxx
-        WifiApControlServiceImpl.cxx
+        WifiRemoteServiceImpl.hxx
+        WifiRemoteServiceImpl.cxx
 )
 
-target_link_libraries(wifiapctrl-server
+target_link_libraries(wifiremote-server
     PRIVATE
-        wifiapctrl-protocol
+        wifiremote-protocol
 )

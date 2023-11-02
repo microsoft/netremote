@@ -8,7 +8,7 @@ set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
 
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
 
-project(wifiapctrl
+project(wifiremote
   LANGUAGES CXX
   VERSION 0.0.1
 )

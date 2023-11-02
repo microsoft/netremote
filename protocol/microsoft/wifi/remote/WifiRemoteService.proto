@@ -1,0 +1,12 @@
+
+syntax = "proto3";
+
+package Microsoft.Wifi.Remote.Service;
+
+import "WifiCore.proto";
+import "WifiRemote.proto";
+
+service WifiRemoteService
+{
+    rpc GetWifiApControl (Microsoft.Wifi.Remote.Request) returns (Microsoft.Wifi.Remote.Response) {}
+}

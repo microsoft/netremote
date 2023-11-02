@@ -1,7 +1,7 @@
 
 syntax = "proto3";
 
-package Microsoft.Wifi.Test.ApControl;
+package Microsoft.Wifi.Remote;
 
 message MessageHeader
 {

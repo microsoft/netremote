@@ -1,5 +1,5 @@
 {
-  "name": "wifiapctrl",
+  "name": "wifiremote",
   "version-string": "1",
   "dependencies": [
     {
