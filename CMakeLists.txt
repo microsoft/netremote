@@ -110,3 +110,4 @@ endif()
 
 add_subdirectory(protocol)
 add_subdirectory(src)
+add_subdirectory(tests)
