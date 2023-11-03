@@ -1,0 +1,57 @@
+# Linux Wi-Fi Remote Framework
+
+This project tree is meant to exercise and test the OS-agnostic portions of the framework.
+
+## Development Environment Setup
+
+As described in the main project [`README`](/README.md), a C++ 20 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 23.10 (mantic) with a few development packages. Instructions for setting up this environment are provided below.
+
+### 1. Install Ubuntu 23.10 (mantic)
+
+If development on Windows is desired, ubuntu may be installed in WSL using a rootfs image. To install WSL, on newer versions of Windows 10, use the following command: `wsl --install --no-distribution`. For complete instructions, refer to [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow these steps to install mantic on WSL:
+
+1. Download the ubuntu 23.10 wsl rootfs archive [https://cloud-images.ubuntu.com/wsl/mantic/current/ubuntu-mantic-wsl-amd64-wsl.rootfs.tar.gz](https://cloud-images.ubuntu.com/wsl/mantic/current/ubuntu-mantic-wsl-amd64-wsl.rootfs.tar.gz).
+2. Choose a location to store the WSL ubuntu filesystem image. A good way to keep organized is to use a top-level directory for all wsl filesystem images such as `c:\wsl`, then add a sub-directory for each distribution installed, such as `c:\wsl\mantic`, `c:\wsl\fedora35`, etc. It's also recommended to do this on a non-system drive if one is available for performance reasons.
+3. Start an elevated command-prompt, and enter the following series of commands:
+```Shell
+mkdir c:\wsl\mantic
+wsl --import mantic c:\wsl\mantic c:\users\myusername\Downloads\ubuntu-mantic-wsl-amd64-wsl.rootfs.tar.gz
+wsl -d mantic
+```
+4. You are now running in a root shell on a fresh ubuntu 23.10 installation. Set up a non-root user to use by default:
+```bash
+adduser mycoolusername
+# <accept all defaults by successively hitting 'Enter', and set a password>
+usermod -G sudo mycoolusername
+# install an editor if you don't like the ones pre-installed (vi and nano are available out of the box)
+```
+5. Create the file `/etc/wsl.conf` (need sudo), and save the following contents to it:
+```ini 
+[user]
+default=mycoolusername
+```
+6. Exit ubuntu:
+```bash
+exit
+```
+7. Shutdown WSL so it can pick up the new default user changes, and re-run ubuntu:
+```Shell
+wsl --shutdown
+wsl -d mantic
+```
+
+You should now be logged on as `mycoolusername`.
+
+### 2. Install Development Dependencies
+
+Execute the following commands in a shell:
+```bash
+sudo apt update
+sudo apt-get install -y build-essential git ninja-build clang clang-format clang-tidy llvm lldb gnupg gdb zip unzip tar curl pkg-config wget
+```
+
+The above will install all the tools required to compile, lint, and debug the project. If hostapd will also be compiled ([git://w1.fi/hostap.git](git://w1.fi/hostap.git)), install the following additional development dependencies:
+
+```bash
+sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev
+```
