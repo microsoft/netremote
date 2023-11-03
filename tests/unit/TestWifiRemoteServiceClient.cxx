@@ -10,8 +10,8 @@
 
 namespace detail
 {
-constexpr auto RemoteServiceAddressHttp = "http://localhost:5047";
-constexpr auto RemoteServiceAddressHttps = "https://localhost:7073";
+constexpr auto RemoteServiceAddressHttp = "localhost:5047";
+constexpr auto RemoteServiceAddressHttps = "localhost:7073";
 } // namespace detail
 
 TEST_CASE("wifi remote service can be reached", "[basic][rpc][client]")
