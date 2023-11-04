@@ -11,24 +11,24 @@
 namespace detail
 {
 constexpr auto RemoteServiceAddressHttp = "localhost:5047";
-constexpr auto RemoteServiceAddressHttps = "localhost:7073";
+[[maybe_unused]] constexpr auto RemoteServiceAddressHttps = "localhost:7073";
 } // namespace detail
 
 TEST_CASE("wifi remote service can be reached", "[basic][rpc][client]")
 {
-    using namespace Microsoft::Wifi::Remote;
-    using namespace Microsoft::Wifi::Remote::Service;
+    using namespace Microsoft::Net::Wifi::Remote;
+    using namespace Microsoft::Net::Wifi::Remote::Service;
 
     auto channel = grpc::CreateChannel(detail::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = WifiRemote::NewStub(channel);
 
     SECTION("GetWifiApControl can be called")
     {
-        Microsoft::Wifi::Remote::Request request{};
+        Microsoft::Net::Wifi::Remote::Request request{};
         request.set_id("TestWifiRemoteServiceClientTest1");
         request.set_payload("Ping");
 
-        Microsoft::Wifi::Remote::Response response{};
+        Microsoft::Net::Wifi::Remote::Response response{};
         grpc::ClientContext clientContext{};
 
         auto status = client->GetWifiApControl(&clientContext, request, &response);

@@ -1,11 +1,11 @@
 
 syntax = "proto3";
 
-package Microsoft.Wifi.Remote.Service;
+package Microsoft.Net.Wifi.Remote.Service;
 
 import "WifiRemote.proto";
 
 service WifiRemote
 {
-    rpc GetWifiApControl (Microsoft.Wifi.Remote.Request) returns (Microsoft.Wifi.Remote.Response) {}
+    rpc GetWifiApControl (Microsoft.Net.Wifi.Remote.Request) returns (Microsoft.Net.Wifi.Remote.Response) {}
 }

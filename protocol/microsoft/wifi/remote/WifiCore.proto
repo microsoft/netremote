@@ -1,7 +1,7 @@
 
 syntax = "proto3";
 
-package Microsoft.Wifi;
+package Microsoft.Net.Wifi;
 
 enum RadioBand
 {

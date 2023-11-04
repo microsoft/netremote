@@ -4,7 +4,7 @@
 #include <iostream>
 #include <microsoft/wifi/remote/WifiRemoteService.hxx>
 
-using Microsoft::Wifi::Remote::Service::WifiRemoteService;
+using Microsoft::Net::Wifi::Remote::Service::WifiRemoteService;
 
 int
 main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])

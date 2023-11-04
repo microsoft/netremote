@@ -1,8 +1,8 @@
 
 using Grpc.Net.Client;
-using Microsoft.Wifi.Remote.Service;
+using Microsoft.Net.Wifi.Remote.Service;
 
-namespace Microsoft.Wifi.Remote.Client.Test
+namespace Microsoft.Net.Wifi.Remote.Client.Test
 {
     [TestClass]
     public class UnitTestWifiRemoteClient
