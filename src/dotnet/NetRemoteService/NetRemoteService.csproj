@@ -19,11 +19,11 @@
     <Protobuf Include="..\..\..\protocol\protos\WifiCore.proto">
       <Link>Protos\WifiCore.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\WifiRemote.proto">
-      <Link>Protos\WifiRemote.proto</Link>
+    <Protobuf Include="..\..\..\protocol\protos\NetRemote.proto">
+      <Link>Protos\NetRemote.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\WifiRemoteService.proto">
-      <Link>Protos\WifiRemoteService.proto</Link>
+    <Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto">
+      <Link>Protos\NetRemoteService.proto</Link>
     </Protobuf>
   </ItemGroup>
 

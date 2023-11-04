@@ -1,5 +1,5 @@
 ﻿
-namespace Microsoft.Net.Wifi.Remote.Client
+namespace Microsoft.Net.Remote.Client
 {
     public class NetRemoteClient
     {

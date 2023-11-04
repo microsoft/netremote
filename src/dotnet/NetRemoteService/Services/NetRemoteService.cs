@@ -1,12 +1,12 @@
 ﻿using Grpc.Core;
-using Microsoft.Net.Wifi.Remote.Service;
+using Microsoft.Net.Remote.Service;
 using System.Text;
 
 using grpc = global::Grpc.Core;
 
-namespace Microsoft.Net.Wifi.Remote.Service
+namespace Microsoft.Net.Remote.Service
 {
-    public class NetRemoteService : WifiRemote.WifiRemoteBase
+    public class NetRemoteService : NetRemote.NetRemoteBase
     {
         private readonly ILogger<NetRemoteService> _logger;
 
@@ -15,9 +15,9 @@ namespace Microsoft.Net.Wifi.Remote.Service
             _logger = logger;
         }
 
-        public override Task<Microsoft.Net.Wifi.Remote.Response> GetWifiApControl(Microsoft.Net.Wifi.Remote.Request request, grpc::ServerCallContext context)
+        public override Task<Microsoft.Net.Remote.Response> GetWifiApControl(Microsoft.Net.Remote.Request request, grpc::ServerCallContext context)
         {
-            return Task.FromResult(new Microsoft.Net.Wifi.Remote.Response
+            return Task.FromResult(new Microsoft.Net.Remote.Response
             {
                 RequestId = request.Id,
                 Payload = Google.Protobuf.ByteString.CopyFromUtf8("Pong")

@@ -2,20 +2,20 @@
 #include <grpcpp/server_builder.h>
 #include <format>
 #include <iostream>
-#include <microsoft/net/wifi/remote/WifiRemoteService.hxx>
+#include <microsoft/net/remote/NetRemoteService.hxx>
 
-using Microsoft::Net::Wifi::Remote::Service::WifiRemoteService;
+using Microsoft::Net::Remote::Service::NetRemoteService;
 
 int
 main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
     static constexpr auto ServerAddress = "0.0.0.0:5047"; 
 
-    WifiRemoteService wifiRemoteService{};
+    NetRemoteService NetRemoteService{};
 
     grpc::ServerBuilder builder{};
     builder.AddListeningPort(ServerAddress, grpc::InsecureServerCredentials());
-    builder.RegisterService(&wifiRemoteService);
+    builder.RegisterService(&NetRemoteService);
 
     auto server{builder.BuildAndStart()};
     std::cout << std::format("Started listening on {}", ServerAddress) << '\n';

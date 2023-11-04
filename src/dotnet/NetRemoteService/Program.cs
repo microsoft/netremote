@@ -1,4 +1,4 @@
-using Microsoft.Net.Wifi.Remote.Service;
+using Microsoft.Net.Remote.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
