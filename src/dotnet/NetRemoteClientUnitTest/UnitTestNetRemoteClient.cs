@@ -15,7 +15,7 @@ namespace Microsoft.Net.Wifi.Remote.Client.Test
         {
             using var channel = GrpcChannel.ForAddress(AddressHttp);
 
-            var client = new WifiRemote.WifiRemoteClient(channel);
+            var client = new NetRemote.NetRemoteClient(channel);
             var reply = client.GetWifiApControl(new Request {
                 Id = "TestSendGetWifiApControl1",
                 RequestType = Request.Types.Type.Basic,

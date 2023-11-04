@@ -6,7 +6,7 @@ using grpc = global::Grpc.Core;
 
 namespace Microsoft.Net.Wifi.Remote.Service
 {
-    public class NetRemoteService : WifiRemote.WifiRemoteBase
+    public class NetRemoteService : NetRemote.NetRemoteBase
     {
         private readonly ILogger<NetRemoteService> _logger;
 
