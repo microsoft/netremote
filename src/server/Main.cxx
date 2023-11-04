@@ -2,7 +2,7 @@
 #include <grpcpp/server_builder.h>
 #include <format>
 #include <iostream>
-#include <microsoft/wifi/remote/WifiRemoteService.hxx>
+#include <microsoft/net/wifi/remote/WifiRemoteService.hxx>
 
 using Microsoft::Net::Wifi::Remote::Service::WifiRemoteService;
 

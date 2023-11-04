@@ -2,8 +2,7 @@
 #include <format>
 #include <iostream>
 
-// #include "include/microsoft/wifi/remote/WifiRemoteService.hxx"
-#include <microsoft/wifi/remote/WifiRemoteService.hxx>
+#include <microsoft/net/wifi/remote/WifiRemoteService.hxx>
 
 using namespace Microsoft::Net::Wifi::Remote::Service;
 

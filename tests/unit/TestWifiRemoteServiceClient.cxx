@@ -5,7 +5,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
-#include <microsoft/wifi/remote/WifiRemoteService.hxx>
+#include <microsoft/net/wifi/remote/WifiRemoteService.hxx>
 #include <WifiRemoteService.grpc.pb.h>
 
 namespace detail

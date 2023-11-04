@@ -2,7 +2,7 @@
 add_library(wifiremote-service STATIC "")
 
 set(WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE}/microsoft/wifi/remote)
+set(WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE}/microsoft/net/wifi/remote)
 
 target_sources(wifiremote-service
     PRIVATE
@@ -18,7 +18,7 @@ target_include_directories(wifiremote-service
 
 target_link_libraries(wifiremote-service
     PUBLIC
-        wifiremote-protocol
+        netremote-protocol
 )
 
 list(APPEND WIFI_REMOTE_SERVICE_PUBLIC_HEADERS

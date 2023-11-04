@@ -8,5 +8,5 @@ target_sources(wifiremote-client
 
 target_link_libraries(wifiremote-client
     PUBLIC
-        wifiremote-protocol
+        netremote-protocol
 )
