@@ -8,19 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiCore.proto">
-      <Link>Protos\WifiCore.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiRemote.proto">
-      <Link>Protos\WifiRemote.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiRemoteService.proto">
-      <Link>Protos\WifiRemoteService.proto</Link>
-    </Protobuf>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+    <Folder Include="Protos\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\..\..\protocol\protos\WifiCore.proto">
+      <Link>Protos\WifiCore.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\protocol\protos\WifiRemote.proto">
+      <Link>Protos\WifiRemote.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\protocol\protos\WifiRemoteService.proto">
+      <Link>Protos\WifiRemoteService.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using Microsoft.Net.Wifi.Remote.Service;
 namespace Microsoft.Net.Wifi.Remote.Client.Test
 {
     [TestClass]
-    public class UnitTestWifiRemoteClient
+    public class UnitTestNetRemoteClient
     {
         private static readonly string AddressHttp = "http://localhost:5047";
         private static readonly string AddressHttps = "https://localhost:7073";

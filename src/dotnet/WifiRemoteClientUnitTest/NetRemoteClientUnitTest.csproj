@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WifiRemoteClient\WifiRemoteClient.csproj" />
+    <ProjectReference Include="..\WifiRemoteClient\NetRemoteClient.csproj" />
   </ItemGroup>
 
 </Project>

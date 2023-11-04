@@ -6,11 +6,11 @@ using grpc = global::Grpc.Core;
 
 namespace Microsoft.Net.Wifi.Remote.Service
 {
-    public class WifiRemoteService : WifiRemote.WifiRemoteBase
+    public class NetRemoteService : WifiRemote.WifiRemoteBase
     {
-        private readonly ILogger<WifiRemoteService> _logger;
+        private readonly ILogger<NetRemoteService> _logger;
 
-        public WifiRemoteService(ILogger<WifiRemoteService> logger)
+        public NetRemoteService(ILogger<NetRemoteService> logger)
         {
             _logger = logger;
         }
