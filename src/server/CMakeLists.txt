@@ -1,17 +1,17 @@
 
-add_executable(wifiremote-server "")
+add_executable(netremote-server "")
 
-target_sources(wifiremote-server
+target_sources(netremote-server
     PRIVATE
         Main.cxx
 )
 
-target_link_libraries(wifiremote-server
+target_link_libraries(netremote-server
     PRIVATE
-        wifiremote-service
+        netremote-service
 )
 
 install(
-    TARGETS wifiremote-server
-    EXPORT wifiremote
+    TARGETS netremote-server
+    EXPORT netremote
 )
