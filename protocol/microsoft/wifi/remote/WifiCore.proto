@@ -9,3 +9,69 @@ enum RadioBand
     RadioBand2400MHz = 1;
     RadioBand5000MHz = 2;
 }
+
+enum Dot11Phytype
+{
+    option allow_alias = true;
+
+    Dot11PhyTypeUnknown = 0;
+    Dot11PhyTypeB = 1;
+    Dot11PhyTypeHrdsss = 1;
+    Dot11PhyTypeG = 2;
+    Dot11PhyTypeErp = 2;
+    Dot11PhyTypeN = 3;
+    Dot11PhyTypeHt = 3;
+    Dot11PhyTypeA = 4;
+    Dot11PhyTypeOfdm = 4;
+    Dot11PhyTypeAC = 5;
+    Dot11PhyTypeVht = 5;
+    Dot11PhyTypeAD = 6;
+    Dot11PhyTypeDmg = 6;
+    Dot11PhyTypeAX = 7;
+    Dot11PhyTypeHe = 7;
+    Dot11PhyTypeBE = 8;
+    Dot11PhyTypeEht = 8;
+}
+
+enum Dot11AuthenticationAlgorithm
+{
+    option allow_alias = true;
+
+    Dot11AuthenticationAlgorithmUnknown = 0;
+    Dot11AuthenticationAlgorithmOpen = 1;
+    Dot11AuthenticationAlgorithmSharedKey = 2;
+    Dot11AuthenticationAlgorithmWpa = 3;
+    Dot11AuthenticationAlgorithmWpaPsk = 4;
+    Dot11AuthenticationAlgorithmWpaNone = 5;
+    Dot11AuthenticationAlgorithmRsna = 6;
+    Dot11AuthenticationAlgorithmRsnaPsk = 7;
+    Dot11AuthenticationAlgorithmWpa3 = 8;
+    Dot11AuthenticationAlgorithmWpa3Enterprise192 = 8;
+    Dot11AuthenticationAlgorithmWpa3Enterprise = 9;
+    Dot11AuthenticationAlgorithmSae = 10;
+    Dot11AuthenticationAlgorithmWpa3Personal = 10;
+    Dot11AuthenticationAlgorithmOwe = 11;
+}
+
+enum Dot11CipherAlgorithm
+{
+    option allow_alias = true;
+
+    Dot11CipherAlgorithmUnknown = 0;
+    Dot11CipherAlgorithmNone = 1;
+    Dot11CipherAlgorithmWep = 2;
+    Dot11CipherAlgorithmWep40 = 3;
+    Dot11CipherAlgorithmWep104 = 4;
+    Dot11CipherAlgorithmTkip = 5;
+    Dot11CipherAlgorithmBip = 6;
+    Dot11CipherAlgorithmBipCmac128 = 6;
+    Dot11CipherAlgorithmBipGmac128 = 7;
+    Dot11CipherAlgorithmBipGmac256 = 8;
+    Dot11CipherAlgorithmBipCmac256 = 9;
+    Dot11CipherAlgorithmGcmp = 10;
+    Dot11CipherAlgorithmGcmp128 = 10;
+    Dot11CipherAlgorithmGcmp256 = 10;
+    Dot11CipherAlgorithmCcmp256 = 11;
+    Dot11CipherAlgorithmWpaUseGroup = 12;
+    Dot11CipherAlgorithmRsnUseGroup = 12;
+}
