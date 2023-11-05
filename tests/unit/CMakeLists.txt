@@ -5,19 +5,19 @@ find_package(Catch2 3 REQUIRED)
 list(APPEND CMAKE_MODULE_PATH "${catch2_SOURCE_DIR}/contrib")
 include(Catch)
 
-add_executable(wifiremote-test-unit)
+add_executable(netremote-test-unit)
 
-target_sources(wifiremote-test-unit
+target_sources(netremote-test-unit
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/TestWifiRemoteServiceClient.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServiceClient.cxx
 )
 
-target_link_libraries(wifiremote-test-unit
+target_link_libraries(netremote-test-unit
     PRIVATE
         Catch2::Catch2WithMain
         gRPC::grpc++
-        wifiremote-service
+        netremote-service
 )
 
-catch_discover_tests(wifiremote-test-unit)
+catch_discover_tests(netremote-test-unit)

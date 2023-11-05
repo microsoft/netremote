@@ -1,11 +1,11 @@
 
 using Grpc.Net.Client;
-using Microsoft.Wifi.Remote.Service;
+using Microsoft.Net.Remote.Service;
 
-namespace Microsoft.Wifi.Remote.Client.Test
+namespace Microsoft.Net.Remote.Client.Test
 {
     [TestClass]
-    public class UnitTestWifiRemoteClient
+    public class UnitTestNetRemoteClient
     {
         private static readonly string AddressHttp = "http://localhost:5047";
         private static readonly string AddressHttps = "https://localhost:7073";
@@ -15,7 +15,7 @@ namespace Microsoft.Wifi.Remote.Client.Test
         {
             using var channel = GrpcChannel.ForAddress(AddressHttp);
 
-            var client = new WifiRemote.WifiRemoteClient(channel);
+            var client = new NetRemote.NetRemoteClient(channel);
             var reply = client.GetWifiApControl(new Request {
                 Id = "TestSendGetWifiApControl1",
                 RequestType = Request.Types.Type.Basic,

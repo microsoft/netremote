@@ -1,6 +1,6 @@
-# Wi-Fi Remote Control
+# Network Remote Control
 
-This project provides the ability to remotely control Wi-Fi access points and related networking components typically used to test Wi-Fi functionality on Windows.
+This project provides the ability to remotely control network components such as Wi-Fi access points typically used to test network functionality on Windows.
 
 ## Project Structure
 
@@ -27,7 +27,7 @@ To help keep the code consistent, please follow these general guidelines:
 | Functions | PascalCase | `AccessPoint GetAccessPointById(std::string_view id)` |
 | Variables | camelCase | `AccessPoint accessPoint{};` |
 | Parameters | camelCase | `void registerEventCallback(AccessPointEventCallback& eventCallback)` |
-| Namespaces | lowercase | `namespace microsoft::wifi::remote` |
+| Namespaces | lowercase | `namespace microsoft::net::remote` |
 | Public Members | PascalCase | `struct AccessPoint { std::string Id; }` |
 | Private Members | camelCase with `m_` prefix | `class AccessPoint { uint64_t m_sessionId; }` |
 
@@ -66,8 +66,8 @@ CMake may be installed in any form, as long as the version meets the minimum. On
 To bootstrap the build environment, instruct CMake to generate the build files. It is strongly recommended to do this in a directory that is separate from the source; this allows one to easily destroy and recreate the build environment without affecting the checked-out source and changes in progress. Typically, a new directory called `build` at the top-level project tree is used for this purpose:
 
 ```Shell
-git clone git@github.com:abeltrano/wifiremote.git
-cd wifiremote
+git clone git@github.com:abeltrano/netremote.git
+cd netremote
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -Bbuild 
 cmake --build build
 ```
@@ -79,3 +79,25 @@ Alternatively, Microsoft provides a [CMake Tools](https://marketplace.visualstud
 In general, you set a build target and variant, then use the `CMake: Build` command to build incrementally. All build targets can be found in the `CMake: Project Outline` activity bar, but a list of them will also be shown when invoking actions that involve targets.
 
 You may need to enable unsupported presets versions. To do this, go to the Preferences UI -> search presets -> enable the option "CMake: Allow Unsupported Presets Versions"
+
+## Contributing
+
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+
+When you submit a pull request, a CLA bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Trademarks
+
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
+trademarks or logos is subject to and must follow 
+[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
+Any use of third-party trademarks or logos are subject to those third-party's policies.

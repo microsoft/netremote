@@ -1,12 +1,12 @@
 
-add_library(wifiremote-client STATIC "")
+add_library(netremote-client STATIC "")
 
-target_sources(wifiremote-client
+target_sources(netremote-client
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Placeholder.cxx
 )
 
-target_link_libraries(wifiremote-client
+target_link_libraries(netremote-client
     PUBLIC
-        wifiremote-protocol
+        netremote-protocol
 )
