@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiRemoteService", "WifiRemoteService\WifiRemoteService.csproj", "{D56170AB-FFA2-435C-8B46-C1517D0873A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetRemoteService", "NetRemoteService\NetRemoteService.csproj", "{D56170AB-FFA2-435C-8B46-C1517D0873A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiRemoteClient", "WifiRemoteClient\WifiRemoteClient.csproj", "{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetRemoteClient", "NetRemoteClient\NetRemoteClient.csproj", "{E4BB11EC-6CE2-4CE9-8806-EA9CF46DE658}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiRemoteClientUnitTest", "WifiRemoteClientUnitTest\WifiRemoteClientUnitTest.csproj", "{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetRemoteClientUnitTest", "NetRemoteClientUnitTest\NetRemoteClientUnitTest.csproj", "{452E5C5E-B769-43FE-AB74-5BD92D6E5BC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

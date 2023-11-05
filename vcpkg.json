@@ -1,5 +1,5 @@
 {
-  "name": "wifiremote",
+  "name": "netremote",
   "version-string": "1",
   "dependencies": [
     {

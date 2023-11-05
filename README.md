@@ -1,6 +1,6 @@
-# Wi-Fi Remote Control
+# Network Remote Control
 
-This project provides the ability to remotely control Wi-Fi access points and related networking components typically used to test Wi-Fi functionality on Windows.
+This project provides the ability to remotely control network components such as Wi-Fi access points typically used to test network functionality on Windows.
 
 ## Project Structure
 
@@ -27,7 +27,7 @@ To help keep the code consistent, please follow these general guidelines:
 | Functions | PascalCase | `AccessPoint GetAccessPointById(std::string_view id)` |
 | Variables | camelCase | `AccessPoint accessPoint{};` |
 | Parameters | camelCase | `void registerEventCallback(AccessPointEventCallback& eventCallback)` |
-| Namespaces | lowercase | `namespace microsoft::wifi::remote` |
+| Namespaces | lowercase | `namespace microsoft::net::remote` |
 | Public Members | PascalCase | `struct AccessPoint { std::string Id; }` |
 | Private Members | camelCase with `m_` prefix | `class AccessPoint { uint64_t m_sessionId; }` |
 
@@ -66,8 +66,8 @@ CMake may be installed in any form, as long as the version meets the minimum. On
 To bootstrap the build environment, instruct CMake to generate the build files. It is strongly recommended to do this in a directory that is separate from the source; this allows one to easily destroy and recreate the build environment without affecting the checked-out source and changes in progress. Typically, a new directory called `build` at the top-level project tree is used for this purpose:
 
 ```Shell
-git clone git@github.com:abeltrano/wifiremote.git
-cd wifiremote
+git clone git@github.com:abeltrano/netremote.git
+cd netremote
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -Bbuild 
 cmake --build build
 ```

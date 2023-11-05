@@ -1,5 +1,5 @@
 
-# Windows Wi-Fi Remote Framework
+# Windows Network Remote Framework
 
 # Development Environment Setup
 

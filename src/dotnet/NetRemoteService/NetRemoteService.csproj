@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x64;ARM64;ARM32;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Protos\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\..\..\protocol\protos\WifiCore.proto">
+      <Link>Protos\WifiCore.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\protocol\protos\NetRemote.proto">
+      <Link>Protos\NetRemote.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto">
+      <Link>Protos\NetRemoteService.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+</Project>

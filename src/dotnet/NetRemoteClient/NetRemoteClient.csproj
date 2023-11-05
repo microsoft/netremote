@@ -21,19 +21,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiCore.proto">
-      <Link>Protos\WifiCore.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiRemote.proto">
-      <Link>Protos\WifiRemote.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiRemoteService.proto">
-      <Link>Protos\WifiRemoteService.proto</Link>
+    <Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto">
+      <Link>Protos\NetRemoteService.proto</Link>
     </Protobuf>
   </ItemGroup>
 
   <ItemGroup>
-	<Protobuf Include="..\..\..\protocol\microsoft\wifi\remote\WifiRemoteService.proto" GrpcServices="Client" />
+	<Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto" GrpcServices="Client" />
+	<Protobuf Include="..\..\..\protocol\protos\WifiCore.proto">
+	  <Link>Protos\WifiCore.proto</Link>
+	</Protobuf>
+	<Protobuf Include="..\..\..\protocol\protos\NetRemote.proto">
+	  <Link>Protos\NetRemote.proto</Link>
+	</Protobuf>
+	<Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto">
+	  <Link>Protos\NetRemoteService.proto</Link>
+	</Protobuf>
   </ItemGroup>
 
 </Project>

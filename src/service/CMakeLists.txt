@@ -1,36 +1,36 @@
 
-add_library(wifiremote-service STATIC "")
+add_library(netremote-service STATIC "")
 
-set(WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE}/microsoft/wifi/remote)
+set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}/microsoft/net/remote)
 
-target_sources(wifiremote-service
+target_sources(netremote-service
     PRIVATE
-        WifiRemoteService.cxx
+        NetRemoteService.cxx
     PUBLIC
-        ${WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/WifiRemoteService.hxx
+        ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteService.hxx
 )
 
-target_include_directories(wifiremote-service
+target_include_directories(netremote-service
     PUBLIC
-        ${WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE}
+        ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}
 )
 
-target_link_libraries(wifiremote-service
+target_link_libraries(netremote-service
     PUBLIC
-        wifiremote-protocol
+        netremote-protocol
 )
 
-list(APPEND WIFI_REMOTE_SERVICE_PUBLIC_HEADERS
-    ${WIFI_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/WifiRemoteService.hxx
+list(APPEND NET_REMOTE_SERVICE_PUBLIC_HEADERS
+    ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteService.hxx
 )
 
-set_target_properties(wifiremote-service PROPERTIES
-    PUBLIC_HEADER "${WIFI_REMOTE_SERVICE_PUBLIC_HEADERS}"
+set_target_properties(netremote-service PROPERTIES
+    PUBLIC_HEADER "${NET_REMOTE_SERVICE_PUBLIC_HEADERS}"
 )
 
 install(
-    TARGETS wifiremote-service
-    EXPORT wifiremote
-    PUBLIC_HEADER DESTINATION "${WIFI_REMOTE_SERVICE_PUBLIC_HEADERS}"
+    TARGETS netremote-service
+    EXPORT netremote
+    PUBLIC_HEADER DESTINATION "${NET_REMOTE_SERVICE_PUBLIC_HEADERS}"
 )

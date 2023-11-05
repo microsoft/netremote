@@ -1,4 +1,4 @@
 
-include_external_msproject(wifiremote-dotnet
-    ${CMAKE_CURRENT_LIST_DIR}/WifiRemote.sln
+include_external_msproject(netremote-dotnet
+    ${CMAKE_CURRENT_LIST_DIR}/NetRemote.sln
 )

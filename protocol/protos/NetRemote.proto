@@ -1,7 +1,7 @@
 
 syntax = "proto3";
 
-package Microsoft.Wifi.Remote;
+package Microsoft.Net.Remote;
 
 message MessageHeader
 {

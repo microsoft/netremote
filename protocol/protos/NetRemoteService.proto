@@ -1,0 +1,11 @@
+
+syntax = "proto3";
+
+package Microsoft.Net.Remote.Service;
+
+import "NetRemote.proto";
+
+service NetRemote
+{
+    rpc GetWifiApControl (Microsoft.Net.Remote.Request) returns (Microsoft.Net.Remote.Response) {}
+}
