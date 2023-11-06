@@ -78,7 +78,5 @@ enum Dot11CipherAlgorithm
 
 message AccessPointConfiguration
 {
-    RadioBand Band = 1;
-    Dot11PhyType PhyType = 2;
+    Dot11PhyType PhyType = 1;
 }
-
