@@ -9,6 +9,8 @@ namespace Microsoft::Net::Remote::Service
 class NetRemoteService : public NetRemote::Service
 {
     virtual ::grpc::Status GetWifiApControl(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Request* request, ::Microsoft::Net::Remote::Response* response) override;
+
+    virtual ::grpc::Status WifiConfigureAccessPoint(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiConfigureAccessPointRequest* request, ::Microsoft::Net::Remote::Wifi::WifiConfigureAccessPointResult* response) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 
