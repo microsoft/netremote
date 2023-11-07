@@ -2,9 +2,10 @@
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos)
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set(PROTO_FILES
-    ${PROTO_DIR}/WifiCore.proto
     ${PROTO_DIR}/NetRemote.proto
     ${PROTO_DIR}/NetRemoteService.proto
+    ${PROTO_DIR}/NetRemoteWifi.proto
+    ${PROTO_DIR}/WifiCore.proto
 )
 
 add_library(netremote-protocol STATIC "")

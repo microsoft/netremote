@@ -10,7 +10,7 @@ enum RadioBand
     RadioBand5000MHz = 2;
 }
 
-enum Dot11Phytype
+enum Dot11PhyType
 {
     option allow_alias = true;
 
@@ -74,4 +74,9 @@ enum Dot11CipherAlgorithm
     Dot11CipherAlgorithmCcmp256 = 11;
     Dot11CipherAlgorithmWpaUseGroup = 12;
     Dot11CipherAlgorithmRsnUseGroup = 12;
+}
+
+message AccessPointConfiguration
+{
+    Dot11PhyType PhyType = 1;
 }
