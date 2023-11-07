@@ -16,16 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\..\..\protocol\protos\NetRemote.proto">
+    <Protobuf Include="..\..\..\protocol\protos\NetRemote.proto" GrpcServices="None">
       <Link>Protos\NetRemote.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto" GprcServices="server">
+    <Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto" GprcServices="Server">
       <Link>Protos\NetRemoteService.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\NetRemoteWifi.proto">
+    <Protobuf Include="..\..\..\protocol\protos\NetRemoteWifi.proto" GrpcServices="None">
       <Link>Protos\NetRemoteWifi.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\WifiCore.proto">
+    <Protobuf Include="..\..\..\protocol\protos\WifiCore.proto" GrpcServices="None">
       <Link>Protos\WifiCore.proto</Link>
     </Protobuf>
   </ItemGroup>
