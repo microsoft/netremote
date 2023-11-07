@@ -36,24 +36,6 @@ namespace Microsoft.Net.Remote.Client.Test
         }
 
         [TestMethod]
-        public void TestSendGetWifiApControl()
-        {
-            using var channel = GrpcChannel.ForAddress(AddressHttp);
-
-            var client = new NetRemote.NetRemoteClient(channel);
-            var reply = client.GetWifiApControl(new Request
-            {
-                Id = "TestSendGetWifiApControl1",
-                RequestType = Request.Types.Type.Basic,
-                Payload = Google.Protobuf.ByteString.CopyFromUtf8("Ping"),
-            });
-
-            Assert.IsNotNull(reply);
-            Assert.IsNotNull(reply.Payload);
-            Assert.AreEqual(reply.Payload.ToStringUtf8(), "Pong");
-        }
-
-        [TestMethod]
         public void TestWifiConfigureAccessPoint()
         {
             var connection = CreateConnection(ConnectionType.Http);
