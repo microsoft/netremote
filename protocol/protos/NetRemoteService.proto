@@ -8,7 +8,5 @@ import "NetRemoteWifi.proto";
 
 service NetRemote
 {
-    rpc GetWifiApControl (Microsoft.Net.Remote.Request) returns (Microsoft.Net.Remote.Response);
-
     rpc WifiConfigureAccessPoint (Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointRequest) returns (Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointResult);
 }

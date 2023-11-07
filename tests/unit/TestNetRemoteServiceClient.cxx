@@ -25,22 +25,6 @@ TEST_CASE("net remote service can be reached", "[basic][rpc][client]")
     auto channel = grpc::CreateChannel(detail::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemote::NewStub(channel);
 
-    SECTION("GetWifiApControl can be called")
-    {
-        Microsoft::Net::Remote::Request request{};
-        request.set_id("TestNetRemoteServiceClientTest1");
-        request.set_payload("Ping");
-
-        Microsoft::Net::Remote::Response response{};
-        grpc::ClientContext clientContext{};
-
-        auto status = client->GetWifiApControl(&clientContext, request, &response);
-
-        REQUIRE(status.ok()); 
-        REQUIRE(response.requestid() == request.id());
-        REQUIRE(response.payload() == "Pong");
-    }
-
     SECTION("WifiConfigureAccessPoint can be called")
     {
         for (const auto& band : magic_enum::enum_values<Microsoft::Net::Wifi::RadioBand>())
