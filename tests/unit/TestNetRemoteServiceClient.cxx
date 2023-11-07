@@ -7,6 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
+#include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 #include <NetRemoteService.grpc.pb.h>
 
@@ -14,26 +15,6 @@ namespace detail
 {
 constexpr auto RemoteServiceAddressHttp = "localhost:5047";
 [[maybe_unused]] constexpr auto RemoteServiceAddressHttps = "localhost:7073";
-
-// TODO: use magic_enum instead
-static constexpr std::array<Microsoft::Net::Wifi::RadioBand, 3> AllRadioBands = {
-    Microsoft::Net::Wifi::RadioBand::RadioBandUnknown,
-    Microsoft::Net::Wifi::RadioBand::RadioBand2400MHz,
-    Microsoft::Net::Wifi::RadioBand::RadioBand5000MHz,
-};
-
-// TODO: use magic_enum instead
-static constexpr std::array<Microsoft::Net::Wifi::Dot11PhyType, 9> AllPhyTypes = {
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeUnknown,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeB,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeG,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeN,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeA,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeAC,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeAD,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeAX,
-  Microsoft::Net::Wifi::Dot11PhyType::Dot11PhyTypeBE,
-};
 } // namespace detail
 
 TEST_CASE("net remote service can be reached", "[basic][rpc][client]")
@@ -62,15 +43,15 @@ TEST_CASE("net remote service can be reached", "[basic][rpc][client]")
 
     SECTION("WifiConfigureAccessPoint can be called")
     {
-        for (const auto& band : detail::AllRadioBands)
+        for (const auto& band : magic_enum::enum_values<Microsoft::Net::Wifi::RadioBand>())
         {
-            for (const auto& phyType : detail::AllPhyTypes)
+            for (const auto& phyType : magic_enum::enum_values<Microsoft::Net::Wifi::Dot11PhyType>())
             {
                 Microsoft::Net::Wifi::AccessPointConfiguration apConfiguration{};
                 apConfiguration.set_phytype(phyType);
 
                 Microsoft::Net::Remote::Wifi::WifiConfigureAccessPointRequest request{};
-                request.set_accesspointid(std::format("TestWifiConfigureAccessPoint"));
+                request.set_accesspointid(std::format("TestWifiConfigureAccessPoint{}", magic_enum::enum_name(band)));
                 request.set_defaultband(band);
                 request.mutable_configurations()->emplace(band, apConfiguration);
 
