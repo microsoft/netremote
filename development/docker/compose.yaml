@@ -1,0 +1,51 @@
+
+services:
+  netremote:
+    image: netremote-dev
+    build:
+      context: ./data
+      dockerfile: ../images/netremote/Dockerfile
+    tty: true
+    stdin_open: true
+    privileged: true
+    profiles:
+      - dontstart
+
+  netremote-dev:
+    image: netremote-dev
+    build:
+      context: ./data
+      dockerfile: ../images/netremote/dev/Dockerfile
+    tty: true
+    stdin_open: true
+    privileged: true
+    volumes:
+      # netremote sources
+      - type: volume
+        source: build-data
+        target: /netremote
+        consistency: delegated
+      # user ssh keys
+      - type: bind
+        source: ${USERPROFILE}/.ssh
+        target: /tmp/.ssh
+        read_only: true
+      # user git config
+      - type: bind
+        source: ${USERPROFILE}/.gitconfig
+        target: /tmp/.gitconfig
+        read_only: true
+    working_dir: /netremote
+
+  netremote-dev-hostapd:
+    image: netremote-dev-hostapd
+    build:
+      context: ./data
+      dockerfile: ../images/netremote/dev/hostapd/Dockerfile
+    tty: true
+    stdin_open: true
+    privileged: true
+
+volumes:
+  build-data:
+    external: false
