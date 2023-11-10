@@ -4,8 +4,7 @@ FROM abeltrano/netremote-dev
 
 # Install packages.
 RUN sudo apt-get update && \
-# TODO: add -qq flags to 'apt-get install' to reduce output once container is stable.
-    sudo apt-get install -y --no-install-recommends \
+    sudo apt-get install -y -qq --no-install-recommends \
         # hostapd build dependencies.
         # libnl-3-dev libssl-dev libnl-genl-3-dev
         libnl-3-dev \

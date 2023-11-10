@@ -1,12 +1,10 @@
 
-# TODO: consider a specific version of ubuntu, like mantic-20231011.
 # abeltrano/netremote-dev
 FROM ubuntu:mantic
 
 # Install packages.
 RUN apt-get update && \
-# TODO: add -qq flags to 'apt-get install' to reduce output once container is stable.
-    apt-get install -y --no-install-recommends \
+    apt-get install -qq -y --no-install-recommends \
         # Project build dependencies.
         # build-essential clang dotnet7 git gnupg lldb llvm ninja-build pkg-config
         build-essential \
