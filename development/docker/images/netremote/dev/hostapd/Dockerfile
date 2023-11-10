@@ -6,10 +6,11 @@ FROM abeltrano/netremote-dev
 RUN sudo apt-get update && \
     sudo apt-get install -y -qq --no-install-recommends \
         # hostapd build dependencies.
-        # libnl-3-dev libssl-dev libnl-genl-3-dev
+        # libnl-3-dev libssl-dev libwpa-client-dev libnl-genl-3-dev
         libnl-3-dev \
-        libssl-dev \
         libnl-genl-3-dev \
+        libssl-dev \
+        libwpa-client-dev \
         # wpa_supplicant build dependencies.
         # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
         libdbus-c++-dev \

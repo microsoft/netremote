@@ -64,7 +64,7 @@ sudo apt-get install -y build-essential git ninja-build clang clang-format clang
 The above will install all the tools required to compile, lint, and debug the project. If hostapd will also be compiled ([git://w1.fi/hostap.git](git://w1.fi/hostap.git)), install the following additional development dependencies:
 
 ```bash
-sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev
+sudo apt-get install -y libnl-3-dev libssl-dev libwpa-client-dev libnl-genl-3-dev 
 ```
 
 ### 3. Install Docker on Windows

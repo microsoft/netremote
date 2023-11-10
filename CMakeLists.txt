@@ -13,6 +13,25 @@ project(netremote
   VERSION 0.0.1
 )
 
+# Conditional inclusion of OS-dependent source trees.
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(BUILD_FOR_LINUX TRUE)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  set(BUILD_FOR_WINDOWS TRUE)
+else ()
+  MESSAGE(FATAL_ERROR "No supported target OS detected, SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+endif()
+
+MESSAGE(STATUS "Target OS ${CMAKE_SYSTEM_NAME} detected")
+
+# Option determining whether the hostapd client library should be built from
+# source, or a pre-built, packaged version discovered on the system.
+option(
+  BUILD_HOSTAP_EXTERNAL
+  "Build hostap project from built-in external source"
+  ON
+)
+
 # Set language configutation options. The C++ standard used must be the lowest
 # common denominator for all the OS-dependent projects. In practice, since this
 # project must build under the Windows build system (build.exe), its toolchain
@@ -27,6 +46,7 @@ set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
 
 include(CheckPIESupported)
 include(CTest)
+include(ExternalProject)
 include(GNUInstallDirs)
 include(grpc)
 include(protoc)
@@ -106,6 +126,44 @@ endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
   add_compile_definitions(_FORTIFY_SOURCE=2)
+endif()
+
+# Common source directories
+set(NETREMOTE_DIR_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
+set(NETREMOTE_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
+set(NETREMOTE_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
+
+# Add common, global compile definitions.
+add_compile_definitions(
+    MAGIC_ENUM_RANGE_MIN=0
+    MAGIC_ENUM_RANGE_MAX=255
+)
+
+# Conditional inclusion of OS-dependent source trees.
+if (BUILD_FOR_LINUX)
+  include(hostap)
+  add_subdirectory(linux)
+elseif (BUILD_FOR_WINDOWS)
+  # Make public version of wil available.
+  set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
+  set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
+
+  find_package(wil CONFIG REQUIRED)
+
+  # Add Windows-specific global compile definitions.
+  add_compile_definitions(
+      _UNICODE
+      UNICODE
+      NOMINMAX
+      WIN32_LEAN_AND_MEAN
+  )
+
+  # Allow more than default number of sections in object files.
+  add_compile_options(
+    /bigobj
+  )
+
+  add_subdirectory(windows)
 endif()
 
 add_subdirectory(protocol)

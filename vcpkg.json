@@ -8,6 +8,10 @@
     },
     "protobuf",
     "catch2",
-    "magic-enum"
+    "magic-enum",
+    {
+      "name": "wil",
+      "platform": "windows"
+    }
   ]
 }
