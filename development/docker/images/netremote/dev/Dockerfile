@@ -79,4 +79,5 @@ RUN git config --global core.autocrlf input && \
 
 # Set entrypoint and start interactive shell (bash).
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
+WORKDIR /home/${USER}
 CMD /bin/bash -i
