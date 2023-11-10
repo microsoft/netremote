@@ -1,10 +1,12 @@
 
 services:
   netremote:
-    image: netremote-dev
+    image: netremote
     build:
       context: ./data
       dockerfile: ../images/netremote/Dockerfile
+    # environment:
+    #   - COMPOSE_CONVERT_WINDOWS_PATHS=1
     tty: true
     stdin_open: true
     privileged: true
