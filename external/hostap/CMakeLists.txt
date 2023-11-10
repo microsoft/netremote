@@ -4,7 +4,10 @@ find_program(MAKE_EXE
     REQUIRED
 )
 
-set(HOSTAP_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/hostap-prefix/src/hostap/wpa_supplicant)
+set(HOSTAP_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/hostap-prefix/src/hostap/wpa_supplicant CACHE INTERNAL "Path of external project code")
+set(HOSTAP_LOCAL_INCLUDE_DIR ${HOSTAP_PREFIX}/usr/local/include CACHE INTERNAL "Path of external project includes")
+set(HOSTAP_LOCAL_LIB_DIR ${HOSTAP_PREFIX}/usr/local/lib CACHE INTERNAL "Path of external project built libraries")
+set(HOSTAP_LOCAL_SBIN_DIR ${HOSTAP_PREFIX}/usr/local/sbin CACHE INTERNAL "Path of external project built system binaries")
 
 ExternalProject_Add(hostap
     GIT_REPOSITORY "http://w1.fi/hostap.git"
