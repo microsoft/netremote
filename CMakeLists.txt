@@ -50,7 +50,6 @@ include(ExternalProject)
 include(GNUInstallDirs)
 include(grpc)
 include(protoc)
-include(hostap)
 
 # Enable verbose output until project is bootstrapped.
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -142,6 +141,7 @@ add_compile_definitions(
 
 # Conditional inclusion of OS-dependent source trees.
 if (BUILD_FOR_LINUX)
+  include(hostap)
   add_subdirectory(linux)
 elseif (BUILD_FOR_WINDOWS)
   # Make public version of wil available.
