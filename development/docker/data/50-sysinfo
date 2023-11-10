@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+if [ -x /usr/bin/neofetch ]; then
+    /usr/bin/neofetch
+fi 

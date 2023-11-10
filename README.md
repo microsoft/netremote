@@ -80,6 +80,21 @@ In general, you set a build target and variant, then use the `CMake: Build` comm
 
 You may need to enable unsupported presets versions. To do this, go to the Preferences UI -> search presets -> enable the option "CMake: Allow Unsupported Presets Versions"
 
+### Docker-based Environment
+
+Several Docker images are available that provide a known working development environment with all of the tools necessary pre-installed:
+
+1. [abeltrano/netremote-dev](https://hub.docker.com/r/abeltrano/netremote-dev): A container image for development of the main project.
+2. [abeltrano/netremote-dev-hostapd](https://hub.docker.com/r/abeltrano/netremote-dev-hostapd): A container image for development of the main project and hostapd, including building modules for the WSL2 kernel.
+
+To use one of the containers, [install Docker](https://docs.docker.com/get-docker/) on your development machine, then start an interactive instance, which will bring you to a bash shell:
+
+```Shell
+docker run -it abeltrano/netremote-dev-hostapd
+```
+
+![container shell](./doc/docker-run-example.png)
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
