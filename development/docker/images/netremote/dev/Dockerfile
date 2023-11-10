@@ -24,10 +24,11 @@ ENV USER=${username}
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         # Generic tools.
-        # curl dos2unix file iproute2 mtools neofetch rsync ssh sudo tar unzip wget
+        # curl dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo tar unzip wget
         curl \
         dos2unix \
         file \
+        gnupg2 \
         iproute2 \
         mtools \
         neofetch \
