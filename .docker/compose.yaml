@@ -1,0 +1,17 @@
+
+services:
+  netremote-dev:
+    build:
+      context: netremote-dev
+      target: netremote-dev
+    tty: true
+    stdin_open: true
+    privileged: true
+
+  netremote-dev-hostapd:
+    build:
+      context: netremote-dev
+      target: netremote-dev-hostapd
+    tty: true
+    stdin_open: true
+    privileged: true
