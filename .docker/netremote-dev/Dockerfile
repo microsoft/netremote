@@ -17,7 +17,7 @@ LABEL org.label-schema.schema-version = "1.0"
 RUN apt-get update && \
     apt-get install -qq -y --no-install-recommends \
         # Project build dependencies.
-        # build-essential ca-certificates clang-17 cmake curl dotnet7 git gnupg lldb llvm ninja-build pkg-config tar unzip zip
+        # build-essential ca-certificates clang-17 cmake curl dotnet7 git gnupg linux-libc-dev lldb llvm ninja-build pkg-config tar unzip zip
         build-essential \
         ca-certificates \
         clang-17 \
@@ -26,6 +26,7 @@ RUN apt-get update && \
         dotnet7 \
         git \
         gnupg \
+        linux-libc-dev \
         lldb \
         llvm \
         ninja-build \
