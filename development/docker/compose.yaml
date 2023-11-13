@@ -19,23 +19,6 @@ services:
     tty: true
     stdin_open: true
     privileged: true
-    volumes:
-      # netremote sources
-      - type: volume
-        source: build-data
-        target: /netremote
-        consistency: delegated
-      # user ssh keys
-      - type: bind
-        source: ${USERPROFILE}/.ssh
-        target: /tmp/.ssh
-        read_only: true
-      # user git config
-      - type: bind
-        source: ${USERPROFILE}/.gitconfig
-        target: /tmp/.gitconfig
-        read_only: true
-    working_dir: /netremote
 
   netremote-dev-hostapd:
     image: netremote-dev-hostapd
@@ -45,24 +28,3 @@ services:
     tty: true
     stdin_open: true
     privileged: true
-    volumes:
-      # netremote sources
-      - type: volume
-        source: build-data
-        target: /netremote
-        consistency: delegated
-      # user ssh keys
-      - type: bind
-        source: ${USERPROFILE}/.ssh
-        target: /tmp/.ssh
-        read_only: true
-      # user git config
-      - type: bind
-        source: ${USERPROFILE}/.gitconfig
-        target: /tmp/.gitconfig
-        read_only: true
-    working_dir: /netremote
-
-volumes:
-  build-data:
-    external: false
