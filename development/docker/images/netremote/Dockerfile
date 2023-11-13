@@ -6,9 +6,9 @@ FROM ubuntu:mantic
 RUN apt-get update && \
     apt-get install -qq -y --no-install-recommends \
         # Project build dependencies.
-        # build-essential clang dotnet7 git gnupg lldb llvm ninja-build pkg-config
+        # build-essential clang-17 dotnet7 git gnupg lldb llvm ninja-build pkg-config
         build-essential \
-        clang \
+        clang-17 \
         dotnet7 \
         git \
         gnupg \
