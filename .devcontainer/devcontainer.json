@@ -3,10 +3,11 @@
 {
 	"name": "NetRemote Development Environment",
 	"dockerComposeFile": [
-        "../.docker/compose.yaml"
+		"../.docker/compose.yaml",
+		"./compose-devcontainer.yaml"
 	],
 	"service": "netremote-dev-hostapd",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"shutdownAction": "none",
 	"customizations": {
 		"vscode": {

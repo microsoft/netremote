@@ -2,11 +2,13 @@
 services:
   netremote-dev:
     volumes:
-    - source:/workspace
+      - ../..:/workspaces:cached
+      - workspace:/workspace
 
   netremote-dev-hostapd:
     volumes:
-    - source:/workspace
+      - ../..:/workspaces:cached
+      - workspace:/workspace
 
 volumes:
-  source:
+  workspace:
