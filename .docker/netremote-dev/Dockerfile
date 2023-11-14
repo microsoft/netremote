@@ -4,6 +4,7 @@ FROM ubuntu:mantic as netremote
 # Set arguments used only in this Dockerfile.
 ARG build_date="2023-11-09T19:51:18Z"
 ARG DEBIAN_FRONTEND=noninteractive
+ARG LLVM_VERSION=17
 
 LABEL maintainer="Andrew Beltrano (anbeltra@microsoft.com)"
 LABEL org.label-schema.build-date = "${build_date}"
@@ -17,27 +18,35 @@ LABEL org.label-schema.schema-version = "1.0"
 RUN apt-get update && \
     apt-get install -qq -y --no-install-recommends \
         # Project build dependencies.
-        # build-essential ca-certificates clang-17 cmake curl dotnet7 git gnupg linux-libc-dev lldb llvm ninja-build pkg-config tar unzip zip
+        # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev lsb-release ninja-build pkg-config software-properties-common tar unzip wget zip
         build-essential \
         ca-certificates \
-        clang-17 \
         cmake \
         curl \
         dotnet7 \
         git \
         gnupg \
         linux-libc-dev \
-        lldb \
-        llvm \
+        lsb-release \
         ninja-build \
         pkg-config \
+        software-properties-common \
         tar \
         unzip \
+        wget \
         zip \
         && \
+    # Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
+    apt-get remove -y --purge clang-16* lldb-16* llvm-16* && \
     # Reduce image size by removing package cache
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install complete llvm toolchain using automatic installation script.
+RUN wget https://apt.llvm.org/llvm.sh && \
+    chmod +x llvm.sh && \
+    ./llvm.sh ${LLVM_VERSION} all && \
+    rm llvm.sh
 
 FROM netremote as netremote-dev
 
@@ -55,7 +64,6 @@ RUN apt-get update && \
         rsync \
         ssh \
         sudo \
-        wget \
         # Generic development tools.
         # clang-format clang-tidy emacs gdb nano policycoreutils-python-utils python-is-python3 vim
         clang-format \
