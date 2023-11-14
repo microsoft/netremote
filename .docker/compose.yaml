@@ -7,11 +7,13 @@ services:
     tty: true
     stdin_open: true
     privileged: true
+    # Enable debugging for ptrace-based debuggers (C++, Go, Rust).
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
 
   netremote-dev-hostapd:
+    extends: netremote-dev
     build:
-      context: netremote-dev
       target: netremote-dev-hostapd
-    tty: true
-    stdin_open: true
-    privileged: true
