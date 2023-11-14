@@ -2,21 +2,13 @@
 services:
   netremote-dev:
     volumes:
-      # Mounts the project folder to '/netremote'.
-      # The source directory is relative to the the compose.yaml file being
-      # extended, which is in .docker/netremote-dev, hence, the workspace root is
-      # 1 levels up (eg. ../).
-    - ../:/netremote:cached
-    # Enable debugging for ptrace-based debuggers (C++, Go, Rust).
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - seccomp:unconfined
+      - ../..:/workspaces:cached
+      - workspace:/workspace
 
   netremote-dev-hostapd:
     volumes:
-    - ../:/netremote:cached
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - seccomp:unconfined
+      - ../..:/workspaces:cached
+      - workspace:/workspace
+
+volumes:
+  workspace:
