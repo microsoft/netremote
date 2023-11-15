@@ -50,6 +50,7 @@
         },
         {
             "name": "dev",
+            "hidden": true,
             "displayName": "Development",
             "description": "Development build for inner-loop",
             "inherits": [
@@ -59,6 +60,7 @@
         {
             "name": "dev-linux",
             "displayName": "Development (Linux)",
+            "description": "Development build for inner-loop on Linux",
             "inherits": [
                 "os-linux",
                 "dev"
@@ -67,6 +69,15 @@
                 "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
                 "CMAKE_C_COMPILER": "/usr/bin/clang-17"
             }
+        },
+        {
+            "name": "dev-windows",
+            "displayName": "Development (Windows)",
+            "description": "Development build for inner-loop on Windows",
+            "inherits": [
+                "os-windows",
+                "dev"
+            ]
         }
     ],
     "buildPresets": [
