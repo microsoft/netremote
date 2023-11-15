@@ -9,11 +9,7 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "cschlosser.doxdocgen",
-                "eamodio.gitlens",
                 "EditorConfig.EditorConfig",
-                "GitHub.copilot-chat",
-                "GitHub.copilot",
                 "ms-vscode.cmake-tools",
                 "ms-vscode.cpptools",
                 "ms-vscode.makefile-tools"
