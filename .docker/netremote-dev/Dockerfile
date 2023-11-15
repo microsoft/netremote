@@ -89,10 +89,6 @@ RUN chmod 0755 /etc/update-motd.d/50-sysinfo && \
     # Permission for entrypoint script
     chmod +x /bin/entrypoint.sh
 
-# Ensure Linux-style line endings are used
-RUN git config --global core.autocrlf input && \
-    git config --global credential.helper 'cache --timeout=36000'
-
 # Set entrypoint and start interactive shell (bash).
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
 CMD /bin/bash -i
