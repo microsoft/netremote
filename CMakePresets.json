@@ -1,0 +1,109 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25
+    },
+    "configurePresets": [
+        {
+            "name": "os-windows",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "os-linux",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "out-of-source-build",
+            "hidden": true,
+            "displayName": "Out of source build",
+            "description": "Configure to build outside of the source tree",
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}"
+        },
+        {
+            "name": "in-source-build",
+            "hidden": true,
+            "displayName": "In source build",
+            "description": "Configure to build inside the source tree",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}"
+        },
+        {
+            "name": "dev-base",
+            "hidden": true,
+            "displayName": "Development (base)",
+            "description": "Base options for all development presets",
+            "inherits": [
+                "out-of-source-build"
+            ]
+        },
+        {
+            "name": "dev",
+            "hidden": true,
+            "displayName": "Development",
+            "description": "Development build for inner-loop",
+            "inherits": [
+                "dev-base"
+            ]
+        },
+        {
+            "name": "dev-linux",
+            "displayName": "Development",
+            "description": "Development build for inner-loop on Linux",
+            "inherits": [
+                "os-linux",
+                "dev"
+            ],
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-17"
+            }
+        },
+        {
+            "name": "dev-windows",
+            "displayName": "Development",
+            "description": "Development build for inner-loop on Windows",
+            "inherits": [
+                "os-windows",
+                "dev"
+            ],
+            "cacheVariables": {
+                "CMAKE_GENERATOR": "Visual Studio 17 2022"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "configuration": "Debug"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test-common",
+            "hidden": true,
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "dev",
+            "configurePreset": "dev",
+            "inherits": [
+                "test-common"
+            ]
+        }
+    ]
+}
