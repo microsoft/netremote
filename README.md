@@ -105,11 +105,11 @@ Use of dev containers in VSCode is the recommended and officially supported deve
 
 1. **[Recommended]** Clone the repository with the 'Dev Containers: Clone Repository in Named Container Volume' dev container extension command. A named volume is a persistent filesystem that is mounted in the container and used to store the repository source code. This allows the source code to survive across container stops, removals, and deletions. As part of the command, you will be prompted to select the named volume to use. On first run, no volumes will have been created so select 'Create a new volume' and give it any name you want (eg `source`). In subsequent command invocations to clone the repository, the source volume will exist and you can select it from the list:
 
-    ![VSCode Clone in Named Container Volume](./doc/vscode-dev-container-prompt-volume-1.png)
+    ![VSCode Clone in Named Container Volume](./doc/vscode-dev-container-prompt-volume.png)
 
-3. Clone the repository as normal. With this method, VSCode will detect a dev container specification and prompt you to open it in a container:
+2. Clone the repository as normal. With this method, VSCode will detect a dev container specification and prompt you to open it in a container:
 
-    ![VSCode Open In Dev Container Prompt](./doc//vscode-dev-container-prompt.png)
+    ![VSCode Open In Dev Container Prompt](./doc/vscode-dev-container-prompt.png)
 
 Select 'Reopen in Container'. Alternatively, you can open the project in the container at any time by invoking the 'Dev Containers: Open Folder in Container' dev container extension at any time.
 
