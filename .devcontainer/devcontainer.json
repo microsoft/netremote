@@ -4,6 +4,7 @@
     "name": "NetRemote Development Environment",
     "dockerComposeFile": "../.docker/compose.yaml",
     "service": "netremote-dev-hostapd",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     "shutdownAction": "none",
     "customizations": {
         "vscode": {
