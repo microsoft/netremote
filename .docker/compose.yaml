@@ -12,8 +12,3 @@ services:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
-
-  netremote-dev-hostapd:
-    extends: netremote-dev
-    build:
-      target: netremote-dev-hostapd

@@ -18,7 +18,7 @@ LABEL org.label-schema.schema-version = "1.0"
 RUN apt-get update && \
     apt-get install -qq -y --no-install-recommends \
         # Project build dependencies.
-        # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev lsb-release ninja-build pkg-config software-properties-common tar unzip wget zip
+        # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
         build-essential \
         ca-certificates \
         cmake \
@@ -27,32 +27,53 @@ RUN apt-get update && \
         git \
         gnupg \
         linux-libc-dev \
-        lsb-release \
         ninja-build \
         pkg-config \
-        software-properties-common \
         tar \
         unzip \
-        wget \
-        zip \
-        && \
-    # Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
-    apt-get remove -y --purge clang-16* lldb-16* llvm-16* && \
-    # Reduce image size by removing package cache
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+        zip
 
 # Install complete llvm toolchain using automatic installation script.
-RUN wget https://apt.llvm.org/llvm.sh && \
+# lsb-release, software-properties-common, and wget are required by the script.
+RUN apt-get install -qq -y --no-install-recommends \
+        lsb-release \
+        software-properties-common \
+        wget && \
+    # Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
+    apt-get remove -y --purge clang-16* lldb-16* llvm-16* && \
+    # Use automatic installation script to install llvm 17 toolchain.
+    wget https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
     ./llvm.sh ${LLVM_VERSION} all && \
+    # Delete the script.
     rm llvm.sh
+
+# Reduce image size by removing package cache
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 FROM netremote as netremote-dev
 
 # Install packages.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        # hostapd build dependencies.
+        # libnl-3-dev libssl-dev libwpa-client-dev libnl-genl-3-dev
+        libnl-3-dev \
+        libnl-genl-3-dev \
+        libssl-dev \
+        libwpa-client-dev \
+        # wpa_supplicant build dependencies.
+        # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+        libdbus-c++-dev \
+        libnl-route-3-dev \
+        # WSL2 kernel development dependencies.
+        # build-essential flex bison dwarves libssl-dev libelf-dev bc
+        bc \
+        bison \
+        dwarves \
+        flex \
+        libelf-dev \
         # Generic tools.
         # dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo wget
         dos2unix \
@@ -92,30 +113,3 @@ RUN chmod 0755 /etc/update-motd.d/50-sysinfo && \
 # Set entrypoint and start interactive shell (bash).
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
 CMD /bin/bash -i
-
-FROM netremote-dev as netremote-dev-hostapd
-
-# Install packages.
-RUN apt-get update && \
-    apt-get install -y -qq --no-install-recommends \
-        # hostapd build dependencies.
-        # libnl-3-dev libssl-dev libwpa-client-dev libnl-genl-3-dev
-        libnl-3-dev \
-        libnl-genl-3-dev \
-        libssl-dev \
-        libwpa-client-dev \
-        # wpa_supplicant build dependencies.
-        # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
-        libdbus-c++-dev \
-        libnl-route-3-dev \
-        # WSL2 kernel development dependencies.
-        # build-essential flex bison dwarves libssl-dev libelf-dev bc
-        bc \
-        bison \
-        dwarves \
-        flex \
-        libelf-dev \
-        && \
-    # Reduce image size by removing package cache
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists
