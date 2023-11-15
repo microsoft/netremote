@@ -93,7 +93,7 @@ To use one of the containers, [install Docker](https://docs.docker.com/get-docke
 docker run -it abeltrano/netremote-dev-hostapd
 ```
 
-![container shell](./doc/docker-run-example.png)
+![container shell](./doc/docker-run-example-1.png)
 
 #### Dev Container
 
