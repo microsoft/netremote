@@ -3,7 +3,7 @@
 {
     "name": "NetRemote Development Environment",
     "dockerComposeFile": "../.docker/compose.yaml",
-    "service": "netremote-dev-hostapd",
+    "service": "netremote-dev",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     "shutdownAction": "none",
     "customizations": {
