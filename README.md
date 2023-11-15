@@ -86,7 +86,7 @@ A Docker image is available that provides a known working Linux development envi
 
 * [abeltrano/netremote-dev](https://hub.docker.com/r/abeltrano/netremote-dev): A container image for development of the project, including hostapd and building modules for the WSL2 kernel.
 
-To the container, [install Docker](https://docs.docker.com/get-docker/) on your development machine, then start an interactive instance, which will bring you to a bash shell:
+To use the Docker container image, [install Docker](https://docs.docker.com/get-docker/) on your development machine, then start an interactive instance, which will bring you to a bash shell:
 
 ```Shell
 docker run -it abeltrano/netremote-dev
