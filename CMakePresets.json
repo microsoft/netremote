@@ -59,7 +59,7 @@
         },
         {
             "name": "dev-linux",
-            "displayName": "Development (Linux)",
+            "displayName": "Development",
             "description": "Development build for inner-loop on Linux",
             "inherits": [
                 "os-linux",
@@ -72,12 +72,15 @@
         },
         {
             "name": "dev-windows",
-            "displayName": "Development (Windows)",
+            "displayName": "Development",
             "description": "Development build for inner-loop on Windows",
             "inherits": [
                 "os-windows",
                 "dev"
-            ]
+            ],
+            "cacheVariables": {
+                "CMAKE_GENERATOR": "Visual Studio 17 2022"
+            }
         }
     ],
     "buildPresets": [
