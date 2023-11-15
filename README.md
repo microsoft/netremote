@@ -92,7 +92,9 @@ To the container, [install Docker](https://docs.docker.com/get-docker/) on your 
 docker run -it abeltrano/netremote-dev
 ```
 
-![container shell](./doc/docker-run-example-1.png)
+![container shell](./doc/docker-run-example.png)
+
+This provides the full development environment but does not sync source code. So instead of using the docker image directly, it is recommended to use a development container described in the [Dev Container](#dev-container) section below.
 
 #### Dev Container
 
