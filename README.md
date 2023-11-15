@@ -66,7 +66,7 @@ CMake may be installed in any form, as long as the version meets the minimum. On
 To bootstrap the build environment, instruct CMake to generate the build files. It is strongly recommended to do this in a directory that is separate from the source; this allows one to easily destroy and recreate the build environment without affecting the checked-out source and changes in progress. Typically, a new directory called `build` at the top-level project tree is used for this purpose:
 
 ```Shell
-git clone git@github.com:abeltrano/netremote.git
+git clone git@github.com:microsoft/netremote.git
 cd netremote
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -Bbuild 
 cmake --build build
@@ -93,26 +93,38 @@ To use one of the containers, [install Docker](https://docs.docker.com/get-docke
 docker run -it abeltrano/netremote-dev-hostapd
 ```
 
-![container shell](./doc/docker-run-example.png)
+![container shell](./doc/docker-run-example-1.png)
+
+#### Dev Container
+
+The docker images are also configured for use with [dev containers](https://containers.dev/). Many IDEs have built-in support for development containers, including but not limited to VSCode. This method is the easiest and fastest way to get a working development environment, especially if you're already using VSCode.
+
+##### VSCode
+
+Use of dev containers in VSCode is the recommended and officially supported development environment. To use this, [install Docker](https://docs.docker.com/get-docker/) on your development machine and install the [Dev Containers VSCode extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers). The Dev Containers extension has two (2) primary ways to use it:
+
+1. **[Recommended]** Clone the repository with the 'Dev Containers: Clone Repository in Named Container Volume' dev container extension command. A named volume is a persistent filesystem that is mounted in the container and used to store the repository source code. This allows the source code to survive across container stops, removals, and deletions. As part of the command, you will be prompted to select the named volume to use. On first run, no volumes will have been created so select 'Create a new volume' and give it any name you want (eg `source`). In subsequent command invocations to clone the repository, the source volume will exist and you can select it from the list:
+
+    ![VSCode Clone in Named Container Volume](./doc/vscode-dev-container-prompt-volume.png)
+
+2. Clone the repository as normal. With this method, VSCode will detect a dev container specification and prompt you to open it in a container:
+
+    ![VSCode Open In Dev Container Prompt](./doc/vscode-dev-container-prompt.png)
+
+Select 'Reopen in Container'. Alternatively, you can open the project in the container at any time by invoking the 'Dev Containers: Open Folder in Container' dev container extension at any time.
+
+A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has very poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. So, this method isn't recommended.
 
 ## Contributing
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+When you submit a pull request, a CLA bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repos using our CLA.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Trademarks
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).  Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
