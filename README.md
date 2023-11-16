@@ -104,17 +104,28 @@ The docker images are also configured for use with [dev containers](https://cont
 
 Use of dev containers in VSCode is the recommended and officially supported development environment. To use this, [install Docker](https://docs.docker.com/get-docker/) on your development machine and install the [Dev Containers VSCode extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers). The Dev Containers extension has two (2) primary ways to use it:
 
-1. **[Recommended]** Clone the repository: press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> or <kbd>F1</kbd> and select the **Dev Containers: Clone Repository in Named Container Volume** dev container extension command. A named volume is a persistent filesystem that is mounted in the container and used to store the repository source code. This allows the source code to survive across container stops, removals, and deletions. As part of the command, you will be prompted to select the named volume to use. On first run, no volumes will have been created so select **Create a new volume** and give it any name you want (eg `source`). In subsequent command invocations to clone the repository, the source volume will exist and you can select it from the list.
+1. **[Recommended]** Cloning directly into a named volume in the container.
+
+    Clone the repository with the dev containers command to use a named volume: press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> or <kbd>F1</kbd> and select the **Dev Containers: Clone Repository in Named Container Volume** dev container extension command. A named volume is a persistent filesystem that is mounted in the container and used to store the repository source code. This allows the source code to survive across container stops, removals, and deletions. As part of the command, you will be prompted to select the named volume to use. On first run, no volumes will have been created so select **Create a new volume** and give it any name you want (eg `source`). In subsequent command invocations to clone the repository, the source volume will exist and you can select it from the list.
 
     ![VSCode Clone in Named Container Volume](./doc/vscode-dev-container-setup.gif)
 
-2. Clone the repository as normal. With this method, VSCode will detect a dev container specification and prompt you to open it in a container:
+2. Cloning locally and sharing source workspace with the container.
+
+    Clone the repository as normal. With this method, VSCode will detect a dev container specification and prompt you to open it in a container:
 
     ![VSCode Open In Dev Container Prompt](./doc/vscode-dev-container-prompt.png)
 
-Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> or <kbd>F1</kbd> and select **Reopen in Container**. Alternatively, you can open the project in the container at any time by invoking the **Dev Containers: Open Folder in Container** dev container extension at any time.
+    Alternatively, you can open the project in the container at any time by invoking the **Dev Containers: Open Folder in Container** dev container extension. Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd> or <kbd>F1</kbd> and select **Reopen in Container**.
 
-A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has very poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. So, this method isn't recommended.
+    A prompt will ask to select a `devcontainer.json` file:
+
+    ![VSCode Select a devcontainer.json file](./doc/vscode-dev-container-prompt-select.png)
+
+    Select **NetRemoteDev-Stateless**, which is configured to mount the workspace directory in a bind mount instead of a volume. The **NetRemoteDev** configuration will not work.
+
+    > [!WARNING]
+    > A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has extremely poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. Therefore, this method is strongly discouraged.
 
 ## Contributing
 
