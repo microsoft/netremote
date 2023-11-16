@@ -111,6 +111,7 @@ Use of dev containers in VSCode is the recommended and officially supported deve
 2. Clone the repository as normal. With this method, VSCode will detect a dev container specification and prompt you to open it in a container:
 
     ![VSCode Open In Dev Container Prompt](./doc/vscode-dev-container-prompt.png)
+
     ![VSCode Select a devcontainer.json file](./doc/vscode-dev-container-prompt-select.png)
 
 For this case, select **NetRemoteDev-Stateless**, which is configured to mount the workspace directory in a bind mount instead of a volume. The **NetRemoteDev** configuration will not work.
