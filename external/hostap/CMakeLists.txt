@@ -1,6 +1,6 @@
 
 # GNU make is required to build the hostap project as it does not include CMake configuration.
-find_program(MAKE_EXE 
+find_program(MAKE 
     NAMES gmake nmake make
     REQUIRED
 )
