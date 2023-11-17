@@ -4,20 +4,6 @@ add_library(wpa-controller STATIC "")
 set(WPA_CONTROLLER_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX ${WPA_CONTROLLER_PUBLIC_INCLUDE}/Wpa)
 
-if (BUILD_HOSTAP_EXTERNAL)
-    add_dependencies(wpa-controller libwpa-client)
-
-    target_link_libraries(wpa-controller
-        PUBLIC
-            libwpa-client
-    )
-else()
-    target_link_libraries(wpa-controller
-        PUBLIC
-            ${LIBWPA_CLIENT}
-    )
-endif()
-
 target_sources(wpa-controller
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/WpaController.cxx
@@ -27,6 +13,13 @@ target_include_directories(wpa-controller
     PUBLIC
         ${WPA_CONTROLLER_PUBLIC_INCLUDE}
 )
+
+target_link_libraries(wpa-controller
+    PUBLIC
+        libwpa-client
+)
+
+add_dependencies(wpa-controller libwpa-client)
 
 list(APPEND WPA_CONTROLLER_PUBLIC_HEADERS
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
