@@ -36,6 +36,16 @@ struct WpaController
     WpaController(std::string_view interfaceName, WpaType type, std::string_view controlSocketPath);
 
     /**
+     * @brief Construct a new WpaController object for the specified interface
+     * using the specified control socket.
+     * 
+     * @param interfaceName The name of the interface to control. Eg. wlan1.
+     * @param type The type of daemon controlling the interface.
+     * @param controlSocketPath The full path to the daemon control socket.
+     */
+    WpaController(std::string_view interfaceName, WpaType type, std::filesystem::path controlSocketPath);
+
+    /**
      * @brief The type of daemon this object is controlling.
      * 
      * @return WpaType 
