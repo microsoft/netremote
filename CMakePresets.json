@@ -113,7 +113,7 @@
                 "test-common"
             ],
             "filter": {
-                "exclude": {
+                "include": {
                     "label": "[local]"
                 }
             }
