@@ -66,8 +66,6 @@ set_target_properties(libwpa-client PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES ${HOSTAP_INSTALL_INCLUDE_DIR}
 )
 
-file(MAKE_DIRECTORY ${HOSTAP_INSTALL_INCLUDE_DIR})
-
 add_dependencies(libwpa-client hostap)
 
 set(LIBWPA_CLIENT
