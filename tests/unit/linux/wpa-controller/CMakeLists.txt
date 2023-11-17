@@ -3,7 +3,6 @@ add_executable(wpa-controller-test-unit)
 
 target_sources(wpa-controller-test-unit
     PRIVATE
-        Main.cxx
         TestWpaController.cxx
 )
 
