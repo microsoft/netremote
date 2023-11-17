@@ -105,6 +105,25 @@
             "inherits": [
                 "test-common"
             ]
+        },
+        {
+            "name": "local-base",
+            "description": "Run tests that don't require a remote connection",
+            "inherits": [
+                "test-common"
+            ],
+            "filter": {
+                "include": {
+                    "label": "[local]"
+                }
+            }
+        },
+        {
+            "name": "local",
+            "configurePreset": "dev-linux",
+            "inherits": [
+                "local-base"
+            ]
         }
     ]
 }

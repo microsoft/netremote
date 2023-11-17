@@ -26,9 +26,6 @@ set(HOSTAP_BINARY_DIR ${HOSTAP_PREFIX}/src/${HOSTAP_EP_NAME}-build)
 set(HOSTAP_INSTALL_DIR ${HOSTAP_PREFIX})
 set(HOSTAP_LOG_DIR ${HOSTAP_STAMP_DIR})
 
-message(STATUS "HOSTAP_PREFIX: ${HOSTAP_PREFIX}")
-message(STATUS "HOSTAP_SOURCE_DIR: ${HOSTAP_SOURCE_DIR}")
-
 # Create local variables for referencing build artifacts.
 set(HOSTAP_INSTALL_INCLUDE_DIR ${HOSTAP_INSTALL_DIR}/usr/local/include)
 set(HOSTAP_INSTALL_LIB_DIR ${HOSTAP_INSTALL_DIR}/usr/local/lib)
