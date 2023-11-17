@@ -7,7 +7,7 @@ else()
         REQUIRED)
 endif()
 
-if(LIBWPA_CLIENT)
+if (LIBWPA_CLIENT)
     set(LIBWPA_CLIENT_TARGET ${LIBWPA_CLIENT})
     MESSAGE(STATUS "Found wpa client: ${LIBWPA_CLIENT}")
 endif()
