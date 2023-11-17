@@ -46,7 +46,7 @@ set(LIBWPA_CLIENT
 )
 
 set(HOSTAPD_BIN
-    ${HOSTAP_LOCAL_BIN_DIR}/hopstapd
+    ${HOSTAP_LOCAL_BIN_DIR}/hostapd
     CACHE FILEPATH    
     "hostapd daemon binary"
 )
