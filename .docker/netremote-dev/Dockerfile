@@ -58,11 +58,10 @@ FROM netremote as netremote-dev
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         # hostapd build dependencies.
-        # libnl-3-dev libssl-dev libwpa-client-dev libnl-genl-3-dev
+        # libnl-3-dev libssl-dev libnl-genl-3-dev
         libnl-3-dev \
         libnl-genl-3-dev \
         libssl-dev \
-        libwpa-client-dev \
         # wpa_supplicant build dependencies.
         # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
         libdbus-c++-dev \
@@ -86,9 +85,7 @@ RUN apt-get update && \
         ssh \
         sudo \
         # Generic development tools.
-        # clang-format clang-tidy emacs gdb nano policycoreutils-python-utils python-is-python3 vim
-        clang-format \
-        clang-tidy \
+        # emacs gdb nano policycoreutils-python-utils python-is-python3 vim
         emacs \
         gdb \
         nano \
