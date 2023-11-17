@@ -17,6 +17,7 @@ target_include_directories(wpa-controller
 target_link_libraries(wpa-controller
     PUBLIC
         libwpa-client
+        magic_enum::magic_enum
 )
 
 list(APPEND WPA_CONTROLLER_PUBLIC_HEADERS

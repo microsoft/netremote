@@ -16,6 +16,7 @@ target_link_libraries(netremote-test-unit
     PRIVATE
         Catch2::Catch2WithMain
         gRPC::grpc++
+        magic_enum::magic_enum
         netremote-service
 )
 
