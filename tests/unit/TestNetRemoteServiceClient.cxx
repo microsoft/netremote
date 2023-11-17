@@ -17,7 +17,7 @@ constexpr auto RemoteServiceAddressHttp = "localhost:5047";
 [[maybe_unused]] constexpr auto RemoteServiceAddressHttps = "localhost:7073";
 } // namespace detail
 
-TEST_CASE("net remote service can be reached", "[basic][rpc][client]")
+TEST_CASE("net remote service can be reached", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
