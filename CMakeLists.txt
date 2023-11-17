@@ -24,14 +24,6 @@ endif()
 
 MESSAGE(STATUS "Target OS ${CMAKE_SYSTEM_NAME} detected")
 
-# Option determining whether the hostapd client library should be built from
-# source, or a pre-built, packaged version discovered on the system.
-option(
-  BUILD_HOSTAP_EXTERNAL
-  "Build hostap project from built-in external source"
-  ON
-)
-
 # Set language configutation options. The C++ standard used must be the lowest
 # common denominator for all the OS-dependent projects. In practice, since this
 # project must build under the Windows build system (build.exe), its toolchain
