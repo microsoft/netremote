@@ -64,6 +64,7 @@ add_library(libwpa-client SHARED IMPORTED GLOBAL)
 set_target_properties(libwpa-client PROPERTIES
     IMPORTED_LOCATION ${HOSTAP_INSTALL_LIB_DIR}/libwpa_client.so
     INTERFACE_INCLUDE_DIRECTORIES ${HOSTAP_INSTALL_INCLUDE_DIR}
+    IMPORTED_NO_SONAME TRUE
 )
 
 add_dependencies(libwpa-client hostap)
