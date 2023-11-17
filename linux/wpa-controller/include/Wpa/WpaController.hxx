@@ -3,6 +3,8 @@
 #define WPA_CONTROLLER_HXX
 
 #include <filesystem>
+#include <shared_mutex>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -90,9 +92,22 @@ struct WpaController
     };
 
 private:
+    /**
+     * @brief Get the control socket object. If a socket connection does not
+     * exist, one will be established.
+     * 
+     * @return struct wpa_ctrl*
+     */
+    struct wpa_ctrl*
+    GetCommandControlSocket();
+
+private:
     const WpaType m_type;
     const std::string m_interfaceName;
     std::filesystem::path m_controlSocketPath;
+    // Protects m_controlSocketCommand.
+    std::shared_mutex m_controlSocketCommandGate;
+    struct wpa_ctrl* m_controlSocketCommand{ nullptr };
 };
 } // namespace Wpa
 
