@@ -28,8 +28,7 @@ TEST_CASE("Send/receive WpaController request/response", "[wpa][client][remote]"
         {
             WpaController wpaController(InterfaceNameDefault, wpaType);
 
-            WpaCommand wpaCommand;
-            wpaCommand.Data = "PING";
+            WpaCommand wpaCommand("PING");
             std::shared_ptr<WpaResponse> wpaResponse;
             REQUIRE_NOTHROW(wpaResponse = wpaController.SendCommand(wpaCommand));
             REQUIRE(wpaResponse != nullptr);
