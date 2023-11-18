@@ -19,8 +19,6 @@ target_link_libraries(wpa-controller
         libwpa-client
 )
 
-add_dependencies(wpa-controller libwpa-client)
-
 list(APPEND WPA_CONTROLLER_PUBLIC_HEADERS
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCore.hxx
