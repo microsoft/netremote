@@ -2,6 +2,7 @@
 #ifndef WPA_COMMAND_HXX
 #define WPA_COMMAND_HXX
 
+#include <string_view>
 #include <string>
 
 namespace Wpa
@@ -12,6 +13,9 @@ namespace Wpa
  */
 struct WpaCommand
 {
+    WpaCommand() = default;
+    WpaCommand(std::string_view data);
+
     std::string Data;
 };
 } // namespace Wpa
