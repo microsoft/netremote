@@ -4,6 +4,7 @@ add_executable(wpa-controller-test-unit)
 target_sources(wpa-controller-test-unit
     PRIVATE
         TestWpaController.cxx
+        WpaDaemonCatch2EventListener.cxx
 )
 
 target_link_libraries(wpa-controller-test-unit
