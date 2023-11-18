@@ -7,16 +7,45 @@
 
 #include <Wpa/WpaController.hxx>
 
+namespace TestDetail
+{
+constexpr auto InterfaceNameDefault = "wlan0";
+constexpr auto ControlSocketPathBase = "/run/";
+
+constexpr auto WpaTypesSupported = {
+    Wpa::WpaType::Hostapd,
+};
+} // namespace TestDetail  
+
+TEST_CASE("Send/receive WpaController request/response", "[wpa][client][remote]")
+{
+    using namespace TestDetail;
+    using namespace Wpa;
+
+    SECTION("Send/receive WpaCommand/WpaResponse")
+    {
+        for (const auto& wpaType : TestDetail::WpaTypesSupported)
+        {
+            WpaController wpaController(InterfaceNameDefault, wpaType);
+
+            WpaCommand wpaCommand;
+            wpaCommand.Data = "PING";
+            std::shared_ptr<WpaResponse> wpaResponse;
+            REQUIRE_NOTHROW(wpaResponse = wpaController.SendCommand(wpaCommand));
+            REQUIRE(wpaResponse != nullptr);
+            REQUIRE(wpaResponse->Payload == "PONG");
+        }
+    }
+}
+
 TEST_CASE("Create a WpaController", "[wpa][client][local]")
 {
-    static constexpr auto InterfaceNameDefault = "wlan0";
-    static constexpr auto ControlSocketPathBase = "/run/";
+    using namespace TestDetail;
+    using namespace Wpa;
 
     const auto ControlSocketPath = std::filesystem::path(ControlSocketPathBase) / InterfaceNameDefault;
     const auto ControlSocketPathString = ControlSocketPath.string();
     const auto ControlSocketPathStringView = std::string_view(ControlSocketPathString);
-
-    using namespace Wpa;
 
     SECTION("Create for each daemon type doesn't cause a crash")
     {
