@@ -17,16 +17,14 @@ struct WpaDaemonInstance : public IWpaDaemonInstance
 {
     void OnStarting() override
     {
-
     }
 
     void OnStopping() override
     {
-
     }
 
 private:
-    static constexpr Wpa::WpaType m_wpaType = wpaType;
+    static constexpr Wpa::WpaType m_wpaType{ wpaType };
 };
 
 #endif // WPA_DAEMON_INSTANCE_HXX
