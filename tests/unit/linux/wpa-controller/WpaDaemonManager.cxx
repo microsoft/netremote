@@ -16,8 +16,9 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     // Note: The user running the test must have root privileges to execute the below command, either directly (root uid) or as a sudoer.
     // Load the mac80211_hwsim kernel module to simulate a wireless interface.
     int ret = std::system("sudo modprobe mac80211_hwsim radios=1");
-    if (ret != 0)
+    if (ret == -1)
     {
+        ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to load mac80211_hwsim kernel module, ret={}\n", ret);
         return std::nullopt;
     }
@@ -32,8 +33,9 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     // Start the daemon, passing the -P option which will create a file containing its pid.
     const auto wpaDaemonStartCommand = std::format("{} -B -P {} -i {} {}", wpaDaemon, pidFilePath.c_str(), interfaceName, arguments);
     ret = std::system(wpaDaemonStartCommand.c_str());
-    if (ret != 0)
+    if (ret == -1)
     {
+        ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to start wpa {} daemon, ret={}\n", magic_enum::enum_name(wpaType), ret);
         return std::nullopt;
     }
