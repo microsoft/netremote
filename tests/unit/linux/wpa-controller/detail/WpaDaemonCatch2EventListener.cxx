@@ -114,7 +114,7 @@ void WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& t
 
 void WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& testCaseStats)
 {
-    std::cout << std::format("Test case ended: {}", testCaseStats.testInfo->name);
+    std::cout << std::format("Test case ended: {}\n", testCaseStats.testInfo->name);
 
     const auto wpaType = detail::GetWpaDaemonTypeFromTags(testCaseStats.testInfo->tags);
     if (!wpaType.has_value())

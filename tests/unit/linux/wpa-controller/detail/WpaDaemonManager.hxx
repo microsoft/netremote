@@ -18,9 +18,24 @@ struct WpaDaemonInstanceHandle
 
 struct WpaDaemonManager
 {
+    /**
+     * @brief Starts an instance of the specified wpa daemon type.
+     * 
+     * @param wpaType The type of wpa daemon to start. 
+     * @param interfaceName The wlan interface for the daemon to use.
+     * @param commandLineArguments The command line arguments to be passed to the daemon binary.
+     * @return std::optional<WpaDaemonInstanceHandle> 
+     */
     static std::optional<WpaDaemonInstanceHandle> Start(Wpa::WpaType wpaType, const std::string& interfaceName = "wlan0", const std::string& commandLineArguments = "");
 
-    static bool Stop(const WpaDaemonInstanceHandle& instanceToken);
+    /**
+     * @brief Stop a running instance of the specified wpa daemon.
+     * 
+     * @param instanceHandle The handle to the daemon instance to stop. 
+     * @return true 
+     * @return false 
+     */
+    static bool Stop(const WpaDaemonInstanceHandle& instanceHandle);
 };
 
 #endif // WPA_DAEMON_MANAGER_HXX
