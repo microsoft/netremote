@@ -11,6 +11,12 @@
 #include "WpaDaemonManager.hxx"
 
 /* static */
+bool WpaDaemonManager::CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName, const std::string& configurationFilePath)
+{
+     
+}
+
+/* static */
 std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaType, const std::string& interfaceName, const std::string& commandLineArguments)
 {
     // Note: The user running the test must have root privileges to execute the below command, either directly (root uid) or as a sudoer.

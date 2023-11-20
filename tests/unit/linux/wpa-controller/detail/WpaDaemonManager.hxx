@@ -2,12 +2,14 @@
 #ifndef WPA_DAEMON_MANAGER_HXX
 #define WPA_DAEMON_MANAGER_HXX
 
+#include <filesystem>
 #include <optional>
 #include <string>
 
 #include <unistd.h>
 #include <sys/types.h>
 
+#include "detail/WpaDaemonManager.hxx"
 #include <Wpa/WpaCore.hxx>
 
 struct WpaDaemonInstanceHandle
@@ -18,6 +20,20 @@ struct WpaDaemonInstanceHandle
 
 struct WpaDaemonManager
 {
+    static constexpr auto InterfaceNameDefault{"wlan0"};
+    static constexpr auto ControlSocketPathBase{"/run/"};
+
+    /**
+     * @brief Create a default configuration file for the specified wpa daemon type.
+     * 
+     * @param wpaType The type of wpa daemon to create the configuration file for.
+     * @param interfaceName The wlan interface for the daemon to use.
+     * @param configurationFilePath The path to the configuration file to create.
+     * @return true 
+     * @return false 
+     */
+    static bool CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName, const std::string& configurationFilePath);
+
     /**
      * @brief Starts an instance of the specified wpa daemon type.
      * 

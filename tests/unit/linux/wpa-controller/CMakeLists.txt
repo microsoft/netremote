@@ -8,6 +8,11 @@ target_sources(wpa-controller-test-unit
         detail/WpaDaemonManager.cxx
 )
 
+target_include_directories(wpa-controller-test-unit
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 target_link_libraries(wpa-controller-test-unit
     PRIVATE
         Catch2::Catch2WithMain
