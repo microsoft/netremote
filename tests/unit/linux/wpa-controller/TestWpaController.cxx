@@ -17,7 +17,7 @@ constexpr auto WpaTypesSupported = {
 };
 } // namespace TestDetail  
 
-TEST_CASE("Send/receive WpaController request/response", "[wpa][client][remote]")
+TEST_CASE("Send/receive WpaController request/response", "[wpa][hostapd][client][remote]")
 {
     using namespace TestDetail;
     using namespace Wpa;
