@@ -5,18 +5,22 @@
 #include <optional>
 #include <string>
 
+#include <unistd.h>
+#include <sys/types.h>
+
 #include <Wpa/WpaCore.hxx>
 
-struct WpaDaemonInstanceToken
+struct WpaDaemonInstanceHandle
 {
     Wpa::WpaType WpaType;
+    std::optional<pid_t> Pid;
 };
 
 struct WpaDaemonManager
 {
-    static std::optional<WpaDaemonInstanceToken> Start(Wpa::WpaType wpaType, const std::string interfaceName = "wlan0", const std::string& commandLineArguments = "");
+    static std::optional<WpaDaemonInstanceHandle> Start(Wpa::WpaType wpaType, const std::string& interfaceName = "wlan0", const std::string& commandLineArguments = "");
 
-    static bool Stop(const WpaDaemonInstanceToken& instanceToken);
+    static bool Stop(const WpaDaemonInstanceHandle& instanceToken);
 };
 
 #endif // WPA_DAEMON_MANAGER_HXX

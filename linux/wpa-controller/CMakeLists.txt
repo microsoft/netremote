@@ -7,6 +7,7 @@ set(WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX ${WPA_CONTROLLER_PUBLIC_INCLUDE}/Wpa)
 target_sources(wpa-controller
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/WpaCommand.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/WpaCore.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaController.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaResponse.cxx
     PUBLIC

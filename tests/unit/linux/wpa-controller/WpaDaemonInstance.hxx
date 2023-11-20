@@ -48,7 +48,7 @@ struct WpaDaemonInstance : public IWpaDaemonInstance
     }
 
 private:
-    std::optional<WpaDaemonInstanceToken> m_instanceToken;
+    std::optional<WpaDaemonInstanceHandle> m_instanceToken;
     static constexpr Wpa::WpaType m_wpaType{ wpaType };
 };
 
