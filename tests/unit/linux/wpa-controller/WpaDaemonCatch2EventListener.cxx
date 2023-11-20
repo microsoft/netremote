@@ -88,9 +88,9 @@ void WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& t
         return;
     }
 
-    const auto wpaTypeName = magic_enum::enum_name(wpaType.value());
+    const auto wpaDaemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType.value());
 
-    std::cout << std::format("Test case for {} daemon starting\n", wpaTypeName);
+    std::cout << std::format("Test case for {} daemon starting\n", wpaDaemon);
 
     std::unique_ptr<IWpaDaemonInstance> wpaDaemonInstance;
     switch (wpaType.value())
@@ -123,13 +123,13 @@ void WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& tes
         return;
     }
 
-    const auto wpaTypeName = magic_enum::enum_name(wpaType.value());
+    const auto wpaDaemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType.value());
 
-    std::cout << std::format("Test case for {} daemon stopping\n", wpaTypeName);
+    std::cout << std::format("Test case for {} daemon stopping\n", wpaDaemon);
     auto wpaDaemonInstanceNode = m_wpaDaemonInstances.extract(wpaType.value());
     if (wpaDaemonInstanceNode.empty())
     {
-        std::cout << std::format("Test case for {} daemon does not have an instance.", wpaTypeName) << std::endl;
+        std::cout << std::format("Test case for {} daemon does not have an instance.", wpaDaemon) << std::endl;
         return;
     }
 

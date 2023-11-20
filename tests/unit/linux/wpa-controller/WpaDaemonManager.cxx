@@ -27,7 +27,7 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     const auto wpaDaemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
     const auto arguments = !std::empty(commandLineArguments)
         ? commandLineArguments
-        : std::format("-c {}.conf {}", wpaDaemon, commandLineArguments);
+        : std::format("{} /etc/{}.conf {}", (wpaType == Wpa::WpaType::WpaSupplicant) ? "-c" : "", wpaDaemon, commandLineArguments);
     const auto pidFilePath{ std::filesystem::temp_directory_path() / std::format("{}.pid", wpaDaemon) };
 
     // Start the daemon, passing the -P option which will create a file containing its pid.
