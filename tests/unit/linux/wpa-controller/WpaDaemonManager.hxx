@@ -3,6 +3,7 @@
 #define WPA_DAEMON_MANAGER_HXX
 
 #include <optional>
+#include <string>
 
 #include <Wpa/WpaCore.hxx>
 
@@ -13,7 +14,7 @@ struct WpaDaemonInstanceToken
 
 struct WpaDaemonManager
 {
-    static std::optional<WpaDaemonInstanceToken> Start(Wpa::WpaType wpaType);
+    static std::optional<WpaDaemonInstanceToken> Start(Wpa::WpaType wpaType, const std::string interfaceName = "wlan0", const std::string& commandLineArguments = "");
 
     static bool Stop(const WpaDaemonInstanceToken& instanceToken);
 };
