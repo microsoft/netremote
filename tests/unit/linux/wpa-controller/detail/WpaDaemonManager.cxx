@@ -12,6 +12,17 @@
 
 namespace detail
 {
+/**
+ * @brief Default hostapd configuration file contents.
+ * 
+ * This configuration file supports WPA2 with typical security settings. It is
+ * meant to be used with a virtualized wlan device created with the
+ * mac80211_hwsim kernel module. The intention is to use this for basic control
+ * socket tests, not to exercise specifically wlan functionality.
+ * 
+ * This string must be formatted with std::format() to provide the interface
+ * name as the first interpolation argument.
+ */
 static constexpr auto WpaDaemonHostapdConfigurationFileContentsFormat = R"CONFIG(
     interface={}
     driver=nl80211
@@ -27,6 +38,14 @@ static constexpr auto WpaDaemonHostapdConfigurationFileContentsFormat = R"CONFIG
     rsn_pairwise=CCMP
 )CONFIG";
 
+/**
+ * @brief Write the default configuration file contents for the specified wpa
+ * daemon type to the specified file stream.
+ * 
+ * @param wpaType The type of wpa daemon to write the configuration file for.
+ * @param interfaceName The wlan interface the daemon will be managing.
+ * @param configurationFile The file stream to write the configuration file to.
+ */
 void WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, const std::string& interfaceName, std::ofstream& configurationFile)
 {
     switch (wpaType)
@@ -45,7 +64,7 @@ void WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, const std::stri
 } // namespace detail
 
 /* static */
-std::filesystem::path WpaDaemonManager::CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName)
+std::filesystem::path WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName)
 {
     // Determine which daemon to create the configuration file for.
     const auto wpaDaemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
