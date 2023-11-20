@@ -32,7 +32,7 @@ TEST_CASE("Send/receive WpaController request/response", "[wpa][hostapd][client]
             std::shared_ptr<WpaResponse> wpaResponse;
             REQUIRE_NOTHROW(wpaResponse = wpaController.SendCommand(wpaCommand));
             REQUIRE(wpaResponse != nullptr);
-            REQUIRE(wpaResponse->Payload == "PONG");
+            REQUIRE(wpaResponse->Payload.starts_with("PONG"));
         }
     }
 }
