@@ -10,10 +10,61 @@
 #include <signal.h>
 #include "WpaDaemonManager.hxx"
 
-/* static */
-bool WpaDaemonManager::CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName, const std::string& configurationFilePath)
+namespace detail
 {
-     
+static constexpr auto WpaDaemonHostapdConfigurationFileContentsFormat = R"CONFIG(
+    interface={}
+    driver=nl80211
+    ctrl_interface=/var/run/hostapd
+    ssid=wificontrollertest
+    hw_mode=g
+    channel=1
+    auth_algs=3
+    wpa=2
+    wpa_passphrase=password
+    wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
+    wpa_pairwise=TKIP CCMP
+    rsn_pairwise=CCMP
+)CONFIG";
+
+void WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, const std::string& interfaceName, std::ofstream& configurationFile)
+{
+    switch (wpaType)
+    {
+    case Wpa::WpaType::Hostapd:
+    {
+        configurationFile << std::format(WpaDaemonHostapdConfigurationFileContentsFormat, interfaceName);
+        break;
+    }
+    default:
+    {
+        throw std::runtime_error(std::format("Unsupported wpa daemon type '{}'", magic_enum::enum_name(wpaType)));
+    }
+    }
+}
+} // namespace detail
+
+/* static */
+std::filesystem::path WpaDaemonManager::CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName)
+{
+    // Determine which daemon to create the configuration file for.
+    const auto wpaDaemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
+    const auto wpaDaemonConfigurationFilePath = std::filesystem::temp_directory_path() / std::format("{}.conf", wpaDaemon);
+
+    // Create the configuration file.
+    const auto wpaDaemonConfigurationFileStatus = std::filesystem::status(wpaDaemonConfigurationFilePath);
+    if (std::filesystem::exists(wpaDaemonConfigurationFileStatus))
+    {
+        return wpaDaemonConfigurationFilePath;
+    }
+
+    // Write default configuration file contents.
+    std::ofstream wpaDaemonConfigurationFile{ wpaDaemonConfigurationFilePath };
+    detail::WriteDefaultConfigurationFileContents(wpaType, interfaceName, wpaDaemonConfigurationFile);
+    wpaDaemonConfigurationFile.flush();
+    wpaDaemonConfigurationFile.close();
+
+    return wpaDaemonConfigurationFilePath;
 }
 
 /* static */

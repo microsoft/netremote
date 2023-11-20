@@ -20,7 +20,14 @@ struct WpaDaemonInstanceHandle
 
 struct WpaDaemonManager
 {
+    /**
+     * @brief The default interface name used, if not provided.
+     */
     static constexpr auto InterfaceNameDefault{"wlan0"};
+
+    /**
+     * @brief The default path to the daemon control socket, if not specified.
+     */
     static constexpr auto ControlSocketPathBase{"/run/"};
 
     /**
@@ -28,11 +35,9 @@ struct WpaDaemonManager
      * 
      * @param wpaType The type of wpa daemon to create the configuration file for.
      * @param interfaceName The wlan interface for the daemon to use.
-     * @param configurationFilePath The path to the configuration file to create.
-     * @return true 
-     * @return false 
+     * @return std::filesystem::path The path to the created configuration file.
      */
-    static bool CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName, const std::string& configurationFilePath);
+    static std::filesystem::path CreateDefaultConfigurationFile(Wpa::WpaType wpaType, const std::string& interfaceName);
 
     /**
      * @brief Starts an instance of the specified wpa daemon type.
