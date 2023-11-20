@@ -36,7 +36,7 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     if (ret == -1)
     {
         ret = WEXITSTATUS(ret);
-        std::cerr << std::format("Failed to start wpa {} daemon, ret={}\n", magic_enum::enum_name(wpaType), ret);
+        std::cerr << std::format("Failed to start wpa '{}' daemon, ret={}\n", wpaDaemon, ret);
         return std::nullopt;
     }
 
@@ -44,7 +44,7 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     std::ifstream pidFile{ pidFilePath };
     if (!pidFile.is_open())
     {
-        std::cerr << std::format("Failed to open pid file for wpa {} daemon\n", wpaDaemon);
+        std::cerr << std::format("Failed to open pid file for wpa '{}' daemon\n", wpaDaemon);
         return std::nullopt;
     }
 
@@ -55,9 +55,11 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     pidFileContents >> pid;
     if (pid == 0 || pidFileContents.fail())
     {
-        std::cerr << std::format("Failed to read pid file {} for wpa {} daemon\n", pidFilePath.c_str(), wpaDaemon);
+        std::cerr << std::format("Failed to read pid file {} for wpa '{}' daemon\n", pidFilePath.c_str(), wpaDaemon);
         return std::nullopt;
     }
+
+    std::cout << std::format("Started wpa '{}' daemon with pid {}\n", wpaDaemon, pid);
 
     // Return a handle to the daemon instance.
     return WpaDaemonInstanceHandle{ 
@@ -73,9 +75,12 @@ bool WpaDaemonManager::Stop(const WpaDaemonInstanceHandle& instanceHandle)
     int ret = kill(instanceHandle.Pid, SIGTERM);
     if (ret != 0)
     {
-        std::cerr << std::format("Failed to stop wpa {} daemon, ret={}\n", magic_enum::enum_name(instanceHandle.WpaType), ret);
+        std::cerr << std::format("Failed to stop wpa '{}' daemon, ret={}\n", magic_enum::enum_name(instanceHandle.WpaType), ret);
         return false;
     }
+
+    const auto wpaDaemon = Wpa::GetWpaTypeDaemonBinaryName(instanceHandle.WpaType);
+    std::cout << std::format("Stopped wpa '{}' daemon with pid {}\n", wpaDaemon, instanceHandle.Pid);
 
     return true;
 }

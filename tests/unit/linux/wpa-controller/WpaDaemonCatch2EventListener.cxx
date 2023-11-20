@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <format>
 #include <iostream>
 #include <optional>
 #include <ranges>
@@ -47,6 +48,8 @@ inline bool CaseInsensitiveStringEquals(std::string_view lhs, std::string_view r
  * matches the enum name of a WpaType. A case insensitive comparison is used to
  * allow the tags to be lower case, which is idiomatic for Catch2.
  * 
+ * TODO: change this to return a vector or unordered_set of WpaType values.
+ * 
  * @param tags The list of test tags to search.
  * @return std::optional<Wpa::WpaType> 
  */
@@ -75,7 +78,7 @@ std::optional<Wpa::WpaType> GetWpaDaemonTypeFromTags([[maybe_unused]] const std:
 
 void WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& testInfo)
 {
-    std::cout << "Test case starting: " << testInfo.name << std::endl;
+    std::cout << std::format("Test case starting: {}\n", testInfo.name);
 
     // Determine if this test case has a tag corresponding to a wpa daemon type (WpaType).
     const auto wpaType = detail::GetWpaDaemonTypeFromTags(testInfo.tags);
@@ -87,7 +90,7 @@ void WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& t
 
     const auto wpaTypeName = magic_enum::enum_name(wpaType.value());
 
-    std::cout << "Test case for {} daemon starting" << wpaTypeName << std::endl;
+    std::cout << std::format("Test case for {} daemon starting\n", wpaTypeName);
 
     std::unique_ptr<IWpaDaemonInstance> wpaDaemonInstance;
     switch (wpaType.value())
@@ -111,7 +114,7 @@ void WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& t
 
 void WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& testCaseStats)
 {
-    std::cout << "Test case ended: " << testCaseStats.testInfo->name << std::endl;
+    std::cout << std::format("Test case ended: {}", testCaseStats.testInfo->name);
 
     const auto wpaType = detail::GetWpaDaemonTypeFromTags(testCaseStats.testInfo->tags);
     if (!wpaType.has_value())
@@ -122,11 +125,11 @@ void WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& tes
 
     const auto wpaTypeName = magic_enum::enum_name(wpaType.value());
 
-    std::cout << "Test case for {} daemon stopping" << wpaTypeName << std::endl;
+    std::cout << std::format("Test case for {} daemon stopping\n", wpaTypeName);
     auto wpaDaemonInstanceNode = m_wpaDaemonInstances.extract(wpaType.value());
     if (wpaDaemonInstanceNode.empty())
     {
-        std::cout << "Test case for {} daemon does not have an instance." << wpaTypeName << std::endl;
+        std::cout << std::format("Test case for {} daemon does not have an instance.", wpaTypeName) << std::endl;
         return;
     }
 
@@ -134,4 +137,3 @@ void WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& tes
     wpaDaemonInstance->OnStopping();
     wpaDaemonInstance.reset();
 }
-
