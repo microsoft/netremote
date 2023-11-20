@@ -13,7 +13,7 @@
 struct WpaDaemonInstanceHandle
 {
     Wpa::WpaType WpaType;
-    std::optional<pid_t> Pid;
+    pid_t Pid;
 };
 
 struct WpaDaemonManager

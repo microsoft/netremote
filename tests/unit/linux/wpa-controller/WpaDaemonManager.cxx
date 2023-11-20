@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include <magic_enum.hpp>
+#include <signal.h>
 #include "WpaDaemonManager.hxx"
 
 /* static */
@@ -28,7 +29,7 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
         : std::format("-c {}.conf {}", wpaDaemon, commandLineArguments);
     const auto pidFilePath{ std::filesystem::temp_directory_path() / std::format("{}.pid", wpaDaemon) };
 
-    // Start the daemon.
+    // Start the daemon, passing the -P option which will create a file containing its pid.
     const auto wpaDaemonStartCommand = std::format("{} -B -P {} -i {} {}", wpaDaemon, pidFilePath.c_str(), interfaceName, arguments);
     ret = std::system(wpaDaemonStartCommand.c_str());
     if (ret != 0)
@@ -37,34 +38,37 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
         return std::nullopt;
     }
 
-    WpaDaemonInstanceHandle instanceHandle{ wpaType, std::nullopt };
-
-    // Get the pid of the running daemon.
+    // Open the pid file on the running daemon.
     std::ifstream pidFile{ pidFilePath };
-    if (pidFile.is_open())
+    if (!pidFile.is_open())
     {
-        pid_t pid{0};
-        std::stringstream pidFileContents{};
-        pidFileContents << pidFile.rdbuf();
-        pidFileContents >> pid;
+        std::cerr << std::format("Failed to open pid file for wpa {} daemon\n", wpaDaemon);
+        return std::nullopt;
+    }
 
-        if (pid != 0 && !pidFileContents.fail())
-        {
-            instanceHandle.Pid = pid;
-        }
+    // Read the pid from the daemon pid file.
+    pid_t pid{0};
+    std::stringstream pidFileContents{};
+    pidFileContents << pidFile.rdbuf();
+    pidFileContents >> pid;
+    if (pid == 0 || pidFileContents.fail())
+    {
+        std::cerr << std::format("Failed to read pid file {} for wpa {} daemon\n", pidFilePath.c_str(), wpaDaemon);
+        return std::nullopt;
     }
 
     // Return a handle to the daemon instance.
-    return std::move(instanceHandle);
+    return WpaDaemonInstanceHandle{ 
+        .WpaType = wpaType,
+        .Pid = pid
+    };
 }
 
 /* static */
 bool WpaDaemonManager::Stop(const WpaDaemonInstanceHandle& instanceHandle)
 {
-    // Kill the process, or all processes matching the name if the pid is not known.
-    int ret = (instanceHandle.Pid.has_value())
-        ? std::system(std::format("kill {}", instanceHandle.Pid.value()).c_str())
-        : std::system(std::format("killall -I {}", Wpa::GetWpaTypeDaemonBinaryName(instanceHandle.WpaType)).c_str());
+    // Kill the process associated with the daemon instance.
+    int ret = kill(instanceHandle.Pid, SIGTERM);
     if (ret != 0)
     {
         std::cerr << std::format("Failed to stop wpa {} daemon, ret={}\n", magic_enum::enum_name(instanceHandle.WpaType), ret);
