@@ -45,6 +45,8 @@ struct WifiVirtualDeviceManager
      * @brief Remove all virtual wlan interfaces for the specified driver.
      * 
      * @param driverName The driver name to remove the virtual wlan interfaces for.
+     * @return true 
+     * @return false 
      */
     bool RemoveInterfaces(std::string_view driverName = DriverDefault);
 
@@ -64,11 +66,11 @@ public:
     static std::unordered_set<std::string> CreateInterfacesForDriver(uint32_t numberOfInterfaces, std::string_view driverName);
 
     /**
-     * @brief 
+     * @brief Remove all virtual wlan interfaces for the specified driver.
      * 
-     * @param driverName 
-     * @return true 
-     * @return false 
+     * @param driverName The driver name to remove the virtual wlan interfaces for.
+     * @return true All virtual wlan interfaces for the specified driver were removed.
+     * @return false Not all virtual wlan interfaces for the specified driver were removed.
      */
     static bool RemoveInterfacesForDriver(std::string_view driverName);
 
