@@ -18,12 +18,12 @@ struct WifiVirtualDeviceManager
     /**
      * @brief Driver name for the mac80211_hwsim driver.
      */
-    static constexpr auto DriverMax80211HwsimName = "mac80211_hwsim";
+    static constexpr auto DriverMac80211HwsimName = "mac80211_hwsim";
 
     /**
      * @brief Default driver used if none is specified.
      */
-    static constexpr auto DriverDefault = DriverMax80211HwsimName;
+    static constexpr auto DriverDefault = DriverMac80211HwsimName;
 
     /**
      * @brief Create a certain number of virtual wlan interfaces using the specified driver.

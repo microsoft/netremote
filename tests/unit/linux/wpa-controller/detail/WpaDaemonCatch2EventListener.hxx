@@ -9,6 +9,7 @@
 #include <catch2/reporters/catch_reporter_registrars.hpp>
 #include <Wpa/WpaCore.hxx>
 
+#include "WifiVirtualDeviceManager.hxx"
 #include "WpaDaemonInstance.hxx"
 
 struct WpaDaemonCatch2EventListener : public Catch::EventListenerBase
@@ -22,6 +23,7 @@ struct WpaDaemonCatch2EventListener : public Catch::EventListenerBase
 
 private:
     std::unordered_map<Wpa::WpaType, std::unique_ptr<IWpaDaemonInstance>> m_wpaDaemonInstances;
+    WifiVirtualDeviceManager m_wifiVirtualDeviceManager;
 };
 
 CATCH_REGISTER_LISTENER(WpaDaemonCatch2EventListener)

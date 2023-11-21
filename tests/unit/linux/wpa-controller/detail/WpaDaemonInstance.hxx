@@ -20,10 +20,10 @@ struct WpaDaemonInstance : public IWpaDaemonInstance
 {
     void OnStarting() override
     {
-        auto instanceToken = WpaDaemonManager::Start(m_wpaType);
+        auto instanceToken = WpaDaemonManager::StartDefault(m_wpaType);
         if (!instanceToken.has_value())
         {
-            std::cerr << std::format("Failed to start wpa {} daemon instance", magic_enum::enum_name(m_wpaType));
+            std::cerr << std::format("Failed to start wpa {} daemon instance\n", magic_enum::enum_name(m_wpaType));
             return;
         }
 
@@ -34,13 +34,13 @@ struct WpaDaemonInstance : public IWpaDaemonInstance
     {
         if (!m_instanceToken.has_value())
         {
-            std::cerr << std::format("Failed to stop wpa {} daemon instance (not started)", magic_enum::enum_name(m_wpaType));
+            std::cerr << std::format("Failed to stop wpa {} daemon instance (not started)\n", magic_enum::enum_name(m_wpaType));
             return;
         }
 
         if (!WpaDaemonManager::Stop(m_instanceToken.value()))
         {
-            std::cerr << std::format("Failed to stop wpa {} daemon instance", magic_enum::enum_name(m_wpaType));
+            std::cerr << std::format("Failed to stop wpa {} daemon instance\n", magic_enum::enum_name(m_wpaType));
             return;
         }
 

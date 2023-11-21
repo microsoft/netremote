@@ -50,7 +50,7 @@ std::unordered_set<std::string> WifiVirtualDeviceManager::CreateInterfacesForDri
 
     // Prepare the driver modprobe arguments, if necessary.
     std::string driverArguments{};
-    if (driverName == DriverMax80211HwsimName)
+    if (driverName == DriverMac80211HwsimName)
     {
         driverArguments = std::format("radios={}", numberOfInterfaces);
     }

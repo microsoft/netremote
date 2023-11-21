@@ -24,18 +24,18 @@ namespace detail
  * name as the first interpolation argument.
  */
 static constexpr auto WpaDaemonHostapdConfigurationFileContentsFormat = R"CONFIG(
-    interface={}
-    driver=nl80211
-    ctrl_interface=/var/run/hostapd
-    ssid=wificontrollertest
-    hw_mode=g
-    channel=1
-    auth_algs=3
-    wpa=2
-    wpa_passphrase=password
-    wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
-    wpa_pairwise=TKIP CCMP
-    rsn_pairwise=CCMP
+interface={}
+driver=nl80211
+ctrl_interface=/var/run/hostapd
+ssid=wificontrollertest
+hw_mode=g
+channel=1
+auth_algs=3
+wpa=2
+wpa_passphrase=password
+wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
+wpa_pairwise=TKIP CCMP
+rsn_pairwise=CCMP
 )CONFIG";
 
 /**
@@ -83,31 +83,13 @@ std::filesystem::path WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(W
     wpaDaemonConfigurationFile.flush();
     wpaDaemonConfigurationFile.close();
 
+    std::cout << std::format("Created default configuration file for wpa '{}' daemon at {}\n", daemon, wpaDaemonConfigurationFilePath.c_str());
     return wpaDaemonConfigurationFilePath;
 }
 
 /* static */
 std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments)
 {
-    // Note: The user running the test must have root privileges to execute the below command, either directly (root uid) or as a sudoer.
-    // Forcefully remove any existing loaded mac80211_hwsim kernel module.
-    int ret = std::system("sudo modprobe -rf mac80211_hwsim");
-    if (ret == -1)
-    {
-        ret = WEXITSTATUS(ret);
-        std::cerr << std::format("Failed to remove existing mac80211_hwsim kernel modules, ret={}\n", ret);
-        return std::nullopt;
-    }
-
-    // Load the mac80211_hwsim kernel module with 1 radio to create a simulated wireless interface the daemon can use.
-    ret = std::system("sudo modprobe mac80211_hwsim radios=1");
-    if (ret == -1)
-    {
-        ret = WEXITSTATUS(ret);
-        std::cerr << std::format("Failed to load mac80211_hwsim kernel module, ret={}\n", ret);
-        return std::nullopt;
-    }
-
     // Use the default interface name if none provided.
     if (std::empty(interfaceName))
     {
@@ -123,8 +105,10 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     // -B -> run in background
     // -P -> write pid to file
     // -i -> interface name
-    const auto wpaDaemonStartCommand = std::format("{} -B -P {} -i {} {} {}", daemon, pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
-    ret = std::system(wpaDaemonStartCommand.c_str());
+    const auto wpaDaemonStartCommand = std::format("{} -B -P {} -i {} {} {} {}", daemon, pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
+    std::cout << std::format("Starting wpa daemon with command '{}'\n", wpaDaemonStartCommand);
+
+    int ret = std::system(wpaDaemonStartCommand.c_str());
     if (ret == -1)
     {
         ret = WEXITSTATUS(ret);

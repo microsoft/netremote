@@ -3,9 +3,10 @@ add_executable(wpa-controller-test-unit)
 
 target_sources(wpa-controller-test-unit
     PRIVATE
-        TestWpaController.cxx
+        detail/WifiVirtualDeviceManager.cxx
         detail/WpaDaemonCatch2EventListener.cxx
         detail/WpaDaemonManager.cxx
+        TestWpaController.cxx
 )
 
 target_include_directories(wpa-controller-test-unit
