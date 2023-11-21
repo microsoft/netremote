@@ -68,23 +68,23 @@ std::filesystem::path WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(W
 {
     // Determine which daemon to create the configuration file for.
     const auto daemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
-    const auto wpaDaemonConfigurationFilePath = std::filesystem::temp_directory_path() / std::format("{}.conf", daemon);
+    const auto daemonConfigurationFilePath = std::filesystem::temp_directory_path() / std::format("{}.conf", daemon);
 
     // Create the configuration file.
-    const auto wpaDaemonConfigurationFileStatus = std::filesystem::status(wpaDaemonConfigurationFilePath);
-    if (std::filesystem::exists(wpaDaemonConfigurationFileStatus))
+    const auto daemonConfigurationFileStatus = std::filesystem::status(daemonConfigurationFilePath);
+    if (std::filesystem::exists(daemonConfigurationFileStatus))
     {
-        return wpaDaemonConfigurationFilePath;
+        return daemonConfigurationFilePath;
     }
 
     // Write default configuration file contents.
-    std::ofstream wpaDaemonConfigurationFile{ wpaDaemonConfigurationFilePath };
-    detail::WriteDefaultConfigurationFileContents(wpaType, interfaceName, wpaDaemonConfigurationFile);
-    wpaDaemonConfigurationFile.flush();
-    wpaDaemonConfigurationFile.close();
+    std::ofstream daemonConfigurationFile{ daemonConfigurationFilePath };
+    detail::WriteDefaultConfigurationFileContents(wpaType, interfaceName, daemonConfigurationFile);
+    daemonConfigurationFile.flush();
+    daemonConfigurationFile.close();
 
-    std::cout << std::format("Created default configuration file for wpa '{}' daemon at {}\n", daemon, wpaDaemonConfigurationFilePath.c_str());
-    return wpaDaemonConfigurationFilePath;
+    std::cout << std::format("Created default configuration file for wpa '{}' daemon at {}\n", daemon, daemonConfigurationFilePath.c_str());
+    return daemonConfigurationFilePath;
 }
 
 /* static */
@@ -105,10 +105,10 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     // -B -> run in background
     // -P -> write pid to file
     // -i -> interface name
-    const auto wpaDaemonStartCommand = std::format("{} -B -P {} -i {} {} {} {}", daemon, pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
-    std::cout << std::format("Starting wpa daemon with command '{}'\n", wpaDaemonStartCommand);
+    const auto daemonStartCommand = std::format("{} -B -P {} -i {} {} {} {}", daemon, pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
+    std::cout << std::format("Starting wpa daemon with command '{}'\n", daemonStartCommand);
 
-    int ret = std::system(wpaDaemonStartCommand.c_str());
+    int ret = std::system(daemonStartCommand.c_str());
     if (ret == -1)
     {
         ret = WEXITSTATUS(ret);
