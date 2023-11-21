@@ -6,11 +6,14 @@ set(WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX ${WPA_CONTROLLER_PUBLIC_INCLUDE}/Wpa)
 
 target_sources(wpa-controller
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/Hostapd.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaCommand.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaCore.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaController.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaResponse.cxx
     PUBLIC
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/Hostapd.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/IHostapd.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommand.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCore.hxx
@@ -25,7 +28,9 @@ target_include_directories(wpa-controller
 target_link_libraries(wpa-controller
     PUBLIC
         libwpa-client
+    PRIVATE
         magic_enum::magic_enum
+        notstd
 )
 
 list(APPEND WPA_CONTROLLER_PUBLIC_HEADERS
