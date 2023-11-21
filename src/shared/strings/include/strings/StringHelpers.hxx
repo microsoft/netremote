@@ -21,7 +21,35 @@ template <typename CharT>
 requires std::integral<CharT>
 unsigned char LowerCast(CharT c)
 {
-    return static_cast<unsigned char>(std::tolower(c));
+    return static_cast<unsigned char>(c);
+}
+
+/**
+ * @brief std::tolower() analog which properly casts the input character to an
+ * appropriate type.
+ * 
+ * @param c 
+ * @return int 
+ */
+template <typename CharT>
+int ToLower(CharT c)
+{
+    return std::tolower(LowerCast(c));
+}
+
+/**
+ * @brief Converts the specified string to lowercase.
+ * 
+ * @param s
+ * @return std::string 
+ */
+std::string ToLower(std::string s)
+{
+    std::ranges::transform(s, std::begin(s), [](auto c) { 
+        return ToLower(c);
+    });
+
+    return s;
 }
 
 /**
@@ -34,7 +62,7 @@ unsigned char LowerCast(CharT c)
  */
 bool CaseInsensitiveCharEquals(char lhs, char rhs)
 {
-    return std::tolower(LowerCast(lhs)) == std::tolower(LowerCast(rhs));
+    return ToLower(lhs) == ToLower(rhs);
 }
 
 /**
@@ -50,20 +78,6 @@ bool CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs)
     return std::ranges::equal(lhs, rhs, CaseInsensitiveCharEquals);
 }
 
-/**
- * @brief Converts the specified string to lowercase.
- * 
- * @param s
- * @return std::string 
- */
-std::string ToLower(std::string s)
-{
-    std::ranges::transform(s, std::begin(s), [](int c) { 
-        return std::tolower(LowerCast(c));
-    });
-
-    return s;
-}
 } // namespace Strings
 
 #endif // STRING_HELPERS_HXX
