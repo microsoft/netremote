@@ -17,8 +17,19 @@ struct WpaDaemonCatch2EventListener : public Catch::EventListenerBase
     // Inherit base class constructor.
     using EventListenerBase::EventListenerBase; 
 
+    /**
+     * @brief Runs when a test case is started.
+     * 
+     * @param testInfo 
+     */
     void testCaseStarting(Catch::TestCaseInfo const& testInfo) override;
 
+    /**
+     * @brief Runs when the last test case has ended.
+     * 
+     * @param testCaseStats 
+     * @return * void 
+     */
     void testCaseEnded(Catch::TestCaseStats const& testCaseStats) override;
 
 private:

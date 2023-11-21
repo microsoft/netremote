@@ -105,7 +105,7 @@ void WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& t
         throw std::runtime_error(std::format("Failed to create wpa {} daemon instance", wpaDaemon));
     }
 
-    wpaDaemonInstance->OnStarting();
+    wpaDaemonInstance->Start();
     m_wpaDaemonInstances.emplace(wpaType.value(), std::move(wpaDaemonInstance));
 
     std::cout << std::format("Started wpa {} daemon instance\n", wpaDaemon);
@@ -131,6 +131,6 @@ void WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& tes
     }
 
     auto wpaDaemonInstance = std::move(wpaDaemonInstanceNode.mapped());
-    wpaDaemonInstance->OnStopping();
+    wpaDaemonInstance->Stop();
     wpaDaemonInstance.reset();
 }
