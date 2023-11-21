@@ -1,14 +1,29 @@
 
-#ifndef STRING_CONVERSION_HXX
-#define STRING_CONVERSION_HXX
+#ifndef STRING_HELPERS_HXX
+#define STRING_HELPERS_HXX
 
 #include <algorithm>
 #include <cctype>
+#include <concepts>
 #include <string_view>
 #include <string>
 
 namespace Strings
 {
+/**
+ * @brief Cast a character for use in lowercase conversions.
+ * 
+ * @tparam CharT The type to be cast from.
+ * @param c The character value to cast.
+ * @return
+ */
+template <typename CharT>
+requires std::integral<CharT>
+unsigned char LowerCast(CharT c)
+{
+    return static_cast<unsigned char>(std::tolower(c));
+}
+
 /**
  * @brief Determines if the specified characters are equal, ignoring case.
  * 
@@ -19,7 +34,7 @@ namespace Strings
  */
 bool CaseInsensitiveCharEquals(char lhs, char rhs)
 {
-    return std::tolower(static_cast<unsigned char>(lhs)) == std::tolower(static_cast<unsigned char>(rhs));
+    return std::tolower(LowerCast(lhs)) == std::tolower(LowerCast(rhs));
 }
 
 /**
@@ -34,6 +49,21 @@ bool CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs)
 {
     return std::ranges::equal(lhs, rhs, CaseInsensitiveCharEquals);
 }
+
+/**
+ * @brief Converts the specified string to lowercase.
+ * 
+ * @param s
+ * @return std::string 
+ */
+std::string ToLower(std::string s)
+{
+    std::ranges::transform(s, std::begin(s), [](int c) { 
+        return std::tolower(LowerCast(c));
+    });
+
+    return s;
+}
 } // namespace Strings
 
-#endif // STRING_CONVERSION_HXX
+#endif // STRING_HELPERS_HXX
