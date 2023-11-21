@@ -3,10 +3,15 @@
 #define WPA_CONTROLLER_HXX
 
 #include <filesystem>
+#include <memory>
+#include <shared_mutex>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
 #include <Wpa/WpaCore.hxx>
+#include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaResponse.hxx>
 
 namespace Wpa
 {
@@ -60,11 +65,30 @@ struct WpaController
     std::filesystem::path ControlSocketPath() const noexcept;
 
     /**
+     * @brief Send a command over the control socket and return the response
+     * synchronously.
+     * 
+     * This will not receive any unsolicited event messages.
+     * 
+     * @param command The command to send.
+     * @return std::shared_ptr<WpaResponse> 
+     */
+    std::shared_ptr<WpaResponse>
+    SendCommand(const WpaCommand& command);
+
+    /**
      * @brief Helper class for working with the wpa control socket.
      */
     struct WpaControlSocket
     {
         WpaControlSocket() = delete;
+
+        /**
+         * @brief Maximum WPA control interface message size, im bytes. The
+         * official wpa_cli tool uses this as an upper bound, so is used
+         * similarly here.
+         */
+        static constexpr auto MessageSizeMax = 4096;
 
         static constexpr auto DefaultPathHostapd = "/var/run/hostapd";
         static constexpr auto DefaultPathWpaSupplicant = "/var/run/wpa_supplicant";
@@ -90,9 +114,22 @@ struct WpaController
     };
 
 private:
+    /**
+     * @brief Get the control socket object. If a socket connection does not
+     * exist, one will be established.
+     * 
+     * @return struct wpa_ctrl*
+     */
+    struct wpa_ctrl*
+    GetCommandControlSocket();
+
+private:
     const WpaType m_type;
     const std::string m_interfaceName;
     std::filesystem::path m_controlSocketPath;
+    // Protects m_controlSocketCommand.
+    std::shared_mutex m_controlSocketCommandGate;
+    struct wpa_ctrl* m_controlSocketCommand{ nullptr };
 };
 } // namespace Wpa
 

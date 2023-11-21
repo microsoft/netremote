@@ -5,25 +5,51 @@
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum.hpp>
 
+#include "detail/WpaDaemonManager.hxx"
 #include <Wpa/WpaController.hxx>
+
+namespace TestDetail
+{
+constexpr auto WpaTypesSupported = {
+    Wpa::WpaType::Hostapd,
+};
+} // namespace TestDetail  
+
+TEST_CASE("Send/receive WpaController request/response", "[wpa][hostapd][client][remote]")
+{
+    using namespace TestDetail;
+    using namespace Wpa;
+
+    SECTION("Send/receive WpaCommand/WpaResponse")
+    {
+        for (const auto& wpaType : TestDetail::WpaTypesSupported)
+        {
+            WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType);
+
+            WpaCommand wpaCommand("PING");
+            std::shared_ptr<WpaResponse> wpaResponse;
+            REQUIRE_NOTHROW(wpaResponse = wpaController.SendCommand(wpaCommand));
+            REQUIRE(wpaResponse != nullptr);
+            REQUIRE(wpaResponse->Payload.starts_with("PONG"));
+        }
+    }
+}
 
 TEST_CASE("Create a WpaController", "[wpa][client][local]")
 {
-    static constexpr auto InterfaceNameDefault = "wlan0";
-    static constexpr auto ControlSocketPathBase = "/run/";
+    using namespace TestDetail;
+    using namespace Wpa;
 
-    const auto ControlSocketPath = std::filesystem::path(ControlSocketPathBase) / InterfaceNameDefault;
+    const auto ControlSocketPath = std::filesystem::path(WpaDaemonManager::ControlSocketPathBase) / WpaDaemonManager::InterfaceNameDefault;
     const auto ControlSocketPathString = ControlSocketPath.string();
     const auto ControlSocketPathStringView = std::string_view(ControlSocketPathString);
-
-    using namespace Wpa;
 
     SECTION("Create for each daemon type doesn't cause a crash")
     {
         std::optional<WpaController> wpaController;
         for (const auto& wpaType : magic_enum::enum_values<WpaType>())
         {
-            REQUIRE_NOTHROW(wpaController.emplace(InterfaceNameDefault, wpaType));
+            REQUIRE_NOTHROW(wpaController.emplace(WpaDaemonManager::InterfaceNameDefault, wpaType));
         }
     }
 
@@ -31,20 +57,26 @@ TEST_CASE("Create a WpaController", "[wpa][client][local]")
     {
         for (const auto& wpaType : magic_enum::enum_values<WpaType>())
         {
-            WpaController wpaController(InterfaceNameDefault, wpaType);
+            WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType);
             REQUIRE(wpaController.Type() == wpaType);
         }
     }
 
-    SECTION("Create with specific control socket path doesn't cause a crash")
+    SECTION("Create with specific control socket path encoded as std::filesystem::path doesn't cause a crash")
     {
         std::optional<WpaController> wpaController;
         for (const auto& wpaType : magic_enum::enum_values<WpaType>())
         {
-            // Create with control socket path encoded as std::filesystem::path.
-            REQUIRE_NOTHROW(wpaController.emplace(InterfaceNameDefault, wpaType, ControlSocketPath));
-            // Create with control socket path encoded as std::string_view.
-            REQUIRE_NOTHROW(wpaController.emplace(InterfaceNameDefault, wpaType, ControlSocketPathStringView));
+            REQUIRE_NOTHROW(wpaController.emplace(WpaDaemonManager::InterfaceNameDefault, wpaType, ControlSocketPath));
+        }
+    }
+
+    SECTION("Create with specific control socket path encoded as std::string_view doesn't cause a crash")
+    {
+        std::optional<WpaController> wpaController;
+        for (const auto& wpaType : magic_enum::enum_values<WpaType>())
+        {
+            REQUIRE_NOTHROW(wpaController.emplace(WpaDaemonManager::InterfaceNameDefault, wpaType, ControlSocketPathStringView));
         }
     }
 
@@ -53,7 +85,7 @@ TEST_CASE("Create a WpaController", "[wpa][client][local]")
         std::optional<WpaController> wpaController;
         for (const auto& wpaType : magic_enum::enum_values<WpaType>())
         {
-            REQUIRE_NOTHROW(wpaController.emplace(InterfaceNameDefault, wpaType));
+            REQUIRE_NOTHROW(wpaController.emplace(WpaDaemonManager::InterfaceNameDefault, wpaType));
         }
     }
 
@@ -62,7 +94,7 @@ TEST_CASE("Create a WpaController", "[wpa][client][local]")
         for (const auto& wpaType : magic_enum::enum_values<WpaType>())
         {
             // Create with control socket path encoded as std::filesystem::path.
-            WpaController wpaController(InterfaceNameDefault, wpaType, ControlSocketPath);
+            WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType, ControlSocketPath);
             REQUIRE(wpaController.ControlSocketPath() == ControlSocketPath);
         }
     }

@@ -52,6 +52,7 @@ set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(gRPC CONFIG REQUIRED)
 find_package(Protobuf CONFIG REQUIRED)
 find_package(Threads REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
 
 # Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
 if (POLICY CMP0083)
