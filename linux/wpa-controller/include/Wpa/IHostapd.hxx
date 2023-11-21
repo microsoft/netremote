@@ -10,7 +10,7 @@ namespace Wpa
  * @brief Interface for interacting with the hostapd daemon.
  * 
  * The documentation for the control interface is sparse, so the source code
- * hostapd_ctrl_iface_receiv_process() was used as a reference:
+ * hostapd_ctrl_iface_receive_process() was used as a reference:
  * https://w1.fi/cgit/hostap/tree/hostapd/ctrl_iface.c?h=hostap_2_10#n3503.
  */
 struct IHostapd
