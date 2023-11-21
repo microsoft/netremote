@@ -11,37 +11,12 @@
 #include <catch2/catch_test_case_info.hpp>
 #include <catch2/interfaces/catch_interfaces_reporter.hpp>
 #include <magic_enum.hpp>
+#include <strings/StringHelpers.hxx>
 
 #include "WpaDaemonCatch2EventListener.hxx"
 
 namespace detail
 {
-/**
- * @brief Determines if the specified characters are equal, ignoring case.
- * 
- * @param lhs
- * @param rhs
- * @return true
- * @return false
- */
-inline bool CaseInsensitiveCharEquals(char lhs, char rhs)
-{
-    return std::tolower(static_cast<unsigned char>(lhs)) == std::tolower(static_cast<unsigned char>(rhs));
-}
-
-/**
- * @brief Determines if the specified strings are equal, ignoring case.
- * 
- * @param lhs
- * @param rhs
- * @return true
- * @return false
- */
-inline bool CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs)
-{
-    return std::ranges::equal(lhs, rhs, CaseInsensitiveCharEquals);
-}
-
 /**
  * @brief Get the first wpa daemon type from the specified test tags.
  * 
@@ -56,6 +31,8 @@ inline bool CaseInsensitiveStringEquals(std::string_view lhs, std::string_view r
  */
 std::optional<Wpa::WpaType> GetWpaDaemonTypeFromTags(const std::vector<Catch::Tag>& tags)
 {
+    using Strings::CaseInsensitiveStringEquals;
+
     // Convert the tag vector into strings so they can be compared to the
     // WpaType enum names. The Catch::Tag implementation uses their own string
     // type and does not provide an implicit conversion to std::string, so the

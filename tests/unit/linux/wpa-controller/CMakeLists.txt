@@ -18,6 +18,7 @@ target_link_libraries(wpa-controller-test-unit
     PRIVATE
         Catch2::Catch2WithMain
         magic_enum::magic_enum
+        strings
         wpa-controller
 )
 
