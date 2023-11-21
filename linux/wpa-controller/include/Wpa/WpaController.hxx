@@ -66,7 +66,7 @@ struct WpaController
 
     /**
      * @brief Send a command over the control socket and return the response
-     * sycnhronously.
+     * synchronously.
      * 
      * This will not receive any unsolicited event messages.
      * 

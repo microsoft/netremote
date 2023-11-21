@@ -3,6 +3,7 @@
 
 using namespace Wpa;
 
-WpaCommand::WpaCommand(std::string_view data) : Data(data)
+WpaCommand::WpaCommand(std::string_view data) : 
+    Data(data)
 {
 }
