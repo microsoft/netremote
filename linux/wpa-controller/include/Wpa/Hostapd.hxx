@@ -59,6 +59,14 @@ struct Hostapd :
      */
     bool Disable() override;
 
+    /**
+     * @brief Terminates the process hosting the daemon.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool Terminate() override;
+
 private:
     bool m_isEnabled{false};
     const std::string m_interface;

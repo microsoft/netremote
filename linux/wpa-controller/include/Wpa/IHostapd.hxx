@@ -55,6 +55,14 @@ struct IHostapd
      * @return false 
      */
     virtual bool Disable() = 0;
+
+    /**
+     * @brief Terminates the process hosting the daemon.
+     * 
+     * @return true 
+     * @return false 
+     */
+    virtual bool Terminate() = 0;
 };
 } // namespace Wpa
 

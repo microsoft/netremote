@@ -2,6 +2,7 @@
 #include <notstd/Exceptions.hxx>
 
 #include <Wpa/Hostapd.hxx>
+#include <Wpa/ProtocolHostapd.hxx>
 
 using namespace Wpa;
 
@@ -18,9 +19,7 @@ std::string_view Hostapd::GetInterface()
 
 bool Hostapd::Ping()
 {
-    static constexpr auto PingCommandPayload = "PING";
-    static constexpr auto PingResponsePayload = "PONG";
-    static constexpr WpaCommand PingCommand(PingCommandPayload);
+    static constexpr WpaCommand PingCommand(ProtocolHostapd::CommandPayloadPing);
 
     const auto response = m_controller.SendCommand(PingCommand);
     if (!response)
@@ -28,7 +27,7 @@ bool Hostapd::Ping()
         return false;
     }
 
-    return (response->Payload.starts_with(PingResponsePayload));
+    return response->IsOk();
 }
 
 bool Hostapd::IsEnabled()
@@ -39,10 +38,26 @@ bool Hostapd::IsEnabled()
 
 bool Hostapd::Enable()
 {
-    throw notstd::NotImplementedException();
+    static constexpr WpaCommand EnableCommand(ProtocolHostapd::CommandPayloadEnable);
+
+    const auto response = m_controller.SendCommand(EnableCommand);
+    m_isEnabled = response->IsOk();
+    return m_isEnabled;
 }
 
 bool Hostapd::Disable() 
 {
-    throw notstd::NotImplementedException();
+    static constexpr WpaCommand DisableCommand(ProtocolHostapd::CommandPayloadDisable);
+
+    const auto response = m_controller.SendCommand(DisableCommand);
+    m_isEnabled = !response->IsOk();
+    return !m_isEnabled;
+}
+
+bool Hostapd::Terminate()
+{
+    static constexpr WpaCommand TerminateCommand(ProtocolHostapd::CommandPayloadTerminate);
+
+    const auto response = m_controller.SendCommand(TerminateCommand);
+    return response->IsOk();
 }
