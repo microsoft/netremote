@@ -18,7 +18,17 @@ std::string_view Hostapd::GetInterface()
 
 bool Hostapd::Ping()
 {
-    throw notstd::NotImplementedException();
+    static constexpr auto PingCommandPayload = "PING";
+    static constexpr auto PingResponsePayload = "PONG";
+    static constexpr WpaCommand PingCommand(PingCommandPayload);
+
+    const auto response = m_controller.SendCommand(PingCommand);
+    if (!response)
+    {
+        return false;
+    }
+
+    return (response->Payload.starts_with(PingResponsePayload));
 }
 
 bool Hostapd::IsEnabled()
