@@ -6,6 +6,7 @@ target_sources(wpa-controller-test-unit
         detail/WifiVirtualDeviceManager.cxx
         detail/WpaDaemonCatch2EventListener.cxx
         detail/WpaDaemonManager.cxx
+        TestHostapd.cxx
         TestWpaController.cxx
 )
 

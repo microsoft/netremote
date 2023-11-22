@@ -13,8 +13,11 @@ namespace Wpa
  */
 struct WpaCommand
 {
-    WpaCommand() = default;
-    WpaCommand(std::string_view data);
+    constexpr WpaCommand() = default;
+    constexpr WpaCommand(std::string_view data) :
+        Data(data)
+    {
+    }
 
     std::string Data;
 };
