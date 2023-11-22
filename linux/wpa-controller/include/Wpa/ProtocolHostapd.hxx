@@ -22,6 +22,24 @@ enum class HostapdInterfaceState
     Unknown
 };
 
+/**
+ * @brief Converts a string to a HostapdInterfaceState.
+ * HostapdInterfaceState::Unknown is returned for invalid input.
+ * 
+ * @param state The state string to convert.
+ * @return HostapdInterfaceState 
+ */
+HostapdInterfaceState HostapdInterfaceStateFromString(std::string_view state) noexcept;
+
+/**
+ * @brief Indicates if the given state describes an operational interface.
+ * 
+ * @param state The state to check.
+ * @return true If the interface is operational.
+ * @return false If the interface is not operational.
+ */
+bool IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
+
 enum class HostapdHwMode
 {
     Unknown,
