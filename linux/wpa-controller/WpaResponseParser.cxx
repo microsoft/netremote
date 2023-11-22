@@ -6,7 +6,7 @@
 
 using namespace Wpa;
 
-WpaResponseParser::WpaResponseParser(const WpaCommand& command, std::string_view responsePayload, std::initializer_list<WpaKeyValuePair> propertiesToParse) :
+WpaResponseParser::WpaResponseParser(const WpaCommand* command, std::string_view responsePayload, std::initializer_list<WpaKeyValuePair> propertiesToParse) :
     Command(command),
     ResponsePayload(responsePayload),
     m_propertiesToParse(propertiesToParse)
