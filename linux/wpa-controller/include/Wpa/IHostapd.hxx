@@ -2,7 +2,10 @@
 #ifndef I_HOSTAPD_HXX
 #define I_HOSTAPD_HXX
 
+#include <exception>
 #include <string_view>
+
+#include <Wpa/ProtocolHostapd.hxx>
 
 namespace Wpa
 {
@@ -33,22 +36,19 @@ struct IHostapd
     virtual bool Ping() = 0;
 
     /**
+     * @brief Get the status for the interface.
      * 
-     * @return true 
-     * @return false 
+     * @return HostapdStatus 
      */
+    virtual HostapdStatus GetStatus() = 0;
 
     /**
      * @brief Determines if the interface is enabled for use.
      * 
-     * @param forceCheck Whether or not the interface should be probed for its
-     * state. When this is false, the cached state will be used. Otherwise, it
-     * will be determined directly by probing it from the remote daemon
-     * instance.  
      * @return true 
      * @return false 
      */
-    virtual bool IsEnabled(bool forceCheck) = 0;
+    virtual bool IsEnabled() = 0;
 
     /**
      * @brief Enables the interface for use.
@@ -73,6 +73,26 @@ struct IHostapd
      * @return false 
      */
     virtual bool Terminate() = 0;
+};
+
+/**
+ * @brief Generic exception that may be thrown by any of the function in IHostapd
+ * 
+ */
+struct HostapdException : std::exception
+{
+    HostapdException(std::string_view message) :
+        m_message(message)
+    {
+    }
+
+    const char* what() const noexcept override
+    {
+        return m_message.c_str();
+    }
+
+private:
+    const std::string m_message;
 };
 } // namespace Wpa
 

@@ -2,7 +2,6 @@
 #ifndef HOSTAPD_HXX
 #define HOSTAPD_HXX
 
-#include <shared_mutex>
 #include <string_view>
 #include <string>
 
@@ -37,16 +36,19 @@ struct Hostapd :
     bool Ping() override;
 
     /**
-     * @brief Determines if the interface is enabled for use.
+     * @brief Get the status for the interface.
      * 
-     * @param forceCheck Whether or not the interface should be probed for its
-     * state. When this is false, the cached state will be used. Otherwise, it
-     * will be determined directly by probing it from the remote daemon
-     * instance.  
+     * @return HostapdStatus 
+     */
+    HostapdStatus GetStatus() override;
+
+    /**
+     * @brief Determines if the interface is enabled for use.
+     *
      * @return true 
      * @return false 
      */
-    bool IsEnabled(bool forceCheck = false) override;
+    bool IsEnabled() override;
 
     /**
      * @brief Enables the interface for use.
@@ -73,11 +75,6 @@ struct Hostapd :
     bool Terminate() override;
 
 private:
-    bool m_isEnabled{false};
-    // Protects any state that can be modified by multiple threads including:
-    // - m_isEnabled
-    std::shared_mutex m_stateGate;
-
     const std::string m_interface;
     WpaController m_controller;
 };
