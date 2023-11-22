@@ -43,14 +43,6 @@ struct Hostapd :
     HostapdStatus GetStatus() override;
 
     /**
-     * @brief Determines if the interface is enabled for use.
-     *
-     * @return true 
-     * @return false 
-     */
-    bool IsEnabled() override;
-
-    /**
      * @brief Enables the interface for use.
      * 
      * @return true 

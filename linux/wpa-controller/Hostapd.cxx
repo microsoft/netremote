@@ -65,12 +65,6 @@ HostapdStatus Hostapd::GetStatus()
     return hostapdStatus;
 }
 
-bool Hostapd::IsEnabled()
-{
-    auto hostapdStatus = GetStatus();
-    return IsHostapdStateOperational(hostapdStatus.State);
-}
-
 bool Hostapd::Enable()
 {
     static constexpr WpaCommand EnableCommand(ProtocolHostapd::CommandPayloadEnable);

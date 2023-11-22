@@ -43,14 +43,6 @@ struct IHostapd
     virtual HostapdStatus GetStatus() = 0;
 
     /**
-     * @brief Determines if the interface is enabled for use.
-     * 
-     * @return true 
-     * @return false 
-     */
-    virtual bool IsEnabled() = 0;
-
-    /**
      * @brief Enables the interface for use.
      * 
      * @return true 
