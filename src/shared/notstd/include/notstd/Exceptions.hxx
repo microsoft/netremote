@@ -1,6 +1,6 @@
 
-#ifndef EXCEPTIONS_HXX
-#define EXCEPTIONS_HXX
+#ifndef NOTSTD_EXCEPTIONS_HXX
+#define NOTSTD_EXCEPTIONS_HXX
 
 #include <format>
 #include <source_location>
@@ -21,4 +21,4 @@ struct NotImplementedException :
 };
 } // namespace notstd
 
-#endif // EXCEPTIONS_HXX
+#endif // NOTSTD_EXCEPTIONS_HXX
