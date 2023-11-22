@@ -16,7 +16,10 @@ namespace Wpa
 struct WpaCommandStatus :
     public WpaCommand
 {
-    constexpr WpaCommandStatus();
+    constexpr WpaCommandStatus() :
+        WpaCommand(ProtocolWpa::CommandPayloadStatus)
+        {
+        }
 
 private:
     std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
