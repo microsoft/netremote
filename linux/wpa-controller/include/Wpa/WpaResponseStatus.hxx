@@ -7,6 +7,9 @@
 
 namespace Wpa
 {
+/**
+ * @brief Representation of the response to the "STATUS" command.
+ */
 struct WpaResponseStatus
     : public WpaResponse
 {

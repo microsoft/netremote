@@ -6,6 +6,9 @@
 
 namespace Wpa
 {
+/**
+ * @brief Representation of the "STATUS" command.
+ */
 struct WpaCommandStatus :
     public WpaCommand
 {
