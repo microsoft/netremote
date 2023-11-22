@@ -33,12 +33,22 @@ struct IHostapd
     virtual bool Ping() = 0;
 
     /**
-     * @brief Determines if the interface is enabled for use.
      * 
      * @return true 
      * @return false 
      */
-    virtual bool IsEnabled() = 0;
+
+    /**
+     * @brief Determines if the interface is enabled for use.
+     * 
+     * @param forceCheck Whether or not the interface should be probed for its
+     * state. When this is false, the cached state will be used. Otherwise, it
+     * will be determined directly by probing it from the remote daemon
+     * instance.  
+     * @return true 
+     * @return false 
+     */
+    virtual bool IsEnabled(bool forceCheck) = 0;
 
     /**
      * @brief Enables the interface for use.

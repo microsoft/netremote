@@ -1,4 +1,7 @@
 
+#include <mutex>
+#include <optional>
+
 #include <notstd/Exceptions.hxx>
 
 #include <Wpa/Hostapd.hxx>
@@ -30,15 +33,55 @@ bool Hostapd::Ping()
     return response->IsOk();
 }
 
-bool Hostapd::IsEnabled()
+bool Hostapd::IsEnabled(bool forceCheck)
 {
-    // TODO: mutual exclusion
+    static constexpr WpaCommand StatusCommand(ProtocolHostapd::CommandPayloadStatus);
+
+    if (!forceCheck)
+    {
+        std::shared_lock stateLockShared{ m_stateGate };
+        return m_isEnabled;
+    }
+
+    std::scoped_lock stateLockExclusive{ m_stateGate };
+    auto response = m_controller.SendCommand(StatusCommand);
+    if (!response->IsOk())
+    {
+        // Return false, but don't update the cached state since we didn't
+        // actually get a valid response.
+        // TODO: log this
+        return false;
+    }
+
+    static constexpr std::string_view StateKey = "state=";
+
+    std::optional<bool> isEnabled;
+    auto keyPosition = response->Payload.find(StateKey);
+    if (keyPosition == response->Payload.npos)
+    {
+        // TODO: the response should *always* have this field, so this is normally
+        // catastrophic. For now, log and move on.
+        return false;
+    }
+
+    // Obtain the value as a string.
+    const auto valuePosition = keyPosition + std::size(StateKey);
+    const char * const value = std::data(response->Payload) + valuePosition;
+
+    // Attempt to parse the string value as a state response value.
+
     return m_isEnabled;
 }
 
 bool Hostapd::Enable()
 {
     static constexpr WpaCommand EnableCommand(ProtocolHostapd::CommandPayloadEnable);
+
+    std::scoped_lock stateLockExclusive{ m_stateGate };
+    if (m_isEnabled)
+    {
+        return true;
+    }
 
     const auto response = m_controller.SendCommand(EnableCommand);
     m_isEnabled = response->IsOk();
