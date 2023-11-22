@@ -20,17 +20,19 @@ constexpr WpaKeyValuePair::WpaKeyValuePair(std::string_view key, WpaValuePresenc
     }
 }
 
-bool WpaKeyValuePair::TryParseValue(std::string_view input)
+std::optional<std::string_view> WpaKeyValuePair::TryParseValue(std::string_view input)
 {
-    // Find the starting position of the key.
-    const auto keyPosition = input.find(Key);
-    if (keyPosition == input.npos)
+    // If not already parsed...
+    if (!Value.has_value())
     {
-        return false;
+        // Find the starting position of the key.
+        const auto keyPosition = input.find(Key);
+        if (keyPosition != input.npos)
+        {
+            // Assign the starting position of the value, advancing past the key.
+            Value = std::data(input) + keyPosition + std::size(Key);
+        }
     }
 
-    // Assign the starting position of the value, advancing past the key.
-    Value = std::data(input) + keyPosition + std::size(Key);
-
-    return true;
+    return Value;
 }
