@@ -19,7 +19,7 @@ struct WpaCommandStatus :
     constexpr WpaCommandStatus();
 
 private:
-    std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) override;
+    std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
 };
 
 struct WpaStatusResponseParser : public WpaResponseParser

@@ -11,7 +11,7 @@ constexpr WpaCommandStatus::WpaCommandStatus() :
 {
 }
 
-std::unique_ptr<WpaResponseParser> WpaCommandStatus::CreateResponseParser(const WpaCommand* command, std::string_view responsePayload)
+std::unique_ptr<WpaResponseParser> WpaCommandStatus::CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const
 {
     return std::make_unique<WpaStatusResponseParser>(command, responsePayload);
 }

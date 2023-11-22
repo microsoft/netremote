@@ -26,12 +26,12 @@ struct WpaCommand :
     }
 
     std::shared_ptr<WpaResponse>
-    ParseResponse(std::string_view responsePayload);
+    ParseResponse(std::string_view responsePayload) const;
 
     std::string Data;
 
 private:
-    std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) override;
+    std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
 };
 } // namespace Wpa
 

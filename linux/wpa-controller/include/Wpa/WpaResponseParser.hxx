@@ -88,7 +88,7 @@ struct WpaResponseParserFactory
      * @param responsePayload The payload the parser should parse.
      * @return std::unique_ptr<WpaResponseParser> 
      */
-    virtual std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) = 0;
+    virtual std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const = 0;
 };
 } // namespace Wpa
 

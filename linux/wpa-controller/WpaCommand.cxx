@@ -4,7 +4,7 @@
 using namespace Wpa;
 
 std::shared_ptr<WpaResponse>
-WpaCommand::ParseResponse(std::string_view responsePayload)
+WpaCommand::ParseResponse(std::string_view responsePayload) const
 {
     std::shared_ptr<WpaResponse> response;
 
@@ -21,7 +21,7 @@ WpaCommand::ParseResponse(std::string_view responsePayload)
     return response;
 }
 
-std::unique_ptr<WpaResponseParser> WpaCommand::CreateResponseParser([[maybe_unused]] const WpaCommand* command, [[maybe_unused]] std::string_view responsePayload)
+std::unique_ptr<WpaResponseParser> WpaCommand::CreateResponseParser([[maybe_unused]] const WpaCommand* command, [[maybe_unused]] std::string_view responsePayload) const
 {
     // Basic commands don't need a response parser since they only provide OK/FAIL results.
     return nullptr;
