@@ -5,7 +5,7 @@ using namespace Wpa;
 
 HostapdInterfaceState Wpa::HostapdInterfaceStateFromString(std::string_view state) noexcept
 {
-    // Implementation uses start_with() instead of equals() to accommodate
+    // Implementation uses starts_with() instead of equals() to accommodate
     // unparsed payloads from command responses.
     if (state.starts_with(ProtocolHostapd::ResponsePayloadStatusUninitialized))
     {

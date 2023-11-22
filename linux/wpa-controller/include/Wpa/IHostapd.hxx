@@ -68,8 +68,8 @@ struct IHostapd
 };
 
 /**
- * @brief Generic exception that may be thrown by any of the function in IHostapd
- * 
+ * @brief Generic exception that may be thrown by any of the functions in
+ * IHostapd.
  */
 struct HostapdException : std::exception
 {
