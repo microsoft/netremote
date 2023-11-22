@@ -6,6 +6,7 @@
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 
 using namespace Wpa;
@@ -36,7 +37,7 @@ bool Hostapd::Ping()
 
 HostapdStatus Hostapd::GetStatus()
 {
-    static constexpr WpaCommand StatusCommand(ProtocolHostapd::CommandPayloadStatus);
+    static constexpr WpaCommandStatus StatusCommand;
 
     auto response = m_controller.SendCommand<WpaResponseStatus>(StatusCommand);
     if (!response)

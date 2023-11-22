@@ -55,7 +55,7 @@ protected:
      * 
      * @return const std::unordered_map<std::string_view, std::string_view>& 
      */
-    const std::unordered_map<std::string_view, std::string_view>& GetProperties() noexcept;
+    const std::unordered_map<std::string_view, std::string_view>& GetProperties() const noexcept;
 
 private:
     /**

@@ -13,7 +13,7 @@ WpaResponseParser::WpaResponseParser(const WpaCommand* command, std::string_view
 {
 }
 
-const std::unordered_map<std::string_view, std::string_view>& WpaResponseParser::GetProperties() noexcept
+const std::unordered_map<std::string_view, std::string_view>& WpaResponseParser::GetProperties() const noexcept
 {
     return m_properties;
 }
