@@ -87,7 +87,7 @@ struct HostapdStatus
 
     // // Present only if a current hwmode is set.
     // std::optional<HostapdHwMode> HwMode;
-    // // Present only if first rwo chars of country code are non-zero.
+    // // Present only if first two chars of country code are non-zero.
     // std::optional<std::array<char, 3>> CountryCode;
 
     // int CacTimeSeconds{ 0 };
