@@ -2,23 +2,9 @@
 #include <format>
 #include <stdexcept>
 
-#include <notstd/Utility.hxx>
-
 #include <Wpa/WpaKeyValuePair.hxx>
 
 using namespace Wpa;
-
-constexpr WpaKeyValuePair::WpaKeyValuePair(std::string_view key, WpaValuePresence presence) :
-    Key(key),
-    IsRequired(notstd::to_underlying(presence))
-{
-    // Ensure the specified key ends with the delimiter. If not, this is a
-    // programming error so throw a runtime exception.
-    if (!Key.ends_with(KeyDelimiter))
-    {
-        throw std::runtime_error(std::format("Key must end with {} delimiter.", KeyDelimiter));
-    }
-}
 
 std::optional<std::string_view> WpaKeyValuePair::TryParseValue(std::string_view input)
 {

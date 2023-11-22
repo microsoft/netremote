@@ -2,8 +2,12 @@
 #ifndef WPA_KEY_VALUE_PAIR_HXX
 #define WPA_KEY_VALUE_PAIR_HXX
 
+#include <format>
 #include <optional>
 #include <string_view>
+
+#include <notstd/Utility.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 
 namespace Wpa
 {
@@ -24,7 +28,7 @@ struct WpaKeyValuePair
     /**
      * @brief The delimeter separating keys from values.
      */
-    static constexpr auto KeyDelimiter = '=';
+    static constexpr auto KeyDelimiter = ProtocolWpa::KeyValueDelimiter;
 
     /**
      * @brief Construct a new WpaKeyValue Pair object.
@@ -32,7 +36,17 @@ struct WpaKeyValuePair
      * @param key The key of the property. 
      * @param presence Whether the property is required or optional.
      */
-    constexpr WpaKeyValuePair(std::string_view key, WpaValuePresence presence = WpaValuePresence::Required);
+    constexpr WpaKeyValuePair(std::string_view key, WpaValuePresence presence) :
+        Key(key),
+        IsRequired(notstd::to_underlying(presence))
+    {
+        // Ensure the specified key ends with the delimiter. If not, this is a
+        // programming error so throw a runtime exception.
+        if (!Key.ends_with(KeyDelimiter))
+        {
+            throw std::runtime_error(std::format("Key must end with {} delimiter.", KeyDelimiter));
+        }
+    }
 
     /**
       * Parses the input string and attempts to resolve the property value,
