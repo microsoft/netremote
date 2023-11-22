@@ -10,7 +10,7 @@ namespace notstd
 /**
  * @brief Converts a enumeration value to its underlying type.
  * 
- * The function prototype matches the c++23 function so can be used in its
+ * The function prototype matches the C++23 function so can be used in its
  * place.
  * 
  * @tparam Enum The enumeration class type to convert.
