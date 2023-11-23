@@ -135,6 +135,30 @@ TEST_CASE("Send GetProperty() command", "[wpa][hostapd][client][remote]")
     }
 }
 
+TEST_CASE("Send SetProperty() command", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("SetProperty() doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetProperty("whatever", "whatever"));
+    }
+
+    SECTION("SetProperty() returns false for invalid property")
+    {
+        REQUIRE_FALSE(hostapd.SetProperty("whatever", "whatever"));
+    }
+
+    SECTION("SetProperty() returns true for valid property")
+    {
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto));
+    }
+
+    // TODO: validate that the property was actually set. Need to find a property whose value is retrievable.
+}
+
 TEST_CASE("Send control commands: Enable(), Disable()", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
