@@ -3,6 +3,7 @@
 #define WPA_COMMAND_GET_HXX
 
 #include <string_view>
+#include <string>
 
 #include <Wpa/WpaCommand.hxx>
 
@@ -21,6 +22,7 @@ struct WpaCommandGet :
      */
     WpaCommandGet(std::string_view propertyName);
 
+    std::string PropertyPayload;
     std::string_view PropertyName;
 };
 

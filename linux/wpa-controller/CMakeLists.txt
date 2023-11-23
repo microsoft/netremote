@@ -11,6 +11,7 @@ target_sources(wpa-controller
         ${CMAKE_CURRENT_LIST_DIR}/ProtocolWpa.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaCommand.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaCommandGet.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/WpaCommandSet.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaCommandStatus.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaController.cxx
         ${CMAKE_CURRENT_LIST_DIR}/WpaCore.cxx
@@ -24,6 +25,7 @@ target_sources(wpa-controller
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolWpa.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommand.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandGet.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandSet.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandStatus.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCore.hxx
@@ -52,6 +54,7 @@ list(APPEND WPA_CONTROLLER_PUBLIC_HEADERS
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/IHostapd.hxx
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommand.hxx
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandGet.hxx
+    ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandSet.hxx
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandStatus.hxx
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
     ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCore.hxx

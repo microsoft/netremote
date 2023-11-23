@@ -3,6 +3,11 @@
 
 using namespace Wpa;
 
+void WpaCommand::SetPayload(std::string_view payload)
+{
+    Payload = payload;
+}
+
 std::shared_ptr<WpaResponse>
 WpaCommand::ParseResponse(std::string_view responsePayload) const
 {

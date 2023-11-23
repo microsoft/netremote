@@ -87,7 +87,7 @@ WpaController::SendCommand(const WpaCommand& command)
     std::array<char, WpaControlSocket::MessageSizeMax> responseBuffer;
     std::size_t responseSize = std::size(responseBuffer);
 
-    int ret = wpa_ctrl_request(controlSocket, std::data(command.Data), std::size(command.Data), std::data(responseBuffer), &responseSize, nullptr);
+    int ret = wpa_ctrl_request(controlSocket, std::data(command.Payload), std::size(command.Payload), std::data(responseBuffer), &responseSize, nullptr);
     switch (ret)
     {
     case 0:
