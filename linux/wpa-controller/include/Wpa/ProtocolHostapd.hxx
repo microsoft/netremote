@@ -180,6 +180,12 @@ struct ProtocolHostapd :
     static constexpr auto ResponsePayloadStatusNoIr = "NO_IR";
     static constexpr auto ResponsePayloadStatusUnknown = "UNKNOWN";
 
+    // Property names for "GET" commands.
+    static constexpr auto PropertyNameVersion = "version";
+    static constexpr auto PropertyNameTlsLibrary = "tls_library";
+    // Note: this value must be updated if the version of hostapd changes.
+    static constexpr auto PropertyVersionValue = "2.10-hostap_2_10";
+
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
     static constexpr auto ResponseStatusPropertyKeyState = "state=";
