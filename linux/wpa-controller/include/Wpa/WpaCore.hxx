@@ -6,6 +6,9 @@
 
 namespace Wpa
 {
+/**
+ * @brief The type of WPA daemon/service.
+ */
 enum class WpaType
 {
     Hostapd,
