@@ -43,6 +43,26 @@ struct IHostapd
     virtual HostapdStatus GetStatus() = 0;
 
     /**
+     * @brief Get a property value for the interface.
+     * 
+     * @param propertyName The name of the property to retrieve.
+     * @param propertyValue The string to store the property value in.
+     * @return true If the property value was obtained and its value is in 'propertyValue'.
+     * @return false If t he property value could not be obtained due to an error.
+     */
+    virtual bool GetProperty(std::string_view propertyName, std::string& propertyValue) = 0;
+
+    /**
+     * @brief Set a property on the interface.
+     * 
+     * @param propertyName The name of the property to set.
+     * @param propertyValue The value of the property to set.
+     * @return true The property was set successfully.
+     * @return false The property was not set successfully.
+     */
+    virtual bool SetProperty(std::string_view propertyName, std::string_view propertyValue) = 0;
+
+    /**
      * @brief Enables the interface for use.
      * 
      * @return true 

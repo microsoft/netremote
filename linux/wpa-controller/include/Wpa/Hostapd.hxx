@@ -43,6 +43,26 @@ struct Hostapd :
     HostapdStatus GetStatus() override;
 
     /**
+     * @brief Get a property value for the interface.
+     * 
+     * @param propertyName The name of the property to retrieve.
+     * @param propertyValue The string to store the property value in.
+     * @return true If the property value was obtained and its value is in 'propertyValue'.
+     * @return false If t he property value could not be obtained due to an error.
+     */
+    bool GetProperty(std::string_view propertyName, std::string& propertyValue) override; 
+
+    /**
+     * @brief Set a property on the interface.
+     * 
+     * @param propertyName The name of the property to set.
+     * @param propertyValue The value of the property to set.
+     * @return true The property was set successfully.
+     * @return false The property was not set successfully.
+     */
+    bool SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
+
+    /**
      * @brief Enables the interface for use.
      * 
      * @return true 
