@@ -14,6 +14,11 @@
 namespace Wpa
 {
 struct WpaCommand;
+
+/**
+ * @brief Interface and base class for a parser that parses a response payload
+ * into a WpaResponse object, typically a derived class of WpaResponse. 
+ */
 struct WpaResponseParser
 {
     virtual ~WpaResponseParser() = default;
@@ -27,9 +32,6 @@ struct WpaResponseParser
      */
     WpaResponseParser(const WpaCommand* command, std::string_view responsePayload, std::initializer_list<WpaKeyValuePair> propertiesToParse);
 
-    const WpaCommand* Command;
-    const std::string_view ResponsePayload;
-
     /**
      * @brief Parses the response payload, returning a WpaResponse object if
      * successful.
@@ -37,6 +39,9 @@ struct WpaResponseParser
      * @return std::shared_ptr<WpaResponse>
      */
     virtual std::shared_ptr<WpaResponse> Parse();
+
+    const WpaCommand* Command;
+    const std::string_view ResponsePayload;
 
 protected:
     /**

@@ -11,6 +11,10 @@
 
 namespace Wpa
 {
+/**
+ * @brief Describes the presence of a property in a WPA control protocol
+ * response.
+ */
 enum class WpaValuePresence : bool
 {
     Required = true,
