@@ -96,6 +96,69 @@ TEST_CASE("Send command: GetStatus()", "[wpa][hostapd][client][remote]")
     }
 }
 
+TEST_CASE("Send GetProperty() command", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("GetProperty() doesn't throw")
+    {
+        std::string whateverValue;
+        REQUIRE_NOTHROW(hostapd.GetProperty("whatever", whateverValue));
+    }
+
+    SECTION("GetProperty() returns false for invalid property")
+    {
+        std::string whateverValue;
+        REQUIRE_FALSE(hostapd.GetProperty("whatever", whateverValue));
+    }
+
+    SECTION("GetProperty() returns true for valid property")
+    {
+        std::string versionValue;
+        REQUIRE(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion, versionValue));
+    }
+
+    SECTION("GetProperty() returns true for valid property with non-empty value")
+    {
+        std::string versionValue;
+        REQUIRE(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion, versionValue));
+        REQUIRE_FALSE(versionValue.empty());
+    }
+
+    SECTION("GetProperty() returns correct value for valid property")
+    {
+        std::string versionValue;
+        CHECK(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion, versionValue));
+        REQUIRE(versionValue == ProtocolHostapd::PropertyVersionValue);
+    }
+}
+
+TEST_CASE("Send SetProperty() command", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("SetProperty() doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetProperty("whatever", "whatever"));
+    }
+
+    SECTION("SetProperty() returns false for invalid property")
+    {
+        REQUIRE_FALSE(hostapd.SetProperty("whatever", "whatever"));
+    }
+
+    SECTION("SetProperty() returns true for valid property")
+    {
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto));
+    }
+
+    // TODO: validate that the property was actually set. Need to find a property whose value is retrievable.
+}
+
 TEST_CASE("Send control commands: Enable(), Disable()", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;

@@ -11,7 +11,7 @@
 namespace Wpa
 {
 /**
- * @brief Object to hold generic command data for a wpa_supplicant or hostapd
+ * @brief Object to hold generic command payload for a wpa_supplicant or hostapd
  * request.
  */
 struct WpaCommand :
@@ -20,10 +20,17 @@ struct WpaCommand :
     virtual ~WpaCommand() = default;
 
     constexpr WpaCommand() = default;
-    constexpr WpaCommand(std::string_view data) :
-        Data(data)
+    constexpr WpaCommand(std::string_view payload) :
+        Payload(payload)
     {
     }
+
+    /**
+     * @brief Set the payload of the command.
+     * 
+     * @param payload The payload to assign.
+     */
+    void SetPayload(std::string_view payload);
 
     /**
      * @brief Parse the response payload into a WpaResponse object.
@@ -34,7 +41,7 @@ struct WpaCommand :
     std::shared_ptr<WpaResponse>
     ParseResponse(std::string_view responsePayload) const;
 
-    std::string Data;
+    std::string Payload;
 
 private:
     /**

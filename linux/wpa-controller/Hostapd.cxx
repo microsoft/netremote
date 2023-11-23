@@ -6,6 +6,8 @@
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/WpaCommandGet.hxx>
+#include <Wpa/WpaCommandSet.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 
@@ -46,6 +48,37 @@ HostapdStatus Hostapd::GetStatus()
     }
 
     return response->Status;
+}
+
+bool Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
+{
+    const WpaCommandGet getCommand(propertyName);
+    const auto response = m_controller.SendCommand(getCommand);
+    if (!response)
+    {
+        throw HostapdException("Failed to send hostapd 'get' command");
+    }
+    // Check Failed() and not IsOk() since the response will indicate failure
+    // with "FAIL", otherwise, the payload is the property value (not "OK").
+    else if (response->Failed())
+    {
+        return false;
+    }
+
+    propertyValue = response->Payload;
+    return true;
+}
+
+bool Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue)
+{
+    const WpaCommandSet setCommand(propertyName, propertyValue);
+    const auto response = m_controller.SendCommand(setCommand);
+    if (!response)
+    {
+        throw HostapdException("Failed to send hostapd 'set' command");
+    }
+
+    return response->IsOk();
 }
 
 bool Hostapd::Enable()

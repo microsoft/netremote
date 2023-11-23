@@ -24,25 +24,6 @@ struct Hostapd :
     Hostapd(std::string_view interfaceName);
 
     /**
-     * @brief Get the name of the interface hostapd is managing.
-     * 
-     * @return std::string_view 
-     */
-    std::string_view GetInterface() override;
-
-    /**
-     * @brief Checks connectivity to the hostapd daemon.
-     */
-    bool Ping() override;
-
-    /**
-     * @brief Get the status for the interface.
-     * 
-     * @return HostapdStatus 
-     */
-    HostapdStatus GetStatus() override;
-
-    /**
      * @brief Enables the interface for use.
      * 
      * @return true 
@@ -65,6 +46,45 @@ struct Hostapd :
      * @return false 
      */
     bool Terminate() override;
+
+    /**
+     * @brief Checks connectivity to the hostapd daemon.
+     */
+    bool Ping() override;
+
+    /**
+     * @brief Get the name of the interface hostapd is managing.
+     * 
+     * @return std::string_view 
+     */
+    std::string_view GetInterface() override;
+
+    /**
+     * @brief Get the status for the interface.
+     * 
+     * @return HostapdStatus 
+     */
+    HostapdStatus GetStatus() override;
+
+    /**
+     * @brief Get a property value for the interface.
+     * 
+     * @param propertyName The name of the property to retrieve.
+     * @param propertyValue The string to store the property value in.
+     * @return true If the property value was obtained and its value is in 'propertyValue'.
+     * @return false If t he property value could not be obtained due to an error.
+     */
+    bool GetProperty(std::string_view propertyName, std::string& propertyValue) override; 
+
+    /**
+     * @brief Set a property on the interface.
+     * 
+     * @param propertyName The name of the property to set.
+     * @param propertyValue The value of the property to set.
+     * @return true The property was set successfully.
+     * @return false The property was not set successfully.
+     */
+    bool SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
 
 private:
     const std::string m_interface;
