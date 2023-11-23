@@ -6,6 +6,8 @@
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/WpaCommandStatus.hxx>
+#include <Wpa/WpaResponseStatus.hxx>
 
 using namespace Wpa;
 
@@ -35,34 +37,15 @@ bool Hostapd::Ping()
 
 HostapdStatus Hostapd::GetStatus()
 {
-    static constexpr WpaCommand StatusCommand(ProtocolHostapd::CommandPayloadStatus);
+    static constexpr WpaCommandStatus StatusCommand;
 
-    auto response = m_controller.SendCommand(StatusCommand);
+    auto response = m_controller.SendCommand<WpaResponseStatus>(StatusCommand);
     if (!response)
     {
         throw HostapdException("Failed to send hostapd 'status' command");
     }
 
-    HostapdStatus hostapdStatus{};
-
-    // Parse the response for the state field. Note that this code will later be
-    // replaced by proper generic response parsing code, so this is quick-and-dirty.
-    static constexpr std::string_view StateKey = "state=";
-
-    // Find interface state string in payload.
-    auto keyPosition = response->Payload.find(StateKey);
-    if (keyPosition == response->Payload.npos)
-    {
-        // The response should always have this field and not much can be done without it.
-        throw HostapdException("hostapd 'status' command response missing state field");
-    }
-
-    // Convert value string to corresponding enum value.
-    const auto valuePosition = keyPosition + std::size(StateKey);
-    const auto* value = std::data(response->Payload) + valuePosition;
-    hostapdStatus.State = HostapdInterfaceStateFromString(value);
-
-    return hostapdStatus;
+    return response->Status;
 }
 
 bool Hostapd::Enable()

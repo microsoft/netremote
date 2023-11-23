@@ -7,10 +7,12 @@ set(NOTSTD_PUBLIC_INCLUDE_PREFIX ${NOTSTD_PUBLIC_INCLUDE}/notstd)
 target_sources(notstd
     PUBLIC
         ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Exceptions.hxx
+        ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Utility.hxx
 )
 
 list(APPEND NOTSTD_PUBLIC_HEADERS
     ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Exceptions.hxx
+    ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Utility.hxx
 )
 
 set_target_properties(notstd PROPERTIES

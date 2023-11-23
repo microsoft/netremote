@@ -179,6 +179,10 @@ struct ProtocolHostapd :
     static constexpr auto ResponsePayloadStatusDfs = "DFS";
     static constexpr auto ResponsePayloadStatusNoIr = "NO_IR";
     static constexpr auto ResponsePayloadStatusUnknown = "UNKNOWN";
+
+    // Response properties for the "STATUS" command.
+    // Note: all properties must be terminated with the key-value delimeter (=).
+    static constexpr auto ResponseStatusPropertyKeyState = "state=";
 };
 
 /**

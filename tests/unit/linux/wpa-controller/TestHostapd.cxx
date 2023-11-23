@@ -101,7 +101,6 @@ TEST_CASE("Send control commands: Enable(), Disable()", "[wpa][hostapd][client][
     using namespace Wpa;
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
-    const auto hostapdStatusInitial = hostapd.GetStatus();
 
     SECTION("Enable() doesn't throw")
     {

@@ -86,18 +86,23 @@ WpaController::SendCommand(const WpaCommand& command)
     // Send the command and receive the response.
     std::array<char, WpaControlSocket::MessageSizeMax> responseBuffer;
     std::size_t responseSize = std::size(responseBuffer);
+
     int ret = wpa_ctrl_request(controlSocket, std::data(command.Data), std::size(command.Data), std::data(responseBuffer), &responseSize, nullptr);
     switch (ret)
     {
     case 0:
-        break;
+    {
+        std::string_view responsePayload{std::data(responseBuffer), responseSize};
+        return command.ParseResponse(responsePayload);
+    }
     case -1:
         std::cerr << std::format("Failed to send or receive command to {} interface.", m_interfaceName) << std::endl;
         return nullptr;
     case -2:
         std::cerr << std::format("Sending command to {} interface timed out.", m_interfaceName) << std::endl;
         return nullptr;
+    default:
+        std::cerr << std::format("Unknown error sending command to {} interface (ret={}).", m_interfaceName, ret) << std::endl;
+        return nullptr;
     }
-
-    return std::make_shared<WpaResponse>(std::string_view{std::data(responseBuffer), responseSize});
 }

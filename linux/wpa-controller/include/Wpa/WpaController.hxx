@@ -2,6 +2,7 @@
 #ifndef WPA_CONTROLLER_HXX
 #define WPA_CONTROLLER_HXX
 
+#include <concepts>
 #include <filesystem>
 #include <memory>
 #include <shared_mutex>
@@ -75,6 +76,21 @@ struct WpaController
      */
     std::shared_ptr<WpaResponse>
     SendCommand(const WpaCommand& command);
+
+    /**
+     * @brief Syntactic sugar for returning a specific derived response type.
+     * 
+     * @tparam ResponseT The type of response to return.
+     * @param command The command to send.
+     * @return std::shared_ptr<ResponseT> 
+     */
+    template <typename ResponseT>
+    requires std::derived_from<ResponseT, WpaResponse>
+    std::shared_ptr<ResponseT>
+    SendCommand(const WpaCommand& command)
+    {
+        return std::dynamic_pointer_cast<ResponseT>(SendCommand(command));
+    }
 
     /**
      * @brief Helper class for working with the wpa control socket.
