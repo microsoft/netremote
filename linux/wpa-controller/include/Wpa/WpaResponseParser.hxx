@@ -7,8 +7,6 @@
 #include <string_view>
 #include <vector>
 #include <unordered_map>
-#include <utility>
-#include <tuple>
 
 #include <Wpa/WpaKeyValuePair.hxx>
 #include <Wpa/WpaResponse.hxx>

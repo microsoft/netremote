@@ -49,7 +49,7 @@ struct WpaKeyValuePair
     }
 
     /**
-      * Parses the input string and attempts to resolve the property value,
+     * Parses the input string and attempts to resolve the property value,
      * assigning it to the Value member if found. Note that this function does
      * not parse the value itself, it only resolves the value location in the
      * input string, making it available for later parsing by derived classes
