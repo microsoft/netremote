@@ -12,4 +12,5 @@ WpaCommandSet::WpaCommandSet(std::string_view propertyName, std::string_view pro
     PropertyName(propertyName),
     PropertyValue(propertyValue)
 {
+    SetPayload(PropertyPayload);
 }
