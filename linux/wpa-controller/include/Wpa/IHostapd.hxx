@@ -24,16 +24,40 @@ struct IHostapd
     virtual ~IHostapd() = default;
 
     /**
-     * @brief Get the name of the interface hostapd is managing.
+     * @brief Enables the interface for use.
      * 
-     * @return std::string_view 
+     * @return true 
+     * @return false 
      */
-    virtual std::string_view GetInterface() = 0;
+    virtual bool Enable() = 0;
+
+    /**
+     * @brief Disables the interface for use.
+     * 
+     * @return true 
+     * @return false 
+     */
+    virtual bool Disable() = 0;
+
+    /**
+     * @brief Terminates the process hosting the daemon.
+     * 
+     * @return true 
+     * @return false 
+     */
+    virtual bool Terminate() = 0;
 
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
     virtual bool Ping() = 0;
+
+    /**
+     * @brief Get the name of the interface hostapd is managing.
+     * 
+     * @return std::string_view 
+     */
+    virtual std::string_view GetInterface() = 0;
 
     /**
      * @brief Get the status for the interface.
@@ -61,30 +85,6 @@ struct IHostapd
      * @return false The property was not set successfully.
      */
     virtual bool SetProperty(std::string_view propertyName, std::string_view propertyValue) = 0;
-
-    /**
-     * @brief Enables the interface for use.
-     * 
-     * @return true 
-     * @return false 
-     */
-    virtual bool Enable() = 0;
-
-    /**
-     * @brief Disables the interface for use.
-     * 
-     * @return true 
-     * @return false 
-     */
-    virtual bool Disable() = 0;
-
-    /**
-     * @brief Terminates the process hosting the daemon.
-     * 
-     * @return true 
-     * @return false 
-     */
-    virtual bool Terminate() = 0;
 };
 
 /**

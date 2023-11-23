@@ -24,16 +24,40 @@ struct Hostapd :
     Hostapd(std::string_view interfaceName);
 
     /**
-     * @brief Get the name of the interface hostapd is managing.
+     * @brief Enables the interface for use.
      * 
-     * @return std::string_view 
+     * @return true 
+     * @return false 
      */
-    std::string_view GetInterface() override;
+    bool Enable() override;
+
+    /**
+     * @brief Disables the interface for use.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool Disable() override;
+
+    /**
+     * @brief Terminates the process hosting the daemon.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool Terminate() override;
 
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
     bool Ping() override;
+
+    /**
+     * @brief Get the name of the interface hostapd is managing.
+     * 
+     * @return std::string_view 
+     */
+    std::string_view GetInterface() override;
 
     /**
      * @brief Get the status for the interface.
@@ -61,30 +85,6 @@ struct Hostapd :
      * @return false The property was not set successfully.
      */
     bool SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
-
-    /**
-     * @brief Enables the interface for use.
-     * 
-     * @return true 
-     * @return false 
-     */
-    bool Enable() override;
-
-    /**
-     * @brief Disables the interface for use.
-     * 
-     * @return true 
-     * @return false 
-     */
-    bool Disable() override;
-
-    /**
-     * @brief Terminates the process hosting the daemon.
-     * 
-     * @return true 
-     * @return false 
-     */
-    bool Terminate() override;
 
 private:
     const std::string m_interface;
