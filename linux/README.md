@@ -58,14 +58,28 @@ Execute the following commands in a shell:
 
 ```bash
 sudo apt update
-sudo apt-get install -y build-essential git ninja-build clang clang-format clang-tidy llvm lldb gnupg gdb zip unzip tar curl pkg-config wget
+sudo apt-get install -y build-essential ca-certificates cmake curl dotnet7 git gnupg2 linux-libc-dev ninja-build pkg-config tar unzip zip
+```
+
+Then remove the pre-installed version of llvm-16, and install llvm-17 with the automated install script:
+
+```bash
+sudo apt-get remove -y --purge clang-16* lldb-16* llvm-16*
+sudo apt-get install -y --no-install-recommends lsb-release software-properties-common wget
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+./llvm.sh 17 all
+rm llvm.sh
 ```
 
 The above will install all the tools required to compile, lint, and debug the project. If hostapd will also be compiled ([git://w1.fi/hostap.git](git://w1.fi/hostap.git)), install the following additional development dependencies:
 
 ```bash
-sudo apt-get install -y libnl-3-dev libssl-dev libwpa-client-dev libnl-genl-3-dev 
+sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
 ```
+
+> [!NOTE]
+> The source of truth for installing development dependencies is found in the development environment [Dockerfile](../.docker/netremote-dev/Dockerfile). The instructions there always trump the instructions here as the contianer described by the `Dockerfile` is used to build the official package.
 
 ### 3. Install Docker on Windows
 
