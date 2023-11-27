@@ -85,9 +85,10 @@ RUN apt-get update && \
         ssh \
         sudo \
         # Generic development tools.
-        # emacs gdb nano policycoreutils-python-utils python-is-python3 vim
+        # emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
         emacs \
         gdb \
+        kmod \
         nano \
         policycoreutils-python-utils \
         python-is-python3 \
@@ -109,14 +110,13 @@ RUN chmod 0755 /etc/update-motd.d/50-sysinfo && \
 
 FROM netremote-dev-base as netremote-build-mac80211hwsim
 
-COPY build-mac80211_hwsim-kmod.sh /tmp/build-mac80211_hwsim-kmod.sh
-RUN chmod +x /tmp/build-mac80211_hwsim-kmod.sh && \
-    /tmp/build-mac80211_hwsim-kmod.sh
+COPY --chmod=755 build-mac80211_hwsim-kmod.sh /tmp/build-mac80211_hwsim-kmod.sh
+RUN /tmp/build-mac80211_hwsim-kmod.sh
 
 FROM netremote-dev-base as netremote-dev
 
 # Copy built-modules from build stage, discarding the source tree.
-COPY --from=netremote-build-mac80211hwsim --chmod=755 /lib/modules/$(uname -r)/ /lib/modules/$(uname -r)/
+COPY --from=netremote-build-mac80211hwsim --chmod=755 /lib/modules/ /lib/modules/
 
 # Set entrypoint and start interactive shell (bash).
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
