@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euxo pipefail
+
 DEBUG=1
 
 # Determine active kernel version number.
@@ -23,11 +25,11 @@ WSL_SRC_CONFIG_DIRECTORY=Microsoft
 WSL_SRC_CONFIG=${WSL_SRC_CONFIG_DIRECTORY}/${WSL_SRC_CONFIG_FILE_NAME}
 
 # WSL kernel compilation arguments.
-WSL_KERNEL_COMPILE_ARG_PARALLEL=-j $(expr $(nproc) - 1)
+WSL_KERNEL_COMPILE_ARG_PARALLEL="-j $(expr $(nproc) - 1)"
 
 # Additional arguments passed to wget when downloading kernel source.
 # Mostly used for testing.
-WGET_XTRA_ARGS="--spider"
+WGET_XTRA_ARGS=
 
 if [[ $DEBUG -eq 1 ]]; then
     echo "DEBUG: KERNEL_VERSION=${KERNEL_VERSION}"
