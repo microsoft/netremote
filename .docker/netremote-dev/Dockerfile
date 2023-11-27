@@ -52,7 +52,7 @@ RUN apt-get install -qq -y --no-install-recommends \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-FROM netremote as netremote-dev
+FROM netremote as netremote-dev-base
 
 # Install packages.
 RUN apt-get update && \
@@ -106,6 +106,17 @@ RUN chmod 0755 /etc/update-motd.d/50-sysinfo && \
     rm -f /etc/update-motd.d/50-landscape-sysinfo && \
     # Permission for entrypoint script
     chmod +x /bin/entrypoint.sh
+
+FROM netremote-dev-base as netremote-build-mac80211hwsim
+
+COPY build-mac80211_hwsim-kmod.sh /tmp/build-mac80211_hwsim-kmod.sh
+RUN chmod +x /tmp/build-mac80211_hwsim-kmod.sh && \
+    /tmp/build-mac80211_hwsim-kmod.sh
+
+FROM netremote-dev-base as netremote-dev
+
+# Copy built-modules from build stage, discarding the source tree.
+COPY --from=netremote-build-mac80211hwsim --chmod=755 /lib/modules/$(uname -r)/ /lib/modules/$(uname -r)/
 
 # Set entrypoint and start interactive shell (bash).
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
