@@ -85,9 +85,10 @@ RUN apt-get update && \
         ssh \
         sudo \
         # Generic development tools.
-        # emacs gdb nano policycoreutils-python-utils python-is-python3 vim
+        # emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
         emacs \
         gdb \
+        kmod \
         nano \
         policycoreutils-python-utils \
         python-is-python3 \
@@ -98,14 +99,16 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy outside content into container.
-COPY entrypoint.sh /bin/entrypoint.sh
-COPY 50-sysinfo /etc/update-motd.d/50-sysinfo
+COPY --chmod=0755 entrypoint.sh /bin/entrypoint.sh
+COPY --chmod=0755 50-sysinfo /etc/update-motd.d/50-sysinfo
+COPY --chmod=0755 build-mac80211_hwsim-kmod.sh /tmp/build-mac80211_hwsim-kmod.sh
 
 # Message of the day settings.
-RUN chmod 0755 /etc/update-motd.d/50-sysinfo && \
-    rm -f /etc/update-motd.d/50-landscape-sysinfo && \
-    # Permission for entrypoint script
-    chmod +x /bin/entrypoint.sh
+RUN rm -f /etc/update-motd.d/50-landscape-sysinfo
+
+# Build the mac80211_hwsim kernel module.
+RUN /tmp/build-mac80211_hwsim-kmod.sh && \
+    mv /tmp/build-mac80211_hwsim-kmod.sh ${HOME}/
 
 # Set entrypoint and start interactive shell (bash).
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
