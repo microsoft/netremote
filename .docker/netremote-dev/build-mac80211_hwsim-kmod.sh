@@ -17,7 +17,8 @@ KERNEL_URL_FILE=${KERNEL_URL_BASE}/${KERNEL_FILE_NAME}
 KERNEL_CONFIG_UTIL=scripts/config
 
 # WSL kernel source directory name.
-WSL_SRC_DIRECTORY_BASE=${WSL_SRC_DIRECTORY_BASE:=$(mktemp -d)}
+WSL_SRC_DIRECTORY_BASE_DEFAULT=${HOME}/src
+WSL_SRC_DIRECTORY_BASE=${WSL_SRC_DIRECTORY_BASE:=${WSL_SRC_DIRECTORY_BASE_DEFAULT}}
 WSL_SRC_DIRECTORY_PREFIX=WSL2-Linux-Kernel-
 WSL_SRC_DIRECTORY=${WSL_SRC_DIRECTORY_PREFIX}${KERNEL_FILE_NAME_STEM}
 WSL_SRC_CONFIG_FILE_NAME=config-${KERNEL_VERSION}
@@ -49,7 +50,11 @@ sudo apt-get install -y build-essential bc bison flex dwarves kmod libssl-dev li
 
 # Download and unpack kernel source.
 echo "Downloading and unpacking kernel source..."
-cd ${WSL_SRC_DIRECTORY_BASE:=${TMP}}
+if [[ ! -d ${WSL_SRC_DIRECTORY_BASE} ]]; then
+    mkdir -p ${WSL_SRC_DIRECTORY_BASE}
+fi
+
+cd ${WSL_SRC_DIRECTORY_BASE}
 wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzvf -
 cd ${WSL_SRC_DIRECTORY}
 
