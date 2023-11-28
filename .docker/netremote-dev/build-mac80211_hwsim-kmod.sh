@@ -2,8 +2,6 @@
 
 set -euxo pipefail
 
-DEBUG=1
-
 # Determine active kernel version number.
 KERNEL_VERSION=`uname -r | grep -Eo '([0-9]+)*(\.?[0-9]+)*' | head -1`
 
@@ -32,6 +30,7 @@ WSL_KERNEL_COMPILE_ARG_PARALLEL="-j $(expr $(nproc) - 1)"
 # Mostly used for testing.
 WGET_XTRA_ARGS=
 
+# Print debug information if DEBUG is set to 1.
 if [[ $DEBUG -eq 1 ]]; then
     echo "DEBUG: KERNEL_VERSION=${KERNEL_VERSION}"
     echo "DEBUG: KERNEL_FILE_NAME=${KERNEL_FILE_NAME}"
@@ -88,8 +87,5 @@ make modules ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
 
 echo "Installing kernel modules..."
 sudo make modules_install
-
-echo "Loading new kernel modules..."
-sudo depmod -a
 
 echo "Done."
