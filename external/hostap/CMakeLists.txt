@@ -54,6 +54,14 @@ ExternalProject_Add(hostap
     INSTALL_COMMAND 
         COMMAND Q=1 DESTDIR=${HOSTAP_INSTALL_DIR} ${MAKE} -C ${WPA_SUPPLICANT_DIR_NAME} install
         COMMAND Q=1 DESTDIR=${HOSTAP_INSTALL_DIR} ${MAKE} -C ${HOSTAPD_DIR_NAME} install
+    INSTALL_BYPRODUCTS
+        ${HOSTAP_INSTALL_BIN_DIR}/hostapd
+        ${HOSTAP_INSTALL_BIN_DIR}/hostapd_cli
+        ${HOSTAP_INSTALL_INCLUDE_DIR}/wpa_ctrl.h
+        ${HOSTAP_INSTALL_LIB_DIR}/libwpa_client.so
+        ${HOSTAP_INSTALL_SBIN_DIR}/wpa_cli
+        ${HOSTAP_INSTALL_SBIN_DIR}/wpa_passphrase
+        ${HOSTAP_INSTALL_SBIN_DIR}/wpa_supplicant
 )
 
 # Define an interface library for libwpa_client.so that other cmake targets can use in target_link_libraries to pull it in as a dependency.
