@@ -5,6 +5,8 @@ package Microsoft.Net.Wifi;
 
 enum RadioBand
 {
+    option allow_alias = true;
+    
     RadioBandUnknown = 0;
     RadioBand2400MHz = 1;
     RadioBand2_4GHz = 1;
