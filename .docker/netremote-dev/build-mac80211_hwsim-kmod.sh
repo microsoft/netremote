@@ -1,4 +1,11 @@
 #!/bin/bash
+#
+# Compiles the mac80211_hwsim driver as a module for the WSL2 kernel.
+#
+# Inspired by:
+# - https://gist.github.com/charlie-x/96a92aaaa04346bdf1fb4c3621f3e392
+# - https://github.com/microsoft/WSL2-Linux-Kernel#build-instructions
+#
 
 set -euxo pipefail
 
@@ -30,16 +37,6 @@ WSL_KERNEL_COMPILE_ARG_PARALLEL="-j $(expr $(nproc) - 1)"
 # Mostly used for testing.
 WGET_XTRA_ARGS=
 
-# Print debug information if DEBUG is set to 1.
-if [[ $DEBUG -eq 1 ]]; then
-    echo "DEBUG: KERNEL_VERSION=${KERNEL_VERSION}"
-    echo "DEBUG: KERNEL_FILE_NAME=${KERNEL_FILE_NAME}"
-    echo "DEBUG: KERNEL_URL_FILE=${KERNEL_URL_FILE}"
-    echo "DEBUG: WSL_SRC_DIRECTORY=${WSL_SRC_DIRECTORY}"
-    echo "DEBUG: WSL_SRC_CONFIG_FILE_NAME=${WSL_SRC_CONFIG_FILE_NAME}"
-    echo "DEBUG: WSL_SRC_CONFIG=${WSL_SRC_CONFIG}"
-fi
-
 # Install dependencies for building kernel modules.
 # (see https://github.com/microsoft/WSL2-Linux-Kernel)
 # added bc, python-is-python3
@@ -63,16 +60,10 @@ if [[ ! -f ${WSL_SRC_CONFIG} ]]; then
     cat /proc/config.gz | gzip -d > ${WSL_SRC_CONFIG}
 fi
 
+# Create a link to where the kernel build expects the config file.
 if [[ ! -f .config ]]; then
     ln -s ${WSL_SRC_CONFIG} .config
 fi
-
-# Supply defaults for any new/unspecified options in the configuration.
-make olddefconfig
-
-# Prepare the source tree for building external modules.
-echo "Preparing kernel source tree for building external modules..."
-make prepare modules_prepare ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
 
 # Update the configuration to build the mac80211_hwsim module and its dependencies.
 echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
@@ -81,6 +72,12 @@ ${KERNEL_CONFIG_UTIL} \
     --module CONFIG_CFG80211 \
     --module CONFIG_MAC80211 \
     --module CONFIG_MAC80211_HWSIM
+
+# Supply defaults for any new/unspecified options in the configuration.
+make olddefconfig
+
+echo "Preparing kernel source tree for building external modules..."
+make prepare modules_prepare ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
 
 echo "Building kernel modules..."
 make modules ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
