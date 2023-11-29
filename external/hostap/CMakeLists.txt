@@ -43,6 +43,14 @@ ExternalProject_Add(hostap
     GIT_REPOSITORY "http://w1.fi/hostap.git"
     GIT_TAG "hostap_2_10"
     GIT_SHALLOW TRUE
+    BUILD_BYPRODUCTS
+        ${HOSTAP_INSTALL_BIN_DIR}/hostapd
+        ${HOSTAP_INSTALL_BIN_DIR}/hostapd_cli
+        ${HOSTAP_INSTALL_INCLUDE_DIR}/wpa_ctrl.h
+        ${HOSTAP_INSTALL_LIB_DIR}/libwpa_client.so
+        ${HOSTAP_INSTALL_SBIN_DIR}/wpa_cli
+        ${HOSTAP_INSTALL_SBIN_DIR}/wpa_passphrase
+        ${HOSTAP_INSTALL_SBIN_DIR}/wpa_supplicant
     CONFIGURE_COMMAND
         # Copy local build configuration files for libwpa_client.so and hostapd builds.
         COMMAND cp -n ${CMAKE_CURRENT_SOURCE_DIR}/libwpa_client/.config ${WPA_SUPPLICANT_PREFIX}/.config
