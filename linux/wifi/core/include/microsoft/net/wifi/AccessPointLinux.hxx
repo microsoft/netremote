@@ -12,6 +12,10 @@ namespace Microsoft::Net::Wifi
 struct AccessPointLinux :
     public AccessPoint
 {
+    /**
+     * @brief Inherit the constructors from the base class.
+     */
+    using AccessPoint::AccessPoint;
 };
 
 } // namespace Microsoft::Net::Wifi

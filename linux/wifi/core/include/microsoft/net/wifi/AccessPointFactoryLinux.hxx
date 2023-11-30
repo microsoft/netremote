@@ -5,7 +5,7 @@
 #include <memory>
 #include <string_view>
 
-#include <microsoft/net/wifi/AccessPointLinux.hxx>
+#include <microsoft/net/wifi/IAccessPointFactory.hxx>
 
 namespace Microsoft::Net::Wifi
 {
