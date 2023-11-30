@@ -36,8 +36,8 @@ TEST_CASE("Destroy an AccessPoint instance", "[wifi][core][ap]")
 
     SECTION("Destroy doesn't cause a crash")
     {
-        std::optional<AccessPoint> accessPoint(Test::InterfaceNameDefault);
-        REQUIRE_NOTHROW(accessPoint.reset());
+        AccessPoint accessPoint{ Test::InterfaceNameDefault };
+        REQUIRE_NOTHROW(accessPoint.~AccessPoint());
     }
 }
 
