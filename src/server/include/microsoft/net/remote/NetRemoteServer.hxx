@@ -57,9 +57,9 @@ private:
     static std::unique_ptr<CLI::App> CreateCliParser();
 
 private:
-    std::unique_ptr<CLI::App> m_cliParser;
     std::string m_serverAddress{ ServerAddressDefault };
     std::unique_ptr<grpc::Server> m_server;
+    std::unique_ptr<CLI::App> m_cliParser;
     Service::NetRemoteService m_service{};
 };
 } // namespace Microsoft::Net::Remote
