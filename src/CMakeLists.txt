@@ -1,5 +1,4 @@
 
-add_subdirectory(apmanager)
 add_subdirectory(client)
 add_subdirectory(dotnet)
 add_subdirectory(server)
