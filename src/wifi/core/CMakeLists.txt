@@ -9,6 +9,7 @@ target_sources(wifi-core
         AccessPoint.cxx
     PUBLIC
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointFactory.hxx
 )
 
 target_include_directories(wifi-core
@@ -18,6 +19,7 @@ target_include_directories(wifi-core
 
 list(APPEND WIFI_CORE_PUBLIC_HEADERS
     ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
+    ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointFactory.hxx
 )
 
 set_target_properties(wifi-core PROPERTIES
@@ -29,4 +31,3 @@ install(
     EXPORT netremote
     PUBLIC_HEADER DESTINATION "${WIFI_CORE_PUBLIC_HEADERS}"
 )
-
