@@ -11,7 +11,7 @@ namespace Microsoft::Net::Wifi::Test
 static constexpr auto InterfaceNameDefault{ "wlan0" };
 } // namespace Microsoft::Net::Wifi::Test
 
-TEST_CASE("Create an AccessPoint instance", "[wifi][core]")
+TEST_CASE("Create an AccessPoint instance", "[wifi][core][ap]")
 {
     using namespace Microsoft::Net::Wifi;
 
@@ -28,5 +28,27 @@ TEST_CASE("Create an AccessPoint instance", "[wifi][core]")
 
         std::optional<AccessPoint> accessPoint2;
         REQUIRE_NOTHROW(accessPoint2.emplace(Test::InterfaceNameDefault));
+    }
+}
+
+TEST_CASE("Destroy an AccessPoint instance", "[wifi][core][ap]")
+{
+    using namespace Microsoft::Net::Wifi;
+
+    SECTION("Destroy doesn't cause a crash")
+    {
+        std::optional<AccessPoint> accessPoint(Test::InterfaceNameDefault);
+        REQUIRE_NOTHROW(accessPoint.reset());
+    }
+}
+
+TEST_CASE("AccessPoint instance reflects basic properties", "[wifi][core][ap]")
+{
+    using namespace Microsoft::Net::Wifi;
+
+    SECTION("GetInterface() returns the interface name")
+    {
+        AccessPoint accessPoint{ Test::InterfaceNameDefault };
+        REQUIRE(accessPoint.GetInterface() == Test::InterfaceNameDefault);
     }
 }
