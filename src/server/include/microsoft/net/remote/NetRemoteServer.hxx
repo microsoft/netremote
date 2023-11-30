@@ -6,7 +6,6 @@
 #include <string_view>
 #include <string>
 
-#include <CLI/CLI.hpp>
 #include <grpcpp/server.h>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 
@@ -18,17 +17,11 @@ namespace Microsoft::Net::Remote
 struct NetRemoteServer
 {
     /**
-     * @brief Default address for the server to listen on.
-     */
-    static constexpr auto ServerAddressDefault = "0.0.0.0:5047";
-
-    /**
-     * @brief Construct a new NetRemoteServer object from command-line arguments.
+     * @brief Construct a new NetRemoteServer object.
      * 
-     * @param argc The number of arguments.
-     * @param argv An array of 'argc' arguments.
+     * @param serverAddress 
      */
-    NetRemoteServer(int argc, char* argv[]);
+    NetRemoteServer(std::string_view serverAddress);
 
     /**
      * @brief Get the GrpcServer object.
@@ -48,18 +41,8 @@ struct NetRemoteServer
     void Stop();
 
 private:
-    /**
-     * @brief Create a CLI11 parser object configured with the supported CLI
-     * arguments.
-     * 
-     * @return std::unique_ptr<CLI::App> 
-     */
-    static std::unique_ptr<CLI::App> CreateCliParser();
-
-private:
-    std::string m_serverAddress{ ServerAddressDefault };
+    std::string m_serverAddress;
     std::unique_ptr<grpc::Server> m_server;
-    std::unique_ptr<CLI::App> m_cliParser;
     Service::NetRemoteService m_service{};
 };
 } // namespace Microsoft::Net::Remote
