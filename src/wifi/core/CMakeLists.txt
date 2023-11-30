@@ -9,6 +9,7 @@ target_sources(wifi-core
         AccessPoint.cxx
     PUBLIC
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointFactory.hxx
 )
 
@@ -19,6 +20,7 @@ target_include_directories(wifi-core
 
 list(APPEND WIFI_CORE_PUBLIC_HEADERS
     ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
+    ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
     ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointFactory.hxx
 )
 

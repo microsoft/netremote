@@ -5,7 +5,7 @@
 #include <memory>
 #include <string_view>
 
-#include <microsoft/net/wifi/AccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -25,7 +25,7 @@ struct IAccessPointFactory
      * @param interface 
      * @return std::shared_ptr<AccessPoint> 
      */
-    virtual std::shared_ptr<AccessPoint> Create(std::string_view interface) = 0;
+    virtual std::shared_ptr<IAccessPoint> Create(std::string_view interface) = 0;
 };
 } // namespace Microsoft::Net::Wifi
 

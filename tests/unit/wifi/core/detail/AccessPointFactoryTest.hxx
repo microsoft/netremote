@@ -5,7 +5,7 @@
 #include <memory>
 #include <string_view>
 
-#include <microsoft/net/wifi/AccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointFactory.hxx>
 
 namespace Microsoft::Net::Wifi::Test
@@ -26,9 +26,9 @@ struct AccessPointFactoryTest :
      * @param interface The interface to create the AccessPoint for. This can be
      * any string and does not have to correspond to a real device interface.
      * 
-     * @return std::shared_ptr<AccessPoint> 
+     * @return std::shared_ptr<IAccessPoint> 
      */
-    std::shared_ptr<AccessPoint> Create(std::string_view interface) override;
+    std::shared_ptr<IAccessPoint> Create(std::string_view interface) override;
 };
 } // namespace Microsoft::Net::Wifi::Test
 

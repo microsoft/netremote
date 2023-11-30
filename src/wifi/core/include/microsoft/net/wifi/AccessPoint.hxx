@@ -2,15 +2,19 @@
 #ifndef ACCESS_POINT_HXX
 #define ACCESS_POINT_HXX
 
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+
 #include <string_view>
 #include <string>
 
 namespace Microsoft::Net::Wifi
 {
 /**
- * @brief The AccessPoint struct represents a wireless access point.
+ * @brief Base IAccessPoint implementation providing functionality common to all
+ * implementations. 
  */
-struct AccessPoint
+struct AccessPoint :
+    public IAccessPoint
 {
     /**
      * @brief Construct a new AccessPoint object with the given network
@@ -25,7 +29,7 @@ struct AccessPoint
      * 
      * @return std::string_view 
      */
-    std::string_view GetInterface() const noexcept;
+    std::string_view GetInterface() const noexcept override;
 
 private:
     const std::string m_interface;
