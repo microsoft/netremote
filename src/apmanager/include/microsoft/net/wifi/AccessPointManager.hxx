@@ -2,6 +2,7 @@
 #ifndef ACCESS_POINT_MANAGER_HXX
 #define ACCESS_POINT_MANAGER_HXX
 
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 
@@ -23,6 +24,7 @@ struct AccessPointManager
     std::unordered_map<std::string, AccessPoint> EnumerateAccessPoints() const noexcept;
 
 private:
+    mutable std::shared_mutex m_accessPointsGate;
     std::unordered_map<std::string, AccessPoint> m_accessPoints;
 };
 } // namespace Microsoft::Net::Wifi
