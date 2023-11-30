@@ -3,6 +3,11 @@
 
 using namespace Microsoft::Net::Wifi;
 
+AccessPointManager::AccessPointManager(std::unique_ptr<IAccessPointFactory> accessPointFactory) :
+    m_accessPointFactory{ std::move(accessPointFactory) }
+{
+}
+
 std::unordered_map<std::string, std::weak_ptr<AccessPoint>> AccessPointManager::EnumerateAccessPoints() const noexcept
 {
     std::shared_lock sharedAccessPointsLock{ m_accessPointsGate };
