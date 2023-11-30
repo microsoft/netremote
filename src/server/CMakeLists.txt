@@ -19,6 +19,8 @@ target_include_directories(netremote-server
 target_link_libraries(netremote-server
     PUBLIC
         netremote-service
+    PRIVATE
+        CLI11::CLI11
 )
 
 install(
