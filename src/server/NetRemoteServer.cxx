@@ -12,6 +12,11 @@ NetRemoteServer::NetRemoteServer(std::string_view serverAddress) :
 {
 }
 
+NetRemoteServer::NetRemoteServer([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
+{
+    // TODO: pass argc, argv to CLI11 parser.
+}
+
 std::unique_ptr<grpc::Server>& NetRemoteServer::GetGrpcServer() noexcept
 {
     return m_server;

@@ -30,6 +30,14 @@ struct NetRemoteServer
     NetRemoteServer(std::string_view serverAddress = ServerAddressDefault);
 
     /**
+     * @brief Construct a new NetRemoteServer object from command-line arguments.
+     * 
+     * @param argc The number of arguments.
+     * @param argv An array of 'argc' arguments.
+     */
+    NetRemoteServer(int argc, char* argv[]);
+
+    /**
      * @brief Get the GrpcServer object.
      * 
      * @return std::unique_ptr<grpc::Server>& 

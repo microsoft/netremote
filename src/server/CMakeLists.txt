@@ -17,7 +17,7 @@ target_include_directories(netremote-server
 )
 
 target_link_libraries(netremote-server
-    PRIVATE
+    PUBLIC
         netremote-service
 )
 
