@@ -22,6 +22,8 @@ target_link_libraries(netremote-test-unit
 
 catch_discover_tests(netremote-test-unit)
 
+add_subdirectory(wifi)
+
 if (BUILD_FOR_LINUX)
     add_subdirectory(linux)
 endif()
