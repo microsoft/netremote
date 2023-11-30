@@ -6,6 +6,7 @@
       "name": "grpc",
       "host": true
     },
+    "cli11",
     "protobuf",
     "catch2",
     "magic-enum",
