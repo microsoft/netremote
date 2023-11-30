@@ -8,7 +8,7 @@ target_sources(netremote-server-linux
 
 target_link_libraries(netremote-server-linux
     PRIVATE
-        netremote-service
+        netremote-server
 )
 
 install(
