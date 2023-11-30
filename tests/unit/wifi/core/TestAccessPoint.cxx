@@ -3,8 +3,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/wifi/AccessPoint.hxx>
-
-#include "detail/AccessPointFactoryTest.hxx"
+#include <microsoft/net/wifi/test/AccessPointFactoryTest.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {

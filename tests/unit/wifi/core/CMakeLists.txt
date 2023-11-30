@@ -3,8 +3,6 @@ add_executable(wifi-core-test-unit)
 
 target_sources(wifi-core-test-unit
     PRIVATE
-        detail/AccessPointFactoryTest.cxx
-        detail/AccessPointFactoryTest.hxx
         TestAccessPoint.cxx
 )
 
@@ -19,6 +17,7 @@ target_link_libraries(wifi-core-test-unit
         magic_enum::magic_enum
         strings
         wifi-core
+        wifi-test-helpers
 )
 
 catch_discover_tests(wifi-core-test-unit)
