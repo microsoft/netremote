@@ -7,6 +7,7 @@ set(WIFI_CORE_LINUX_PUBLIC_INCLUDE_PREFIX ${WIFI_CORE_LINUX_PUBLIC_INCLUDE}/micr
 target_sources(wifi-core-linux
     PRIVATE
         AccessPointLinux.cxx
+        AccessPointFactoryLinux.cxx
     PUBLIC
         ${WIFI_CORE_LINUX_PUBLIC_INCLUDE_PREFIX}/AccessPointLinux.hxx
         ${WIFI_CORE_LINUX_PUBLIC_INCLUDE_PREFIX}/AccessPointFactoryLinux.hxx
