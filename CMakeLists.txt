@@ -134,10 +134,7 @@ add_compile_definitions(
 )
 
 # Conditional inclusion of OS-dependent source trees.
-if (BUILD_FOR_LINUX)
-  include(hostap)
-  add_subdirectory(linux)
-elseif (BUILD_FOR_WINDOWS)
+if (BUILD_FOR_WINDOWS)
   # Make public version of wil available.
   set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
   set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
@@ -157,7 +154,7 @@ elseif (BUILD_FOR_WINDOWS)
     /bigobj
   )
 
-  add_subdirectory(windows)
+  # add_subdirectory(windows)
 endif()
 
 add_subdirectory(protocol)
