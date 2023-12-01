@@ -9,6 +9,8 @@ add_executable(netremote-test-unit)
 
 target_sources(netremote-test-unit
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteCommon.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServiceClient.cxx
 )
 
@@ -17,7 +19,7 @@ target_link_libraries(netremote-test-unit
         Catch2::Catch2WithMain
         gRPC::grpc++
         magic_enum::magic_enum
-        netremote-service
+        netremote-server
 )
 
 catch_discover_tests(netremote-test-unit)
