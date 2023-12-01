@@ -11,6 +11,11 @@ target_link_libraries(netremote-server-linux
         netremote-server
 )
 
+set_target_properties(netremote-server-linux
+    PROPERTIES
+        OUTPUT_NAME netremote-server
+)
+
 install(
     TARGETS netremote-server-linux
     EXPORT netremote

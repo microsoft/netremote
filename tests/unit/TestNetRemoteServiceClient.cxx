@@ -1,23 +1,36 @@
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <format>
 #include <iostream>
 
 #include <catch2/catch_test_macros.hpp>
-#include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 #include <NetRemoteService.grpc.pb.h>
 
+using namespace std::chrono_literals;
+
 namespace detail
 {
 constexpr auto RemoteServiceAddressHttp = "localhost:5047";
 [[maybe_unused]] constexpr auto RemoteServiceAddressHttps = "localhost:7073";
+constexpr auto RemoteServiceConnectionTimeout = 3s;
 } // namespace detail
 
 TEST_CASE("net remote service can be reached", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote::Service;
+
+    auto channel = grpc::CreateChannel(detail::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + detail::RemoteServiceConnectionTimeout));
+}
+
+TEST_CASE("WifiConfigureAccessPoint API can be called", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
@@ -25,7 +38,7 @@ TEST_CASE("net remote service can be reached", "[basic][rpc][client][remote]")
     auto channel = grpc::CreateChannel(detail::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemote::NewStub(channel);
 
-    SECTION("WifiConfigureAccessPoint can be called")
+    SECTION("Can be called")
     {
         for (const auto& band : magic_enum::enum_values<Microsoft::Net::Wifi::RadioBand>())
         {

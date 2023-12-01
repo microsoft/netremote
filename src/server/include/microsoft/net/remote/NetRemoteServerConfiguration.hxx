@@ -45,7 +45,7 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Run the service in the background.
      */
-    bool RunInBackground{ true };
+    bool RunInBackground{ false };
 };
 
 } // namespace Microsoft::Net::Remote

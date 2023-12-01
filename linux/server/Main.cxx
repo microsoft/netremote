@@ -8,8 +8,7 @@
 
 using namespace Microsoft::Net::Remote;
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     const auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
 
@@ -27,6 +26,10 @@ main(int argc, char* argv[])
             std::cerr << what << std::endl;
             throw std::runtime_error(what);
         }
+    }
+    else
+    {
+        server.GetGrpcServer()->Wait();
     }
 
     return 0;
