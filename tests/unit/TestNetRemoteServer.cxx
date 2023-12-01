@@ -1,14 +1,9 @@
 
-#include <algorithm>
 #include <optional>
-#include <ranges>
-#include <tuple>
-#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators_range.hpp>
 #include <grpcpp/create_channel.h>
-#include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <NetRemoteService.grpc.pb.h>
 
@@ -27,16 +22,24 @@ TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 TEST_CASE("Destroy a NetRemoteServer instance", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+
+    std::optional<NetRemoteServer> server{ Test::RemoteServiceAddressHttp };
+    server->Run();
 
     SECTION("Destroy doesn't cause a crash")
     {
-        std::optional<NetRemoteServer> server{ Test::RemoteServiceAddressHttp };
         REQUIRE_NOTHROW(server.reset());
     }
 
-    SECTION("Destroy doesn't cause a crash with no connected clients")
+    SECTION("Destroy doesn't cause a crash with connected clients")
     {
-        std::optional<NetRemoteServer> server{ Test::RemoteServiceAddressHttp };
+        // Vary the number of connected clients and validate test section for each.
+        const auto numClientsToCreate = Catch::Generators::range(1, 2);
+
+        // Establish client connections to the server.
+        const auto clients = Test::EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
+
         REQUIRE_NOTHROW(server.reset());
     }
 }
@@ -77,15 +80,7 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
         const auto numClientsToCreate = Catch::Generators::range(1, 3);
 
         // Establish client connections to the server.
-        std::vector<std::tuple<std::shared_ptr<grpc::Channel>, std::unique_ptr<NetRemote::Stub>>> clients(static_cast<std::size_t>(numClientsToCreate.get()));
-        std::ranges::transform(clients, std::begin(clients), [&](auto&&)
-        {
-            auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
-            auto client = NetRemote::NewStub(channel);
-            REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + Test::RemoteServiceConnectionTimeout));
-
-            return std::make_tuple(channel, std::move(client));
-        });
+        const auto clients = Test::EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
 
         // Stop the server.
         REQUIRE_NOTHROW(server.Stop());
@@ -108,15 +103,8 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
         // Vary the number of connected clients and validate test section for each.
         const auto numClientsToCreate = Catch::Generators::range(1, 3);
 
-        std::vector<std::tuple<std::shared_ptr<grpc::Channel>, std::unique_ptr<NetRemote::Stub>>> clients(static_cast<std::size_t>(numClientsToCreate.get()));
-        std::ranges::transform(clients, std::begin(clients), [&](auto&&)
-        {
-            auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
-            auto client = NetRemote::NewStub(channel);
-            REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + Test::RemoteServiceConnectionTimeout));
-
-            return std::make_tuple(channel, std::move(client));
-        });
+        // Establish client connections to the server.
+        const auto clients = Test::EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
 
         REQUIRE_NOTHROW(server.Stop());
         REQUIRE(server.GetGrpcServer() == nullptr);

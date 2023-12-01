@@ -9,6 +9,7 @@ add_executable(netremote-test-unit)
 
 target_sources(netremote-test-unit
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteCommon.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServiceClient.cxx
 )
