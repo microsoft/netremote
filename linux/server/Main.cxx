@@ -27,6 +27,10 @@ int main(int argc, char* argv[])
             throw std::runtime_error(what);
         }
     }
+    else
+    {
+        server.GetGrpcServer()->Wait();
+    }
 
     return 0;
 }
