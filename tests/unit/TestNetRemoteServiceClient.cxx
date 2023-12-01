@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include <catch2/catch_test_macros.hpp>
-#include <grpc/grpc.h>
 #include <grpcpp/create_channel.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
