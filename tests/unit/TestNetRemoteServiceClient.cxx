@@ -56,7 +56,6 @@ TEST_CASE("WifiConfigureAccessPoint API can be called", "[basic][rpc][client][re
                 grpc::ClientContext clientContext{};
 
                 auto status = client->WifiConfigureAccessPoint(&clientContext, request, &result);
-                INFO(status.error_message());
 
                 REQUIRE(status.ok());
                 REQUIRE(result.succeeded() == true);
