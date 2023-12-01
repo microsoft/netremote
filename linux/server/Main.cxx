@@ -8,8 +8,7 @@
 
 using namespace Microsoft::Net::Remote;
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     const auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
 
