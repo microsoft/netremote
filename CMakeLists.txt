@@ -1,11 +1,12 @@
 
 cmake_minimum_required(VERSION 3.25)
 
+# Instruct CMake to search the cmake directory for include scripts.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
 
+# Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
-
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
 
 project(netremote
@@ -64,10 +65,6 @@ endif()
 check_pie_supported(LANGUAGES CXX)
 if (CMAKE_CXX_LINK_PIE_SUPPORTED)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
-
-if (WERROR)
-  add_compile_options(-Werror)
 endif()
 
 # Set compiler specific options
@@ -132,6 +129,10 @@ add_compile_definitions(
     MAGIC_ENUM_RANGE_MIN=0
     MAGIC_ENUM_RANGE_MAX=255
 )
+
+if (WERROR)
+  add_compile_options(-Werror)
+endif()
 
 add_subdirectory(protocol)
 add_subdirectory(src)
