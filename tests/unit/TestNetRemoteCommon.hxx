@@ -28,12 +28,13 @@ constexpr auto RemoteServiceConnectionTimeout = 3s;
 
 /**
  * @brief Establish the specified number of connections to a netremote server
- * with default address and credentials.
+ * with specified address and default credentials.
  * 
  * @param numConnectionsToEstablish The number of client connections to establish.
+ * @param serverAddress The server address to connect to. Defaults to RemoteServiceAddressHttp.
  * @return std::vector<std::tuple<std::shared_ptr<grpc::Channel>, std::unique_ptr<Microsoft::Net::Remote::Service::NetRemote::Stub>>> 
  */
-std::vector<std::tuple<std::shared_ptr<grpc::Channel>, std::unique_ptr<Microsoft::Net::Remote::Service::NetRemote::Stub>>> EstablishClientConnections(std::size_t numConnectionsToEstablish);
+std::vector<std::tuple<std::shared_ptr<grpc::Channel>, std::unique_ptr<Microsoft::Net::Remote::Service::NetRemote::Stub>>> EstablishClientConnections(std::size_t numConnectionsToEstablish, std::string_view serverAddress = RemoteServiceAddressHttp);
 
 } // namespace Micosoft::Net::Remote::Test
 
