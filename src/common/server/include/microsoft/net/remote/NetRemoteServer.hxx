@@ -16,6 +16,8 @@ namespace Microsoft::Net::Remote
  */
 struct NetRemoteServer
 {
+    virtual ~NetRemoteServer();
+
     /**
      * @brief Construct a new NetRemoteServer object.
      * 

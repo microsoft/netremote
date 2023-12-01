@@ -12,6 +12,11 @@ NetRemoteServer::NetRemoteServer(std::string_view serverAddress) :
     m_serverAddress{ serverAddress }
 {}
 
+NetRemoteServer::~NetRemoteServer()
+{
+    Stop();
+}
+
 std::unique_ptr<grpc::Server>& NetRemoteServer::GetGrpcServer() noexcept
 {
     return m_server;
