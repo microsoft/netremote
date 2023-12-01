@@ -1,11 +1,12 @@
 
 cmake_minimum_required(VERSION 3.25)
 
+# Instruct CMake to search the cmake directory for include scripts.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
 
+# Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
-
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
 
 project(netremote
@@ -66,10 +67,6 @@ if (CMAKE_CXX_LINK_PIE_SUPPORTED)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-if (WERROR)
-  add_compile_options(-Werror)
-endif()
-
 # Set compiler specific options
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # Common options for both gcc and clang
@@ -124,8 +121,8 @@ endif()
 
 # Common source directories
 set(NETREMOTE_DIR_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
-set(NETREMOTE_DIR_LINUX ${CMAKE_CURRENT_LIST_DIR}/linux)
-set(NETREMOTE_DIR_WINDOWS ${CMAKE_CURRENT_LIST_DIR}/windows)
+set(NETREMOTE_DIR_LINUX ${NETREMOTE_DIR_SRC}/linux)
+set(NETREMOTE_DIR_WINDOWS ${NETREMOTE_DIR_SRC}/windows)
 
 # Add common, global compile definitions.
 add_compile_definitions(
@@ -133,31 +130,8 @@ add_compile_definitions(
     MAGIC_ENUM_RANGE_MAX=255
 )
 
-# Conditional inclusion of OS-dependent source trees.
-if (BUILD_FOR_LINUX)
-  include(hostap)
-  add_subdirectory(linux)
-elseif (BUILD_FOR_WINDOWS)
-  # Make public version of wil available.
-  set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
-  set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
-
-  find_package(wil CONFIG REQUIRED)
-
-  # Add Windows-specific global compile definitions.
-  add_compile_definitions(
-      _UNICODE
-      UNICODE
-      NOMINMAX
-      WIN32_LEAN_AND_MEAN
-  )
-
-  # Allow more than default number of sections in object files.
-  add_compile_options(
-    /bigobj
-  )
-
-  add_subdirectory(windows)
+if (WERROR)
+  add_compile_options(-Werror)
 endif()
 
 add_subdirectory(protocol)
