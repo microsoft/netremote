@@ -9,6 +9,7 @@
     "cli11",
     "protobuf",
     "catch2",
+    "plog",
     "magic-enum",
     {
       "name": "wil",
