@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_SERVER_CONFIGURATION_HXX
 #define NET_REMOTE_SERVER_CONFIGURATION_HXX
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -46,6 +47,14 @@ struct NetRemoteServerConfiguration
      * @brief Run the service in the background.
      */
     bool RunInBackground{ false };
+
+    /**
+     * @brief How verbose log output should be. The default level is 0, which
+     * will show all warnings, errors, and fatal messages. A level of 1 will
+     * show all info messages, and a level of 2 will show all debug messages,
+     * and a level of 3 or above will show all verbose messages.
+     */
+    uint8_t LogVerbosity{ 0 };
 };
 
 } // namespace Microsoft::Net::Remote

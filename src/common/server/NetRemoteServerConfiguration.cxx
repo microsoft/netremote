@@ -12,7 +12,7 @@ CLI::App&
 ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
 {
     app.add_flag(
-        "-d",
+        "-d,--daemon,-b,--background",
         config.RunInBackground,
         "Run the service as a daemon in the background");
 
@@ -20,6 +20,11 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         "-a,--address",
         config.ServerAddress,
         "The address to listen on for incoming connections.");
+
+    app.add_option(
+        "-v,--verbosity",
+        config.LogVerbosity,
+        "The log verbosity level. Supply multiple times to increase verbosity (0=warnings, errors, and fatal messages, 1=info messages, 2=debug messages, 3=verbose messages).");
 
     return app;
 }
