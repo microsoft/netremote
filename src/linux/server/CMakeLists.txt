@@ -8,7 +8,10 @@ target_sources(netremote-server-linux
 
 target_link_libraries(netremote-server-linux
     PRIVATE
+        logging-utils
         netremote-server
+        notstd
+        plog::plog
 )
 
 set_target_properties(netremote-server-linux
