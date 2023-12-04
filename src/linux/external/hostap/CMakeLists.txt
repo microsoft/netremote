@@ -82,3 +82,5 @@ set(HOSTAPD_BIN
     CACHE FILEPATH    
     "hostapd daemon binary"
 )
+
+add_subdirectory(systemd)

@@ -1,0 +1,10 @@
+[Unit]
+Description=Hostapd Daemon
+
+[Service]
+Type=forked
+Restart=on-failure
+ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B ${HOSTAP_BINARY_DIR}/${HOSTAPD_PREFIX}/.config
+
+[Install]
+WantedBy=default.target

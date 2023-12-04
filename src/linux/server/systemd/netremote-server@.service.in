@@ -1,0 +1,10 @@
+[Unit]
+Description=Netremote Daemon
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=${CMAKE_INSTALL_FULL_SBINDIR}/netremote-server -d
+
+[Install]
+WantedBy=default.target
