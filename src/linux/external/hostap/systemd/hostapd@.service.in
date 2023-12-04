@@ -2,9 +2,9 @@
 Description=Hostapd Daemon
 
 [Service]
-Type=forked
+Type=simple
 Restart=on-failure
-ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B ${HOSTAP_BINARY_DIR}/${HOSTAPD_PREFIX}/.config
+ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B etc/hostapd/hostapd.conf
 
 [Install]
 WantedBy=default.target
