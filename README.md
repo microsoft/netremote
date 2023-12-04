@@ -4,7 +4,7 @@ This project provides the ability to remotely control network components such as
 
 ## Project Structure
 
-This project is organized to allow primary development on both Linux and Windows. Hence, [CMake](https://cmake.org/) is used as the build system generator. Consequently, there is an OS-independent source tree `src`, and OS-dependent source trees `windows` and `linux`.
+This project is organized to allow primary development on both Linux and Windows. Hence, [CMake](https://cmake.org/) is used as the build system generator. Consequently, there is an OS-independent source tree under [`src`](./src/common), and OS-dependent source trees [`linux`](./src/linux/) and [`windows`](./src/windows/)`.
 
 ## Coding Guidelines
 
@@ -35,7 +35,7 @@ To help keep the code consistent, please follow these general guidelines:
 
 While not required, it is strongly recommended to configure git with a [GNU Privacy Guard (GPG)](https://gnupg.org/) signing key. This allows GitHub to verify commits were pushed by a specific user and will show a green `Verified` status beside each verified commit. Follow these steps to configure a signing key for commit verification:
 
-1. Install the gpg tools for the target operating system (see the OS-specific `README` files for details: [Windows](./windows/README.md#2-configure-commit-signing-optional), [Linux](./linux/README.md#development-environment-setup)).
+1. Install the gpg tools for the target operating system (see the OS-specific `README` files for details: [Windows](./src/windows/README.md#2-configure-commit-signing-optional), [Linux](./src/linux/README.md#development-environment-setup)).
 2. [Generate a gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/generating-a-new-gpg-key)
 3. [Add the gpg key to your github account](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)
 4. [Configure git to use the gpg key](https://docs.github.com/en/authentication/managing-commit-signature-verification/telling-git-about-your-signing-key). This link will also tell you how to use gpg signing with an ssh key. Additionally, if you wish tell git to use a type any type of signing by default, be it gpg, ssh or X.509, you need to run the following command ```git config --global commit.gpgsign true```
@@ -53,11 +53,11 @@ Both a compiler and standard C++ library supporting C++20 are required. The C++ 
 
 #### Windows
 
-[Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally satisfies the requirements, however, the full integrated development environment (IDE) is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). The build tools come with a C++ compatible compiler and standard library. Detailed development environment setup instructions can be found in the Windows [`README`](/windows/README.md).
+[Visual Studio 2022](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030&passive=false) generally satisfies the requirements, however, the full integrated development environment (IDE) is not needed. A much leaner alternative for those using other editors such as Visual Studio Code can instead install [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022). The build tools come with a C++ compatible compiler and standard library. Detailed development environment setup instructions can be found in the Windows [`README`](./src/windows/README.md).
 
 #### Linux
 
-g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 23.10 (mantic) with clang 17.0.0 and LLVM 17.0.0. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](/linux/README.md).
+g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 23.10 (mantic) with clang 17.0.0 and LLVM 17.0.0. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](./src/linux/README.md).
 
 ### CMake
 
