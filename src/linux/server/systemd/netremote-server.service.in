@@ -1,5 +1,6 @@
 [Unit]
 Description=Netremote Daemon
+Requires=hostapd.service
 
 [Service]
 Type=simple

@@ -1,0 +1,11 @@
+[Unit]
+Description=Hostapd Daemon
+
+[Service]
+Type=forking
+Restart=on-failure
+ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B -P /var/run/hostapd.pid -i wlan0 etc/hostapd/hostapd.conf
+PIDFile=/var/run/hostapd.pid
+
+[Install]
+WantedBy=default.target
