@@ -5,7 +5,7 @@
 #include <catch2/generators/catch_generators_range.hpp>
 #include <grpcpp/create_channel.h>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
-#include <NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 
 #include "TestNetRemoteCommon.hxx"
 

@@ -2,7 +2,7 @@
 #ifndef NET_REMOTE_SERVICE_HXX
 #define NET_REMOTE_SERVICE_HXX
 
-#include <NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 
 namespace Microsoft::Net::Remote::Service
 {

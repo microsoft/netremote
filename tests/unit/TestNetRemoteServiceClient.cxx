@@ -5,9 +5,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <grpcpp/create_channel.h>
 #include <magic_enum.hpp>
-#include <NetRemoteService.grpc.pb.h>
-
 #include <microsoft/net/remote/NetRemoteServer.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 
 #include "TestNetRemoteCommon.hxx"
 

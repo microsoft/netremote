@@ -10,7 +10,7 @@
 #include <tuple>
 #include <vector>
 
-#include <NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 
 namespace Microsoft::Net::Remote::Test
 {
