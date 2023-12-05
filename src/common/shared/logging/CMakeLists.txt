@@ -19,11 +19,3 @@ target_link_libraries(logging-utils
     PUBLIC 
         plog::plog
 )
-
-install(
-    TARGETS logging-utils
-    EXPORT logging-utils
-    ARCHIVE
-    FILE_SET HEADERS
-    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${LOGUTILS_DIR_PUBLIC_INCLUDE_SUFFIX}"
-)
