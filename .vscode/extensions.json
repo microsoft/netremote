@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake",
+        "cschlosser.doxdocgen",
+        "bierner.github-markdown-preview",
+        "davidanson.vscode-markdownlint",
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        "coolbear.systemd-unit-file",
+        "redhat.vscode-yaml"
+    ]
+}
