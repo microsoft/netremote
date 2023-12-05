@@ -26,11 +26,6 @@ target_sources(${PROJECT_NAME}-protocol
         ${PROTO_HEADERS_GENERATED_GRPC}
 )
 
-target_include_directories(${PROJECT_NAME}-protocol
-    PUBLIC
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-)
-
 target_link_libraries(${PROJECT_NAME}-protocol
     PUBLIC
         protobuf::libprotobuf
