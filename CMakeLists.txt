@@ -124,6 +124,7 @@ endif()
 set(NETREMOTE_DIR_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
 set(NETREMOTE_DIR_LINUX ${NETREMOTE_DIR_SRC}/linux)
 set(NETREMOTE_DIR_WINDOWS ${NETREMOTE_DIR_SRC}/windows)
+set(NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE ${CMAKE_INSTALL_INCLUDEDIR}/netremote)
 
 # Add common, global compile definitions.
 add_compile_definitions(
