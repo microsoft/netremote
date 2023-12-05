@@ -17,13 +17,13 @@ target_sources(wifi-apmanager
 
 target_link_libraries(wifi-apmanager
     PUBLIC
-        netremote-protocol
+        ${PROJECT_NAME}-protocol
         wifi-core
 )
 
 install(
     TARGETS wifi-apmanager
-    EXPORT netremote
+    EXPORT ${PROJECT_NAME}
     FILE_SET HEADERS
     PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${WIFI_APMANAGER_PUBLIC_INCLUDE_SUFFIX}"
 )

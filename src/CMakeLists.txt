@@ -10,7 +10,7 @@ endif()
 
 # Install the common netremote export
 install(
-    EXPORT netremote
-    NAMESPACE netremote::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/netremote
+    EXPORT ${PROJECT_NAME}
+    NAMESPACE ${PROJECT_NAME}::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )

@@ -1,27 +1,27 @@
 
-add_executable(netremote-server-linux "")
+add_executable(${PROJECT_NAME}-server-linux "")
 
-target_sources(netremote-server-linux
+target_sources(${PROJECT_NAME}-server-linux
     PRIVATE
         Main.cxx
 )
 
-target_link_libraries(netremote-server-linux
+target_link_libraries(${PROJECT_NAME}-server-linux
     PRIVATE
         logging-utils
-        netremote-server
+        ${PROJECT_NAME}-server
         notstd
         plog::plog
 )
 
-set_target_properties(netremote-server-linux
+set_target_properties(${PROJECT_NAME}-server-linux
     PROPERTIES
-        OUTPUT_NAME netremote-server
+        OUTPUT_NAME ${PROJECT_NAME}-server
 )
 
 install(
-    TARGETS netremote-server-linux
-    EXPORT netremote
+    TARGETS ${PROJECT_NAME}-server-linux
+    EXPORT ${PROJECT_NAME}
 )
 
 add_subdirectory(systemd)

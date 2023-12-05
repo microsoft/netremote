@@ -1,11 +1,11 @@
 
-add_library(netremote-server STATIC "")
+add_library(${PROJECT_NAME}-server STATIC "")
 
 set(NET_REMOTE_SERVER_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(NET_REMOTE_SERVER_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote)
 set(NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVER_PUBLIC_INCLUDE}/${NET_REMOTE_SERVER_PUBLIC_INCLUDE_SUFFIX})
 
-target_sources(netremote-server
+target_sources(${PROJECT_NAME}-server
     PRIVATE
         NetRemoteServer.cxx
         NetRemoteServerConfiguration.cxx
@@ -17,16 +17,16 @@ target_sources(netremote-server
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServerConfiguration.hxx
 )
 
-target_link_libraries(netremote-server
+target_link_libraries(${PROJECT_NAME}-server
     PUBLIC
-        netremote-service
+        ${PROJECT_NAME}-service
     PRIVATE
         CLI11::CLI11
 )
 
 install(
-    TARGETS netremote-server
-    EXPORT netremote
+    TARGETS ${PROJECT_NAME}-server
+    EXPORT ${PROJECT_NAME}
     FILE_SET HEADERS
     PUBLIC_HEADER DESTINATION ${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${NET_REMOTE_SERVER_PUBLIC_INCLUDE_SUFFIX}
 )
