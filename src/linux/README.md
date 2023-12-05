@@ -79,7 +79,7 @@ sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libd
 ```
 
 > [!NOTE]
-> The source of truth for installing development dependencies is found in the development environment [Dockerfile](../.docker/netremote-dev/Dockerfile). The instructions there always trump the instructions here as the contianer described by the `Dockerfile` is used to build the official package.
+> The source of truth for installing development dependencies is found in the development environment [Dockerfile](/.docker/netremote-dev/Dockerfile). The instructions there always trump the instructions here as the contianer described by the `Dockerfile` is used to build the official package.
 
 ### 3. Install Docker on Windows
 
