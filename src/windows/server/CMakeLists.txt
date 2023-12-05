@@ -1,23 +1,23 @@
 
-add_executable(netremote-server-windows "")
+add_executable(${PROJECT_NAME}-server-windows "")
 
-target_sources(netremote-server-windows
+target_sources(${PROJECT_NAME}-server-windows
     PRIVATE
         Main.cxx
 )
 
-target_link_libraries(netremote-server-windows
+target_link_libraries(${PROJECT_NAME}-server-windows
     PRIVATE
-        netremote-server
+        ${PROJECT_NAME}-server
 )
 
-set_target_properties(netremote-server-windows
+set_target_properties(${PROJECT_NAME}-server-windows
     PROPERTIES
-        OUTPUT_NAME netremote-server
+        OUTPUT_NAME ${PROJECT_NAME}-server
 )
 
 install(
-    TARGETS netremote-server-windows
-    EXPORT netremote
+    TARGETS ${PROJECT_NAME}-server-windows
+    EXPORT ${PROJECT_NAME}
 )
 

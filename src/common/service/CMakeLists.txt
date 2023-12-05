@@ -1,36 +1,28 @@
 
-add_library(netremote-service STATIC "")
+add_library(${PROJECT_NAME}-service STATIC "")
 
 set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}/microsoft/net/remote)
+set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote)
+set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}/${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_SUFFIX})
 
-target_sources(netremote-service
+target_sources(${PROJECT_NAME}-service
     PRIVATE
         NetRemoteService.cxx
     PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}
+    FILES
         ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteService.hxx
 )
 
-target_include_directories(netremote-service
+target_link_libraries(${PROJECT_NAME}-service
     PUBLIC
-        ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}
-)
-
-target_link_libraries(netremote-service
-    PUBLIC
-        netremote-protocol
-)
-
-list(APPEND NET_REMOTE_SERVICE_PUBLIC_HEADERS
-    ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteService.hxx
-)
-
-set_target_properties(netremote-service PROPERTIES
-    PUBLIC_HEADER "${NET_REMOTE_SERVICE_PUBLIC_HEADERS}"
+        ${PROJECT_NAME}-protocol
 )
 
 install(
-    TARGETS netremote-service
-    EXPORT netremote
-    PUBLIC_HEADER DESTINATION "${NET_REMOTE_SERVICE_PUBLIC_HEADERS}"
+    TARGETS ${PROJECT_NAME}-service
+    EXPORT ${PROJECT_NAME}
+    FILE_SET HEADERS
+    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_SUFFIX}"
 )
