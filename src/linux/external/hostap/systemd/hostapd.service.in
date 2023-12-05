@@ -4,8 +4,8 @@ Description=Hostapd Daemon
 [Service]
 Type=forking
 Restart=on-failure
-ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B -P /run/hostapd.pid -i wlan0 /etc/hostapd/hostapd.conf
-PIDFile=/run/hostapd.pid
+ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B -P /${CMAKE_INSTALL_RUNSTATEDIR}/hostapd/hostapd.pid -i wlan0 /${CMAKE_INSTALL_SYSCONFDIR}/hostapd/hostapd.conf
+PIDFile=/${CMAKE_INSTALL_RUNSTATEDIR}/hostapd/hostapd.pid
 
 [Install]
 WantedBy=default.target
