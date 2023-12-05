@@ -7,3 +7,10 @@ if (BUILD_FOR_LINUX)
 elseif (BUILD_FOR_WINDOWS)
     add_subdirectory(windows)
 endif()
+
+# Install the common netremote export
+install(
+    EXPORT netremote
+    NAMESPACE netremote::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/netremote
+)

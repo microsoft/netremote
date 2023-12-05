@@ -2,18 +2,17 @@
 add_library(logging-utils STATIC "")
 
 set(LOGUTILS_DIR_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX ${LOGUTILS_DIR_PUBLIC_INCLUDE}/logging)
+set(LOGUTILS_DIR_PUBLIC_INCLUDE_SUFFIX logging)
+set(LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX ${LOGUTILS_DIR_PUBLIC_INCLUDE}/${LOGUTILS_DIR_PUBLIC_INCLUDE_SUFFIX})
 
 target_sources(logging-utils
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/LogUtils.cxx
     PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS ${LOGUTILS_DIR_PUBLIC_INCLUDE}
+    FILES
         ${LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
-)
-
-target_include_directories(logging-utils
-    PUBLIC
-        ${LOGUTILS_DIR_PUBLIC_INCLUDE}
 )
 
 target_link_libraries(logging-utils 
@@ -21,15 +20,10 @@ target_link_libraries(logging-utils
         plog::plog
 )
 
-list(APPEND LOGUTILS_PUBLIC_HEADERS
-    ${LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
-)
-
-set_target_properties(logging-utils PROPERTIES PUBLIC_HEADER "${LOGUTILS_PUBLIC_HEADERS}")
-
 install(
     TARGETS logging-utils
     EXPORT logging-utils
     ARCHIVE
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/logging
+    FILE_SET HEADERS
+    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${LOGUTILS_DIR_PUBLIC_INCLUDE_SUFFIX}"
 )

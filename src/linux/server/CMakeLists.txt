@@ -25,4 +25,3 @@ install(
 )
 
 add_subdirectory(systemd)
-
