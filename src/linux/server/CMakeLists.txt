@@ -24,3 +24,5 @@ install(
     EXPORT netremote
 )
 
+add_subdirectory(systemd)
+
