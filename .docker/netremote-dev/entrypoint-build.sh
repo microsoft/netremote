@@ -7,7 +7,7 @@ BUILD_DIR=build
 
 # Assign cmake presets.
 # TODO: make these arguments, and use these as the default values?
-PRESET_CONFIGURE=dev
+PRESET_CONFIGURE=dev-linux
 PRESET_BUILD=${PRESET_CONFIGURE}
 PRESET_INSTALL=${PRESET_CONFIGURE}
 
