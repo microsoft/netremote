@@ -6,7 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
 
 # Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
-set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg)
+set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg CACHE PATH "Location of vcpkg submodule root")
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
 
 project(netremote
