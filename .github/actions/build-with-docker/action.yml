@@ -3,6 +3,6 @@ name: 'Build'
 description: 'Build the repository in a Docker container'
 runs:
   using: 'docker'
-  image: 'docker://netremote-build:latest'
+  image: 'docker://abeltrano/netremote-build:latest'
   args:
     - '/github/workspace'
