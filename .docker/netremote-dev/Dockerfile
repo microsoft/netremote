@@ -1,5 +1,5 @@
 
-FROM ubuntu:mantic as netremote
+FROM ubuntu:mantic as netremote-build
 
 # Set arguments used only in this Dockerfile.
 ARG build_date="2023-11-09T19:51:18Z"
@@ -76,7 +76,12 @@ RUN apt-get install -qq -y --no-install-recommends \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-FROM netremote as netremote-dev
+COPY --chmod=0755 entrypoint-build.sh /bin/entrypoint-build.sh
+
+# Build the repository.
+ENTRYPOINT [ "/bin/entrypoint-build.sh" ]
+
+FROM netremote-build as netremote-dev
 
 # Install packages.
 RUN apt-get update && \

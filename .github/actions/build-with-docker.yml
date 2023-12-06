@@ -1,0 +1,8 @@
+
+name: 'Build
+description: 'Build' the repository in a Docker container'
+runs:
+  using: 'docker'
+  image: 'docker:://netremote-build'
+  args:
+    - '/github/workspace'
