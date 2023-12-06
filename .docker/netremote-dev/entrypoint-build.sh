@@ -17,6 +17,9 @@ if [[ ! -d ${REPOSITORY_ROOT} ]]; then
   exit 1
 fi
 
+# Add the workspace directory to the safe directory list.
+git config --global --add safe.directory /github/workspace
+
 # Change to the root of the repo.
 cd ${REPOSITORY_ROOT}
 cmake -B ${BUILD_DIR} --preset ${PRESET_CONFIGURE} .
