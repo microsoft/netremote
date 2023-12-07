@@ -25,13 +25,11 @@ PRESET_BUILD=${PRESET_CONFIGURE}
 # Add the workspace directory to the safe directory list.
 git config --global --add safe.directory ${REPOSITORY_ROOT}
 
-echo "$(ls -la /github/home/.cache/vcpkg/archives)"
-
 # Change to the root of the repo.
 cd ${REPOSITORY_ROOT}
 mv ${VCPKG_ROOT} .
-mv ${VCPKG_ROOT}/../vcpkg_installed .
+mv /vcpkg_installed .
 export VCPKG_ROOT=${REPOSITORY_ROOT}/vcpkg
 cmake -B ${BUILD_DIR} --preset ${PRESET_CONFIGURE}
 cmake --build --preset ${PRESET_BUILD}
-cmake --install ${BUILD_DIR}
+cmake --install
