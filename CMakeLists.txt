@@ -66,6 +66,7 @@ find_package(Threads REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(plog CONFIG REQUIRED)
+find_package(Git REQUIRED)
 
 # Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
 if (POLICY CMP0083)

@@ -1,9 +1,15 @@
 
 vcpkg_from_git(
     OUT_SOURCE_PATH SOURCE_PATH
-    URL /workspaces/netremote
-    REF f906b2293822e200008e7e51c574d5dc006bc141
-    FETCH_REF user/corbinphipps/add-vcpkg-port
+    URL C:/Users/corbinphipps/source/repos/netremote
+    REF 92a13dbdda126793ec1fa21c123e835e411e2749
+    FETCH_REF 
+)
+
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS
+        ${FEATURE_OPTIONS}
 )
 
 vcpkg_cmake_install()

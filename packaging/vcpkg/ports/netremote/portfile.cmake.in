@@ -6,6 +6,12 @@ vcpkg_from_git(
     FETCH_REF @VCPKG_GIT_REF_FETCH@
 )
 
+vcpkg_cmake_configure(
+    SOURCE_PATH "${SOURCE_PATH}"
+    OPTIONS
+        ${FEATURE_OPTIONS}
+)
+
 vcpkg_cmake_install()
 vcpkg_copy_pdbs()
 
