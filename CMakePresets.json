@@ -40,6 +40,22 @@
             "installDir": "${sourceDir}/out/install/${presetName}"
         },
         {
+            "name": "linux-base",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-17",
+                "CMAKE_GENERATOR": "Ninja"
+            }
+        },
+        {
+            "name": "windows-base",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_GENERATOR": "Visual Studio 17 2022"
+            }
+        },
+        {
             "name": "dev-base",
             "hidden": true,
             "displayName": "Development (base)",
@@ -63,13 +79,9 @@
             "description": "Development build for inner-loop on Linux",
             "inherits": [
                 "os-linux",
+                "linux-base",
                 "dev"
-            ],
-            "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
-                "CMAKE_C_COMPILER": "/usr/bin/clang-17",
-                "CMAKE_GENERATOR": "Ninja"
-            }
+            ]
         },
         {
             "name": "dev-windows",
@@ -77,23 +89,103 @@
             "description": "Development build for inner-loop on Windows",
             "inherits": [
                 "os-windows",
+                "windows-base",
                 "dev"
+            ]
+        },
+        {
+            "name": "release-base",
+            "hidden": true,
+            "inherits": [
+                "in-source-build"
+            ]
+        },
+        {
+            "name": "release-linux",
+            "inherits":[
+                "os-linux",
+                "linux-base",
+                "release-base"
             ],
             "cacheVariables": {
-                "CMAKE_GENERATOR": "Visual Studio 17 2022"
+                "CMAKE_GENERATOR": "Ninja Multi-Config"
             }
+        },
+        {
+            "name": "release-windows",
+            "inherits":[
+                "os-windows",
+                "windows-base",
+                "release-base"
+            ]
         }
     ],
     "buildPresets": [
         {
             "name": "dev-linux",
-            "configurePreset": "dev-linux",
-            "configuration": "Debug"
+            "configurePreset": "dev-linux"
         },
         {
             "name": "dev-windows",
-            "configurePreset": "dev-windows",
+            "configurePreset": "dev-windows"
+        },
+        {
+            "name": "cfg-debug",
+            "hidden": true,
             "configuration": "Debug"
+        },
+
+        {
+            "name": "cfg-release",
+            "hidden": true,
+            "configuration": "Release"
+        },
+        {
+            "name": "cfg-release-with-debug",
+            "hidden": true,
+            "configuration": "RelWithDebInfo"
+        },
+        {
+            "name": "release-linux-debug",
+            "configurePreset": "release-linux",
+            "inherits": [
+                "cfg-debug"
+            ]
+        },
+        {
+            "name": "release-linux-release",
+            "configurePreset": "release-linux",
+            "inherits": [
+                "cfg-release"
+            ]
+        },
+        {
+            "name": "release-linux-release-with-debug",
+            "configurePreset": "release-linux",
+            "inherits": [
+                "cfg-release-with-debug"
+            ]
+        },
+        {
+            "name": "release-windows-debug",
+            "configurePreset": "release-windows",
+            "inherits": [
+                "cfg-debug"
+            ]
+        },
+        {
+            "name": "release-windows-release",
+            "configurePreset": "release-windows",
+            "inherits": [
+                "cfg-release"
+            ]
+        },
+        {
+            "name": "release-windows-release-with-debug",
+            "configurePreset": "release-windows",
+            "inherits": [
+                "cfg-release-with-debug"
+            ]
         }
     ],
     "testPresets": [
