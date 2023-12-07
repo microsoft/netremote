@@ -87,9 +87,22 @@
     ],
     "buildPresets": [
         {
-            "name": "dev",
-            "configurePreset": "dev",
+            "name": "debug",
             "configuration": "Debug"
+        },
+        {
+            "name": "dev-linux",
+            "configurePreset": "dev-linux",
+            "inherits": [
+                "debug"
+            ]
+        },
+        {
+            "name": "dev-windows",
+            "configurePreset": "dev-windows",
+            "inherits": [
+                "debug"
+            ]
         }
     ],
     "testPresets": [
@@ -109,6 +122,7 @@
         },
         {
             "name": "local-base",
+            "hidden": true,
             "description": "Run tests that don't require a remote connection",
             "inherits": [
                 "test-common"
@@ -117,8 +131,7 @@
                 "include": {
                     "label": "[local]"
                 }
-            },
-            "hidden": true
+            }
         },
         {
             "name": "local",
