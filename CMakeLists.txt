@@ -15,6 +15,8 @@ set(VCPKG_TARGET_DEVELOPMENT "development")
 set(VCPKG_TARGET_RELEASE "release")
 set(VCPKG_TARGET ${VCPKG_TARGET_DEVELOPMENT} CACHE STRING "vcpkg target: either 'development' or 'release'")
 
+set(VCPKG_MANIFEST_DIR ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/ports/netremote)
+
 # Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg CACHE PATH "Location of vcpkg submodule root")
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
