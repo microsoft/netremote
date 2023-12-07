@@ -17,9 +17,6 @@ function(vcpkg_configure)
     ${ARGN}
   )
 
-  # Enable debug output from the vcpkg install command.
-  set(VCPKG_INSTALL_OPTIONS "--debug") 
-
   # If the vcpkg root has been specified externally, use it.
   if (DEFINED ENV{VCPKG_ROOT})
     set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
