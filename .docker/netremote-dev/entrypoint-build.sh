@@ -26,10 +26,11 @@ PRESET_BUILD=${PRESET_CONFIGURE}
 git config --global --add safe.directory ${REPOSITORY_ROOT}
 
 # Change to the root of the repo.
+echo "VCPKG_DEFAULT_BINARY_CACHE=${VCPKG_DEFAULT_BINARY_CACHE}"
 cd ${REPOSITORY_ROOT}
-mv ${VCPKG_ROOT} .
-mv /vcpkg_installed .
-export VCPKG_ROOT=${REPOSITORY_ROOT}/vcpkg
+# mv ${VCPKG_ROOT} .
+# mv /vcpkg_installed .
+# export VCPKG_ROOT=${REPOSITORY_ROOT}/vcpkg
 cmake -B ${BUILD_DIR} --preset ${PRESET_CONFIGURE}
 cmake --build --preset ${PRESET_BUILD}
 cmake --install
