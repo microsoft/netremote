@@ -7,7 +7,8 @@ obj/
 # CMake
 build/
 out/
+
 # vcpkg
 vcpkg_installed*/
 /vcpkg/
-packaging/vcpkg/ports/netremote/portfile.cmake
+/packaging/vcpkg/ports/netremote/portfile.cmake
