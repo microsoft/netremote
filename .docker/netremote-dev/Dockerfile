@@ -76,6 +76,11 @@ RUN apt-get install -qq -y --no-install-recommends \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Set environment variables for external vcpkg to support binary caching
+ENV VCPKG_ROOT_BASE=/
+ENV VCPKG_ROOT=${VCPKG_SUBMODULE_ROOT_BASE}vcpkg
+WORKDIR ${VCPKG_ROOT_BASE}
+
 # Obtain vcpkg, bootstrap it, and install dependencies.
 COPY vcpkg.json .
 
