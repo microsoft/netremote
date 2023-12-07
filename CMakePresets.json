@@ -87,22 +87,14 @@
     ],
     "buildPresets": [
         {
-            "name": "debug",
-            "configuration": "Debug"
-        },
-        {
             "name": "dev-linux",
             "configurePreset": "dev-linux",
-            "inherits": [
-                "debug"
-            ]
+            "configuration": "Debug"
         },
         {
             "name": "dev-windows",
             "configurePreset": "dev-windows",
-            "inherits": [
-                "debug"
-            ]
+            "configuration": "Debug"
         }
     ],
     "testPresets": [
