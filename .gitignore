@@ -10,3 +10,4 @@ out/
 # vcpkg
 vcpkg_installed*/
 /vcpkg/
+packaging/vcpkg/ports/netremote/portfile.cmake
