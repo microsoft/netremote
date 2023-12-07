@@ -77,7 +77,7 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for external vcpkg to support binary caching
-ENV VCPKG_ROOT_BASE=/
+ENV VCPKG_ROOT_BASE=/vcpkg
 ENV VCPKG_BINARY_CACHE=${VCPKG_ROOT_BASE}cache
 ENV VCPKG_ROOT=${VCPKG_ROOT_BASE}vcpkg
 ENV VCPKG_DEFAULT_BINARY_CACHE=${VCPKG_BINARY_CACHE}
