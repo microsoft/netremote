@@ -7,7 +7,6 @@
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <notstd/Utility.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
-#include <plog/Appenders/DebugOutputAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/MessageOnlyFormatter.h>
 #include <plog/Formatters/TxtFormatter.h>
