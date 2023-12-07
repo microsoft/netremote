@@ -76,6 +76,14 @@ RUN apt-get install -qq -y --no-install-recommends \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Obtain vcpkg, bootstrap it, and install dependencies.
+COPY vcpkg.json .
+
+RUN git clone https://github.com/microsoft/vcpkg.git --depth 1 && \
+    ./vcpkg/bootstrap-vcpkg.sh && \
+    ./vcpkg/vcpkg install --clean-buildtrees-after-build --clean-downloads-after-build
+
+# Copy build entrypoint script.
 COPY --chmod=0755 entrypoint-build.sh /bin/entrypoint-build.sh
 
 # Build the repository.
