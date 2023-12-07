@@ -3,7 +3,6 @@
 set -euf -o pipefail
 
 REPOSITORY_ROOT=${1:-${PWD}}
-VCPKG_SUBMODULE_ROOT=${PWD}/vcpkg
 BUILD_DIR=build
 
 # Verify the repository root is a git repository.
@@ -13,8 +12,8 @@ if [[ ! -d ${REPOSITORY_ROOT}/.git ]]; then
 fi
 
 # Verify the vcpkg toolchain file is present.
-if [[ ! -d ${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake ]]; then
-  echo "Vcpkg toolchain file not found: ${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake"
+if [[ ! -f ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake ]]; then
+  echo "vcpkg cmake toolchain file not found: ${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
   exit 1
 fi
 
@@ -28,6 +27,6 @@ git config --global --add safe.directory ${REPOSITORY_ROOT}
 
 # Change to the root of the repo.
 cd ${REPOSITORY_ROOT}
-cmake -B ${BUILD_DIR} --preset ${PRESET_CONFIGURE} -DVCPKG_SUBMODULE_ROOT=${VCPKG_SUBMODULE_ROOT} .
+cmake -B ${BUILD_DIR} --preset ${PRESET_CONFIGURE}
 cmake --build --preset ${PRESET_BUILD}
 cmake --install ${BUILD_DIR}
