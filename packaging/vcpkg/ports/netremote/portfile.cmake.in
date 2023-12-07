@@ -6,8 +6,12 @@ vcpkg_from_git(
     FETCH_REF @VCPKG_GIT_REF_FETCH@
 )
 
+vcpkg_find_acquire_program(
+    GIT
+)
+
 vcpkg_cmake_configure(
-    SOURCE_PATH "${SOURCE_PATH}"
+    SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
         -DNETREMOTE_DISABLE_TESTS=TRUE
         ${FEATURE_OPTIONS}
