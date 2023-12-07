@@ -91,6 +91,8 @@ RUN git clone https://github.com/microsoft/vcpkg.git --depth 1 && \
 # Copy build entrypoint script.
 COPY --chmod=0755 entrypoint-build.sh /bin/entrypoint-build.sh
 
+ENV VCPKG_INSTALL_OPTIONS=--debug
+
 # Build the repository.
 ENTRYPOINT [ "/bin/entrypoint-build.sh" ]
 

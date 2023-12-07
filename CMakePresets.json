@@ -68,7 +68,8 @@
             "cacheVariables": {
                 "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
                 "CMAKE_C_COMPILER": "/usr/bin/clang-17",
-                "CMAKE_GENERATOR": "Ninja"
+                "CMAKE_GENERATOR": "Ninja",
+                "VCPKG_INSTALL_OPTIONS": "--debug"
             }
         },
         {
