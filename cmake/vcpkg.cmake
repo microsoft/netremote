@@ -40,7 +40,14 @@ function(vcpkg_configure)
     )
   endif()
 
-  # Set the CMake toolchain file to use vcpkg.
-  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "CMake toolchain file")
+  # Ignore all changes to the submodule tree.
+  get_filename_component(VCPKG_SUBMODULE_NAME ${VCPKG_SUBMODULE_ROOT} NAME)
+  execute_process(COMMAND ${GIT_EXECUTABLE} "config submodule.${VCPKG_SUBMODULE_NAME}.ignore all"
+    WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}/../
+  )
+endif()
+
+# Set the CMake toolchain file to use vcpkg.
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "CMake toolchain file")
 
 endfunction()
