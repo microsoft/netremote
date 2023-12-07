@@ -1,5 +1,5 @@
 
-FROM ubuntu:mantic as netremote
+FROM ubuntu:mantic as netremote-build
 
 # Set arguments used only in this Dockerfile.
 ARG build_date="2023-11-09T19:51:18Z"
@@ -21,8 +21,8 @@ LABEL org.label-schema.schema-version = "1.0"
 # 1. Update package cache.
 # sudo apt-get update
 #
-# 2. Install core build tools:
-# sudo apt-get install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
+# 2. Install core build tools and dependencies:
+# sudo apt-get install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
 #
 # 3. Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
 # sudo apt-get remove -y --purge clang-16* lldb-16* llvm-16*
@@ -35,13 +35,13 @@ LABEL org.label-schema.schema-version = "1.0"
 # rm llvm.sh
 #
 # 5. Install development dependency packages:
-# sudo apt-get install -y --no-install-recommends libnl-3-dev libnl-genl-3-dev libssl-dev libdbus-c++-dev libnl-route-3-dev bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
+# sudo apt-get install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
 #
 
 # Install packages.
 RUN apt-get update && \
     apt-get install -qq -y --no-install-recommends \
-        # Project build dependencies.
+        # Core project build dependencies.
         # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
         build-essential \
         ca-certificates \
@@ -55,7 +55,16 @@ RUN apt-get update && \
         pkg-config \
         tar \
         unzip \
-        zip
+        zip \
+        # hostapd build dependencies.
+        # libnl-3-dev libssl-dev libnl-genl-3-dev
+        libnl-3-dev \
+        libnl-genl-3-dev \
+        libssl-dev \
+        # wpa_supplicant build dependencies.
+        # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+        libdbus-c++-dev \
+        libnl-route-3-dev
 
 # Install complete llvm toolchain using automatic installation script.
 # lsb-release, software-properties-common, and wget are required by the script.
@@ -76,20 +85,34 @@ RUN apt-get install -qq -y --no-install-recommends \
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-FROM netremote as netremote-dev
+# Set environment variables for external vcpkg to support binary caching
+ENV VCPKG_ROOT_BASE=/vcpkg
+ENV VCPKG_BINARY_CACHE=${VCPKG_ROOT_BASE}/cache
+ENV VCPKG_ROOT=${VCPKG_ROOT_BASE}/vcpkg
+ENV VCPKG_DEFAULT_BINARY_CACHE=${VCPKG_BINARY_CACHE}
+
+WORKDIR ${VCPKG_ROOT_BASE}
+
+RUN mkdir -p ${VCPKG_BINARY_CACHE}
+
+# Obtain vcpkg, bootstrap it, and install dependencies.
+COPY vcpkg.json .
+
+RUN git clone https://github.com/microsoft/vcpkg.git --depth 1 && \
+    ./vcpkg/bootstrap-vcpkg.sh && \
+    ./vcpkg/vcpkg install --clean-buildtrees-after-build --clean-downloads-after-build
+
+# Copy build entrypoint script.
+COPY --chmod=0755 entrypoint-build.sh /bin/entrypoint-build.sh
+
+# Build the repository.
+ENTRYPOINT [ "/bin/entrypoint-build.sh" ]
+
+FROM netremote-build as netremote-dev
 
 # Install packages.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        # hostapd build dependencies.
-        # libnl-3-dev libssl-dev libnl-genl-3-dev
-        libnl-3-dev \
-        libnl-genl-3-dev \
-        libssl-dev \
-        # wpa_supplicant build dependencies.
-        # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
-        libdbus-c++-dev \
-        libnl-route-3-dev \
         # WSL2 kernel development dependencies.
         # build-essential flex bison dwarves libssl-dev libelf-dev bc
         bc \
