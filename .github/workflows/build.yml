@@ -1,4 +1,6 @@
 
+name: 'Build in Docker Container'
+
 on: 
   pull_request:
   workflow_dispatch:
