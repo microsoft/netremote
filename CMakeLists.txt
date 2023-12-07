@@ -150,4 +150,7 @@ endif()
 add_subdirectory(packaging)
 add_subdirectory(protocol)
 add_subdirectory(src)
-add_subdirectory(tests)
+
+if (NOT NETREMOTE_DISABLE_TESTS)
+  add_subdirectory(tests)
+endif()
