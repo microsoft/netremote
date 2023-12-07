@@ -28,5 +28,5 @@ git config --global --add safe.directory ${REPOSITORY_ROOT}
 # Change to the root of the repo.
 cd ${REPOSITORY_ROOT}
 cmake --preset ${PRESET_CONFIGURE}
-cmake --preset ${PRESET_BUILD} --build
-cmake --install --config ${BUILD_CONFIG} out
+cmake --build --preset ${PRESET_BUILD}
+cmake --install out/build/${PRESET_CONFIGURE} --config ${BUILD_CONFIG}
