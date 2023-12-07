@@ -9,7 +9,7 @@ vcpkg_from_git(
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
-        -DNETREMOTE_DISABLE_TESTS
+        -DNETREMOTE_DISABLE_TESTS=TRUE
         ${FEATURE_OPTIONS}
 )
 
