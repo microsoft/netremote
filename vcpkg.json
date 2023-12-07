@@ -2,18 +2,6 @@
   "name": "netremote",
   "version-string": "1",
   "dependencies": [
-    {
-      "name": "grpc",
-      "host": true
-    },
-    "cli11",
-    "protobuf",
-    "catch2",
-    "plog",
-    "magic-enum",
-    {
-      "name": "wil",
-      "platform": "windows"
-    }
+    "cli11"
   ]
 }
