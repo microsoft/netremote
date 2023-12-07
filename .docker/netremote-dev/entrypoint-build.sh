@@ -27,6 +27,7 @@ git config --global --add safe.directory ${REPOSITORY_ROOT}
 
 # Change to the root of the repo.
 cd ${REPOSITORY_ROOT}
+mv ${VCPKG_ROOT} .
 cmake -B ${BUILD_DIR} --preset ${PRESET_CONFIGURE}
 cmake --build --preset ${PRESET_BUILD}
 cmake --install ${BUILD_DIR}
