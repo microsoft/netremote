@@ -18,7 +18,7 @@ PRESET_CONFIGURE=dev-linux
 PRESET_BUILD=dev
 
 # Add the workspace directory to the safe directory list.
-git config --global --add safe.directory /github/workspace
+git config --global --add safe.directory ${REPOSITORY_ROOT}
 
 # Change to the root of the repo.
 cd ${REPOSITORY_ROOT}
