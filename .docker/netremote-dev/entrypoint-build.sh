@@ -3,12 +3,18 @@
 set -euf -o pipefail
 
 REPOSITORY_ROOT=${1:-${PWD}}
-VCPKG_SUBMODULE_ROOT=${PWD}
+VCPKG_SUBMODULE_ROOT=${PWD}/vcpkg
 BUILD_DIR=build
 
 # Verify the repository root is a git repository.
 if [[ ! -d ${REPOSITORY_ROOT}/.git ]]; then
   echo "Repository root is not a git repository: ${REPOSITORY_ROOT}"
+  exit 1
+fi
+
+# Verify the vcpkg toolchain file is present.
+if [[ ! -d ${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake ]]; then
+  echo "Vcpkg toolchain file not found: ${VCPKG_SUBMODULE_ROOT}/scripts/buildsystems/vcpkg.cmake"
   exit 1
 fi
 
