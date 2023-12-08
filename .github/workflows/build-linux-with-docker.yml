@@ -1,0 +1,14 @@
+
+name: 'Build in Docker Container'
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build in container
+        uses: ./.github/actions/build-with-docker
+ 
