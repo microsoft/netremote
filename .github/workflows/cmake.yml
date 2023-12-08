@@ -1,0 +1,143 @@
+name: Build [CMake]
+
+on:
+  workflow_dispatch:
+    inputs:
+      analyze-codeql:
+        required: true
+        default: true
+        type: boolean
+        description: 'Peform static analysis with CodeQL'
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+        description: 'Build ARM64 architecture'
+      install:
+        required: true
+        default: false
+        type: boolean
+        description: 'Invoke CMake install for the project'
+      test:
+        required: false
+        default: true
+        type: boolean
+        description: 'Invoke CMake CTest for the project'
+      package:
+        required: true
+        default: false
+        type: boolean
+        description: 'Invoke CMake CPack for the project'
+      publish-artifacts:
+        required: true
+        default: false
+        type: boolean
+        description: 'Publish build artifacts'
+      build-types:
+        required: true
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
+      preset-name:
+        required: true
+        default: 'dev-windows'
+        type: choice
+        options:
+          - 'dev-windows'
+          - 'release-windows'
+        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+  workflow_call:
+    inputs:
+      build-types:
+        required: false
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+      analyze-codeql:
+        required: false
+        default: true
+        type: boolean
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+      install:
+        required: false
+        default: false
+        type: boolean
+      test:
+        required: false
+        default: true
+        type: boolean
+      package:
+        required: false
+        default: false
+        type: boolean
+      publish-artifacts:
+        required: false
+        default: false
+        type: boolean
+      preset-name:
+        required: false
+        default: 'dev-windows'
+        type: string
+
+jobs:
+  build:
+    name: cmake build
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: windows-2022 }
+          - { os: windows-2022, arch: 'ARM64' }
+        build-type: ${{ fromJson(inputs.build-types) }}
+    runs-on: ${{ matrix.config.os }}
+ 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Initialize CodeQL
+      if: inputs.analyze-codeql == true
+      uses: github/codeql-action/init@v2
+      with:
+        languages: 'cpp'
+
+    - name: CMake Configure
+      if: ${{ ! matrix.config.arch }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+
+    - name: CMake Configure Cross-Compile ${{ matrix.config.arch }}
+      if: ${{ matrix.config.arch }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DNETREMOTE_DISABLE_TESTS=TRUE -A ${{ matrix.config.arch }}
+
+    - name: CMake Build
+      run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
+
+    - name: CMake Test (ctest)
+      if: ${{ inputs.test == true && ! matrix.config.arch }}
+      run: ctest --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
+
+    - name: CMake Install
+      if: inputs.install == true
+      run: cmake --build --preset ${{ inputs.preset-name }} --target install --config ${{ matrix.build-type }}
+
+    - name: CMake Package (cpack)
+      if: inputs.package == true
+      run: cpack --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
+
+    - name: Perform CodeQL Analysis
+      if: inputs.analyze-codeql == true
+      uses: github/codeql-action/analyze@v2
+
+    - name: Publish Artifacts
+      if: inputs.publish-artifacts == true
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-package-${{ runner.os }}-${{ matrix.build-type }}-${{ matrix.config.arch != '' && matrix.config.arch || runner.arch }}
+        path: |
+          ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.tar.*
+          ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.zip
