@@ -1,0 +1,50 @@
+
+# Obtain current git branch.
+execute_process(COMMAND ${GIT_EXECUTABLE} branch --show
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH_CURRENT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Obtain git HEAD commit sha from this branch.
+execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_REF_HEAD
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Obtain git origin url.
+execute_process(COMMAND ${GIT_EXECUTABLE} remote get-url origin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    OUTPUT_VARIABLE GIT_URL_ORIGIN
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Current development versioning information.
+set(VCPKG_DEVELOPMENT_URL ${CMAKE_SOURCE_DIR})
+set(VCPKG_DEVELOPMENT_GIT_REF ${GIT_REF_HEAD})
+set(VCPKG_DEVELOPMENT_GIT_REF_FETCH ${GIT_BRANCH_CURRENT})
+
+# Current release versioning information.
+set(VCPKG_RELEASE_TAG v0.0.1)
+set(VCPKG_RELEASE_URL ${GIT_URL_ORIGIN})
+set(VCPKG_RELEASE_GIT_REF ${VCPKG_RELEASE_TAG})
+set(VCPKG_RELEASE_GIT_REF_FETCH ${GIT_BRANCH_CURRENT})
+
+# Determine the vcpkg target the codebase is being built for.
+if (VCPKG_TARGET STREQUAL VCPKG_TARGET_DEVELOPMENT)
+    set(VCPKG_TARGET_SELECTOR DEVELOPMENT)
+else()
+    set(VCPKG_TARGET_SELECTOR RELEASE)
+endif()
+
+# Select configuration based on build target.
+set(VCPKG_GIT_URL ${VCPKG_${VCPKG_TARGET_SELECTOR}_URL})
+set(VCPKG_GIT_REF ${VCPKG_${VCPKG_TARGET_SELECTOR}_GIT_REF})
+set(VCPKG_GIT_REF_FETCH ${VCPKG_${VCPKG_TARGET_SELECTOR}_GIT_REF_FETCH})
+
+set(VCPKG_PORT_FILE_OUT ${CMAKE_CURRENT_LIST_DIR}/ports/netremote/portfile.cmake)
+set(VCPKG_PORT_FILE_IN ${VCPKG_PORT_FILE_OUT}.in)
+
+# Generate portfile.cmake with selected versioning and configuration information.
+configure_file(${VCPKG_PORT_FILE_IN} ${VCPKG_PORT_FILE_OUT} @ONLY)

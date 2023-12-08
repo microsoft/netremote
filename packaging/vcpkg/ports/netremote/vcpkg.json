@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "netremote",
+  "version-string": "0.0.1",
+  "dependencies": [
+    {
+      "name": "grpc",
+      "host": true
+    },
+    "cli11",
+    "protobuf",
+    "catch2",
+    "plog",
+    "magic-enum",
+    {
+      "name": "wil",
+      "platform": "windows"
+    },
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ]
+}

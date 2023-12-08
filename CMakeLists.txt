@@ -5,6 +5,18 @@ cmake_minimum_required(VERSION 3.25)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
 
+# vcpkg build target.
+# 
+# This controls the versioning information used when the vcpkg is built. 
+# When "development" is selected, the HEAD revision of the current branch will be used.  
+# When "release" is selected, the latest hard-coded version in packaging/vcpkg/CMakeLists.txt.
+#
+set(VCPKG_TARGET_DEVELOPMENT "development")
+set(VCPKG_TARGET_RELEASE "release")
+set(VCPKG_TARGET ${VCPKG_TARGET_DEVELOPMENT} CACHE STRING "vcpkg target: either 'development' or 'release'")
+
+set(VCPKG_MANIFEST_DIR ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/ports/netremote)
+
 # Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg CACHE PATH "Location of vcpkg submodule root")
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
@@ -56,6 +68,7 @@ find_package(Threads REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(plog CONFIG REQUIRED)
+find_package(Git REQUIRED)
 
 # Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
 if (POLICY CMP0083)
@@ -136,6 +149,10 @@ if (WERROR)
   add_compile_options(-Werror)
 endif()
 
+add_subdirectory(packaging)
 add_subdirectory(protocol)
 add_subdirectory(src)
-add_subdirectory(tests)
+
+if (NOT NETREMOTE_DISABLE_TESTS)
+  add_subdirectory(tests)
+endif()
