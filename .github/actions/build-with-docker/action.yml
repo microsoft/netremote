@@ -1,6 +1,6 @@
 
-name: 'build'
-description: 'build the repository in a docker container'
+name: 'Build'
+description: 'Build the repository in a docker container'
 runs:
   using: 'docker'
   image: 'docker://abeltrano/netremote-build:latest'
