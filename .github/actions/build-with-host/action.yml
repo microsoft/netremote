@@ -26,10 +26,15 @@ inputs:
     required: false
     default: 'dev-windows'
     description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+  vcpkg-binarycache:
+    required: false
+    default: 'true'
+    description: 'Use the vcpkg binary cache'
 runs:
   using: 'composite'
   steps:
   - name: Configure vcpkg to use Github Actions Cache 
+    if: ${{ inputs.vcpkg-binarycache == 'true' }}
     uses: actions/github-script@v6
     with:
       script: |
@@ -37,6 +42,7 @@ runs:
         core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
   - name: Install vcpkg dependencies with Github Actions Cache
+    if: ${{ inputs.vcpkg-binarycache == 'true' }}
     run: vcpkg install --binarysource="clear;x-gha,readwrite"
     shell: pwsh
 
