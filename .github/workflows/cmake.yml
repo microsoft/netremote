@@ -1,13 +1,11 @@
-
 name: Build [CMake]
 
 on:
-  pull_request:
   workflow_dispatch:
     inputs:
       analyze-codeql:
-        required: false
-        default: false
+        required: true
+        default: true
         type: boolean
         description: 'Peform static analysis with CodeQL'
       build-arm64:
@@ -16,34 +14,70 @@ on:
         type: boolean
         description: 'Build ARM64 architecture'
       install:
-        required: false
+        required: true
         default: false
         type: boolean
         description: 'Invoke CMake install for the project'
       package:
-        required: false
+        required: true
         default: false
         type: boolean
         description: 'Invoke CMake CPack for the project'
       publish-artifacts:
-        required: false
+        required: true
         default: false
         type: boolean
         description: 'Publish build artifacts'
       build-types:
-        required: false
+        required: true
         # Note the string here contains a JSON array. This is later converted to an array using fromJson.
         default: "[ 'Debug' ]"
         type: string
         description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
       preset-name:
-        required: false
-        default: 'release-windows'
+        required: true
+        default: 'cicd'
         type: choice
         options:
-          - 'dev-windows'
-          - 'release-windows'
+          - 'dev'
+          - 'dev-driver'
+          - 'vcpkg-dev'
+          - 'vcpkg-release'
+          - 'cicd'
+          - 'official-release'
         description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+  workflow_call:
+    inputs:
+      build-types:
+        required: false
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+      analyze-codeql:
+        required: false
+        default: true
+        type: boolean
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+      install:
+        required: false
+        default: false
+        type: boolean
+      package:
+        required: false
+        default: false
+        type: boolean
+      publish-artifacts:
+        required: false
+        default: false
+        type: boolean
+      preset-name:
+        required: false
+        default: 'cicd'
+        type: string
 
 jobs:
   build:
@@ -52,14 +86,19 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-2022  }
-          - { os: windows-2022, arch: 'ARM64' }
+          - { os: windows-2022, generator: 'Visual Studio 17 2022' }
+          - { os: windows-2022, generator: 'Visual Studio 17 2022', arch: 'ARM64' }
+          - { os: ubuntu-22.04, generator: 'Ninja Multi-Config' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Install build tools
+      if: matrix.config.os == 'ubuntu-22.04'
+      run: sudo apt-get install ninja-build
 
     - name: Initialize CodeQL
       if: inputs.analyze-codeql == true
@@ -69,11 +108,11 @@ jobs:
 
     - name: CMake Configure
       if: ${{ ! matrix.config.arch }}
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}"
 
     - name: CMake Configure Cross-Compile ${{ matrix.config.arch }}
       if: ${{ matrix.config.arch }}
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DNETREMOTE_DISABLE_TESTS=TRUE -A ${{ matrix.config.arch }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DNOF_DISABLE_TESTS=TRUE -G"${{ matrix.config.generator }}" -A ${{ matrix.config.arch }}
 
     - name: CMake Build
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
