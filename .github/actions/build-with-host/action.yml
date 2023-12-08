@@ -73,7 +73,7 @@ runs:
     if: inputs.publish-artifacts == 'true'
     uses: actions/upload-artifact@v3
     with:
-      name: release-package-${{ runner.os }}-${{ input.build-type }}-${{ input.arch != '' && input.arch || runner.arch }}
+      name: release-package-${{ runner.os }}-${{ inputs.build-type }}-${{ inputs.arch != '' && inputs.arch || runner.arch }}
       path: |
         ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.tar.*
         ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.zip
