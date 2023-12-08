@@ -18,6 +18,11 @@ on:
         default: false
         type: boolean
         description: 'Invoke CMake install for the project'
+      test:
+        required: false
+        default: true
+        type: boolean
+        description: 'Invoke CMake CTest for the project'
       package:
         required: true
         default: false
@@ -39,10 +44,8 @@ on:
         default: 'cicd'
         type: choice
         options:
-          - 'dev'
-          - 'dev-driver'
-          - 'vcpkg-dev'
-          - 'vcpkg-release'
+          - 'dev-windows'
+          - 'release-windows'
           - 'cicd'
           - 'official-release'
         description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
@@ -66,6 +69,10 @@ on:
         required: false
         default: false
         type: boolean
+      test:
+        required: false
+        default: true
+        type: boolean
       package:
         required: false
         default: false
@@ -76,7 +83,7 @@ on:
         type: boolean
       preset-name:
         required: false
-        default: 'cicd'
+        default: 'dev-windows'
         type: string
 
 jobs:
@@ -86,19 +93,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-2022, generator: 'Visual Studio 17 2022' }
-          - { os: windows-2022, generator: 'Visual Studio 17 2022', arch: 'ARM64' }
-          - { os: ubuntu-22.04, generator: 'Ninja Multi-Config' }
+          - { os: windows-2022  }
+          - { os: windows-2022', arch: 'ARM64' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Install build tools
-      if: matrix.config.os == 'ubuntu-22.04'
-      run: sudo apt-get install ninja-build
 
     - name: Initialize CodeQL
       if: inputs.analyze-codeql == true
@@ -108,17 +110,17 @@ jobs:
 
     - name: CMake Configure
       if: ${{ ! matrix.config.arch }}
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -G"${{ matrix.config.generator }}"
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
 
     - name: CMake Configure Cross-Compile ${{ matrix.config.arch }}
       if: ${{ matrix.config.arch }}
-      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DNOF_DISABLE_TESTS=TRUE -G"${{ matrix.config.generator }}" -A ${{ matrix.config.arch }}
+      run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DNETREMOTE_DISABLE_TESTS=TRUE -A ${{ matrix.config.arch }}
 
     - name: CMake Build
       run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ matrix.build-type }}
 
     - name: CMake Test (ctest)
-      if: ${{ ! matrix.config.arch }}
+      if: ${{ inputs.test == true && ! matrix.config.arch }}
       run: ctest --preset ${{ inputs.preset-name }} -C ${{ matrix.build-type }}
 
     - name: CMake Install
