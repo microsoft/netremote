@@ -41,13 +41,11 @@ on:
         description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
       preset-name:
         required: true
-        default: 'cicd'
+        default: 'dev-windows'
         type: choice
         options:
           - 'dev-windows'
           - 'release-windows'
-          - 'cicd'
-          - 'official-release'
         description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
   push:
   workflow_call:
@@ -94,8 +92,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-2022  }
-          - { os: windows-2022', arch: 'ARM64' }
+          - { os: windows-2022 }
+          - { os: windows-2022, arch: 'ARM64' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
