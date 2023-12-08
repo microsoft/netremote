@@ -17,34 +17,30 @@ function(vcpkg_configure)
     ${ARGN}
   )
 
-  # Only configure vcpkg if not already done externally.
-  if ("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}" STREQUAL "")
-    # If the vcpkg root has been specified externally, use it.
-    if (DEFINED ENV{VCPKG_ROOT})
-      set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
-    # Otherwise, use the specified submodule root.
-    else()
-      set(VCPKG_ROOT ${VCPKG_SUBMODULE_ROOT})
+  # If the vcpkg root has been specified externally, use it.
+  if (DEFINED ENV{VCPKG_ROOT})
+    set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
+  # Otherwise, use the specified submodule root.
+  else()
+    set(VCPKG_ROOT ${VCPKG_SUBMODULE_ROOT})
 
-      find_package(Git REQUIRED)
+    find_package(Git REQUIRED)
 
-      # Initialize vcpkg sub-module if not already done.
-      if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
-        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
-          WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}/../
-          COMMAND_ERROR_IS_FATAL ANY)
-      endif()
-
-      # Ignore all changes to the submodule tree.
-      get_filename_component(VCPKG_SUBMODULE_NAME ${VCPKG_SUBMODULE_ROOT} NAME)
-      execute_process(COMMAND ${GIT_EXECUTABLE} "config submodule.${VCPKG_SUBMODULE_NAME}.ignore all"
-        WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}../
-      )
+    # Initialize vcpkg sub-module if not already done.
+    if (NOT EXISTS ${VCPKG_SUBMODULE_ROOT}/.git)
+      execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${VCPKG_SUBMODULE_ROOT}
+        WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}/../
+        COMMAND_ERROR_IS_FATAL ANY)
     endif()
 
-    # Set the CMake toolchain file to use vcpkg.
-    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "CMake toolchain file")
-
+    # Ignore all changes to the submodule tree.
+    get_filename_component(VCPKG_SUBMODULE_NAME ${VCPKG_SUBMODULE_ROOT} NAME)
+    execute_process(COMMAND ${GIT_EXECUTABLE} "config submodule.${VCPKG_SUBMODULE_NAME}.ignore all"
+      WORKING_DIRECTORY ${VCPKG_SUBMODULE_ROOT}../
+    )
   endif()
+
+  # Set the CMake toolchain file to use vcpkg.
+  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "CMake toolchain file")
 
 endfunction()
