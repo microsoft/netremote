@@ -1,7 +1,8 @@
 
 name: Build [CMake]
 
-on: 
+on:
+  pull_request:
   workflow_dispatch:
     inputs:
       analyze-codeql:
