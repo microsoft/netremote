@@ -106,6 +106,16 @@ jobs:
       with:
         languages: 'cpp'
 
+    - name: Configure vcpkg to use Github Actions Cache 
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+          core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+    - name: Install vcpkg dependencies with Github Actions Cache
+      run: vcpkg install zlib --binarysource="clear;x-gha,readwrite"
+
     - name: CMake Configure
       if: ${{ ! matrix.config.arch }}
       run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ matrix.build-type }}
