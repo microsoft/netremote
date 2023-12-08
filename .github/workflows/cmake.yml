@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       analyze-codeql:
-        required: true
-        default: true
+        required: false
+        default: false
         type: boolean
         description: 'Peform static analysis with CodeQL'
       build-arm64:
@@ -16,28 +16,28 @@ on:
         type: boolean
         description: 'Build ARM64 architecture'
       install:
-        required: true
+        required: false
         default: false
         type: boolean
         description: 'Invoke CMake install for the project'
       package:
-        required: true
+        required: false
         default: false
         type: boolean
         description: 'Invoke CMake CPack for the project'
       publish-artifacts:
-        required: true
+        required: false
         default: false
         type: boolean
         description: 'Publish build artifacts'
       build-types:
-        required: true
+        required: false
         # Note the string here contains a JSON array. This is later converted to an array using fromJson.
         default: "[ 'Debug' ]"
         type: string
         description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
       preset-name:
-        required: true
+        required: false
         default: 'release-windows'
         type: choice
         options:
