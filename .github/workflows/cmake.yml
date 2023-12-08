@@ -1,47 +1,48 @@
 
 name: Build [CMake]
 
-on: [workflow_dispatch, workflow_call]
-  inputs:
-    analyze-codeql:
-      required: true
-      default: true
-      type: boolean
-      description: 'Peform static analysis with CodeQL'
-    build-arm64:
-      required: false
-      default: false
-      type: boolean
-      description: 'Build ARM64 architecture'
-    install:
-      required: true
-      default: false
-      type: boolean
-      description: 'Invoke CMake install for the project'
-    package:
-      required: true
-      default: false
-      type: boolean
-      description: 'Invoke CMake CPack for the project'
-    publish-artifacts:
-      required: true
-      default: false
-      type: boolean
-      description: 'Publish build artifacts'
-    build-types:
-      required: true
-      # Note the string here contains a JSON array. This is later converted to an array using fromJson.
-      default: "[ 'Debug' ]"
-      type: string
-      description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
-    preset-name:
-      required: true
-      default: 'cicd'
-      type: choice
-      options:
-        - 'dev-windows'
-        - 'release-windows'
-      description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+on: 
+  workflow_dispatch:
+    inputs:
+      analyze-codeql:
+        required: true
+        default: true
+        type: boolean
+        description: 'Peform static analysis with CodeQL'
+      build-arm64:
+        required: false
+        default: false
+        type: boolean
+        description: 'Build ARM64 architecture'
+      install:
+        required: true
+        default: false
+        type: boolean
+        description: 'Invoke CMake install for the project'
+      package:
+        required: true
+        default: false
+        type: boolean
+        description: 'Invoke CMake CPack for the project'
+      publish-artifacts:
+        required: true
+        default: false
+        type: boolean
+        description: 'Publish build artifacts'
+      build-types:
+        required: true
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
+      preset-name:
+        required: true
+        default: 'release-windows'
+        type: choice
+        options:
+          - 'dev-windows'
+          - 'release-windows'
+        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
 
 jobs:
   build:
