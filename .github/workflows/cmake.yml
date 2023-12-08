@@ -47,7 +47,6 @@ on:
           - 'dev-windows'
           - 'release-windows'
         description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
-  push:
   workflow_call:
     inputs:
       build-types:
