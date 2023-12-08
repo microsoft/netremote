@@ -1,0 +1,35 @@
+name: Workflow Validation
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    name: build
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: windows-2022, generator: 'Visual Studio 17 2022' }
+          - { os: windows-2022, generator: 'Visual Studio 17 2022', arch: 'ARM64' }
+          - { os: ubuntu-22.04, generator: 'Ninja Multi-Config' }
+        build-type: [ 'debug', 'release' ]
+    runs-on: ${{ matrix.config.os }}
+    
+    steps:
+    - name: Dump contexts
+      run: |
+        echo matrix == '${{ matrix }}'
+        echo matrix.config == '${{ matrix.config }}'
+    - name: Dump selections
+      run: |
+        echo os == '${{ matrix.config.os }}'
+        echo generator == '${{ matrix.config.generator }}'
+        echo arch == '${{ matrix.config.arch }}'
+    - name: Conditional arch
+      if: ${{ matrix.config.arch }}
+      run: echo got an arch!
+    - name: Conditional !arch
+      if: ${{ ! matrix.config.arch }}
+      run: echo no arch!
