@@ -114,7 +114,7 @@ jobs:
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
     - name: Install vcpkg dependencies with Github Actions Cache
-      run: vcpkg install zlib --binarysource="clear;x-gha,readwrite"
+      run: vcpkg install --binarysource="clear;x-gha,readwrite"
 
     - name: CMake Configure
       if: ${{ ! matrix.config.arch }}
