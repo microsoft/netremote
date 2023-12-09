@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.25)
 # Instruct CMake to search the cmake directory for include scripts.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
+option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
 
 # vcpkg build target.
 # 
@@ -14,8 +15,6 @@ include(vcpkg)
 set(VCPKG_TARGET_DEVELOPMENT "development")
 set(VCPKG_TARGET_RELEASE "release")
 set(VCPKG_TARGET ${VCPKG_TARGET_DEVELOPMENT} CACHE STRING "vcpkg target: either 'development' or 'release'")
-
-set(VCPKG_MANIFEST_DIR ${CMAKE_CURRENT_LIST_DIR}/packaging/vcpkg/ports/netremote)
 
 # Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg CACHE PATH "Location of vcpkg submodule root")
