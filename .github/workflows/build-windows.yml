@@ -1,0 +1,35 @@
+
+name: 'Build Windows'
+
+on: 
+  workflow_dispatch:
+    inputs:
+      build-type:
+        description: 'Build type'
+        required: true
+        type: choice
+        options:
+          - 'Debug'
+          - 'Release'
+          - 'RelWithDebInfo'
+          - 'MinSizeRel'
+        default: 'Debug'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        uses: ./.github/actions/build-with-host
+        with:
+          build-type: ${{ inputs.build-type }}
+          preset-name: 'dev-windows'
+          analyze-codeql: false
+          build-arm64: false
+          install: false
+          test: false 
+          package: false 
+          publish-artifacts: false 
+ 

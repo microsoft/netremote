@@ -1,0 +1,21 @@
+# Primary workflow that runs on each pull request and push to the primary
+# branches, develop and main.
+
+name: CI/CD
+
+# Run on workflow dispatch to allow manual triggering of the workflow, and run
+# on pushes and PRs to the main branches to enforce code quality and test
+# coverage.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  build-validation:
+    name: Build Validation
+    uses: ./.github/workflows/build.yml
+    with:
+      build-types: "[ 'Debug' ]"
