@@ -20,8 +20,8 @@ function(vcpkg_configure)
   # If the vcpkg root has been specified externally, use it.
   if (DEFINED ENV{VCPKG_ROOT})
     set(VCPKG_ROOT "$ENV{VCPKG_ROOT}")
-  # Otherwise, use the specified submodule root.
-  else()
+  # Otherwise, use the specified submodule root if the toolchain isn't already configured.
+  elseif ("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}" STREQUAL "")
     set(VCPKG_ROOT ${VCPKG_SUBMODULE_ROOT})
 
     find_package(Git REQUIRED)
@@ -41,6 +41,8 @@ function(vcpkg_configure)
   endif()
 
   # Set the CMake toolchain file to use vcpkg.
-  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "CMake toolchain file")
+  if (DEFINED VCPKG_ROOT)
+    set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "CMake toolchain file")
+  endif()
 
 endfunction()
