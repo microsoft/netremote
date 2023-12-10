@@ -3,10 +3,7 @@
   "name": "netremote",
   "version-string": "0.0.1",
   "dependencies": [
-    {
-      "name": "grpc",
-      "host": true
-    },
+    "grpc",
     "cli11",
     "protobuf",
     "catch2",
