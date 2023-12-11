@@ -124,8 +124,8 @@ Use of dev containers in VSCode is the recommended and officially supported deve
 
     Select **NetRemoteDev-Stateless**, which is configured to mount the workspace directory in a bind mount instead of a volume. The **NetRemoteDev** configuration will not work.
 
-    > [!WARNING]
-    > A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has extremely poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. Therefore, this method is strongly discouraged.
+> [!WARNING]
+> A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has extremely poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. Therefore, this method is strongly discouraged.
 
 ## Contributing
 
