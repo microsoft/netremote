@@ -4,7 +4,7 @@ This project provides the ability to remotely control network components such as
 
 ## Project Structure
 
-This project is organized to allow primary development on both Linux and Windows. Hence, [CMake](https://cmake.org/) is used as the build system generator. Consequently, there is an OS-independent source tree under [`src`](./src/common), and OS-dependent source trees [`linux`](./src/linux/) and [`windows`](./src/windows/)`.
+This project is organized to allow primary development on both Linux and Windows. Hence, [CMake](https://cmake.org/) is used as the build system generator. Consequently, there is an OS-independent source tree under [`src`](./src/common), and OS-dependent source trees [`linux`](./src/linux/) and [`windows`](./src/windows/).
 
 ## Coding Guidelines
 
@@ -124,8 +124,8 @@ Use of dev containers in VSCode is the recommended and officially supported deve
 
     Select **NetRemoteDev-Stateless**, which is configured to mount the workspace directory in a bind mount instead of a volume. The **NetRemoteDev** configuration will not work.
 
-    > [!WARNING]
-    > A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has extremely poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. Therefore, this method is strongly discouraged.
+> [!WARNING]
+> A major drawback of this method is that the source tree is mounted in the container using a bind mount, which has extremely poor performance to the point where git operations are essentially unusable. Hence, this method typically requires two (2) VSCode windows: one for the repository on the host where git operations are carried out, and one for the container where the source is modified and built. Therefore, this method is strongly discouraged.
 
 ## Contributing
 
