@@ -43,7 +43,7 @@ runs:
 
   - name: Install vcpkg dependencies with Github Actions Cache
     if: ${{ inputs.vcpkg-binarycache == 'true' }}
-    run: vcpkg install --binarysource="clear;x-gha,readwrite"
+    run: vcpkg install --binarysource="clear;x-gha,readwrite" --clean-buildtrees-after-build --clean-downloads-after-build
     shell: pwsh
 
   - name: CMake Configure
