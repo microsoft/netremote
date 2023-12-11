@@ -4,7 +4,7 @@ This project provides the ability to remotely control network components such as
 
 ## Project Structure
 
-This project is organized to allow primary development on both Linux and Windows. Hence, [CMake](https://cmake.org/) is used as the build system generator. Consequently, there is an OS-independent source tree under [`src`](./src/common), and OS-dependent source trees [`linux`](./src/linux/) and [`windows`](./src/windows/)`.
+This project is organized to allow primary development on both Linux and Windows. Hence, [CMake](https://cmake.org/) is used as the build system generator. Consequently, there is an OS-independent source tree under [`src`](./src/common), and OS-dependent source trees [`linux`](./src/linux/) and [`windows`](./src/windows/).
 
 ## Coding Guidelines
 
