@@ -9,10 +9,29 @@ set(PROTO_FILES
     ${PROTO_DIR}/WifiCore.proto
 )
 
-# Create a list of the generated headers.
-file(GLOB PROTO_FILES_GENERATED "${PROTO_DIR_BINARY}/*.pb.h")
-string(REGEX REPLACE "[.]proto$" ".pb.h" PROTO_HEADERS_GENERATED "${PROTO_FILES_GENERATED}")
-string(REGEX REPLACE "[.]proto$" ".pb.grpc.h" PROTO_HEADERS_GENERATED_GRPC "${PROTO_FILES_GENERATED}")
+# Create a list of the generated headers. The below code isn't used because
+# we've encountered intermittent errors when building with external vcpkg (eg.
+# via port) which results in empty file lists and thus, the generated headers
+# are not installed. It appears to be some sort of race condition in CMake
+# itself
+#
+# file(GLOB PROTO_FILES_GENERATED "${PROTO_DIR_BINARY}/*.pb.h")
+# string(REGEX REPLACE "[.]proto$" ".pb.h" PROTO_HEADERS_GENERATED "${PROTO_FILES_GENERATED}")
+# string(REGEX REPLACE "[.]proto$" ".pb.grpc.h" PROTO_HEADERS_GENERATED_GRPC "${PROTO_FILES_GENERATED}")
+#
+set(PROTO_HEADERS_GENERATED
+    ${PROTO_DIR_BINARY}/NetRemote.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteService.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteWifi.pb.h
+    ${PROTO_DIR_BINARY}/WifiCore.pb.h
+)
+
+set(PROTO_HEADERS_GENERATED_GRPC
+    ${PROTO_DIR_BINARY}/NetRemote.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteService.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteWifi.grpc.pb.h
+    ${PROTO_DIR_BINARY}/WifiCore.grpc.pb.h
+)
 
 add_library(${PROJECT_NAME}-protocol STATIC "")
 
