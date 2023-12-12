@@ -49,6 +49,7 @@ runs:
       echo "VCPKG_DEFAULT_BINARY_CACHE=${VCPKG_DEFAULT_BINARY_CACHE}" >> "${GITHUB_ENV}"
       New-Item -Path ${env:VCPKG_DEFAULT_BINARY_CACHE} -ItemType Directory -Force
       vcpkg install --binarysource="clear;default;x-gha,readwrite"
+      echo "VCPKG_BINARY_SOURCES=clear;x-gha" >> "${GITHUB_ENV}"
     shell: pwsh
 
   - name: CMake Configure
