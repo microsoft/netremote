@@ -22,6 +22,7 @@ target_link_libraries(${PROJECT_NAME}-server
         ${PROJECT_NAME}-service
     PRIVATE
         CLI11::CLI11
+        plog::plog
 )
 
 install(

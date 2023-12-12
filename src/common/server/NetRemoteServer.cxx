@@ -5,6 +5,7 @@
 
 #include <grpcpp/server_builder.h>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
 
@@ -34,7 +35,7 @@ void NetRemoteServer::Run()
     builder.RegisterService(&m_service);
 
     m_server = builder.BuildAndStart();
-    std::cout << std::format("Started listening on {}", m_serverAddress) << std::endl;
+    LOG_INFO << std::format("netremote server started listening on {}", m_serverAddress) << std::endl;
 }
 
 void NetRemoteServer::Stop()
