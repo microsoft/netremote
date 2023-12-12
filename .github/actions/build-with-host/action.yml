@@ -30,6 +30,7 @@ inputs:
     required: false
     default: 'true'
     description: 'Use the vcpkg binary cache'
+
 runs:
   using: 'composite'
   steps:
@@ -40,10 +41,15 @@ runs:
       script: |
         core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
         core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        core.exportVariable('VCPKG_DEFAULT_BINARY_CACHE', 'C:/vcpkg/archive');
+        core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;x-gha,readwrite');
 
   - name: Install vcpkg dependencies with Github Actions Cache
     if: ${{ inputs.vcpkg-binarycache == 'true' }}
-    run: vcpkg install --binarysource="clear;x-gha,readwrite"
+    run: |
+      echo "VCPKG_DEFAULT_BINARY_CACHE=${VCPKG_DEFAULT_BINARY_CACHE}" >> "${GITHUB_ENV}"
+      echo "VCPKG_BINARY_SOURCES=${VCPKG_BINARY_SOURCES}" >> "${GITHUB_ENV}"
+      New-Item -Path ${env:VCPKG_DEFAULT_BINARY_CACHE} -ItemType Directory -Force
     shell: pwsh
 
   - name: CMake Configure
