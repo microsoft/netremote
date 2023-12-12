@@ -26,10 +26,8 @@ jobs:
         with:
           build-type: ${{ inputs.build-type }}
           preset-name: 'dev-windows'
-          analyze-codeql: false
-          build-arm64: false
           install: false
           test: false 
           package: false 
-          publish-artifacts: false 
+          publish-artifacts: false
  
