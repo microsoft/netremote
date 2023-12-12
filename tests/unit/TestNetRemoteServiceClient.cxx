@@ -48,3 +48,27 @@ TEST_CASE("WifiConfigureAccessPoint API can be called", "[basic][rpc][client][re
         }
     }
 }
+
+TEST_CASE("WifiEnumerateAccessPoints API can be called", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Wifi;
+
+    NetRemoteServer server{ Test::RemoteServiceAddressHttp };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiEnumerateAccessPointsRequest request{};
+
+        WifiEnumerateAccessPointsResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+        REQUIRE(status.ok());
+    }
+}
