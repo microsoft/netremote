@@ -94,14 +94,6 @@
             ]
         },
         {
-            "name": "dev-windows-arm64",
-            "displayName": "Development (ARM64)",
-            "inherits": [
-                "dev-windows"
-            ],
-            "architecture": "arm64"
-        },
-        {
             "name": "release-base",
             "hidden": true,
             "inherits": [
