@@ -41,7 +41,7 @@ runs:
       script: |
         core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
         core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-        core.exportVariable('VCPKG_DEFAULT_BINARY_CACHE', 'VCPKG_DEFAULT_BINARY_CACHE');
+        core.exportVariable('VCPKG_DEFAULT_BINARY_CACHE', 'C:/vcpkg/archive');
 
   - name: Install vcpkg dependencies with Github Actions Cache
     if: ${{ inputs.vcpkg-binarycache == 'true' }}
