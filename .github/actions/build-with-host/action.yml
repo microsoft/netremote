@@ -40,10 +40,13 @@ runs:
       script: |
         core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
         core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+        core.exportVariable('VCPKG_DEFAULT_BINARY_CACHE ', 'C:/vcpkg/archives');
 
   - name: Install vcpkg dependencies with Github Actions Cache
     if: ${{ inputs.vcpkg-binarycache == 'true' }}
-    run: vcpkg install --binarysource="clear;x-gha,readwrite" --clean-after-build
+    run: |
+      New-Item -Path ${env:VCPKG_DEFAULT_BINARY_CACHE} -ItemType Directory -Force
+      vcpkg install --binarysource="clear;files,x-gha,readwrite"
     shell: pwsh
 
   - name: CMake Configure
