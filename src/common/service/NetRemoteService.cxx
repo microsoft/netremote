@@ -15,3 +15,9 @@ using namespace Microsoft::Net::Remote::Service;
 
     return grpc::Status::OK;
 }
+
+
+::grpc::Status NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, [[maybe_unused]] ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response)
+{
+    return grpc::Status::OK;
+}

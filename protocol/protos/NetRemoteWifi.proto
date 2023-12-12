@@ -35,3 +35,12 @@ message WifiConfigureAccessPointResult
     //
     bool Succeeded = 2;
 }
+
+message WifiEnumerateAccessPointsRequest
+{
+}
+
+message WifiEnumerateAccessPointsResult
+{
+
+}
