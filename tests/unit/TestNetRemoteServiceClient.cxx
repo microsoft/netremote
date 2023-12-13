@@ -82,9 +82,10 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
         auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
         REQUIRE(status.ok());
-        // for (const auto& accessPoint : result.accesspoints())
-        // {
-        //     REQUIRE(accessPoint.enabled() == false);
-        // }
+
+        for (const auto& accessPoint : result.accesspoints())
+        {
+            REQUIRE(!accessPoint.isenabled());
+        }
     }
 }
