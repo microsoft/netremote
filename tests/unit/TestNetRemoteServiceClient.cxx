@@ -10,7 +10,7 @@
 
 #include "TestNetRemoteCommon.hxx"
 
-TEST_CASE("WifiConfigureAccessPoint API can be called", "[basic][rpc][client][remote]")
+TEST_CASE("WifiConfigureAccessPoint API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
@@ -49,7 +49,7 @@ TEST_CASE("WifiConfigureAccessPoint API can be called", "[basic][rpc][client][re
     }
 }
 
-TEST_CASE("WifiEnumerateAccessPoints API can be called", "[basic][rpc][client][remote]")
+TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
