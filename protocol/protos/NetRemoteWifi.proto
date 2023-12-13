@@ -36,11 +36,18 @@ message WifiConfigureAccessPointResult
     bool Succeeded = 2;
 }
 
+message AccessPointDescriptor
+{
+    string AccessPointId = 1;
+    bool IsEnabled = 2;
+    Microsoft.Net.Wifi.AccessPointCapabilities Capabilities = 3;
+}
+
 message WifiEnumerateAccessPointsRequest
 {
 }
 
 message WifiEnumerateAccessPointsResult
 {
-
+    repeated Microsoft.Net.Remote.Wifi.AccessPointDescriptor AccessPoints = 1;
 }
