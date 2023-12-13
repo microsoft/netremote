@@ -8,6 +8,7 @@ name: CI/CD
 # coverage.
 on:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   build-validation:
