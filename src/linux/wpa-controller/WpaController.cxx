@@ -70,7 +70,7 @@ WpaController::GetCommandControlSocket()
     // Update the member and return it.
     m_controlSocketCommand = controlSocket;
     return controlSocket;
- }
+}
 
 std::shared_ptr<WpaResponse>
 WpaController::SendCommand(const WpaCommand& command)

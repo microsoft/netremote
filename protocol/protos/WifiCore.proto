@@ -89,3 +89,15 @@ message AccessPointConfiguration
 {
     Dot11PhyType PhyType = 1;
 }
+
+message AccessPointCapabilities
+{
+    repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
+    repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
+    repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
+}
+
+enum AccessPointState
+{
+    AccessPointStateUnknown = 0;
+}
