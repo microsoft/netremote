@@ -93,7 +93,8 @@ message AccessPointConfiguration
 message AccessPointCapabilities
 {
     repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
-    repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 2;
+    repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
+    repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
 }
 
 enum AccessPointState
