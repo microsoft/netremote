@@ -124,7 +124,7 @@ message AccessPointCapabilities
     repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
     repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
-    repeated Microsoft.Net.Wifi.Dot11CipherAlgorithm CipherAlgorithms = 4;
+    repeated Microsoft.Net.Wifi.Dot11CipherAlgorithm EncryptionAlgorithms = 4;
 }
 
 enum AccessPointState
