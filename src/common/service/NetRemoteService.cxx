@@ -57,6 +57,7 @@ using Microsoft::Net::Wifi::Dot11PhyType;
     LOG_VERBOSE << std::format("Received WifiAccessPointDisable request for access point id {}\n", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
+    // TODO: Disable the access point.
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     response->set_accesspointid(request->accesspointid());
