@@ -72,11 +72,11 @@ bool NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::N
 
     if (!request->has_configuration())
     {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No configuration provided");
-        return false;
+        // Configuration isn't required, so exit early.
+        return true;
     }
 
+    // Configuration isn't required, but if it's present, it must be valid.
     const auto& configuration = request->configuration();
     if (!configuration.has_ssid())
     {
