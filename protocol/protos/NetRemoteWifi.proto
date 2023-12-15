@@ -52,8 +52,8 @@ message WifiAccessPointApplyConfigurationResultConfigurationItem
     WifiAccessPointApplyConfigurationStatus Status = 3;
 
     // Indicates the parts of the corresponging 'WifiAccessPointApplyConfigurationRequestConfigurationItem.Configuration'
-    // field that were successfully applied.
-    google.protobuf.FieldMask ConfigurationMask = 4;
+    // field that were successfully applied. Set only when Status != WifiAccessPointApplyConfigurationStatusSucceeded.
+    google.protobuf.FieldMask ConfigurationFailuresMask = 4;
 }
 
 message WifiAccessPointApplyConfigurationRequest
