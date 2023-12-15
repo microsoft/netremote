@@ -45,7 +45,7 @@ namespace Microsoft.Net.Remote.Client.Test
             {
                 foreach (var phyType in Enum.GetValues(typeof(Net.Wifi.Dot11PhyType)).Cast<Net.Wifi.Dot11PhyType>())
                 {
-                    var request = new WifiConfigureAccessPointRequest
+                    var request = new WifiAccessPointApplyConfigurationRequest
                     {
                         AccessPointId = string.Format("TestWifiConfigureAccessPoint{0}", band),
                         DefaultBand = band,

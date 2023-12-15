@@ -12,9 +12,9 @@ namespace Microsoft.Net.Remote.Service
             _logger = logger;
         }
 
-        public override Task<Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointResult> WifiConfigureAccessPoint(Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointRequest request, Grpc::ServerCallContext context)
+        public override Task<Microsoft.Net.Remote.Wifi.WifiAccessPointApplyConfigurationResult> WifiConfigureAccessPoint(Microsoft.Net.Remote.Wifi.WifiAccessPointApplyConfigurationRequest request, Grpc::ServerCallContext context)
         {
-            return Task.FromResult(new Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointResult
+            return Task.FromResult(new Microsoft.Net.Remote.Wifi.WifiAccessPointApplyConfigurationResult
             {
                 AccessPointId = request.AccessPointId,
                 Succeeded = true,
