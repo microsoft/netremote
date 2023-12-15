@@ -47,7 +47,6 @@ TEST_CASE("WifiConfigureAccessPoint API", "[basic][rpc][client][remote]")
                 WifiAccessPointApplyConfigurationRequestConfigurationItem item{};
                 item.set_band(band);
                 item.mutable_configuration()->set_phytype(phyType);
-                *item.mutable_configurationmask() = google::protobuf::util::FieldMaskUtil::GetFieldMaskForAllFields<AccessPointConfiguration>();
 
                 return item;
             });

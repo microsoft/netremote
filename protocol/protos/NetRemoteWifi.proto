@@ -32,11 +32,8 @@ message WifiAccessPointApplyConfigurationRequestConfigurationItem
     // The band the AP should be configured for.
     Microsoft.Net.Wifi.RadioBand Band = 2;
 
-    // Specifies the parts of the 'Configuration' field to be applied.
-    google.protobuf.FieldMask ConfigurationMask = 3;
-
     // The configuration for the AP.
-    Microsoft.Net.Wifi.AccessPointConfiguration Configuration = 4;
+    Microsoft.Net.Wifi.AccessPointConfiguration Configuration = 3;
 }
 
 message WifiAccessPointApplyConfigurationResultConfigurationItem
