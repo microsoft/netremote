@@ -85,9 +85,38 @@ enum Dot11CipherAlgorithm
     Dot11CipherAlgorithmRsnUseGroup = 12;
 }
 
+message Dot11Ssid
+{
+    oneof Value
+    {
+        string Name = 1;
+        string Hex = 2;
+        bytes Data = 3;
+    }
+}
+
+message Dot11MacAddress
+{
+    bytes Value = 1;
+}
+
+message SharedKey
+{
+    oneof Value
+    {
+        string Passphrase = 1;
+        bytes Data = 2;
+    }
+}
+
 message AccessPointConfiguration
 {
-    Dot11PhyType PhyType = 1;
+    Dot11Ssid Ssid = 1;
+    Dot11MacAddress Bssid = 2;
+    Dot11PhyType PhyType = 3;
+    Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 4;
+    Dot11CipherAlgorithm EncryptionAlgorithm = 5;
+    repeated RadioBand Bands = 6;
 }
 
 message AccessPointCapabilities
@@ -95,6 +124,7 @@ message AccessPointCapabilities
     repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
     repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
+    repeated Microsoft.Net.Wifi.Dot11CipherAlgorithm CipherAlgorithms = 4;
 }
 
 enum AccessPointState

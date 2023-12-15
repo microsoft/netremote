@@ -3,6 +3,7 @@ syntax = "proto3";
 
 package Microsoft.Net.Remote.Wifi;
 
+import "google/protobuf/any.proto";
 import "WifiCore.proto";
 
 message WifiConfigureAccessPointRequest
@@ -50,4 +51,41 @@ message WifiEnumerateAccessPointsRequest
 message WifiEnumerateAccessPointsResult
 {
     repeated Microsoft.Net.Remote.Wifi.WifiEnumerateAccessPointsResultItem AccessPoints = 1;
+}
+
+enum WifiAccessPointOperationStatusCode
+{
+    WifiAccessPointOperationStatusCodeSucceeded = 0;
+    WifiAccessPointOperationStatusCodeAccessPointInvalid = 1;
+    WifiAccessPointOperationStatusCodeAccessPointNotEnabled = 2;
+    WifiAccessPointOperationStatusCodeOperationNotSupported = 3;
+}
+
+message WifiAccessPointOperationStatus
+{
+    WifiAccessPointOperationStatusCode Code = 1;
+    string Message = 2;
+    google.protobuf.Any Details = 3;
+}
+
+message WifiAccessPointEnableRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.AccessPointConfiguration Configuration = 2;
+}
+
+message WifiAccessPointEnableResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiAccessPointDisableRequest
+{
+    string AccessPointId = 1;
+}
+
+message WifiAccessPointDisableResult
+{
+    WifiAccessPointOperationStatus Status = 2;
 }
