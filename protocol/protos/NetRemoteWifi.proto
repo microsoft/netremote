@@ -55,10 +55,12 @@ message WifiEnumerateAccessPointsResult
 
 enum WifiAccessPointOperationStatusCode
 {
-    WifiAccessPointOperationStatusCodeSucceeded = 0;
-    WifiAccessPointOperationStatusCodeAccessPointInvalid = 1;
-    WifiAccessPointOperationStatusCodeAccessPointNotEnabled = 2;
-    WifiAccessPointOperationStatusCodeOperationNotSupported = 3;
+    WifiAccessPointOperationStatusCodeUnknown = 0;
+    WifiAccessPointOperationStatusCodeSucceeded = 1;
+    WifiAccessPointOperationStatusCodeInvalidParameter = 2;
+    WifiAccessPointOperationStatusCodeAccessPointInvalid = 3;
+    WifiAccessPointOperationStatusCodeAccessPointNotEnabled = 4;
+    WifiAccessPointOperationStatusCodeOperationNotSupported = 5;
 }
 
 message WifiAccessPointOperationStatus
@@ -87,5 +89,6 @@ message WifiAccessPointDisableRequest
 
 message WifiAccessPointDisableResult
 {
+    string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
