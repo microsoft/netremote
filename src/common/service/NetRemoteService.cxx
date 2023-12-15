@@ -18,6 +18,7 @@ NetRemoteService::WifiConfigureAccessPoint([[maybe_unused]] ::grpc::ServerContex
 
     response->set_accesspointid(request->accesspointid());
 
+    // Apply configuration for requested band on the access point.
     std::vector<WifiAccessPointApplyConfigurationResultConfigurationItem> results(static_cast<std::size_t>(std::size(request->configurations())));
     std::ranges::transform(request->configurations(), std::begin(results), [&](const auto& configuration) {
         return WifiAccessPointApplyConfiguration(request->accesspointid(), configuration);
@@ -40,10 +41,19 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 }
 
 ::Microsoft::Net::Remote::Wifi::WifiAccessPointApplyConfigurationResultConfigurationItem 
-NetRemoteService::WifiAccessPointApplyConfiguration([[maybe_unused]] std::string_view accessPointId, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiAccessPointApplyConfigurationRequestConfigurationItem& configuredDesired)
+NetRemoteService::WifiAccessPointApplyConfiguration([[maybe_unused]] std::string_view accessPointId, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointApplyConfigurationRequestConfigurationItem& configurationDesired)
 {
     ::Microsoft::Net::Remote::Wifi::WifiAccessPointApplyConfigurationResultConfigurationItem result{};
-    result.set_status(Microsoft::Net::Remote::Wifi::WifiAccessPointApplyConfigurationStatus::WifiAccessPointApplyConfigurationStatusSucceeded);
+
+    result.set_band(configurationDesired.band());
+    if (configurationDesired.has_id())
+    {
+        result.set_id(configurationDesired.id());
+    }
+
     // TODO: implement if design accepted
+
+    result.set_status(Microsoft::Net::Remote::Wifi::WifiAccessPointApplyConfigurationStatus::WifiAccessPointApplyConfigurationStatusSucceeded);
+
     return result;
 }

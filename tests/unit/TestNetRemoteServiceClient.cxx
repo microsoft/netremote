@@ -68,6 +68,7 @@ TEST_CASE("WifiConfigureAccessPoint API", "[basic][rpc][client][remote]")
             REQUIRE(std::size(result.configurationresults()) == std::size(request.configurations()));
 
             for (const auto& configurationResult : result.configurationresults()) {
+                REQUIRE(configurationResult.band() == configurationResult.band());
                 REQUIRE(configurationResult.status() == WifiAccessPointApplyConfigurationStatus::WifiAccessPointApplyConfigurationStatusSucceeded);
             }
         }
