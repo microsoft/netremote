@@ -4,17 +4,17 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::function<void(AccessPointPresence presence, const std::shared_ptr<IAccessPoint> deviceChanged)> onDevicePresenceChanged) :
+AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> deviceChanged)> onDevicePresenceChanged) :
     m_onDevicePresenceChanged(std::move(onDevicePresenceChanged))
 {}
 
-void AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresence presence, const std::shared_ptr<IAccessPoint> deviceChanged)> onDevicePresenceChanged)
+void AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> deviceChanged)> onDevicePresenceChanged)
 {
     std::unique_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     m_onDevicePresenceChanged = std::move(onDevicePresenceChanged);
 }
 
-void AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresence presence, std::shared_ptr<IAccessPoint> deviceChanged) const noexcept
+void AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> deviceChanged) const noexcept
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) 
