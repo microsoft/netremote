@@ -35,6 +35,53 @@ TEST_CASE("Destroy an AccessPointDiscoveryAgent instance", "[wifi][core][apmanag
     }
 }
 
+TEST_CASE("Start/stop state is reflected correctly", "[wifi][core][apmanager]")
+{
+    using namespace Microsoft::Net::Wifi;
+
+    SECTION("Start/stop state is initially stopped")
+    {
+        auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        REQUIRE_FALSE(accessPointDiscoveryAgent.IsStarted());
+    }
+
+    SECTION("Start/stop state is started after start")
+    {
+        auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        accessPointDiscoveryAgent.Start();
+        REQUIRE(accessPointDiscoveryAgent.IsStarted());
+    }
+
+    SECTION("Start/stop state is stopped after stop")
+    {
+        auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgent.Stop();
+        REQUIRE_FALSE(accessPointDiscoveryAgent.IsStarted());
+    }
+
+    SECTION("Start/stop state is started after multiple toggles")
+    {
+        auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgent.Stop();
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgent.Stop();
+        accessPointDiscoveryAgent.Start();
+        REQUIRE(accessPointDiscoveryAgent.IsStarted());
+    }
+
+    SECTION("Start/stop state is stopped after multiple toggles")
+    {
+        auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgent.Stop();
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgent.Stop();
+        REQUIRE_FALSE(accessPointDiscoveryAgent.IsStarted());
+    }
+}
+
 TEST_CASE("Presence events are raised", "[wifi][core][apmanager]")
 {
     using namespace Microsoft::Net::Wifi;
@@ -73,6 +120,28 @@ TEST_CASE("Presence events are raised", "[wifi][core][apmanager]")
         REQUIRE(accessPointChanged == accessPoint);
     }
 
+    SECTION("Arrival event is raised after toggling start/stop")
+    {
+        // Register a callback which completes the promise when invoked.
+        accessPointDiscoveryAgent.RegisterDiscoveryEventCallback([&presenceEventRaised](auto&& presenceEvent, auto&& accessPointChanged) {
+            presenceEventRaised.set_value({ presenceEvent, std::move(accessPointChanged) });
+        });
+
+        // Toggle start/stop state.
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgent.Stop();
+        accessPointDiscoveryAgent.Start();
+
+        // Simulate adding an access point and verify the callback fired to ensure prior callback registration was preserved.
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint);
+        REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::ready);
+
+        // Verify the callback fired with the expected event and access point.
+        const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
+        REQUIRE(presenceEvent == AccessPointPresenceEvent::Arrived);
+        REQUIRE(accessPointChanged == accessPoint);
+    }
+
     SECTION("Departed event is raised")
     {
         // Add an initial access point.
@@ -92,5 +161,56 @@ TEST_CASE("Presence events are raised", "[wifi][core][apmanager]")
         const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
         REQUIRE(presenceEvent == AccessPointPresenceEvent::Departed);
         REQUIRE(accessPointChanged == accessPoint);
+    }
+
+    SECTION("Departed event is raised after start/stop")
+    {
+        // Add an initial access point.
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint);
+
+        // Register a callback which completes the promise when invoked.
+        accessPointDiscoveryAgent.RegisterDiscoveryEventCallback([&presenceEventRaised](auto&& presenceEvent, auto&& accessPointChanged) {
+            presenceEventRaised.set_value({ presenceEvent, std::move(accessPointChanged) });
+        });
+
+        // Toggle start/stop state.
+        accessPointDiscoveryAgent.Stop();
+        accessPointDiscoveryAgent.Start();
+
+        // Simulate removing an access point and verify the callback fired to ensure prior callback registration was preserved.
+        accessPointDiscoveryAgentOperationsTest->RemoveAccessPoint(accessPoint);
+        REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::ready);
+
+        // Verify the callback fired with the expected event and access point.
+        const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
+        REQUIRE(presenceEvent == AccessPointPresenceEvent::Departed);
+        REQUIRE(accessPointChanged == accessPoint);
+    }
+
+    SECTION("Arrival event is not raised when stoppped")
+    {
+        // Register a callback which completes the promise when invoked.
+        accessPointDiscoveryAgent.RegisterDiscoveryEventCallback([&presenceEventRaised](auto&& presenceEvent, auto&& accessPointChanged) {
+            presenceEventRaised.set_value({ presenceEvent, std::move(accessPointChanged) });
+        });
+
+        // Add an access point and verify the callback was not fired.
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint);
+        REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::timeout);
+    }
+    
+    SECTION("Departed event is not raised when stoppped")
+    {
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint);
+
+        // Register a callback which completes the promise when invoked.
+        accessPointDiscoveryAgent.RegisterDiscoveryEventCallback([&presenceEventRaised](auto&& presenceEvent, auto&& accessPointChanged) {
+            presenceEventRaised.set_value({ presenceEvent, std::move(accessPointChanged) });
+        });
+
+        // Remove the access point and verify the callback was not fired.
+        accessPointDiscoveryAgentOperationsTest->RemoveAccessPoint(accessPoint);
+        REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::timeout);
     }
 }

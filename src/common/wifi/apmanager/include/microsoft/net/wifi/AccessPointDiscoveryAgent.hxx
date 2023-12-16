@@ -26,7 +26,7 @@ struct AccessPointDiscoveryAgent
 
     /**
      * @brief Construct a new AccessPointDiscoveryAgent object with the specified operations.
-     * 
+     *
      * @param operations The discovery operations to use.
      */
     explicit AccessPointDiscoveryAgent(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations) noexcept;
