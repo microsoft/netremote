@@ -50,6 +50,15 @@ public:
     AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent> discoveryAgent);
 
     /**
+     * @brief Get the IAccessPoint object with the specified interface name.
+     *
+     * @param interfaceName The interface name of the access point to get.
+     * @return std::weak_ptr<IAccessPoint>
+     */
+    std::weak_ptr<IAccessPoint>
+    GetAccessPoint(std::string_view interfaceName) const;
+
+    /**
      * @brief Get a collection of all access points.
      *
      * This function allows the caller to further filter the collection based
