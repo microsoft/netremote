@@ -3,8 +3,8 @@
 
 #include <errno.h>
 #include <logging/LogUtils.hxx>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
+#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <notstd/Utility.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
@@ -16,14 +16,14 @@
 
 using namespace Microsoft::Net::Remote;
 
-enum class LogInstanceId : int
-{
+enum class LogInstanceId : int {
     // Default logger is 0 and is omitted from this enumeration.
     Console = 1,
-    File = 2,    
+    File = 2,
 };
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
@@ -45,13 +45,11 @@ int main(int argc, char* argv[])
     server.Run();
 
     // If running in the background, daemonize the process.
-    if (configuration.RunInBackground)
-    {
+    if (configuration.RunInBackground) {
         constexpr int nochdir = 0; // Change current working directory to /
         constexpr int noclose = 0; // Don't redirect stdin, stdout to /dev/null
 
-        if (daemon(nochdir, noclose) != 0) 
-        {
+        if (daemon(nochdir, noclose) != 0) {
             const int error = errno;
             const auto what = std::format("failed to daemonize (error={})", error);
             LOG_ERROR << what;
@@ -59,8 +57,7 @@ int main(int argc, char* argv[])
         }
     }
     // Otherwise wait for the server to exit.
-    else
-    {
+    else {
         server.GetGrpcServer()->Wait();
     }
 

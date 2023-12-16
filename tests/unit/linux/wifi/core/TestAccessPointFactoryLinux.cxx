@@ -47,7 +47,7 @@ TEST_CASE("Create() function", "[wifi][core][ap][linux]")
     SECTION("Create() with empty/null inteface doesn't cause a crash")
     {
         AccessPointFactoryLinux accessPointFactory{};
-        REQUIRE_NOTHROW(accessPointFactory.Create({})) ;
+        REQUIRE_NOTHROW(accessPointFactory.Create({}));
     }
 
     SECTION("Create() with valid input arguments returns non-nullptr instance")

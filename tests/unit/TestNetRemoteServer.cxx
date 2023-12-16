@@ -86,8 +86,7 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
         REQUIRE_NOTHROW(server.Stop());
 
         // Validate each channel is in IDLE state.
-        for (const auto& [channel, _] : clients)
-        {
+        for (const auto& [channel, _] : clients) {
             REQUIRE(channel->GetState(false) == GRPC_CHANNEL_IDLE);
         }
     }
@@ -123,8 +122,7 @@ TEST_CASE("NetRemoteServer can be cycled through run/stop states", "[basic][rpc]
     {
         const auto numCycles = Catch::Generators::range(1, 3);
 
-        for ([[maybe_unused]] auto _ : std::views::iota(0, numCycles.get()))
-        {
+        for ([[maybe_unused]] auto _ : std::views::iota(0, numCycles.get())) {
             REQUIRE_NOTHROW(server.Stop());
             REQUIRE_NOTHROW(server.Run());
 

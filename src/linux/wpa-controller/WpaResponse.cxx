@@ -1,6 +1,6 @@
 
-#include <Wpa/WpaResponse.hxx>
 #include <Wpa/ProtocolWpa.hxx>
+#include <Wpa/WpaResponse.hxx>
 
 using namespace Wpa;
 
@@ -15,12 +15,14 @@ WpaResponse::operator bool() const
     return IsOk();
 }
 
-bool WpaResponse::IsOk() const
+bool
+WpaResponse::IsOk() const
 {
     return (ProtocolWpa::IsResponseOk(Payload));
 }
 
-bool WpaResponse::Failed() const
+bool
+WpaResponse::Failed() const
 {
     return (ProtocolWpa::IsResponseFail(Payload));
 }

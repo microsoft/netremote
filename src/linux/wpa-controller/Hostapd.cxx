@@ -19,49 +19,49 @@ Hostapd::Hostapd(std::string_view interfaceName) :
 {
 }
 
-std::string_view Hostapd::GetInterface()
+std::string_view
+Hostapd::GetInterface()
 {
     return m_interface;
 }
 
-bool Hostapd::Ping()
+bool
+Hostapd::Ping()
 {
     static constexpr WpaCommand PingCommand(ProtocolHostapd::CommandPayloadPing);
 
     const auto response = m_controller.SendCommand(PingCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to ping hostapd");
     }
 
     return response->Payload.starts_with(ProtocolHostapd::ResponsePayloadPing);
 }
 
-HostapdStatus Hostapd::GetStatus()
+HostapdStatus
+Hostapd::GetStatus()
 {
     static constexpr WpaCommandStatus StatusCommand;
 
     auto response = m_controller.SendCommand<WpaResponseStatus>(StatusCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to send hostapd 'status' command");
     }
 
     return response->Status;
 }
 
-bool Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
+bool
+Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
 {
     const WpaCommandGet getCommand(propertyName);
     const auto response = m_controller.SendCommand(getCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to send hostapd 'get' command");
     }
     // Check Failed() and not IsOk() since the response will indicate failure
     // with "FAIL", otherwise, the payload is the property value (not "OK").
-    else if (response->Failed())
-    {
+    else if (response->Failed()) {
         return false;
     }
 
@@ -69,29 +69,27 @@ bool Hostapd::GetProperty(std::string_view propertyName, std::string& propertyVa
     return true;
 }
 
-bool Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue)
+bool
+Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue)
 {
     const WpaCommandSet setCommand(propertyName, propertyValue);
     const auto response = m_controller.SendCommand(setCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to send hostapd 'set' command");
     }
 
     return response->IsOk();
 }
 
-bool Hostapd::Enable()
+bool
+Hostapd::Enable()
 {
     static constexpr WpaCommand EnableCommand(ProtocolHostapd::CommandPayloadEnable);
 
     const auto response = m_controller.SendCommand(EnableCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to send hostapd 'enable' command");
-    }
-    else if (response->IsOk())
-    {
+    } else if (response->IsOk()) {
         return true;
     }
 
@@ -103,17 +101,15 @@ bool Hostapd::Enable()
     return IsHostapdStateOperational(status.State);
 }
 
-bool Hostapd::Disable() 
+bool
+Hostapd::Disable()
 {
     static constexpr WpaCommand DisableCommand(ProtocolHostapd::CommandPayloadDisable);
 
     const auto response = m_controller.SendCommand(DisableCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to send hostapd 'disable' command");
-    }
-    else if (response->IsOk())
-    {
+    } else if (response->IsOk()) {
         return true;
     }
 
@@ -125,13 +121,13 @@ bool Hostapd::Disable()
     return !IsHostapdStateOperational(status.State);
 }
 
-bool Hostapd::Terminate()
+bool
+Hostapd::Terminate()
 {
     static constexpr WpaCommand TerminateCommand(ProtocolHostapd::CommandPayloadTerminate);
 
     const auto response = m_controller.SendCommand(TerminateCommand);
-    if (!response)
-    {
+    if (!response) {
         throw HostapdException("Failed to send hostapd 'terminate' command");
     }
 

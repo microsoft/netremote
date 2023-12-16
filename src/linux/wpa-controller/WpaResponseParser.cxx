@@ -13,17 +13,18 @@ WpaResponseParser::WpaResponseParser(const WpaCommand* command, std::string_view
 {
 }
 
-const std::unordered_map<std::string_view, std::string_view>& WpaResponseParser::GetProperties() const noexcept
+const std::unordered_map<std::string_view, std::string_view>&
+WpaResponseParser::GetProperties() const noexcept
 {
     return m_properties;
 }
 
-std::shared_ptr<WpaResponse> WpaResponseParser::Parse()
+std::shared_ptr<WpaResponse>
+WpaResponseParser::Parse()
 {
     // Attempt to parse the properties, bailing on an error.
     auto propertiesParsed = TryParseProperties();
-    if (!propertiesParsed)
-    {
+    if (!propertiesParsed) {
         return nullptr;
     }
 
@@ -31,30 +32,24 @@ std::shared_ptr<WpaResponse> WpaResponseParser::Parse()
     return ParsePayload();
 }
 
-bool WpaResponseParser::TryParseProperties()
+bool
+WpaResponseParser::TryParseProperties()
 {
-    if (std::empty(m_propertiesToParse))
-    {
+    if (std::empty(m_propertiesToParse)) {
         return true;
     }
 
-    for (auto propertyToParseIterator = std::begin(m_propertiesToParse); propertyToParseIterator != std::end(m_propertiesToParse); )
-    {
+    for (auto propertyToParseIterator = std::begin(m_propertiesToParse); propertyToParseIterator != std::end(m_propertiesToParse);) {
         auto& propertyToParse = *propertyToParseIterator;
         auto propertyValue = propertyToParse.TryParseValue(ResponsePayload);
-        if (propertyValue.has_value())
-        {
+        if (propertyValue.has_value()) {
             m_properties[propertyToParse.Key] = *propertyValue;
             propertyToParseIterator = m_propertiesToParse.erase(propertyToParseIterator);
             continue;
-        }
-        else if (propertyToParse.IsRequired)
-        {
+        } else if (propertyToParse.IsRequired) {
             std::cerr << std::format("Failed to parse required property: {}", propertyToParse.Key) << std::endl;
             return false;
-        }
-        else
-        {
+        } else {
             ++propertyToParseIterator;
         }
     }

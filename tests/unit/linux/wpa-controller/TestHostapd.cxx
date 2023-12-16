@@ -2,9 +2,9 @@
 #include <optional>
 #include <thread>
 
-#include <catch2/catch_test_macros.hpp>
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <catch2/catch_test_macros.hpp>
 
 #include "detail/WpaDaemonManager.hxx"
 

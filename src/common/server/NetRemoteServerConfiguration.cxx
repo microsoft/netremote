@@ -37,14 +37,10 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
     NetRemoteServerConfiguration configuration{};
     ConfigureCliAppOptions(app, configuration);
 
-    try
-    {
+    try {
         app.parse(std::forward<Args>(args)...);
-    }
-    catch (const CLI::ParseError& parseError)
-    {
-        if (throwOnParseError)
-        {
+    } catch (const CLI::ParseError& parseError) {
+        if (throwOnParseError) {
             throw parseError;
         }
     }
