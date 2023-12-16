@@ -5,7 +5,8 @@
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
 
-std::shared_ptr<IAccessPoint> AccessPointFactoryTest::Create(std::string_view interface)
+std::shared_ptr<IAccessPoint>
+AccessPointFactoryTest::Create(std::string_view interface)
 {
     return std::make_shared<AccessPoint>(interface);
 }

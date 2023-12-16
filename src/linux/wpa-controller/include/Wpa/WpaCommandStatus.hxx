@@ -21,21 +21,23 @@ struct WpaCommandStatus :
      */
     constexpr WpaCommandStatus() :
         WpaCommand(ProtocolWpa::CommandPayloadStatus)
-        {
-        }
+    {
+    }
 
 private:
-    std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
+    std::unique_ptr<WpaResponseParser>
+    CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
 };
 
 /**
  * @brief Parser for the "STATUS" command response.
  */
-struct WpaStatusResponseParser : public WpaResponseParser
+struct WpaStatusResponseParser : 
+    public WpaResponseParser
 {
     /**
      * @brief Construct a new WpaStatusResponseParser object.
-     * 
+     *
      * @param command The command associated with the response.
      * @param responsePayload The response payload to parse.
      */
@@ -44,10 +46,11 @@ struct WpaStatusResponseParser : public WpaResponseParser
     /**
      * @brief Parses the response payload, returning a WpaResponseStatus object
      * if successful.
-     * 
-     * @return std::shared_ptr<WpaResponse> 
+     *
+     * @return std::shared_ptr<WpaResponse>
      */
-    std::shared_ptr<WpaResponse> ParsePayload() override;
+    std::shared_ptr<WpaResponse>
+    ParsePayload() override;
 };
 
 } // namespace Wpa

@@ -2,8 +2,8 @@
 #ifndef WPA_COMMAND_SET_HXX
 #define WPA_COMMAND_SET_HXX
 
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <Wpa/WpaCommand.hxx>
 
@@ -17,7 +17,7 @@ struct WpaCommandSet :
 {
     /**
      * @brief Construct a new WpaCommandSet object for the specified property.
-     * 
+     *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value to set the property to.
      */

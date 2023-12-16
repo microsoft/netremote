@@ -3,8 +3,8 @@
 #define NET_REMOTE_SERVER_HXX
 
 #include <memory>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <grpcpp/server.h>
 #include <microsoft/net/remote/NetRemoteService.hxx>
@@ -20,27 +20,30 @@ struct NetRemoteServer
 
     /**
      * @brief Construct a new NetRemoteServer object.
-     * 
-     * @param serverAddress 
+     *
+     * @param serverAddress
      */
     NetRemoteServer(std::string_view serverAddress);
 
     /**
      * @brief Get the GrpcServer object.
-     * 
-     * @return std::unique_ptr<grpc::Server>& 
+     *
+     * @return std::unique_ptr<grpc::Server>&
      */
-    std::unique_ptr<grpc::Server>& GetGrpcServer() noexcept;
+    std::unique_ptr<grpc::Server>&
+    GetGrpcServer() noexcept;
 
     /**
      * @brief Start the server if not already started.
      */
-    void Run();
+    void
+    Run();
 
     /**
      * @brief Stop the server if started.
      */
-    void Stop();
+    void
+    Stop();
 
 private:
     std::string m_serverAddress;

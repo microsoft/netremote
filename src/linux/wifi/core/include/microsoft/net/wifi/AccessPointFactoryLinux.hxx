@@ -17,11 +17,12 @@ struct AccessPointFactoryLinux :
 {
     /**
      * @brief Create an access point object for the given network interface.
-     * 
-     * @param interface 
-     * @return std::shared_ptr<IAccessPoint> 
+     *
+     * @param interface
+     * @return std::shared_ptr<IAccessPoint>
      */
-    std::shared_ptr<IAccessPoint> Create(std::string_view interface) override;
+    std::shared_ptr<IAccessPoint>
+    Create(std::string_view interface) override;
 };
 } // namespace Microsoft::Net::Wifi
 

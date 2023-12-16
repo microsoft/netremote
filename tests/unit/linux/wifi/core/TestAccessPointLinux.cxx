@@ -11,7 +11,7 @@ TEST_CASE("Create an AccessPointLinux instance", "[wifi][core][ap][linux]")
 {
     using namespace Microsoft::Net::Wifi;
 
-     SECTION("Create doesn't cause a crash")
+    SECTION("Create doesn't cause a crash")
     {
         std::optional<AccessPointLinux> accessPoint;
         REQUIRE_NOTHROW(accessPoint.emplace(Test::InterfaceNameDefault));

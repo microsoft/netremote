@@ -2,8 +2,8 @@
 #ifndef WPA_RESPONSE_HXX
 #define WPA_RESPONSE_HXX
 
-#include <string_view>
 #include <string>
+#include <string_view>
 
 namespace Wpa
 {
@@ -20,13 +20,13 @@ struct WpaResponse
 
     /**
      * @brief Construct an empty WpaResponse object.
-     * 
+     *
      */
     WpaResponse() = default;
 
     /**
      * @brief Construct a WpaResponse object with the specified payload.
-     * 
+     *
      * @param payload The payload of a WPA control command response.
      */
     WpaResponse(std::string_view payload);
@@ -34,27 +34,29 @@ struct WpaResponse
     /**
      * @brief Implicit bool operator allowing WpaResponse to be used directly in
      * condition statements (eg. if (response) // ...).
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     operator bool() const;
 
     /**
      * @brief Indicates whether the response describes a successful result.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
-    bool IsOk() const;
+    bool
+    IsOk() const;
 
     /**
      * @brief Indicates whether the response describes a failed result.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
-    bool Failed() const;
+    bool
+    Failed() const;
 
 private:
     /**

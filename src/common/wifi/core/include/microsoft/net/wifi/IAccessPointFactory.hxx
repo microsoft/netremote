@@ -21,11 +21,12 @@ struct IAccessPointFactory
 
     /**
      * @brief Create a new access point object for the given network interface.
-     * 
-     * @param interface 
-     * @return std::shared_ptr<AccessPoint> 
+     *
+     * @param interface
+     * @return std::shared_ptr<AccessPoint>
      */
-    virtual std::shared_ptr<IAccessPoint> Create(std::string_view interface) = 0;
+    virtual std::shared_ptr<IAccessPoint>
+    Create(std::string_view interface) = 0;
 };
 } // namespace Microsoft::Net::Wifi
 

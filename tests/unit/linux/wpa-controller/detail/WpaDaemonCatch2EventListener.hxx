@@ -5,32 +5,35 @@
 #include <memory>
 #include <unordered_map>
 
+#include <Wpa/WpaCore.hxx>
 #include <catch2/reporters/catch_reporter_event_listener.hpp>
 #include <catch2/reporters/catch_reporter_registrars.hpp>
-#include <Wpa/WpaCore.hxx>
 
 #include "WifiVirtualDeviceManager.hxx"
 #include "WpaDaemonInstance.hxx"
 
-struct WpaDaemonCatch2EventListener : public Catch::EventListenerBase
+struct WpaDaemonCatch2EventListener :
+    public Catch::EventListenerBase
 {
     // Inherit base class constructor.
-    using EventListenerBase::EventListenerBase; 
+    using EventListenerBase::EventListenerBase;
 
     /**
      * @brief Runs when a test case is started.
-     * 
-     * @param testInfo 
+     *
+     * @param testInfo
      */
-    void testCaseStarting(Catch::TestCaseInfo const& testInfo) override;
+    void
+    testCaseStarting(Catch::TestCaseInfo const& testInfo) override;
 
     /**
      * @brief Runs when the last test case has ended.
-     * 
-     * @param testCaseStats 
-     * @return * void 
+     *
+     * @param testCaseStats
+     * @return * void
      */
-    void testCaseEnded(Catch::TestCaseStats const& testCaseStats) override;
+    void
+    testCaseEnded(Catch::TestCaseStats const& testCaseStats) override;
 
 private:
     std::unordered_map<Wpa::WpaType, std::unique_ptr<IWpaDaemonInstance>> m_wpaDaemonInstances;

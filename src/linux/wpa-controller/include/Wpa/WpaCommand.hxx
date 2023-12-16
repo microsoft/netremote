@@ -3,8 +3,8 @@
 #define WPA_COMMAND_HXX
 
 #include <memory>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <Wpa/WpaResponseParser.hxx>
 
@@ -27,16 +27,17 @@ struct WpaCommand :
 
     /**
      * @brief Set the payload of the command.
-     * 
+     *
      * @param payload The payload to assign.
      */
-    void SetPayload(std::string_view payload);
+    void
+    SetPayload(std::string_view payload);
 
     /**
      * @brief Parse the response payload into a WpaResponse object.
-     * 
+     *
      * @param responsePayload The response payload to parse.
-     * @return std::shared_ptr<WpaResponse> 
+     * @return std::shared_ptr<WpaResponse>
      */
     std::shared_ptr<WpaResponse>
     ParseResponse(std::string_view responsePayload) const;
@@ -46,12 +47,13 @@ struct WpaCommand :
 private:
     /**
      * @brief Create a response parser object for the given command.
-     * 
+     *
      * @param command The command to create a response parser for.
      * @param responsePayload The response payload to parse.
-     * @return std::unique_ptr<WpaResponseParser> 
+     * @return std::unique_ptr<WpaResponseParser>
      */
-    std::unique_ptr<WpaResponseParser> CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
+    std::unique_ptr<WpaResponseParser>
+    CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
 };
 } // namespace Wpa
 

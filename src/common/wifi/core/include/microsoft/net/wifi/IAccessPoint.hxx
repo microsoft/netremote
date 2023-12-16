@@ -18,10 +18,11 @@ struct IAccessPoint
 
     /**
      * @brief Get the network interface name representing the access point.
-     * 
-     * @return std::string_view 
+     *
+     * @return std::string_view
      */
-    virtual std::string_view GetInterface() const noexcept = 0;
+    virtual std::string_view
+    GetInterface() const noexcept = 0;
 };
 } // namespace Microsoft::Net::Wifi
 

@@ -9,7 +9,8 @@
 
 #include "WifiVirtualDeviceManager.hxx"
 
-std::unordered_set<std::string> WifiVirtualDeviceManager::CreateInterfaces(uint32_t numberOfInterfaces, std::string_view driverName)
+std::unordered_set<std::string>
+WifiVirtualDeviceManager::CreateInterfaces(uint32_t numberOfInterfaces, std::string_view driverName)
 {
     auto interfacesCreated = CreateInterfacesForDriver(numberOfInterfaces, driverName);
     auto& interfacesExisting = m_interfaces[driverName];
@@ -18,22 +19,23 @@ std::unordered_set<std::string> WifiVirtualDeviceManager::CreateInterfaces(uint3
     return interfacesCreated;
 }
 
-std::unordered_map<std::string_view, std::unordered_set<std::string>> WifiVirtualDeviceManager::EnumerateInterfaces() const
+std::unordered_map<std::string_view, std::unordered_set<std::string>>
+WifiVirtualDeviceManager::EnumerateInterfaces() const
 {
     return m_interfaces;
 }
 
-bool WifiVirtualDeviceManager::RemoveInterfaces(std::string_view driverName)
+bool
+WifiVirtualDeviceManager::RemoveInterfaces(std::string_view driverName)
 {
     return RemoveInterfacesForDriver(driverName);
 }
 
-bool WifiVirtualDeviceManager::RemoveAllInterfaces()
+bool
+WifiVirtualDeviceManager::RemoveAllInterfaces()
 {
-    for (auto it = std::begin(m_interfaces); it != std::end(m_interfaces); )
-    {
-        if (!RemoveInterfacesForDriver(it->first))
-        {
+    for (auto it = std::begin(m_interfaces); it != std::end(m_interfaces);) {
+        if (!RemoveInterfacesForDriver(it->first)) {
             return false;
         }
 
@@ -44,22 +46,21 @@ bool WifiVirtualDeviceManager::RemoveAllInterfaces()
 }
 
 /* static */
-std::unordered_set<std::string> WifiVirtualDeviceManager::CreateInterfacesForDriver(uint32_t numberOfInterfaces, std::string_view driverName)
+std::unordered_set<std::string>
+WifiVirtualDeviceManager::CreateInterfacesForDriver(uint32_t numberOfInterfaces, std::string_view driverName)
 {
     static constexpr auto InterfaceNamePrefixDefault = "wlan";
 
     // Prepare the driver modprobe arguments, if necessary.
     std::string driverArguments{};
-    if (driverName == DriverMac80211HwsimName)
-    {
+    if (driverName == DriverMac80211HwsimName) {
         driverArguments = std::format("radios={}", numberOfInterfaces);
     }
 
     // Load the specified kernel module, which should create the simulated wireless interface(s).
     const auto driverLoadCommand = std::format("sudo modprobe {} {}", driverName, driverArguments);
     int ret = std::system(driverLoadCommand.c_str());
-    if (ret == -1)
-    {
+    if (ret == -1) {
         ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to load {} driver, load command '{}' failed (ret={})\n", driverName, driverLoadCommand, ret);
         return {};
@@ -73,19 +74,19 @@ std::unordered_set<std::string> WifiVirtualDeviceManager::CreateInterfacesForDri
     });
 
     return {
-        std::make_move_iterator(std::begin(interfaces)), 
+        std::make_move_iterator(std::begin(interfaces)),
         std::make_move_iterator(std::end(interfaces))
     };
 }
 
 /* static */
-bool WifiVirtualDeviceManager::RemoveInterfacesForDriver(std::string_view driverName)
+bool
+WifiVirtualDeviceManager::RemoveInterfacesForDriver(std::string_view driverName)
 {
     // Forcefully remove any existing loaded kernel module for this driver.
     const auto driverUnloadCommand = std::format("sudo modprobe -rf {}", driverName);
     int ret = std::system(driverUnloadCommand.c_str());
-    if (ret == -1)
-    {
+    if (ret == -1) {
         ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to unload {} driver, unload command '{}' failed (ret={})\n", driverName, driverUnloadCommand, ret);
         return false;

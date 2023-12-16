@@ -2,8 +2,8 @@
 #ifndef HOSTAPD_HXX
 #define HOSTAPD_HXX
 
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/WpaController.hxx>
@@ -18,73 +18,81 @@ struct Hostapd :
 {
     /**
      * @brief Construct a new Hostapd object.
-     * 
+     *
      * @param interfaceName The name of the intrerface to control. Eg. wlan1.
      */
     Hostapd(std::string_view interfaceName);
 
     /**
      * @brief Enables the interface for use.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
-    bool Enable() override;
+    bool
+    Enable() override;
 
     /**
      * @brief Disables the interface for use.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
-    bool Disable() override;
+    bool
+    Disable() override;
 
     /**
      * @brief Terminates the process hosting the daemon.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
-    bool Terminate() override;
+    bool
+    Terminate() override;
 
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
-    bool Ping() override;
+    bool
+    Ping() override;
 
     /**
      * @brief Get the name of the interface hostapd is managing.
-     * 
-     * @return std::string_view 
+     *
+     * @return std::string_view
      */
-    std::string_view GetInterface() override;
+    std::string_view
+    GetInterface() override;
 
     /**
      * @brief Get the status for the interface.
-     * 
-     * @return HostapdStatus 
+     *
+     * @return HostapdStatus
      */
-    HostapdStatus GetStatus() override;
+    HostapdStatus
+    GetStatus() override;
 
     /**
      * @brief Get a property value for the interface.
-     * 
+     *
      * @param propertyName The name of the property to retrieve.
      * @param propertyValue The string to store the property value in.
      * @return true If the property value was obtained and its value is in 'propertyValue'.
      * @return false If t he property value could not be obtained due to an error.
      */
-    bool GetProperty(std::string_view propertyName, std::string& propertyValue) override; 
+    bool
+    GetProperty(std::string_view propertyName, std::string& propertyValue) override;
 
     /**
      * @brief Set a property on the interface.
-     * 
+     *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
      * @return true The property was set successfully.
      * @return false The property was not set successfully.
      */
-    bool SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
+    bool
+    SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
 
 private:
     const std::string m_interface;

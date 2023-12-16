@@ -5,7 +5,8 @@
 
 #include <logging/LogUtils.hxx>
 
-std::string logging::GetLogName(std::string_view componentName)
+std::string
+logging::GetLogName(std::string_view componentName)
 {
     const auto now = std::chrono::system_clock::now();
     const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
@@ -20,10 +21,10 @@ std::string logging::GetLogName(std::string_view componentName)
     return ss.str();
 }
 
-plog::Severity logging::LogVerbosityToPlogSeverity(uint8_t verbosity) noexcept
+plog::Severity
+logging::LogVerbosityToPlogSeverity(uint8_t verbosity) noexcept
 {
-    switch (verbosity)
-    {
+    switch (verbosity) {
     case 0:
         return plog::warning;
     case 1:

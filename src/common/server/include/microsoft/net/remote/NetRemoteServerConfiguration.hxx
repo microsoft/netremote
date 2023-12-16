@@ -18,11 +18,11 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Create a NetRemoteServerConfiguration object from command-line
      * arguments.
-     * 
-     * @param argc 
-     * @param argv 
+     *
+     * @param argc
+     * @param argv
      * @param throwOnParseError
-     * @return NetRemoteServerConfiguration 
+     * @return NetRemoteServerConfiguration
      */
     static NetRemoteServerConfiguration
     FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError = false);
@@ -30,10 +30,10 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Create a NetRemoteServerConfiguration object from command-line
      * arguments.
-     * 
-     * @param args 
+     *
+     * @param args
      * @param throwOnParseError
-     * @return NetRemoteServerConfiguration 
+     * @return NetRemoteServerConfiguration
      */
     static NetRemoteServerConfiguration
     FromCommandLineArguments(std::vector<std::string>& args, bool throwOnParseError = false);

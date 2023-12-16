@@ -3,8 +3,8 @@
 #define LOG_UTILS_HXX
 
 #include <cstdint>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <plog/Severity.h>
 
@@ -19,15 +19,17 @@ namespace logging
  * @param componentName The name of the component the log is for. Eg. 'server', 'client', etc.
  * @return std::string
  */
-std::string GetLogName(std::string_view componentName);
+std::string
+GetLogName(std::string_view componentName);
 
 /**
  * @brief Converts a log verbosity level to a plog severity level.
- * 
+ *
  * @param verbosity The log verbosity level.
  * @return plog::Severity
  */
-plog::Severity LogVerbosityToPlogSeverity(uint8_t verbosity) noexcept;
+plog::Severity
+LogVerbosityToPlogSeverity(uint8_t verbosity) noexcept;
 
 } // namespace logging
 

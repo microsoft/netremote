@@ -1,10 +1,10 @@
 
 #include <Wpa/WpaCore.hxx>
 
-std::string_view Wpa::GetWpaTypeDaemonBinaryName(WpaType type) noexcept
+std::string_view
+Wpa::GetWpaTypeDaemonBinaryName(WpaType type) noexcept
 {
-    switch (type)
-    {
+    switch (type) {
     case WpaType::Hostapd:
         return "hostapd";
     case WpaType::WpaSupplicant:

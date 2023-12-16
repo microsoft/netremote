@@ -20,17 +20,18 @@ struct AccessPointManager
 {
     /**
      * @brief Construct a new AccessPointManager with the given access point factory.
-     * 
-     * @param accessPointFactory 
+     *
+     * @param accessPointFactory
      */
     AccessPointManager(std::unique_ptr<IAccessPointFactory> accessPointFactory);
 
     /**
      * @brief Return a list of the currently available access points.
-     * 
-     * @return std::unordered_map<std::string, std::weak_ptr<AccessPoint>> 
+     *
+     * @return std::unordered_map<std::string, std::weak_ptr<AccessPoint>>
      */
-    std::unordered_map<std::string, std::weak_ptr<AccessPoint>> EnumerateAccessPoints() const noexcept;
+    std::unordered_map<std::string, std::weak_ptr<AccessPoint>>
+    EnumerateAccessPoints() const noexcept;
 
 private:
     std::unique_ptr<IAccessPointFactory> m_accessPointFactory;

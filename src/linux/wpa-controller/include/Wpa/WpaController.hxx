@@ -10,8 +10,8 @@
 #include <string>
 #include <string_view>
 
-#include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
 
 namespace Wpa
@@ -25,7 +25,7 @@ struct WpaController
     /**
      * @brief Construct a new WpaController object for the specified interface
      * with a default control socket path.
-     * 
+     *
      * @param interfaceName The name of the interface to control. Eg. wlan1.
      * @param type The type of daemon controlling the interface.
      */
@@ -34,7 +34,7 @@ struct WpaController
     /**
      * @brief Construct a new WpaController object for the specified interface
      * using the specified control socket.
-     * 
+     *
      * @param interfaceName The name of the interface to control. Eg. wlan1.
      * @param type The type of daemon controlling the interface.
      * @param controlSocketPath The full path to the daemon control socket.
@@ -44,7 +44,7 @@ struct WpaController
     /**
      * @brief Construct a new WpaController object for the specified interface
      * using the specified control socket.
-     * 
+     *
      * @param interfaceName The name of the interface to control. Eg. wlan1.
      * @param type The type of daemon controlling the interface.
      * @param controlSocketPath The full path to the daemon control socket.
@@ -53,39 +53,43 @@ struct WpaController
 
     /**
      * @brief The type of daemon this object is controlling.
-     * 
-     * @return WpaType 
+     *
+     * @return WpaType
      */
-    WpaType Type() const noexcept;
+    WpaType
+    Type() const noexcept;
 
     /**
      * @brief The path of the control socket this object is using.
-     * 
-     * @return std::filesystem::path 
+     *
+     * @return std::filesystem::path
      */
-    std::filesystem::path ControlSocketPath() const noexcept;
+    std::filesystem::path
+    ControlSocketPath() const noexcept;
 
     /**
      * @brief Send a command over the control socket and return the response
      * synchronously.
-     * 
+     *
      * This will not receive any unsolicited event messages.
-     * 
+     *
      * @param command The command to send.
-     * @return std::shared_ptr<WpaResponse> 
+     * @return std::shared_ptr<WpaResponse>
      */
     std::shared_ptr<WpaResponse>
     SendCommand(const WpaCommand& command);
 
     /**
      * @brief Syntactic sugar for returning a specific derived response type.
-     * 
+     *
      * @tparam ResponseT The type of response to return.
      * @param command The command to send.
-     * @return std::shared_ptr<ResponseT> 
+     * @return std::shared_ptr<ResponseT>
      */
+    // clang-format off
     template <typename ResponseT>
     requires std::derived_from<ResponseT, WpaResponse>
+    // clang-format on
     std::shared_ptr<ResponseT>
     SendCommand(const WpaCommand& command)
     {
@@ -111,14 +115,14 @@ struct WpaController
 
         /**
          * @brief Get the default path for the control socket of the specified daemon.
-         * 
+         *
          * @param wpaType The wpa daemon type to get the default control socket for.
          * @return constexpr auto A string containing the default control socket path.
          */
-        static constexpr auto DefaultPath(WpaType wpaType)
+        static constexpr auto
+        DefaultPath(WpaType wpaType)
         {
-            switch (wpaType)
-            {
+            switch (wpaType) {
             case WpaType::Hostapd:
                 return DefaultPathHostapd;
             case WpaType::WpaSupplicant:
@@ -133,7 +137,7 @@ private:
     /**
      * @brief Get the control socket object. If a socket connection does not
      * exist, one will be established.
-     * 
+     *
      * @return struct wpa_ctrl*
      */
     struct wpa_ctrl*

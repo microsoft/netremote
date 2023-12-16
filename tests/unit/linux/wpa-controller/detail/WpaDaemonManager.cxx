@@ -1,25 +1,25 @@
 
 #include <cstdlib>
-#include <format>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
+#include "WpaDaemonManager.hxx"
 #include <magic_enum.hpp>
 #include <signal.h>
-#include "WpaDaemonManager.hxx"
 
 namespace detail
 {
 /**
  * @brief Default hostapd configuration file contents.
- * 
+ *
  * This configuration file supports WPA2 with typical security settings. It is
  * meant to be used with a virtualized wlan device created with the
  * mac80211_hwsim kernel module. The intention is to use this for basic control
  * socket tests, not to exercise specifically wlan functionality.
- * 
+ *
  * This string must be formatted with std::format() to provide the interface
  * name as the first interpolation argument.
  */
@@ -41,22 +41,20 @@ rsn_pairwise=CCMP
 /**
  * @brief Write the default configuration file contents for the specified wpa
  * daemon type to the specified file stream.
- * 
+ *
  * @param wpaType The type of wpa daemon to write the configuration file for.
  * @param interfaceName The wlan interface the daemon will be managing.
  * @param configurationFile The file stream to write the configuration file to.
  */
-void WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, std::string_view interfaceName, std::ofstream& configurationFile)
+void
+WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, std::string_view interfaceName, std::ofstream& configurationFile)
 {
-    switch (wpaType)
-    {
-    case Wpa::WpaType::Hostapd:
-    {
+    switch (wpaType) {
+    case Wpa::WpaType::Hostapd: {
         configurationFile << std::format(WpaDaemonHostapdConfigurationFileContentsFormat, interfaceName);
         break;
     }
-    default:
-    {
+    default: {
         throw std::runtime_error(std::format("Unsupported wpa daemon type '{}'", magic_enum::enum_name(wpaType)));
     }
     }
@@ -64,7 +62,8 @@ void WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, std::string_vie
 } // namespace detail
 
 /* static */
-std::filesystem::path WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(Wpa::WpaType wpaType, std::string_view interfaceName)
+std::filesystem::path
+WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(Wpa::WpaType wpaType, std::string_view interfaceName)
 {
     // Determine which daemon to create the configuration file for.
     const auto daemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
@@ -72,8 +71,7 @@ std::filesystem::path WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(W
 
     // Create the configuration file.
     const auto daemonConfigurationFileStatus = std::filesystem::status(daemonConfigurationFilePath);
-    if (std::filesystem::exists(daemonConfigurationFileStatus))
-    {
+    if (std::filesystem::exists(daemonConfigurationFileStatus)) {
         return daemonConfigurationFilePath;
     }
 
@@ -88,11 +86,11 @@ std::filesystem::path WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(W
 }
 
 /* static */
-std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments)
+std::optional<WpaDaemonInstanceHandle>
+WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments)
 {
     // Use the default interface name if none provided.
-    if (std::empty(interfaceName))
-    {
+    if (std::empty(interfaceName)) {
         interfaceName = WpaDaemonManager::InterfaceNameDefault;
     }
 
@@ -109,8 +107,7 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     std::cout << std::format("Starting wpa daemon with command '{}'\n", daemonStartCommand);
 
     int ret = std::system(daemonStartCommand.c_str());
-    if (ret == -1)
-    {
+    if (ret == -1) {
         ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to start wpa '{}' daemon, ret={}\n", daemon, ret);
         return std::nullopt;
@@ -118,19 +115,17 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
 
     // Open the pid file on the running daemon.
     std::ifstream pidFile{ pidFilePath };
-    if (!pidFile.is_open())
-    {
+    if (!pidFile.is_open()) {
         std::cerr << std::format("Failed to open pid file for wpa '{}' daemon\n", daemon);
         return std::nullopt;
     }
 
     // Read the pid from the daemon pid file.
-    pid_t pid{0};
+    pid_t pid{ 0 };
     std::stringstream pidFileContents{};
     pidFileContents << pidFile.rdbuf();
     pidFileContents >> pid;
-    if (pid == 0 || pidFileContents.fail())
-    {
+    if (pid == 0 || pidFileContents.fail()) {
         std::cerr << std::format("Failed to read pid file {} for wpa '{}' daemon\n", pidFilePath.c_str(), daemon);
         return std::nullopt;
     }
@@ -138,18 +133,18 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::Start(Wpa::WpaType wpaT
     std::cout << std::format("Started wpa '{}' daemon with pid {}\n", daemon, pid);
 
     // Return a handle to the daemon instance.
-    return WpaDaemonInstanceHandle{ 
+    return WpaDaemonInstanceHandle{
         .WpaType = wpaType,
         .Pid = pid
     };
 }
 
 /* static */
-std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::StartDefault(Wpa::WpaType wpaType, std::string_view interfaceName)
+std::optional<WpaDaemonInstanceHandle>
+WpaDaemonManager::StartDefault(Wpa::WpaType wpaType, std::string_view interfaceName)
 {
     auto configurationFilePath = CreateAndWriteDefaultConfigurationFile(wpaType, interfaceName);
-    if (configurationFilePath.empty())
-    {
+    if (configurationFilePath.empty()) {
         std::cerr << std::format("Failed to create default configuration file for wpa '{}' daemon\n", Wpa::GetWpaTypeDaemonBinaryName(wpaType));
         return std::nullopt;
     }
@@ -158,12 +153,12 @@ std::optional<WpaDaemonInstanceHandle> WpaDaemonManager::StartDefault(Wpa::WpaTy
 }
 
 /* static */
-bool WpaDaemonManager::Stop(const WpaDaemonInstanceHandle& instanceHandle)
+bool
+WpaDaemonManager::Stop(const WpaDaemonInstanceHandle& instanceHandle)
 {
     // Kill the process associated with the daemon instance.
     int ret = kill(instanceHandle.Pid, SIGTERM);
-    if (ret != 0)
-    {
+    if (ret != 0) {
         std::cerr << std::format("Failed to stop wpa '{}' daemon, ret={}\n", magic_enum::enum_name(instanceHandle.WpaType), ret);
         return false;
     }

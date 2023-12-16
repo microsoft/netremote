@@ -18,15 +18,16 @@ NetRemoteServer::~NetRemoteServer()
     Stop();
 }
 
-std::unique_ptr<grpc::Server>& NetRemoteServer::GetGrpcServer() noexcept
+std::unique_ptr<grpc::Server>&
+NetRemoteServer::GetGrpcServer() noexcept
 {
     return m_server;
 }
 
-void NetRemoteServer::Run()
+void
+NetRemoteServer::Run()
 {
-    if (m_server != nullptr)
-    {
+    if (m_server != nullptr) {
         return;
     }
 
@@ -38,10 +39,10 @@ void NetRemoteServer::Run()
     LOG_INFO << std::format("netremote server started listening on {}", m_serverAddress);
 }
 
-void NetRemoteServer::Stop()
+void
+NetRemoteServer::Stop()
 {
-    if (m_server == nullptr)
-    {
+    if (m_server == nullptr) {
         return;
     }
 

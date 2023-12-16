@@ -24,10 +24,8 @@ TEST_CASE("WifiConfigureAccessPoint API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        for (const auto& band : magic_enum::enum_values<Microsoft::Net::Wifi::RadioBand>())
-        {
-            for (const auto& phyType : magic_enum::enum_values<Microsoft::Net::Wifi::Dot11PhyType>())
-            {
+        for (const auto& band : magic_enum::enum_values<Microsoft::Net::Wifi::RadioBand>()) {
+            for (const auto& phyType : magic_enum::enum_values<Microsoft::Net::Wifi::Dot11PhyType>()) {
                 Microsoft::Net::Wifi::AccessPointConfiguration apConfiguration{};
                 apConfiguration.set_phytype(phyType);
 
@@ -70,7 +68,9 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
         auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
         REQUIRE(status.ok());
-        REQUIRE_NOTHROW([&]{ [[maybe_unused]] const auto& accessPoints = result.accesspoints(); });
+        REQUIRE_NOTHROW([&] {
+            [[maybe_unused]] const auto& accessPoints = result.accesspoints();
+        });
     }
 
     SECTION("Initial enablement status is disabled")
@@ -83,8 +83,7 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
         auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
         REQUIRE(status.ok());
 
-        for (const auto& accessPoint : result.accesspoints())
-        {
+        for (const auto& accessPoint : result.accesspoints()) {
             REQUIRE(!accessPoint.isenabled());
         }
     }
