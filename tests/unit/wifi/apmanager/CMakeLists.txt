@@ -3,6 +3,10 @@ add_executable(wifi-apmanager-test-unit)
 
 target_sources(wifi-apmanager-test-unit
     PRIVATE
+        AccessPointDiscoveryAgentOperationsTest.cxx
+        AccessPointDiscoveryAgentOperationsTest.hxx
+        AccessPointTest.hxx
+        TestAccessPointDiscoveryAgent.cxx
         TestAccessPointManager.cxx
 )
 
