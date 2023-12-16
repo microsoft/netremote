@@ -30,21 +30,24 @@ public:
      *
      * @return std::shared_ptr<AccessPointManager>
      */
-    [[nodiscard]] static std::shared_ptr<AccessPointManager> Create();
+    [[nodiscard]] static std::shared_ptr<AccessPointManager>
+    Create();
 
     /**
      * @brief Get an instance of this access point manager.
      *
      * @return std::shared_ptr<AccessPointManager>
      */
-    std::shared_ptr<AccessPointManager> GetInstance() noexcept;
+    std::shared_ptr<AccessPointManager>
+    GetInstance() noexcept;
 
     /**
      * @brief Adds a new access point discovery agent for use.
      *
      * @param discoveryAgent The discovery agent to add.
      */
-    void AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent> discoveryAgent);
+    void
+    AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent> discoveryAgent);
 
     /**
      * @brief Get a collection of all access points.
@@ -57,18 +60,21 @@ public:
      *
      * @return std::vector<std::weak_ptr<IAccessPoint>>
      */
-    std::vector<std::weak_ptr<IAccessPoint>> GetAllAccessPoints() const;
+    std::vector<std::weak_ptr<IAccessPoint>>
+    GetAllAccessPoints() const;
 
     ~AccessPointManager() = default;
     AccessPointManager(const AccessPointManager&) = delete;
     AccessPointManager(AccessPointManager&&) = delete;
-    AccessPointManager& operator=(AccessPointManager&) = delete;
-    AccessPointManager& operator=(AccessPointManager&&) = delete;
+    AccessPointManager&
+    operator=(AccessPointManager&) = delete;
+    AccessPointManager&
+    operator=(AccessPointManager&&) = delete;
 
 protected:
     /**
      * @brief Default constructor.
-     * 
+     *
      * It's intentional that this is *declared* here and default-implemented
      * in the source file. This is required because IAccessPoint
      * and AccessPointDiscoveryAgent are used as incomplete
@@ -90,21 +96,24 @@ private:
      * @param presence
      * @param accessPointChanged
      */
-    void OnAccessPointPresenceChanged(AccessPointDiscoveryAgent* discoveryAgent, AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged);
+    void
+    OnAccessPointPresenceChanged(AccessPointDiscoveryAgent* discoveryAgent, AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged);
 
     /**
      * @brief Adds a new access point.
      *
      * @param accessPoint The access point to add.
      */
-    void AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
+    void
+    AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
 
     /**
      * @brief Removes an existing access point from use.
      *
      * @param accessPoint The access point to remove.
      */
-    void RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
+    void
+    RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
 
 private:
     mutable std::mutex m_accessPointGate;

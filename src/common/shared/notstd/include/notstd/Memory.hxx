@@ -26,7 +26,7 @@ template <typename BaseT>
 struct enable_make_protected : public BaseT
 {
     template <typename... TArgs>
-    explicit enable_make_protected(TArgs&&... args) :
+    explicit enable_make_protected(TArgs &&...args) :
         BaseT(std::forward<TArgs>(args)...)
     {}
 };

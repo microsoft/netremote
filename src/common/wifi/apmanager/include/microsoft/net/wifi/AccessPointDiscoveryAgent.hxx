@@ -15,8 +15,7 @@ struct IAccessPoint;
 /**
  * @brief The presence of a an access point.
  */
-enum class AccessPointPresenceEvent 
-{
+enum class AccessPointPresenceEvent {
     Arrived,
     Departed,
 };
@@ -59,24 +58,28 @@ struct AccessPointDiscoveryAgent
      * @return true
      * @return false
      */
-    bool IsStarted() const noexcept;
+    bool
+    IsStarted() const noexcept;
 
     /**
      * @brief Start actively discovering devices.
      */
-    void Start();
+    void
+    Start();
 
     /**
      * @brief Stop actively discovering devices.
      */
-    void Stop();
+    void
+    Stop();
 
     /**
      * @brief Probe for all existing devices.
-     * 
-     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>> 
+     *
+     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */
-    std::future<std::vector<std::shared_ptr<IAccessPoint>>> ProbeAsync();
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    ProbeAsync();
 
 protected:
     /**
@@ -85,25 +88,29 @@ protected:
      * @param presence The presence change that occurred.
      * @param accessPointChanged The device the change occurred for.
      */
-    void DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept;
+    void
+    DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept;
 
 protected:
     /**
      * @brief Derived class implementation of discovery start.
      */
-    virtual void StartImpl();
+    virtual void
+    StartImpl();
 
     /**
      * @brief Derived class implementation of discovery stop.
      */
-    virtual void StopImpl();
+    virtual void
+    StopImpl();
 
     /**
      * @brief Derived class implementation of asynchronous discovery probe.
      *
      * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */
-    virtual std::future<std::vector<std::shared_ptr<IAccessPoint>>> ProbeAsyncImpl();
+    virtual std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    ProbeAsyncImpl();
 
 private:
     std::atomic<bool> m_started{ false };

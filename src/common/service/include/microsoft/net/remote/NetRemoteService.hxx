@@ -6,7 +6,7 @@
 
 namespace Microsoft::Net::Remote::Service
 {
-class NetRemoteService : 
+class NetRemoteService :
     public NetRemote::Service
 {
     virtual ::grpc::Status
