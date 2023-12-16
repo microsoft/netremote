@@ -41,7 +41,7 @@ struct AccessPointDiscoveryAgent
      *
      * @param onDevicePresenceChanged
      */
-    explicit AccessPointDiscoveryAgent(std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> deviceChanged)> onDevicePresenceChanged);
+    explicit AccessPointDiscoveryAgent(std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged);
 
     /**
      * @brief Register a callback for device presence change events.
@@ -51,7 +51,7 @@ struct AccessPointDiscoveryAgent
      * @param onDevicePresenceChanged The callback to register.
      */
     void
-    RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> deviceChanged)> onDevicePresenceChanged);
+    RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged);
 
     /**
      * @brief indicates the started/running state.
@@ -83,9 +83,9 @@ protected:
      * @brief Wrapper for safely invoking any device presence changed registered callback.
      *
      * @param presence The presence change that occurred.
-     * @param deviceChanged The device the change occurred for.
+     * @param accessPointChanged The device the change occurred for.
      */
-    void DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> deviceChanged) const noexcept;
+    void DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept;
 
 protected:
     /**
@@ -109,7 +109,7 @@ private:
     std::atomic<bool> m_started{ false };
 
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
-    std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> deviceChanged)> m_onDevicePresenceChanged;
+    std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)> m_onDevicePresenceChanged;
 };
 
 } // namespace Microsoft::Net::Wifi
