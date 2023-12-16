@@ -9,6 +9,18 @@ AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::unique_ptr<IAccessPoin
 {
 }
 
+AccessPointDiscoveryAgent::~AccessPointDiscoveryAgent()
+{
+    // If the agent was started, the operations object has a lambda that
+    // captured the 'this' pointer. Once the agent is destroyed, the 'this'
+    // pointer will become invalid. Consequently, call Stop() here to ensure the
+    // operations object releases the lambda and no longer references the 'this'
+    // pointer. Technically, the lambda could be retained by the operations
+    // instance, however, we assume a well-behaved implementation in this
+    // regard.
+    Stop();
+}
+
 void
 AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged)
 {

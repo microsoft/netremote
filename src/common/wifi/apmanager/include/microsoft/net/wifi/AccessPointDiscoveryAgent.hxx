@@ -22,7 +22,7 @@ struct AccessPointDiscoveryAgent
     /**
      * @brief Destroy the AccessPointDiscoveryAgent object
      */
-    virtual ~AccessPointDiscoveryAgent() = default;
+    virtual ~AccessPointDiscoveryAgent();
 
     /**
      * @brief Construct a new AccessPointDiscoveryAgent object with the specified operations.
