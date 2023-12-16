@@ -5,9 +5,10 @@
 #include <iostream>
 #include <mutex>
 
-#include <Wpa/WpaController.hxx>
 #include <magic_enum.hpp>
 #include <wpa_ctrl.h>
+
+#include <Wpa/WpaController.hxx>
 
 using namespace Wpa;
 
