@@ -14,7 +14,7 @@
 using namespace Microsoft::Net::Wifi;
 using namespace std::chrono_literals;
 
-TEST_CASE("Create an AccessPointDiscoveryAgent instance", "[wifi][core][apmanager]")
+TEST_CASE("Create an AccessPointDiscoveryAgent instance", "[wifi][core][apdiscoveryagent]")
 {
     using namespace Microsoft::Net::Wifi;
 
@@ -24,7 +24,7 @@ TEST_CASE("Create an AccessPointDiscoveryAgent instance", "[wifi][core][apmanage
     }
 }
 
-TEST_CASE("Destroy an AccessPointDiscoveryAgent instance", "[wifi][core][apmanager]")
+TEST_CASE("Destroy an AccessPointDiscoveryAgent instance", "[wifi][core][apdiscoveryagent]")
 {
     using namespace Microsoft::Net::Wifi;
 
@@ -35,7 +35,7 @@ TEST_CASE("Destroy an AccessPointDiscoveryAgent instance", "[wifi][core][apmanag
     }
 }
 
-TEST_CASE("Start/stop state is reflected correctly", "[wifi][core][apmanager]")
+TEST_CASE("Start/stop state is reflected correctly", "[wifi][core][apdiscoveryagent]")
 {
     using namespace Microsoft::Net::Wifi;
 
@@ -82,7 +82,7 @@ TEST_CASE("Start/stop state is reflected correctly", "[wifi][core][apmanager]")
     }
 }
 
-TEST_CASE("Presence events are raised", "[wifi][core][apmanager]")
+TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
 {
     using namespace Microsoft::Net::Wifi;
 
