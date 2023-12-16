@@ -74,8 +74,8 @@ AccessPointManager::GetAllAccessPoints() const
 {
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
 
-    std::vector<std::weak_ptr<IAccessPoint>> accessPoints;
-    std::transform(std::cbegin(m_accessPoints), std::cend(m_accessPoints), std::back_inserter(accessPoints), [](const auto& accessPoint) {
+    std::vector<std::weak_ptr<IAccessPoint>> accessPoints(std::size(m_accessPoints));
+    std::ranges::transform(m_accessPoints, std::begin(accessPoints), [](const auto& accessPoint) {
         // Implicit conversion from std::shared_ptr to std::weak_ptr.
         return accessPoint;
     });
