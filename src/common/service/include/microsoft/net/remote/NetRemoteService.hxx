@@ -6,7 +6,8 @@
 
 namespace Microsoft::Net::Remote::Service
 {
-class NetRemoteService : public NetRemote::Service
+class NetRemoteService : 
+    public NetRemote::Service
 {
     virtual ::grpc::Status
     WifiConfigureAccessPoint(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiConfigureAccessPointRequest* request, ::Microsoft::Net::Remote::Wifi::WifiConfigureAccessPointResult* response) override;

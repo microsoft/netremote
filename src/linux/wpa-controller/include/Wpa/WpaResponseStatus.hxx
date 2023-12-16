@@ -10,7 +10,8 @@ namespace Wpa
 /**
  * @brief Representation of the response to the "STATUS" command.
  */
-struct WpaResponseStatus : public WpaResponse
+struct WpaResponseStatus :
+    public WpaResponse
 {
     WpaResponseStatus() = default;
 

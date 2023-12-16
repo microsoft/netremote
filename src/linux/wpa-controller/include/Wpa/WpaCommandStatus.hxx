@@ -32,7 +32,8 @@ private:
 /**
  * @brief Parser for the "STATUS" command response.
  */
-struct WpaStatusResponseParser : public WpaResponseParser
+struct WpaStatusResponseParser : 
+    public WpaResponseParser
 {
     /**
      * @brief Construct a new WpaStatusResponseParser object.

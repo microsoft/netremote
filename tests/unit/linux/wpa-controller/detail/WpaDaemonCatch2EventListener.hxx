@@ -12,7 +12,8 @@
 #include "WifiVirtualDeviceManager.hxx"
 #include "WpaDaemonInstance.hxx"
 
-struct WpaDaemonCatch2EventListener : public Catch::EventListenerBase
+struct WpaDaemonCatch2EventListener :
+    public Catch::EventListenerBase
 {
     // Inherit base class constructor.
     using EventListenerBase::EventListenerBase;

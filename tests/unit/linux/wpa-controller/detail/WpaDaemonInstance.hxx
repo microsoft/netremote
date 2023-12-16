@@ -28,7 +28,8 @@ struct IWpaDaemonInstance
  * @tparam wpaType The type of wpa instance to manage.
  */
 template <Wpa::WpaType wpaType>
-struct WpaDaemonInstance : public IWpaDaemonInstance
+struct WpaDaemonInstance :
+    public IWpaDaemonInstance
 {
     WpaDaemonInstance() :
         m_wpaDaemonName(Wpa::GetWpaTypeDaemonBinaryName(m_wpaType))
