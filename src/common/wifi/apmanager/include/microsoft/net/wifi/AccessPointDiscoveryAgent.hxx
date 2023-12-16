@@ -91,7 +91,7 @@ protected:
     void
     DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept;
 
-protected:
+private:
     /**
      * @brief Derived class implementation of discovery start.
      */
