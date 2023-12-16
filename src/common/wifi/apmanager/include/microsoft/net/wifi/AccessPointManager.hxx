@@ -1,6 +1,6 @@
 
-#ifndef ACCESS_POINT_MANAGER
-#define ACCESS_POINT_MANAGER
+#ifndef ACCESS_POINT_MANAGER_HXX
+#define ACCESS_POINT_MANAGER_HXX
 
 #include <memory>
 #include <mutex>
@@ -134,4 +134,4 @@ private:
 
 } // namespace Microsoft::Net::Wifi
 
-#endif // ACCESS_POINT_MANAGER
+#endif // ACCESS_POINT_MANAGER_HXX
