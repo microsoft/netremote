@@ -2,13 +2,24 @@
 #ifndef I_ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_HXX
 #define I_ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_HXX
 
+#include <functional>
 #include <future>
 #include <memory>
 #include <vector>
 
 namespace Microsoft::Net::Wifi
 {
+enum class AccessPointPresenceEvent {
+    Arrived,
+    Departed,
+};
+
 struct IAccessPoint;
+
+/**
+ * @brief Prototype for the callback invoked when an access point is discovered or removed.
+ */
+using AccessPointPresenceEventCallback = std::function<void(AccessPointPresenceEvent, std::shared_ptr<IAccessPoint>)>;
 
 /**
  * @brief Operations used to perform discovery of access points, used by
@@ -20,9 +31,11 @@ struct IAccessPointDiscoveryAgentOperations
 
     /**
      * @brief Start the discovery process.
+     * 
+     * @param callback The callback to invoke when an access point is discovered or removed.
      */
     virtual void
-    Start() = 0;
+    Start(AccessPointPresenceEventCallback callback) = 0;
 
     /**
      * @brief Stop the discovery process.
@@ -31,7 +44,7 @@ struct IAccessPointDiscoveryAgentOperations
     Stop() = 0;
 
     /**
-     * @brief Derived class implementation of asynchronous discovery probe.
+     * @brief Perform an asynchronous discovery probe.
      *
      * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */

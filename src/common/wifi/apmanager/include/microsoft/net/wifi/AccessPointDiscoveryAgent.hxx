@@ -15,14 +15,6 @@ namespace Microsoft::Net::Wifi
 struct IAccessPoint;
 
 /**
- * @brief The presence of a an access point.
- */
-enum class AccessPointPresenceEvent {
-    Arrived,
-    Departed,
-};
-
-/**
  * @brief Discovers and monitors IAccessPoint instances.
  */
 struct AccessPointDiscoveryAgent

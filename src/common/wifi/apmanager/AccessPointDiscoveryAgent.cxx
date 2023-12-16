@@ -36,7 +36,9 @@ AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
-        m_operations->Start();
+        m_operations->Start([this](auto&& presence, auto&& accessPointChanged) {
+            DevicePresenceChanged(presence, std::move(accessPointChanged));
+        });
     }
 }
 
