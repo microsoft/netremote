@@ -18,6 +18,8 @@ target_sources(wifi-apmanager
 )
 
 target_link_libraries(wifi-apmanager
+    PRIVATE
+        notstd
     PUBLIC
         ${PROJECT_NAME}-protocol
         wifi-core
