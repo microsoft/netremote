@@ -62,7 +62,7 @@ public:
      * @brief Get a collection of all access points.
      *
      * This function allows the caller to further filter the collection based
-     * on it's own set of conditions. As such, weak_ptrs are provided since
+     * on its own set of conditions. As such, weak_ptrs are provided since
      * no assumptions are made as to when the caller will actually filter
      * the collection and select a subset for use, thereby promoting the
      * weak pointers to shared pointers.
