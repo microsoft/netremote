@@ -12,5 +12,3 @@ out/
 vcpkg_installed*/
 /vcpkg/
 /packaging/vcpkg/ports/netremote/portfile.cmake
-src/common/wifi/apmanager/AccessPointDiscoveryAgent.cxx
-src/common/wifi/apmanager/include/microsoft/net/wifi/AccessPointDiscoveryAgent.hxx
