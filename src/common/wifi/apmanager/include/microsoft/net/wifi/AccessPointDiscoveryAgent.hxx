@@ -17,7 +17,8 @@ struct IAccessPoint;
 /**
  * @brief Discovers and monitors IAccessPoint instances.
  */
-struct AccessPointDiscoveryAgent
+struct AccessPointDiscoveryAgent :
+    public std::enable_shared_from_this<AccessPointDiscoveryAgent>
 {
     /**
      * @brief Destroy the AccessPointDiscoveryAgent object
@@ -28,8 +29,18 @@ struct AccessPointDiscoveryAgent
      * @brief Construct a new AccessPointDiscoveryAgent object with the specified operations.
      *
      * @param operations The discovery operations to use.
+     * @return AccessPointDiscoveryAgent
      */
-    explicit AccessPointDiscoveryAgent(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations) noexcept;
+    [[nodiscard]] static std::shared_ptr<AccessPointDiscoveryAgent>
+    Create(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations);
+
+    /**
+     * @brief Get a shared pointer reference of this object instance.
+     *
+     * @return std::shared_ptr<AccessPointDiscoveryAgent>
+     */
+    std::shared_ptr<AccessPointDiscoveryAgent>
+    GetInstance() noexcept;
 
     /**
      * @brief Register a callback for device presence change events.
@@ -71,6 +82,13 @@ struct AccessPointDiscoveryAgent
     ProbeAsync();
 
 protected:
+    /**
+     * @brief Construct a new AccessPointDiscoveryAgent object with the specified operations.
+     *
+     * @param operations The discovery operations to use.
+     */
+    explicit AccessPointDiscoveryAgent(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations) noexcept;
+
     /**
      * @brief Wrapper for safely invoking any device presence changed registered callback.
      *

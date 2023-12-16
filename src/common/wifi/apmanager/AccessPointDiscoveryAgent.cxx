@@ -1,6 +1,7 @@
 
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <notstd/Memory.hxx>
 
 using namespace Microsoft::Net::Wifi;
 
@@ -19,6 +20,18 @@ AccessPointDiscoveryAgent::~AccessPointDiscoveryAgent()
     // instance, however, we assume a well-behaved implementation in this
     // regard.
     Stop();
+}
+
+std::shared_ptr<AccessPointDiscoveryAgent>
+AccessPointDiscoveryAgent::Create(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations)
+{
+    return std::make_shared<notstd::enable_make_protected<AccessPointDiscoveryAgent>>(std::move(operations));
+}
+
+std::shared_ptr<AccessPointDiscoveryAgent>
+AccessPointDiscoveryAgent::GetInstance() noexcept
+{
+    return shared_from_this();
 }
 
 void
