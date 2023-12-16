@@ -13,6 +13,7 @@ target_sources(wifi-apmanager
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_APMANAGER_PUBLIC_INCLUDE}
     FILES
+        ${WIFI_APMANAGER_PUBLIC_INCLUDE_PREFIX}/IAccessPointDiscoveryAgentOperations.hxx
         ${WIFI_APMANAGER_PUBLIC_INCLUDE_PREFIX}/AccessPointDiscoveryAgent.hxx
         ${WIFI_APMANAGER_PUBLIC_INCLUDE_PREFIX}/AccessPointManager.hxx
 )
