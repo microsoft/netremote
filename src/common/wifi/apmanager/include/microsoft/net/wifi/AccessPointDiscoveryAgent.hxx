@@ -8,6 +8,8 @@
 #include <memory>
 #include <shared_mutex>
 
+#include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
+
 namespace Microsoft::Net::Wifi
 {
 struct IAccessPoint;
@@ -26,21 +28,16 @@ enum class AccessPointPresenceEvent {
 struct AccessPointDiscoveryAgent
 {
     /**
-     * @brief Construct a new AccessPointDiscoveryAgent object.
-     */
-    AccessPointDiscoveryAgent() = default;
-
-    /**
      * @brief Destroy the AccessPointDiscoveryAgent object
      */
     virtual ~AccessPointDiscoveryAgent() = default;
 
     /**
-     * @brief Construct a new AccessPointDiscoveryAgent object.
-     *
-     * @param onDevicePresenceChanged
+     * @brief Construct a new AccessPointDiscoveryAgent object with the specified operations.
+     * 
+     * @param operations The discovery operations to use.
      */
-    explicit AccessPointDiscoveryAgent(std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged);
+    explicit AccessPointDiscoveryAgent(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations) noexcept;
 
     /**
      * @brief Register a callback for device presence change events.
@@ -92,27 +89,7 @@ protected:
     DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept;
 
 private:
-    /**
-     * @brief Derived class implementation of discovery start.
-     */
-    virtual void
-    StartImpl();
-
-    /**
-     * @brief Derived class implementation of discovery stop.
-     */
-    virtual void
-    StopImpl();
-
-    /**
-     * @brief Derived class implementation of asynchronous discovery probe.
-     *
-     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-     */
-    virtual std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-    ProbeAsyncImpl();
-
-private:
+    std::unique_ptr<IAccessPointDiscoveryAgentOperations> m_operations;
     std::atomic<bool> m_started{ false };
 
     mutable std::shared_mutex m_onDevicePresenceChangedGate;

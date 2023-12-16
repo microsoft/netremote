@@ -4,9 +4,10 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged) :
-    m_onDevicePresenceChanged(std::move(onDevicePresenceChanged))
-{}
+AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::unique_ptr<IAccessPointDiscoveryAgentOperations> operations) noexcept :
+    m_operations{ std::move(operations) }
+{
+}
 
 void
 AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged)
@@ -35,7 +36,7 @@ AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
-        StartImpl();
+        m_operations->Start();
     }
 }
 
@@ -44,28 +45,12 @@ AccessPointDiscoveryAgent::Stop()
 {
     bool expected = true;
     if (m_started.compare_exchange_weak(expected, false)) {
-        StopImpl();
+        m_operations->Stop();
     }
 }
 
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgent::ProbeAsync()
 {
-    return ProbeAsyncImpl();
-}
-
-void
-AccessPointDiscoveryAgent::StartImpl()
-{}
-
-void
-AccessPointDiscoveryAgent::StopImpl()
-{}
-
-std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-AccessPointDiscoveryAgent::ProbeAsyncImpl()
-{
-    std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
-    probePromise.set_value({});
-    return probePromise.get_future();
+    return m_operations->ProbeAsync();
 }
