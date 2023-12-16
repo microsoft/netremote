@@ -9,19 +9,19 @@ namespace Wpa
 /**
  * @brief The type of WPA daemon/service.
  */
-enum class WpaType
-{
+enum class WpaType {
     Hostapd,
     WpaSupplicant
 };
 
 /**
  * @brief Get the WpaType associated daemon binary name.
- * 
+ *
  * @param type The WpaType to obtain the daemon binary name for.
- * @return std::string_view 
+ * @return std::string_view
  */
-std::string_view GetWpaTypeDaemonBinaryName(WpaType type) noexcept;
+std::string_view
+GetWpaTypeDaemonBinaryName(WpaType type) noexcept;
 
 } // namespace Wpa
 

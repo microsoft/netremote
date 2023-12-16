@@ -5,8 +5,8 @@
 #include <format>
 #include <iostream>
 
-#include <Wpa/WpaCore.hxx>
 #include "WpaDaemonManager.hxx"
+#include <Wpa/WpaCore.hxx>
 
 /**
  * @brief Represents a running instance of a WPA daemon.
@@ -15,28 +15,31 @@ struct IWpaDaemonInstance
 {
     virtual ~IWpaDaemonInstance() = default;
 
-    virtual bool Start() = 0;
-    virtual bool Stop() = 0;
+    virtual bool
+    Start() = 0;
+
+    virtual bool
+    Stop() = 0;
 };
 
 /**
  * @brief Concrete implementation of IWpaDaemonInstance for a specific WPA daemon type.
- * 
+ *
  * @tparam wpaType The type of wpa instance to manage.
  */
 template <Wpa::WpaType wpaType>
 struct WpaDaemonInstance : public IWpaDaemonInstance
 {
-    WpaDaemonInstance()
-        : m_wpaDaemonName(Wpa::GetWpaTypeDaemonBinaryName(m_wpaType))
+    WpaDaemonInstance() :
+        m_wpaDaemonName(Wpa::GetWpaTypeDaemonBinaryName(m_wpaType))
     {
     }
 
-    bool Start() override
+    bool
+    Start() override
     {
         auto instanceToken = WpaDaemonManager::StartDefault(m_wpaType);
-        if (!instanceToken.has_value())
-        {
+        if (!instanceToken.has_value()) {
             std::cerr << std::format("Failed to start {} daemon instance\n", m_wpaDaemonName);
             return false;
         }
@@ -45,16 +48,15 @@ struct WpaDaemonInstance : public IWpaDaemonInstance
         return true;
     }
 
-    bool Stop() override
+    bool
+    Stop() override
     {
-        if (!m_instanceToken.has_value())
-        {
+        if (!m_instanceToken.has_value()) {
             std::cout << std::format("Warning: No {} daemon instance running\n", m_wpaDaemonName);
             return true;
         }
 
-        if (!WpaDaemonManager::Stop(m_instanceToken.value()))
-        {
+        if (!WpaDaemonManager::Stop(m_instanceToken.value())) {
             std::cerr << std::format("Failed to stop {} daemon instance\n", m_wpaDaemonName);
             return false;
         }

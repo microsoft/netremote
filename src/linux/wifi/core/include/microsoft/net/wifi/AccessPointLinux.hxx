@@ -5,7 +5,7 @@
 #include <microsoft/net/wifi/AccessPoint.hxx>
 
 namespace Microsoft::Net::Wifi
-{  
+{
 /**
  * @brief Access point implementation for Linux.
  */

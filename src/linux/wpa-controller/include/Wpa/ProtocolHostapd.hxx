@@ -15,8 +15,7 @@ namespace Wpa
 /**
  * @brief Describes the state of the interface.
  */
-enum class HostapdInterfaceState
-{
+enum class HostapdInterfaceState {
     Uninitialized,
     Disabled,
     Enabled,
@@ -28,8 +27,7 @@ enum class HostapdInterfaceState
     Unknown
 };
 
-enum class HostapdHwMode
-{
+enum class HostapdHwMode {
     Unknown,
     Ieee80211b,
     Ieee80211g, // 2.4 GHz
@@ -71,7 +69,7 @@ struct HostapdStatus
     // commented out for the time being. Many of them may not be kept if they
     // have no use in the implementation, but for now, this is a complete list
     // of all fields that are returned from the 'STATUS' message.
-    
+
     // std::string PhyRadio;   // eg. phy=34
     // int Frequency{ 0 };     // eg. 2412
     // int NumberOfStationsNonErp{ 0 };
@@ -92,7 +90,7 @@ struct HostapdStatus
 
     // int CacTimeSeconds{ 0 };
     // // Present only if CAC is in progress.
-    // std::optional<long> CacTimeRemainingSeconds; 
+    // std::optional<long> CacTimeRemainingSeconds;
 
     // uint8_t Channel{ 0 };
     // int EdmgEnable{ 0 };
@@ -153,7 +151,6 @@ struct HostapdStatus
     // //  - At least one rate is supported with current configuration.
     // std::optional<std::string> SupportedRates; // Space separated hex string, eg. '%02x %02x ....'.
 
-
     // // Present with:
     // //  - The current operational mode supports the currently active frequency.
     // std::optional<unsigned> MaxTxPower;
@@ -200,22 +197,24 @@ struct ProtocolHostapd :
 
 /**
  * @brief Converts a string to a HostapdInterfaceState.
- * 
+ *
  * @param state The state string to convert.
  * @return HostapdInterfaceState The corresponding HostapdInterfaceState
  * enumeration value, or HostapdInterfaceState::Unknown if an invalid state was
  * provided.
  */
-HostapdInterfaceState HostapdInterfaceStateFromString(std::string_view state) noexcept;
+HostapdInterfaceState
+HostapdInterfaceStateFromString(std::string_view state) noexcept;
 
 /**
  * @brief Indicates if the given state describes an operational interface.
- * 
+ *
  * @param state The state to check.
  * @return true If the interface is operational.
  * @return false If the interface is not operational.
  */
-bool IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
+bool
+IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
 } // namespace Wpa
 
 #endif // HOSTAPD_PROTOCOL_HXX

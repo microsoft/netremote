@@ -53,21 +53,23 @@ struct ProtocolWpa
 
     /**
      * @brief Determines if a response payload indicates success.
-     * 
+     *
      * @param response The response payload to check.
-     * @return true 
-     * @return false 
+     * @return true
+     * @return false
      */
-    static bool IsResponseOk(std::string_view response);
+    static bool
+    IsResponseOk(std::string_view response);
 
     /**
      * @brief Determines if a response payload indicates failure.
-     * 
+     *
      * @param response The response payload to check.
-     * @return true 
-     * @return false 
+     * @return true
+     * @return false
      */
-    static bool IsResponseFail(std::string_view response);
+    static bool
+    IsResponseFail(std::string_view response);
 };
 } // namespace Wpa
 

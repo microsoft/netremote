@@ -1,6 +1,6 @@
 
 #ifndef ACCESS_POIINT_FACTORY_TEST_HXX
-#define ACCESS_POIINT_FACTORY_TEST_HXX 
+#define ACCESS_POIINT_FACTORY_TEST_HXX
 
 #include <memory>
 #include <string_view>
@@ -22,13 +22,14 @@ struct AccessPointFactoryTest :
 
     /**
      * @brief Create an AccessPoint for testing purposes.
-     * 
+     *
      * @param interface The interface to create the AccessPoint for. This can be
      * any string and does not have to correspond to a real device interface.
-     * 
-     * @return std::shared_ptr<IAccessPoint> 
+     *
+     * @return std::shared_ptr<IAccessPoint>
      */
-    std::shared_ptr<IAccessPoint> Create(std::string_view interface) override;
+    std::shared_ptr<IAccessPoint>
+    Create(std::string_view interface) override;
 };
 } // namespace Microsoft::Net::Wifi::Test
 
