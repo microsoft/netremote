@@ -12,13 +12,6 @@ AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::unique_ptr<IAccessPoin
 
 AccessPointDiscoveryAgent::~AccessPointDiscoveryAgent()
 {
-    // If the agent was started, the operations object has a lambda that
-    // captured the 'this' pointer. Once the agent is destroyed, the 'this'
-    // pointer will become invalid. Consequently, call Stop() here to ensure the
-    // operations object releases the lambda and no longer references the 'this'
-    // pointer. Technically, the lambda could be retained by the operations
-    // instance, however, we assume a well-behaved implementation in this
-    // regard.
     Stop();
 }
 
@@ -61,8 +54,11 @@ AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
-        m_operations->Start([this](auto&& presence, auto&& accessPointChanged) {
-            DevicePresenceChanged(presence, std::move(accessPointChanged));
+        m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPointChanged) {
+            // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
+            if (auto strongThis = weakThis.lock(); strongThis) {
+                strongThis->DevicePresenceChanged(presence, std::move(accessPointChanged));
+            }
         });
     }
 }
