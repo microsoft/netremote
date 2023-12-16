@@ -8,56 +8,62 @@ AccessPointDiscoveryAgent::AccessPointDiscoveryAgent(std::function<void(AccessPo
     m_onDevicePresenceChanged(std::move(onDevicePresenceChanged))
 {}
 
-void AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged)
+void
+AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged)
 {
     std::unique_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     m_onDevicePresenceChanged = std::move(onDevicePresenceChanged);
 }
 
-void AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept
+void
+AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
-    if (m_onDevicePresenceChanged) 
-    {
+    if (m_onDevicePresenceChanged) {
         m_onDevicePresenceChanged(presence, std::move(accessPointChanged));
     }
 }
 
-bool AccessPointDiscoveryAgent::IsStarted() const noexcept
+bool
+AccessPointDiscoveryAgent::IsStarted() const noexcept
 {
     return m_started;
 }
 
-void AccessPointDiscoveryAgent::Start()
+void
+AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
-    if (m_started.compare_exchange_weak(expected, true)) 
-    {
+    if (m_started.compare_exchange_weak(expected, true)) {
         StartImpl();
     }
 }
 
-void AccessPointDiscoveryAgent::Stop()
+void
+AccessPointDiscoveryAgent::Stop()
 {
     bool expected = true;
-    if (m_started.compare_exchange_weak(expected, false))
-    {
+    if (m_started.compare_exchange_weak(expected, false)) {
         StopImpl();
     }
 }
 
-std::future<std::vector<std::shared_ptr<IAccessPoint>>> AccessPointDiscoveryAgent::ProbeAsync()
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+AccessPointDiscoveryAgent::ProbeAsync()
 {
     return ProbeAsyncImpl();
 }
 
-void AccessPointDiscoveryAgent::StartImpl()
+void
+AccessPointDiscoveryAgent::StartImpl()
 {}
 
-void AccessPointDiscoveryAgent::StopImpl()
+void
+AccessPointDiscoveryAgent::StopImpl()
 {}
 
-std::future<std::vector<std::shared_ptr<IAccessPoint>>> AccessPointDiscoveryAgent::ProbeAsyncImpl()
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+AccessPointDiscoveryAgent::ProbeAsyncImpl()
 {
     std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
     probePromise.set_value({});
