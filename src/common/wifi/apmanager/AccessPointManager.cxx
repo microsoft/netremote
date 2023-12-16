@@ -88,7 +88,7 @@ AccessPointManager::AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent>
 {
     using namespace std::chrono_literals;
 
-    // Use a weak_ptr below to ensure that the device object manager can
+    // Use a weak_ptr below to ensure that the access point manager can
     // be safely destroyed prior to the discovery agent. This allows the
     // callback to be registered indefinitely, safely checking whether this
     // instance is still valid upon each callback invocation.
@@ -98,34 +98,34 @@ AccessPointManager::AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent>
         }
     });
 
-    // If this agent has already started, kick off a probe to ensure any devices
-    // already found will be added ot this manager.
-    std::future<std::vector<std::shared_ptr<IAccessPoint>>> existingDevicesProbe;
+    // If this agent has already started, kick off a probe to ensure any access
+    // points already found will be added to this manager.
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>> existingAccessPointsProbe;
     const bool isStarted = discoveryAgent->IsStarted();
     if (isStarted) {
-        existingDevicesProbe = discoveryAgent->ProbeAsync();
+        existingAccessPointsProbe = discoveryAgent->ProbeAsync();
     } else {
         discoveryAgent->Start();
     }
 
     // If the agent hasn't yet been started, start it now, then probe for
-    // existing devices in case they've already been discovered.
+    // existing access points in case they've already been discovered.
     {
         std::unique_lock<std::shared_mutex> discoveryAgentLock{ m_discoveryAgentsGate };
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
-    if (existingDevicesProbe.valid()) {
+    if (existingAccessPointsProbe.valid()) {
         static constexpr auto probeTimeout = 3s;
 
         // Wait for the operation to complete.
-        const auto waitResult = existingDevicesProbe.wait_for(probeTimeout);
+        const auto waitResult = existingAccessPointsProbe.wait_for(probeTimeout);
 
-        // If the operation completed, get the results and add those devices.
+        // If the operation completed, get the results and add those access points.
         if (waitResult == std::future_status::ready) {
-            auto existingDevices = existingDevicesProbe.get();
-            for (auto& existingDevice : existingDevices) {
-                AddAccessPoint(std::move(existingDevice));
+            auto existingAccessPoints = existingAccessPointsProbe.get();
+            for (auto& existingAccessPoint : existingAccessPoints) {
+                AddAccessPoint(std::move(existingAccessPoint));
             }
         } else {
             // TODO: log error
