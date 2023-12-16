@@ -253,7 +253,7 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
         accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint);
         REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::timeout);
     }
-    
+
     SECTION("Departed event is not raised when stoppped")
     {
         accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint);
