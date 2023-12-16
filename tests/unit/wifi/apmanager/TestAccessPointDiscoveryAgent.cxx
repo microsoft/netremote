@@ -28,9 +28,63 @@ TEST_CASE("Destroy an AccessPointDiscoveryAgent instance", "[wifi][core][apdisco
 {
     using namespace Microsoft::Net::Wifi;
 
+    auto accessPoint1{ std::make_shared<Test::AccessPointTest>("TestAccessPoint1") };
+    auto accessPoint2{ std::make_shared<Test::AccessPointTest>("TestAccessPoint2") };
+
     SECTION("Destroy doesn't cause a crash")
     {
         auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        REQUIRE_NOTHROW(accessPointDiscoveryAgent.~AccessPointDiscoveryAgent());
+    }
+
+    SECTION("Destroy doesn't cause a crash while started")
+    {
+        auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() } };
+        accessPointDiscoveryAgent.Start();
+        REQUIRE_NOTHROW(accessPointDiscoveryAgent.~AccessPointDiscoveryAgent());
+    }
+
+    SECTION("Destroy doesn't cause a crash with discovered access points")
+    {
+        auto accessPointDiscoveryAgentOperations{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() };
+        auto* accessPointDiscoveryAgentOperationsTest{ accessPointDiscoveryAgentOperations.get() };
+
+        AccessPointDiscoveryAgent accessPointDiscoveryAgent{ std::move(accessPointDiscoveryAgentOperations) };
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint1);
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint2);
+        REQUIRE_NOTHROW(accessPointDiscoveryAgent.~AccessPointDiscoveryAgent());
+    }
+
+    SECTION("Destroy doesn't cause a crash while started with discovered access points")
+    {
+        auto accessPointDiscoveryAgentOperations{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() };
+        auto* accessPointDiscoveryAgentOperationsTest{ accessPointDiscoveryAgentOperations.get() };
+
+        AccessPointDiscoveryAgent accessPointDiscoveryAgent{ std::move(accessPointDiscoveryAgentOperations) };
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint1);
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPoint2);
+        REQUIRE_NOTHROW(accessPointDiscoveryAgent.~AccessPointDiscoveryAgent());
+    }
+
+    SECTION("Destory doesn't cause a crash when discovered access point ownership is released")
+    {
+        auto accessPointDiscoveryAgentOperations{ std::make_unique<Test::AccessPointDiscoveryAgentOperationsTest>() };
+        auto* accessPointDiscoveryAgentOperationsTest{ accessPointDiscoveryAgentOperations.get() };
+
+        // Create access points that are exclusively owned by this test.
+        auto accessPointOwned1{ std::make_shared<Test::AccessPointTest>("TestAccessPoint1") };
+        auto accessPointOwned2{ std::make_shared<Test::AccessPointTest>("TestAccessPoint2") };
+
+        AccessPointDiscoveryAgent accessPointDiscoveryAgent{ std::move(accessPointDiscoveryAgentOperations) };
+        accessPointDiscoveryAgent.Start();
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPointOwned1);
+        accessPointDiscoveryAgentOperationsTest->AddAccessPoint(accessPointOwned2);
+
+        // Release test access point ownership.
+        accessPointOwned1.reset();
+        accessPointOwned2.reset();
+
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.~AccessPointDiscoveryAgent());
     }
 }
