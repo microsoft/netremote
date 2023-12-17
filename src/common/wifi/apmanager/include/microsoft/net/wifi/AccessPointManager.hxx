@@ -47,7 +47,7 @@ public:
      * @param discoveryAgent The discovery agent to add.
      */
     void
-    AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent> discoveryAgent);
+    AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent> discoveryAgent);
 
     /**
      * @brief Get the IAccessPoint object with the specified interface name.
@@ -129,7 +129,7 @@ private:
     std::vector<std::shared_ptr<IAccessPoint>> m_accessPoints{};
 
     mutable std::shared_mutex m_discoveryAgentsGate;
-    std::vector<std::unique_ptr<AccessPointDiscoveryAgent>> m_discoveryAgents;
+    std::vector<std::shared_ptr<AccessPointDiscoveryAgent>> m_discoveryAgents;
 };
 
 } // namespace Microsoft::Net::Wifi
