@@ -84,7 +84,7 @@ AccessPointManager::GetAllAccessPoints() const
 }
 
 void
-AccessPointManager::AddDiscoveryAgent(std::unique_ptr<AccessPointDiscoveryAgent> discoveryAgent)
+AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent> discoveryAgent)
 {
     using namespace std::chrono_literals;
 
