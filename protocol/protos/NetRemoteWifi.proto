@@ -6,37 +6,6 @@ package Microsoft.Net.Remote.Wifi;
 import "google/protobuf/any.proto";
 import "WifiCore.proto";
 
-message WifiConfigureAccessPointRequest
-{
-    // The unique identifier of the access point to configure.
-    string AccessPointId = 1;
-
-    // The default band the AP should be configured for.
-    Microsoft.Net.Wifi.RadioBand DefaultBand = 2;
-
-    // All the possible configurations for the AP. The key field *must* be a
-    // Microsoft.Net.Wifi.RadioBand enumeration value. This is to workaround the
-    // inability to use enums as map keys in proto3. So it must be used as if
-    // the 'Configurations' field was defined with type:
-    //      map<Microsoft.Net.Wifi.RadioBand, Microsoft.Net.Wifi.AccessPointConfiguration>
-    //
-    map<int32, Microsoft.Net.Wifi.AccessPointConfiguration> Configurations = 3;
-}
-
-message WifiConfigureAccessPointResult
-{
-    // The unique identifier of the access point that was requested to be configured.
-    string AccessPointId = 1;
-
-    // Whether the configuration succeeded or not.
-    // TODO: 
-    //  - this seems too coarse. Should we return a map<int32, bool> instead?
-    //      - Would that information be actionable?
-    //  - is an error code better?
-    //
-    bool Succeeded = 2;
-}
-
 message WifiEnumerateAccessPointsResultItem
 {
     string AccessPointId = 1;

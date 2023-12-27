@@ -34,31 +34,5 @@ namespace Microsoft.Net.Remote.Client.Test
 
             return new GrpcConnection(channel, client);
         }
-
-        [TestMethod]
-        public void TestWifiConfigureAccessPoint()
-        {
-            var connection = CreateConnection(ConnectionType.Http);
-            using var channel = connection.Channel;
- 
-            foreach (var band in Enum.GetValues(typeof(Net.Wifi.RadioBand)).Cast<Net.Wifi.RadioBand>())
-            {
-                foreach (var phyType in Enum.GetValues(typeof(Net.Wifi.Dot11PhyType)).Cast<Net.Wifi.Dot11PhyType>())
-                {
-                    var request = new WifiConfigureAccessPointRequest
-                    {
-                        AccessPointId = string.Format("TestWifiConfigureAccessPoint{0}", band),
-                        DefaultBand = band,
-                    };
-
-                    request.Configurations.Add((int)phyType, new Net.Wifi.AccessPointConfiguration { PhyType = phyType });
-                    var result = connection.Client.WifiConfigureAccessPoint(request);
-
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result.Succeeded);
-                    Assert.AreEqual(request.AccessPointId, result.AccessPointId);
-                }
-            }
-        }
     }
 }
