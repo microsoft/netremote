@@ -10,4 +10,6 @@ service NetRemote
 {
     rpc WifiConfigureAccessPoint (Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointRequest) returns (Microsoft.Net.Remote.Wifi.WifiConfigureAccessPointResult);
     rpc WifiEnumerateAccessPoints (Microsoft.Net.Remote.Wifi.WifiEnumerateAccessPointsRequest) returns (Microsoft.Net.Remote.Wifi.WifiEnumerateAccessPointsResult);
+    rpc WifiAccessPointEnable (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableResult);
+    rpc WifiAccessPointDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableResult);
 }
