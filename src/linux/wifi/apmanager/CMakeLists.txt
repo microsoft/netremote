@@ -19,6 +19,7 @@ target_link_libraries(wifi-apmanager-linux
     PRIVATE
         mnl-static
         notstd
+        plog::plog
     PUBLIC
         wifi-apmanager
         wifi-core
