@@ -123,4 +123,11 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync", "[wifi][core
         accessPointDiscoveryAgent.Stop();
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync());
     }
+
+    SECTION("ProbeAsync returns a valid future")
+    {
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        accessPointDiscoveryAgent.Start(nullptr);
+        REQUIRE(accessPointDiscoveryAgent.ProbeAsync().valid());
+    }
 }

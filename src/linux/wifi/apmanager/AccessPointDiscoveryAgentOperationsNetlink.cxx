@@ -58,7 +58,14 @@ AccessPointDiscoveryAgentOperationsNetlink::Stop()
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
-    return {};
+    std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
+    auto probeFuture = probePromise.get_future();
+
+    // TODO: implement this.
+    std::vector<std::shared_ptr<IAccessPoint>> accessPoints{};
+    probePromise.set_value(std::move(accessPoints));
+
+    return probeFuture;
 }
 
 void
