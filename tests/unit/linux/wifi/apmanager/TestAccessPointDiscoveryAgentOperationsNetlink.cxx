@@ -130,4 +130,16 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync", "[wifi][core
         accessPointDiscoveryAgent.Start(nullptr);
         REQUIRE(accessPointDiscoveryAgent.ProbeAsync().valid());
     }
+
+    SECTION("ProbeAsync result can be obtained without causing a crash")
+    {
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync().get());
+    }
+
+    SECTION("ProbeAsync result is valid")
+    {
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync().get().clear());
+    }
 }
