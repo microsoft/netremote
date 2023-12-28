@@ -17,6 +17,7 @@ target_sources(wifi-apmanager-linux
 
 target_link_libraries(wifi-apmanager-linux
     PRIVATE
+        mnl-static
         notstd
     PUBLIC
         wifi-apmanager
