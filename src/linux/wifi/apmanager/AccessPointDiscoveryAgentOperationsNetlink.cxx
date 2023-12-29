@@ -92,7 +92,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     // Update the access point presence callback for the netlink message handler to use.
     // Note: This is not thread-safe.
     m_accessPointPresenceCallback = std::move(accessPointPresenceEventCallback);
-    m_netlinkMessageProcessingThread = std::jthread([this, netlinkSocket = std::move(netlinkSocket)](std::stop_token stopToken) {
+    m_netlinkMessageProcessingThread = std::jthread([this, netlinkSocket = std::move(netlinkSocket)](std::stop_token stopToken) mutable {
         ProcessNetlinkMessagesThread(std::move(netlinkSocket), std::move(stopToken));
     });
 }
