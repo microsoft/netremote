@@ -285,8 +285,8 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
         }
 
         // Wait for at least one event file descriptor to become ready.
-        int numEvents = epoll_wait(fdEpoll, events, EpollEventsMax, -1);
-        if (numEvents < 0) {
+        int numEventsReady = epoll_wait(fdEpoll, events, EpollEventsMax, -1);
+        if (numEventsReady < 0) {
             const auto err = errno;
             if (err == EINTR) {
                 LOG_VERBOSE << "Interrupted while waiting for epoll events, retrying";
@@ -298,7 +298,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
         }
 
         // Determine which file descriptor(s) became ready and handle them.
-        for (auto i = 0; i < EpollEventsMax; i++) {
+        for (auto i = 0; i < numEventsReady; i++) {
             const auto &eventReady = events[i];
             if (eventReady.data.fd == netlinkSocketFileDescriptor) {
                 HandleNetlinkSocketReady(netlinkSocket);
