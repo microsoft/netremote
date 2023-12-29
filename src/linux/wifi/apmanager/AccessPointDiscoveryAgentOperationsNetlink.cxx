@@ -3,7 +3,9 @@
 #include <format>
 #include <stdexcept>
 
+#include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <netlink/handlers.h>
 #include <notstd/Scope.hxx>
 #include <plog/Log.h>
@@ -52,7 +54,7 @@ AccessPointDiscoveryAgentOperationsNetlink::RequestNetlinkProcessingLoopStop()
     ssize_t numWritten = write(m_eventLoopStopFd, &StopValue, sizeof StopValue);
     if (numWritten != sizeof StopValue) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to write to event loop stop fd with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to write to event loop stop fd with error {} ({})", err, strerror(err));
     }
 }
 
@@ -69,7 +71,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     if (netlinkSocket == nullptr) {
         // TODO: this function needs to signal the error either through its return type, or an exception.
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to allocate new netlink socket with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to allocate new netlink socket with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -77,7 +79,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     int ret = nl_connect(netlinkSocket, NETLINK_ROUTE);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to connect netlink socket with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to connect netlink socket with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -85,7 +87,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     ret = nl_socket_add_membership(netlinkSocket, RTMGRP_LINK);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to add netlink socket membership with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to add netlink socket membership with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -144,11 +146,12 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(NetlinkMessage
         // TODO: process message
         break;
     default:
-        PLOG_VERBOSE << std::format("Ignoring netlink message with type %d", netlinkMessage.Header()->nlmsg_type);
+        PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessage.Header()->nlmsg_type);
         return;
     }
 
     if (accessPointPresenceEventCallback != nullptr) {
+        LOG_VERBOSE << std::format("Invoking access point presence event callback with event '{}' on '{}'", magic_enum::enum_name(accessPointPresenceEvent), accessPoint != nullptr ? accessPoint->GetInterface() : "<unknown>");
         accessPointPresenceEventCallback(accessPointPresenceEvent, std::move(accessPoint));
     }
 }
@@ -157,6 +160,9 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(NetlinkMessage
 int
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessageRaw, void *contextArgument)
 {
+    LOG_VERBOSE << "Received netlink message callback";
+
+    // Validate the context argument and cookie to ensure the discovery agent is still alive.
     auto *instance{ static_cast<AccessPointDiscoveryAgentOperationsNetlink *>(contextArgument) };
     if (instance == nullptr) {
         static constexpr auto errorMessage{ "Netlink message callback context is null; this is a bug!" };
@@ -169,7 +175,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struc
 
     NetlinkMessage netlinkMessage{ netlinkMessageRaw };
     auto ret = instance->ProcessNetlinkMessages(netlinkMessage, instance->m_accessPointPresenceCallback);
-    LOG_VERBOSE << std::format("Processed netlink message with result %d", ret);
+    LOG_VERBOSE << std::format("Processed netlink message with result {}", ret);
 
     return ret;
 }
@@ -184,7 +190,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     int ret = nl_socket_modify_cb(netlinkSocket, NL_CB_VALID, NL_CB_CUSTOM, ProcessNetlinkMessagesCallback, this);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to modify netlink socket callback with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to modify netlink socket callback with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -192,7 +198,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     ret = nl_socket_set_nonblocking(netlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to set netlink socket to non-blocking mode with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to set netlink socket to non-blocking mode with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -200,7 +206,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     auto netlinkSocketFileDescriptor = nl_socket_get_fd(netlinkSocket);
     if (netlinkSocketFileDescriptor < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to obtain netlink socket file descriptor with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to obtain netlink socket file descriptor with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -208,7 +214,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     int fdEpoll = epoll_create1(0);
     if (fdEpoll < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to create epoll instance with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to create epoll instance with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -230,7 +236,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     ret = epoll_ctl(fdEpoll, EPOLL_CTL_ADD, netlinkSocketFileDescriptor, epollEventNetlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to register netlink socket event with epoll with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to register netlink socket event with epoll with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -238,7 +244,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     int eventLoopStopFd = eventfd(0, 0);
     if (eventLoopStopFd < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to create eventfd for stopping event loop with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to create eventfd for stopping event loop with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -257,7 +263,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     ret = epoll_ctl(fdEpoll, EPOLL_CTL_ADD, eventLoopStopFd, epollEventLoopStopFd);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to register event loop stop fd event with epoll with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to register event loop stop fd event with epoll with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -282,7 +288,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
                 continue;
             }
 
-            LOG_ERROR << std::format("Failed to wait for epoll events with error %d (%s)", err, strerror(err));
+            LOG_ERROR << std::format("Failed to wait for epoll events with error {} ({})", err, strerror(err));
             break;
         }
 
@@ -294,7 +300,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
             } else if (eventReady.data.fd == eventLoopStopFd) {
                 stopRequested = true;
             } else {
-                LOG_WARNING << std::format("Unknown file descriptor %d is ready for reading", eventReady.data.fd);
+                LOG_WARNING << std::format("Unknown file descriptor {} is ready for reading", eventReady.data.fd);
             }
         }
     }
@@ -316,7 +322,7 @@ AccessPointDiscoveryAgentOperationsNetlink::HandleNetlinkSocketReady(NetlinkSock
                 LOG_VERBOSE << "Interrupted while waiting for netlink messages, retrying";
                 continue;
             } else {
-                LOG_ERROR << std::format("Failed to receive netlink messages with error %d (%s)", err, strerror(err));
+                LOG_ERROR << std::format("Failed to receive netlink messages with error {} ({})", err, strerror(err));
                 break;
             }
         } else {
