@@ -72,22 +72,12 @@ private:
     ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessage, void *contextArgument);
 
     /**
-     * @brief Process a series of netlink messages.
-     *
-     * @param netlinkMessage The first/parent netlink message to process.
-     * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
-     * @return int
-     */
-    int
-    ProcessNetlinkMessages(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
-
-    /**
      * @brief Process a single netlink message.
      *
      * @param netlinkMessage The netlink message to process.
      * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
      */
-    void
+    int
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
 private:

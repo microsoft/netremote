@@ -3,6 +3,9 @@
 #include <format>
 #include <stdexcept>
 
+#include <linux/if.h>
+#include <linux/if_link.h>
+#include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -124,13 +127,6 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 }
 
 int
-AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessages([[maybe_unused]] struct nl_msg *netlinkMessage, [[maybe_unused]] AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
-{
-    LOG_VERBOSE << "Processing netlink message";
-    return NL_OK;
-}
-
-void
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
     std::shared_ptr<IAccessPoint> accessPoint{ nullptr };
@@ -139,8 +135,18 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
 
     if (netlinkMessageHeader == nullptr) {
         LOG_ERROR << "Netlink message header is null, ignoring message";
-        return;
+        return NL_SKIP;
     }
+
+    auto interfaceNameAttribute = nlmsg_find_attr(netlinkMessageHeader, sizeof *netlinkMessageHeader, IFLA_IFNAME);
+    if (interfaceNameAttribute == nullptr) {
+        LOG_ERROR << "Netlink message does not contain interface name attribute, ignoring message";
+        return NL_SKIP;
+    }
+
+    const auto *interfaceName = static_cast<const char *>(RTA_DATA(interfaceNameAttribute));
+    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) }; 
+    LOG_VERBOSE << std::format("Received netlink message with type {}, interface {}, index {}", netlinkMessageHeader->nlmsg_type, interfaceName, interfaceInfoMessage->ifi_index);
 
     switch (netlinkMessageHeader->nlmsg_type) {
     case RTM_NEWLINK:
@@ -153,13 +159,15 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         break;
     default:
         PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessageHeader->nlmsg_type);
-        return;
+        return NL_SKIP;
     }
 
     if (accessPointPresenceEventCallback != nullptr) {
-        LOG_VERBOSE << std::format("Invoking access point presence event callback with event '{}' on '{}'", magic_enum::enum_name(accessPointPresenceEvent), accessPoint != nullptr ? accessPoint->GetInterface() : "<unknown>");
+        LOG_VERBOSE << std::format("Invoking access point presence event callback with event args 'presence={}, accessPointChanged={}'", magic_enum::enum_name(accessPointPresenceEvent), accessPoint != nullptr ? accessPoint->GetInterface() : "<unknown>");
         accessPointPresenceEventCallback(accessPointPresenceEvent, std::move(accessPoint));
     }
+
+    return NL_OK;
 }
 
 /* static */
@@ -179,7 +187,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struc
         return NL_STOP;
     }
 
-    auto ret = instance->ProcessNetlinkMessages(netlinkMessage, instance->m_accessPointPresenceCallback);
+    auto ret = instance->ProcessNetlinkMessage(netlinkMessage, instance->m_accessPointPresenceCallback);
     LOG_VERBOSE << std::format("Processed netlink message with result {}", ret);
 
     return ret;
