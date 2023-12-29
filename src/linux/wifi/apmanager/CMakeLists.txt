@@ -17,10 +17,10 @@ target_sources(wifi-apmanager-linux
 
 target_link_libraries(wifi-apmanager-linux
     PRIVATE
-        notstd
+        nl
         plog::plog
     PUBLIC
-        nl
+        libnl-helpers
         wifi-apmanager
         wifi-core
 )

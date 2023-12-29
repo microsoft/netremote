@@ -1,57 +1,71 @@
 
 #include <cerrno>
 #include <format>
+#include <stdexcept>
 
-#include <linux/rtnetlink.h>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
-#include <notstd/Scope.hxx>
+#include <netlink/handlers.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Wifi;
 
-void
-AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallback callback)
+using Microsoft::Net::Netlink::NetlinkMessage;
+
+AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink() :
+    m_cookie(CookieValid)
+{}
+
+AccessPointDiscoveryAgentOperationsNetlink::~AccessPointDiscoveryAgentOperationsNetlink()
 {
-    // Don't start a new thread if one is already running.
-    if (m_netlinkThread.joinable()) {
-        return;
-    }
+    // Invalidate the cookie as a rudimentary way to detect use-after-free
+    // within the netlink thread.
+    m_cookie = CookieInvalid;
+}
+
+void
+AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback)
+{
+    using Microsoft::Net::Netlink::NetlinkSocket;
 
     // Open a new netlink socket with the routing/networking family group.
-    auto* netlinkSocket = mnl_socket_open(NETLINK_ROUTE);
+    auto netlinkSocket{ NetlinkSocket::Allocate() };
     if (netlinkSocket == nullptr) {
         // TODO: this function needs to signal the error either through its return type, or an exception.
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to open netlink socket with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to allocate new netlink socket with error %d (%s)", err, strerror(err));
         return;
     }
 
-    auto closeSocketOnFailure = notstd::ScopeExit([&netlinkSocket]() {
-        mnl_socket_close(netlinkSocket);
-    });
-
-    // Find the socket to the link group of messages.
-    const auto bindResult = mnl_socket_bind(netlinkSocket, RTMGRP_LINK, MNL_SOCKET_AUTOPID);
-    if (bindResult < 0) {
+    // Register a callback to be invoked for all valid netlink messages (ie.
+    // those that have been successfuly parsed).
+    int ret = nl_socket_modify_cb(netlinkSocket, NL_CB_VALID, NL_CB_CUSTOM, ProcessNetlinkMessagesCallback, this);
+    if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to bind netlink socket with error %d (%s)", err, strerror(err));
+        LOG_ERROR << std::format("Failed to modify netlink socket callback with error %d (%s)", err, strerror(err));
         return;
     }
 
-    closeSocketOnFailure.release();
+    // Subscribe to the link group of messages.
+    ret = nl_socket_add_membership(netlinkSocket, RTMGRP_LINK);
+    if (ret < 0) {
+        const auto err = errno;
+        LOG_ERROR << std::format("Failed to add netlink socket membership with error %d (%s)", err, strerror(err));
+        return;
+    }
 
-    // Start a thread to process netlink messages.
-    m_netlinkThread = std::jthread([this, netlinkSocket, callback = std::move(callback)](std::stop_token stopToken) {
-        ProcessNetlinkMessages(netlinkSocket, std::move(callback), stopToken);
-    });
+    // Update the acces point presence callback for the netlink message handler to use.
+    // Note: This is not thread-safe.
+    m_accessPointPresenceCallback = std::move(accessPointPresenceEventCallback);
+    m_netlinkSocket = std::move(netlinkSocket);
 }
 
 void
 AccessPointDiscoveryAgentOperationsNetlink::Stop()
 {
-    if (m_netlinkThread.joinable()) {
-        m_netlinkThread.request_stop();
-        m_netlinkThread.join();
+    if (m_netlinkSocket != nullptr)
+    {
+        nl_socket_free(m_netlinkSocket);
+        m_netlinkSocket = nullptr; 
     }
 }
 
@@ -68,8 +82,30 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
     return probeFuture;
 }
 
-void
-AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessages([[maybe_unused]] mnl_socket* netlinkSocket, [[maybe_unused]] AccessPointPresenceEventCallback callback, [[maybe_unused]] std::stop_token stopToken)
+int
+AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage([[maybe_unused]] NetlinkMessage& netlinkMessage, [[maybe_unused]] AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
     // TODO:
+    return NL_OK;
+}
+
+/* static */
+int
+AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessageRaw, void *contextArgument)
+{
+    auto *instance{ static_cast<AccessPointDiscoveryAgentOperationsNetlink *>(contextArgument) };
+    if (instance == nullptr) {
+        static constexpr auto errorMessage{ "Netlink message callback context is null; this is a bug!" };
+        LOG_FATAL << errorMessage;
+        throw std::runtime_error(errorMessage);
+    } else if (instance->m_cookie != CookieValid) {
+        LOG_ERROR << "Netlink message callback context cookie is invalid; discovery agent instance has been destroyed";
+        return NL_STOP;
+    }
+
+    NetlinkMessage netlinkMessage{ netlinkMessageRaw };
+    auto ret = instance->ProcessNetlinkMessage(netlinkMessage, instance->m_accessPointPresenceCallback);
+    LOG_VERBOSE << std::format("Processed netlink message with result %d", ret);
+
+    return ret;
 }
