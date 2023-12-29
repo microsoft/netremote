@@ -48,6 +48,14 @@ NetlinkSocket::Reset()
     }
 }
 
+struct nl_sock*
+NetlinkSocket::Release() noexcept
+{
+    auto socket = Socket;
+    Socket = nullptr;
+    return socket;
+}
+
 NetlinkSocket::operator struct nl_sock *() const noexcept
 {
     return Socket;

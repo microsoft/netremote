@@ -84,6 +84,13 @@ struct NetlinkSocket
     Reset();
 
     /**
+     * @brief Release ownership of the managed netlink socket, returning it to
+     * the caller.
+     */
+    struct nl_sock*
+    Release() noexcept;
+
+    /**
      * @brief Implicit conversion operator to struct nl_sock *, allowing this
      * class to be used in netlink API calls.
      *
