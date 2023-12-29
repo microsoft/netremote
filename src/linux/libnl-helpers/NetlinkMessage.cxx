@@ -1,18 +1,16 @@
 
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
-#include <netlink/msg.h>
 
 using namespace Microsoft::Net::Netlink;
 
-NetlinkMessage::NetlinkMessage(struct nl_msg *message)
-    : Message(message)
+NetlinkMessage::NetlinkMessage(struct nl_msg *message) :
+    Message(message)
 {
 }
 
 NetlinkMessage::~NetlinkMessage()
 {
-    if (Message != nullptr)
-    {
+    if (Message != nullptr) {
         nlmsg_free(Message);
         Message = nullptr;
     }
@@ -21,4 +19,10 @@ NetlinkMessage::~NetlinkMessage()
 NetlinkMessage::operator struct nl_msg *() const noexcept
 {
     return Message;
+}
+
+struct nlmsghdr *
+NetlinkMessage::Header() const noexcept
+{
+    return nlmsg_hdr(Message);
 }

@@ -19,10 +19,11 @@ struct NetlinkSocket
 
     /**
      * @brief Allocate a new struct nl_sock, and wrap it in a NetlinkSocket.
-     * 
-     * @return NetlinkSocket 
+     *
+     * @return NetlinkSocket
      */
-    static NetlinkSocket Allocate();
+    static NetlinkSocket
+    Allocate();
 
     /**
      * @brief Construct a default NetlinkSocket object that does not own a
@@ -34,7 +35,7 @@ struct NetlinkSocket
      * @brief Construct a new NetlinkSocket that manages a pre-existing struct
      * nl_sock object. Note that once construction is complete, this object owns
      * the socket and will free it when it is destroyed.
-     * 
+     *
      * @param socket The netlink socket to manage.
      */
     NetlinkSocket(struct nl_sock *socket);
@@ -46,9 +47,15 @@ struct NetlinkSocket
     ~NetlinkSocket();
 
     /**
+     * @brief Reset the managed netlink socket, freeing it if it exists.
+     */
+    void
+    Reset();
+
+    /**
      * @brief Implicit conversion operator to struct nl_sock *, allowing this
      * class to be used in netlink API calls.
-     * 
+     *
      * @return struct nl_sock * The netlink socket managed by this object.
      */
     operator struct nl_sock *() const noexcept;

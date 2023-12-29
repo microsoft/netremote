@@ -10,6 +10,7 @@
 using namespace Microsoft::Net::Wifi;
 
 using Microsoft::Net::Netlink::NetlinkMessage;
+using Microsoft::Net::Netlink::NetlinkSocket;
 
 AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink() :
     m_cookie(CookieValid)
@@ -25,8 +26,6 @@ AccessPointDiscoveryAgentOperationsNetlink::~AccessPointDiscoveryAgentOperations
 void
 AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback)
 {
-    using Microsoft::Net::Netlink::NetlinkSocket;
-
     // Open a new netlink socket with the routing/networking family group.
     auto netlinkSocket{ NetlinkSocket::Allocate() };
     if (netlinkSocket == nullptr) {
@@ -62,11 +61,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
 void
 AccessPointDiscoveryAgentOperationsNetlink::Stop()
 {
-    if (m_netlinkSocket != nullptr)
-    {
-        nl_socket_free(m_netlinkSocket);
-        m_netlinkSocket = nullptr; 
-    }
+    m_netlinkSocket.Reset();
 }
 
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
@@ -83,9 +78,29 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 }
 
 int
-AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage([[maybe_unused]] NetlinkMessage& netlinkMessage, [[maybe_unused]] AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
+AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage([[maybe_unused]] NetlinkMessage &netlinkMessage, [[maybe_unused]] AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
-    // TODO:
+    std::shared_ptr<IAccessPoint> accessPoint{ nullptr };
+    AccessPointPresenceEvent accessPointPresenceEvent;
+
+    switch (netlinkMessage.Header()->nlmsg_type) {
+    case RTM_NEWLINK:
+        accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
+        // TODO: process message
+        break;
+    case RTM_DELLINK:
+        accessPointPresenceEvent = AccessPointPresenceEvent::Departed;
+        // TODO: process message
+        break;
+    default:
+        // Ignore and skip all other message types.
+        return NL_SKIP;
+    }
+
+    if (accessPointPresenceEventCallback != nullptr) {
+        accessPointPresenceEventCallback(accessPointPresenceEvent, std::move(accessPoint));
+    }
+
     return NL_OK;
 }
 
