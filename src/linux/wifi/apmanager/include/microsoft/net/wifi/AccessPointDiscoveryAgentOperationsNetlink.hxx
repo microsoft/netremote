@@ -3,6 +3,8 @@
 #define ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_NETLINK_HXX
 
 #include <cstdint>
+#include <stop_token>
+#include <thread>
 
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
@@ -35,6 +37,29 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
 
 private:
     /**
+     * @brief Request that the netlink processing loop stop.
+     */
+    void
+    RequestNetlinkProcessingLoopStop();
+
+    /**
+     * @brief Handles when the netlink socket is ready for reading.
+     * 
+     * @param netlinkSocket The netlink socket that is ready for reading.
+     */
+    void
+    HandleNetlinkSocketReady(Microsoft::Net::Netlink::NetlinkSocket& netlinkSocket);
+
+    /**
+     * @brief Thread function for processing netlink messages.
+     * 
+     * @param netlinkSocket The netlink socket to use for processing messages.
+     * @param stopToken The stop token to use for stopping the thread.
+     */
+    void
+    ProcessNetlinkMessagesThread(Microsoft::Net::Netlink::NetlinkSocket netlinkSocket, std::stop_token stopToken);
+
+    /**
      * @brief C-style function for use with netlink message callbacks.
      *
      * @param netlinkMessage The netlink message being processed.
@@ -47,13 +72,22 @@ private:
     ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessage, void *contextArgument);
 
     /**
-     * @brief Process a netlink message.
+     * @brief Process a series of netlink messages.
      *
-     * @param netlinkMessage The netlink message to process.
+     * @param netlinkMessage The first/parent netlink message to process.
      * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
      * @return int
      */
     int
+    ProcessNetlinkMessages(Microsoft::Net::Netlink::NetlinkMessage &netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
+
+    /**
+     * @brief Process a single netlink message.
+     *
+     * @param netlinkMessage The netlink message to process.
+     * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
+     */
+    void
     ProcessNetlinkMessage(Microsoft::Net::Netlink::NetlinkMessage &netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
 private:
@@ -64,7 +98,9 @@ private:
 
     uint32_t m_cookie{ CookieInvalid };
     AccessPointPresenceEventCallback m_accessPointPresenceCallback{ nullptr };
-    Microsoft::Net::Netlink::NetlinkSocket m_netlinkSocket;
+
+    int m_eventLoopStopFd{ -1 };
+    std::jthread m_netlinkMessageProcessingThread;
 };
 } // namespace Microsoft::Net::Wifi
 
