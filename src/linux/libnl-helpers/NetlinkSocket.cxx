@@ -3,6 +3,13 @@
 
 using namespace Microsoft::Net::Netlink;
 
+/* static */
+NetlinkSocket NetlinkSocket::Allocate()
+{
+    auto socket = nl_socket_alloc();
+    return NetlinkSocket{ socket };
+}
+
 NetlinkSocket::NetlinkSocket(struct nl_sock *socket)
     : Socket(socket)
 {
