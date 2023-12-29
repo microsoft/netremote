@@ -15,7 +15,7 @@ struct NetlinkSocket
     /**
      * @brief The netlink socket owned by this object.
      */
-    struct nl_sock *Socket{ nullptr };
+    struct nl_sock* Socket{ nullptr };
 
     /**
      * @brief Allocate a new struct nl_sock, and wrap it in a NetlinkSocket.
@@ -32,19 +32,50 @@ struct NetlinkSocket
     NetlinkSocket() = default;
 
     /**
+     * @brief Delete the copy constructor to enforce unique ownership.
+     */
+    NetlinkSocket(const NetlinkSocket&) = delete;
+
+    /**
+     * @brief Delete the copy assignment operator to enforce unique ownership.
+     *
+     * @return NetlinkSocket&
+     */
+    NetlinkSocket&
+    operator=(const NetlinkSocket&) = delete;
+
+    /**
+     * @brief Move-construct a new NetlinkSocket object. This takes ownership of
+     * the other instance.
+     *
+     * @param other The other instance to move from.
+     */
+    NetlinkSocket(NetlinkSocket&& other);
+
+    /**
+     * @brief Move-assign this instance from another instance. This takes
+     * ownership of the other instance.
+     *
+     * @param other The other instance to move from.
+     * @return NetlinkSocket&
+     */
+    NetlinkSocket&
+    operator=(NetlinkSocket&& other);
+
+    /**
      * @brief Construct a new NetlinkSocket that manages a pre-existing struct
      * nl_sock object. Note that once construction is complete, this object owns
      * the socket and will free it when it is destroyed.
      *
      * @param socket The netlink socket to manage.
      */
-    NetlinkSocket(struct nl_sock *socket);
+    NetlinkSocket(struct nl_sock* socket);
 
     /**
      * @brief Destroy the NetlinkSocket object, freeing the managed netlink
      * socket if it exists.
      */
-    ~NetlinkSocket();
+    virtual ~NetlinkSocket();
 
     /**
      * @brief Reset the managed netlink socket, freeing it if it exists.

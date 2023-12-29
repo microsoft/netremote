@@ -11,9 +11,27 @@ NetlinkSocket::Allocate()
     return NetlinkSocket{ socket };
 }
 
-NetlinkSocket::NetlinkSocket(struct nl_sock *socket) :
+NetlinkSocket::NetlinkSocket(struct nl_sock* socket) :
     Socket(socket)
 {
+}
+
+NetlinkSocket::NetlinkSocket(NetlinkSocket&& other) :
+    Socket(other.Socket)
+{
+    other.Socket = nullptr;
+}
+
+NetlinkSocket&
+NetlinkSocket::operator=(NetlinkSocket&& other)
+{
+    if (this != &other) {
+        Reset();
+        Socket = other.Socket;
+        other.Socket = nullptr;
+    }
+
+    return *this;
 }
 
 NetlinkSocket::~NetlinkSocket()
