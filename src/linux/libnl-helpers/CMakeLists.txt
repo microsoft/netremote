@@ -1,0 +1,30 @@
+
+add_library(libnl-helpers STATIC "")
+
+set(LIBNL_HELPERS_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(LIBNL_HELPERS_PUBLIC_INCLUDE_SUFFIX microsoft/net/netlink)
+set(LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX ${LIBNL_HELPERS_PUBLIC_INCLUDE}/${LIBNL_HELPERS_PUBLIC_INCLUDE_SUFFIX})
+
+target_sources(libnl-helpers
+    PRIVATE
+        NetlinkSocket.cxx
+        NetlinkMessage.cxx
+    PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS ${LIBNL_HELPERS_PUBLIC_INCLUDE}
+    FILES
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
+)
+
+target_link_libraries(libnl-helpers
+    PUBLIC
+        nl
+)
+
+install(
+    TARGETS libnl-helpers
+    EXPORT ${PROJECT_NAME}
+    FILE_SET HEADERS
+    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${LIBNL_HELPERS_PUBLIC_INCLUDE_SUFFIX}"
+)
