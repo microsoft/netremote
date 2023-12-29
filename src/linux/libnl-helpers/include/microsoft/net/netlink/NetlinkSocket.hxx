@@ -2,6 +2,7 @@
 #ifndef MICROSOFT_NET_NETLINK_NETLINK_SOCKET_HXX
 #define MICROSOFT_NET_NETLINK_NETLINK_SOCKET_HXX
 
+#include <netlink/socket.h>
 #include <netlink/netlink.h>
 
 namespace Microsoft::Net::Netlink
