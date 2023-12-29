@@ -57,7 +57,7 @@ include(protoc)
 include(cmake-properties)
 
 # Enable verbose output until project is bootstrapped.
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON" FORCE)
 
 # Pull in external dependencies.
 # Look for protobuf-config.cmake.
