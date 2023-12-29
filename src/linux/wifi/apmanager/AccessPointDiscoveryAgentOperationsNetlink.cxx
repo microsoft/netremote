@@ -124,19 +124,25 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 }
 
 int
-AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessages([[maybe_unused]] NetlinkMessage &netlinkMessage, [[maybe_unused]] AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
+AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessages([[maybe_unused]] struct nl_msg *netlinkMessage, [[maybe_unused]] AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
     LOG_VERBOSE << "Processing netlink message";
     return NL_OK;
 }
 
 void
-AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(NetlinkMessage &netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
+AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
     std::shared_ptr<IAccessPoint> accessPoint{ nullptr };
     AccessPointPresenceEvent accessPointPresenceEvent;
+    auto netlinkMessageHeader{ nlmsg_hdr(netlinkMessage) };
 
-    switch (netlinkMessage.Header()->nlmsg_type) {
+    if (netlinkMessageHeader == nullptr) {
+        LOG_ERROR << "Netlink message header is null, ignoring message";
+        return;
+    }
+
+    switch (netlinkMessageHeader->nlmsg_type) {
     case RTM_NEWLINK:
         accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
         // TODO: process message
@@ -146,7 +152,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(NetlinkMessage
         // TODO: process message
         break;
     default:
-        PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessage.Header()->nlmsg_type);
+        PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessageHeader->nlmsg_type);
         return;
     }
 
@@ -158,7 +164,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(NetlinkMessage
 
 /* static */
 int
-AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessageRaw, void *contextArgument)
+AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessage, void *contextArgument)
 {
     LOG_VERBOSE << "Received netlink message callback";
 
@@ -173,7 +179,6 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struc
         return NL_STOP;
     }
 
-    NetlinkMessage netlinkMessage{ netlinkMessageRaw };
     auto ret = instance->ProcessNetlinkMessages(netlinkMessage, instance->m_accessPointPresenceCallback);
     LOG_VERBOSE << std::format("Processed netlink message with result {}", ret);
 

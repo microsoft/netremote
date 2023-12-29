@@ -44,15 +44,15 @@ private:
 
     /**
      * @brief Handles when the netlink socket is ready for reading.
-     * 
+     *
      * @param netlinkSocket The netlink socket that is ready for reading.
      */
     void
-    HandleNetlinkSocketReady(Microsoft::Net::Netlink::NetlinkSocket& netlinkSocket);
+    HandleNetlinkSocketReady(Microsoft::Net::Netlink::NetlinkSocket &netlinkSocket);
 
     /**
      * @brief Thread function for processing netlink messages.
-     * 
+     *
      * @param netlinkSocket The netlink socket to use for processing messages.
      * @param stopToken The stop token to use for stopping the thread.
      */
@@ -79,7 +79,7 @@ private:
      * @return int
      */
     int
-    ProcessNetlinkMessages(Microsoft::Net::Netlink::NetlinkMessage &netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
+    ProcessNetlinkMessages(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
     /**
      * @brief Process a single netlink message.
@@ -88,7 +88,7 @@ private:
      * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
      */
     void
-    ProcessNetlinkMessage(Microsoft::Net::Netlink::NetlinkMessage &netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
+    ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
 private:
     // Cookie used to validate that the callback context is valid.
