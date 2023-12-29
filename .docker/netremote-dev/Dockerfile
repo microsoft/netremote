@@ -22,7 +22,7 @@ LABEL org.label-schema.schema-version = "1.0"
 # sudo apt-get update
 #
 # 2. Install core build tools and dependencies:
-# sudo apt-get install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg libmnl-dev linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+# sudo apt-get install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
 #
 # 3. Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
 # sudo apt-get remove -y --purge clang-16* lldb-16* llvm-16*
@@ -42,7 +42,7 @@ LABEL org.label-schema.schema-version = "1.0"
 RUN apt-get update && \
     apt-get install -qq -y --no-install-recommends \
         # Core project build dependencies.
-        # build-essential ca-certificates cmake curl dotnet7 git gnupg libmnl-dev linux-libc-dev ninja-build pkg-config tar unzip zip
+        # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
         build-essential \
         ca-certificates \
         cmake \
@@ -50,7 +50,6 @@ RUN apt-get update && \
         dotnet7 \
         git \
         gnupg \
-        libmnl-dev \
         linux-libc-dev \
         ninja-build \
         pkg-config \
