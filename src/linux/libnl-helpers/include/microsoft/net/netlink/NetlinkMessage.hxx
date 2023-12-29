@@ -16,7 +16,7 @@ struct NetlinkMessage
     /**
      * @brief The netlink message owned by this object.
      */
-    struct nl_msg *Message{ nullptr };
+    struct nl_msg* Message{ nullptr };
 
     /**
      * @brief Construct a new NetlinkMessage object that does not own a netlink
@@ -31,13 +31,57 @@ struct NetlinkMessage
      *
      * @param message The netlink message to manage.
      */
-    NetlinkMessage(struct nl_msg *message);
+    NetlinkMessage(struct nl_msg* message);
+
+    /**
+     * @brief Delete the copy constructor to enforce unique ownership.
+     */
+    NetlinkMessage(const NetlinkMessage&) = delete;
+
+    /**
+     * @brief Delete the copy assignment operator to enforce unique ownership.
+     *
+     * @return NetlinkMessage&
+     */
+    NetlinkMessage&
+    operator=(const NetlinkMessage&) = delete;
+
+    /**
+     * @brief Move-construct a new NetlinkMessage object. This takes ownership of
+     * the other instance.
+     *
+     * @param other The other instance to move from.
+     */
+    NetlinkMessage(NetlinkMessage&& other);
+
+    /**
+     * @brief Move-assign this instance from another instance. This takes
+     * ownership of the other instance.
+     *
+     * @param other The other instance to move from.
+     * @return NetlinkMessage&
+     */
+    NetlinkMessage&
+    operator=(NetlinkMessage&& other);
 
     /**
      * @brief Destroy the NetlinkMessage object, freeing the managed netlink
      * message if it exists.
      */
     ~NetlinkMessage();
+
+    /**
+     * @brief Reset the managed netlink message, freeing it if it exists.
+     */
+    void
+    Reset();
+
+    /**
+     * @brief Release ownership of the managed netlink message, returning it to
+     * the caller.
+     */
+    struct nl_msg*
+    Release() noexcept;
 
     /**
      * @brief Implicit conversion operator to struct nl_msg *, allowing this
@@ -52,7 +96,7 @@ struct NetlinkMessage
      *
      * @return struct nlmsghdr*
      */
-    struct nlmsghdr *
+    struct nlmsghdr*
     Header() const noexcept;
 };
 } // namespace Microsoft::Net::Netlink
