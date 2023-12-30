@@ -54,7 +54,6 @@ include(ExternalProject)
 include(GNUInstallDirs)
 include(grpc)
 include(protoc)
-include(cmake-properties)
 
 # Enable to debug CMake issues.
 set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Verbose Makefile Generation")
