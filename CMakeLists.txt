@@ -128,6 +128,8 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   # TODO
 endif()
 
+add_compile_definitions("$<$<CONFIG:DEBUG>:DEBUG>")
+
 if (CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
   add_compile_definitions(_FORTIFY_SOURCE=2)
 endif()
