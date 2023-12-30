@@ -103,11 +103,9 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     // Lookup the membership id for the "config" multicast group if not already done.
     int nl80211MulticastGroupIdConfig = m_nl80211MulticastGroupIdConfig;
     if (nl80211MulticastGroupIdConfig == -1) {
-        static constexpr auto NetlinkGenlControlFamilyName = "nlctrl";
-
-        nl80211MulticastGroupIdConfig = genl_ctrl_resolve_grp(netlinkSocket, NetlinkGenlControlFamilyName, NL80211_MULTICAST_GROUP_CONFIG);
+        nl80211MulticastGroupIdConfig = genl_ctrl_resolve_grp(netlinkSocket, NL80211_GENL_NAME, NL80211_MULTICAST_GROUP_CONFIG);
         if (nl80211MulticastGroupIdConfig < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 multicast group id for config with error {}", nl80211MulticastGroupIdConfig);
+            LOG_ERROR << std::format("Failed to resolve nl80211 multicast group id for config with error {} ({})", nl80211MulticastGroupIdConfig, nl_geterror(nl80211MulticastGroupIdConfig));
             return;
         }
         m_nl80211MulticastGroupIdConfig = nl80211MulticastGroupIdConfig;
