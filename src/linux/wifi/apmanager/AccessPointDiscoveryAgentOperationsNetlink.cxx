@@ -5,8 +5,8 @@
 
 #include <linux/if.h>
 #include <linux/if_link.h>
-#include <linux/rtnetlink.h>
 #include <linux/nl80211.h>
+#include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -172,7 +172,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     }
 
     const auto *interfaceName = static_cast<const char *>(RTA_DATA(interfaceNameAttribute));
-    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) }; 
+    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) };
     LOG_VERBOSE << std::format("Received netlink message with type {}, interface {}, index {}", netlinkMessageHeader->nlmsg_type, interfaceName, interfaceInfoMessage->ifi_index);
 
     switch (netlinkMessageHeader->nlmsg_type) {
