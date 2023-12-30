@@ -1,4 +1,5 @@
 
+#include <array>
 #include <cerrno>
 #include <format>
 #include <stdexcept>
@@ -8,6 +9,7 @@
 #include <linux/nl80211.h>
 #include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <netlink/genl/ctrl.h>
@@ -156,40 +158,50 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
 {
     std::shared_ptr<IAccessPoint> accessPoint{ nullptr };
     AccessPointPresenceEvent accessPointPresenceEvent;
-    auto netlinkMessageHeader{ nlmsg_hdr(netlinkMessage) };
+    auto *netlinkMessageHeader{ static_cast<struct nlmsghdr *>(nlmsg_hdr(netlinkMessage)) };
+    auto *genlMessageHeader{ static_cast<struct genlmsghdr *>(nlmsg_data(netlinkMessageHeader)) };
 
-    if (netlinkMessageHeader == nullptr) {
-        LOG_ERROR << "Netlink message header is null, ignoring message";
+    if (genlMessageHeader == nullptr) {
+        LOG_ERROR << "Netlink genl message header is null, ignoring message";
         return NL_SKIP;
+    }
+
+    // // Parse the message attributes.
+    std::array<struct nlattr *, NL80211_ATTR_MAX + 1> netlinkMessageAttributes{};
+    int ret = nla_parse(std::data(netlinkMessageAttributes), std::size(netlinkMessageAttributes), genlmsg_attrdata(genlMessageHeader, 0), genlmsg_attrlen(genlMessageHeader, 0), nullptr);
+    if (ret < 0) {
+        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        return NL_SKIP;
+    }
+
+    const char *interfaceName{ nullptr };
+
+    switch (genlMessageHeader->cmd) {
+    case NL80211_CMD_NEW_INTERFACE: {
+        accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
+        interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        LOG_VERBOSE << "Received netlink message with command NL80211_CMD_NEW_INTERFACE";
+        break;
+    }
+    case NL80211_CMD_DEL_INTERFACE: {
+        accessPointPresenceEvent = AccessPointPresenceEvent::Departed;
+        interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        LOG_VERBOSE << "Received netlink message with command NL80211_CMD_DEL_INTERFACE";
+        break;
+    }
+    default: {
+        PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessageHeader->nlmsg_type);
+        return NL_SKIP;
+    }
+    }
+
+    if (interfaceName != nullptr) {
+        accessPoint = std::make_shared<AccessPoint>(interfaceName);
     }
 
 #ifdef DEBUG
     nl_msg_dump(netlinkMessage, stdout);
 #endif
-
-    auto interfaceNameAttribute = nlmsg_find_attr(netlinkMessageHeader, sizeof *netlinkMessageHeader, IFLA_IFNAME);
-    if (interfaceNameAttribute == nullptr) {
-        LOG_ERROR << "Netlink message does not contain interface name attribute, ignoring message";
-        return NL_SKIP;
-    }
-
-    const auto *interfaceName = static_cast<const char *>(RTA_DATA(interfaceNameAttribute));
-    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) };
-    LOG_VERBOSE << std::format("Received netlink message with type {}, interface {}, index {}", netlinkMessageHeader->nlmsg_type, interfaceName, interfaceInfoMessage->ifi_index);
-
-    switch (netlinkMessageHeader->nlmsg_type) {
-    case RTM_NEWLINK:
-        accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
-        // TODO: process message
-        break;
-    case RTM_DELLINK:
-        accessPointPresenceEvent = AccessPointPresenceEvent::Departed;
-        // TODO: process message
-        break;
-    default:
-        PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessageHeader->nlmsg_type);
-        return NL_SKIP;
-    }
 
     if (accessPointPresenceEventCallback != nullptr) {
         LOG_VERBOSE << std::format("Invoking access point presence event callback with event args 'presence={}, accessPointChanged={}'", magic_enum::enum_name(accessPointPresenceEvent), accessPoint != nullptr ? accessPoint->GetInterface() : "<unknown>");
