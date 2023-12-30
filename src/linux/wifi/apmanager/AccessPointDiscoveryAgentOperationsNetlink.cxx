@@ -5,10 +5,13 @@
 
 #include <linux/if.h>
 #include <linux/if_link.h>
+#include <linux/nl80211.h>
 #include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <netlink/genl/ctrl.h>
+#include <netlink/genl/genl.h>
 #include <netlink/handlers.h>
 #include <notstd/Scope.hxx>
 #include <plog/Log.h>
@@ -69,28 +72,52 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
         Stop();
     }
 
-    // Open a new netlink socket with the routing/networking family group.
+    // TODO: This function needs to signal errors either through its return type, or an exception.
+
+    // Allocate a new netlink socket.
     auto netlinkSocket{ NetlinkSocket::Allocate() };
     if (netlinkSocket == nullptr) {
-        // TODO: this function needs to signal the error either through its return type, or an exception.
-        const auto err = errno;
-        LOG_ERROR << std::format("Failed to allocate new netlink socket with error {} ({})", err, strerror(err));
+        LOG_ERROR << "Failed to allocate new netlink socket for nl control";
         return;
     }
 
-    // Connect the socket to the netlink routing family.
-    int ret = nl_connect(netlinkSocket, NETLINK_ROUTE);
+    // Connect the socket to the generic netlink family.
+    int ret = genl_connect(netlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to connect netlink socket with error {} ({})", err, strerror(err));
+        LOG_ERROR << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err));
         return;
     }
 
-    // Subscribe to the link group of messages.
-    ret = nl_socket_add_membership(netlinkSocket, RTMGRP_LINK);
+    // Lookup the nl80211 netlink id if not already done.
+    int nl80211NetlinkId = m_nl80211NetlinkId;
+    if (nl80211NetlinkId == -1) {
+        nl80211NetlinkId = genl_ctrl_resolve(netlinkSocket, NL80211_GENL_NAME);
+        if (nl80211NetlinkId < 0) {
+            LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {}", nl80211NetlinkId);
+            return;
+        }
+        m_nl80211NetlinkId = nl80211NetlinkId;
+    }
+
+    // Lookup the membership id for the "config" multicast group if not already done.
+    int nl80211MulticastGroupIdConfig = m_nl80211MulticastGroupIdConfig;
+    if (nl80211MulticastGroupIdConfig == -1) {
+        static constexpr auto NetlinkGenlControlFamilyName = "nlctrl";
+
+        nl80211MulticastGroupIdConfig = genl_ctrl_resolve_grp(netlinkSocket, NetlinkGenlControlFamilyName, NL80211_MULTICAST_GROUP_CONFIG);
+        if (nl80211MulticastGroupIdConfig < 0) {
+            LOG_ERROR << std::format("Failed to resolve nl80211 multicast group id for config with error {}", nl80211MulticastGroupIdConfig);
+            return;
+        }
+        m_nl80211MulticastGroupIdConfig = nl80211MulticastGroupIdConfig;
+    }
+
+    // Subscribe to configuration messages.
+    ret = nl_socket_add_membership(netlinkSocket, nl80211MulticastGroupIdConfig);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to add netlink socket membership with error {} ({})", err, strerror(err));
+        LOG_ERROR << std::format("Failed to add netlink socket membership for '" NL80211_MULTICAST_GROUP_CONFIG "' group with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -145,7 +172,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     }
 
     const auto *interfaceName = static_cast<const char *>(RTA_DATA(interfaceNameAttribute));
-    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) }; 
+    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) };
     LOG_VERBOSE << std::format("Received netlink message with type {}, interface {}, index {}", netlinkMessageHeader->nlmsg_type, interfaceName, interfaceInfoMessage->ifi_index);
 
     switch (netlinkMessageHeader->nlmsg_type) {

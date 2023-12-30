@@ -86,6 +86,9 @@ private:
     // Cookie used to invalidate the callback context.
     static constexpr uint32_t CookieInvalid{ 0xDEADBEEFu };
 
+    int m_nl80211NetlinkId{ -1 };
+    int m_nl80211MulticastGroupIdConfig{ -1 };
+
     uint32_t m_cookie{ CookieInvalid };
     AccessPointPresenceEventCallback m_accessPointPresenceCallback{ nullptr };
 
