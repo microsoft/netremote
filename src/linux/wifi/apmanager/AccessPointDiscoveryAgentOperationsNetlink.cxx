@@ -94,7 +94,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     if (nl80211NetlinkId == -1) {
         nl80211NetlinkId = genl_ctrl_resolve(netlinkSocket, NL80211_GENL_NAME);
         if (nl80211NetlinkId < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {}", nl80211NetlinkId);
+            LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {} ({})", nl80211NetlinkId, nl_geterror(nl80211NetlinkId));
             return;
         }
         m_nl80211NetlinkId = nl80211NetlinkId;
