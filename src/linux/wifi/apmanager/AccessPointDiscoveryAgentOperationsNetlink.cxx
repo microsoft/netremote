@@ -74,7 +74,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
 
     // TODO: This function needs to signal errors either through its return type, or an exception.
 
-    // moved to a separate function and done only once per instance.
+    // Allocate a new netlink socket.
     auto netlinkSocket{ NetlinkSocket::Allocate() };
     if (netlinkSocket == nullptr) {
         LOG_ERROR << "Failed to allocate new netlink socket for nl control";
