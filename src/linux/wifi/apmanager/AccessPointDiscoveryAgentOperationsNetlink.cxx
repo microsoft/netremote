@@ -163,6 +163,10 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         return NL_SKIP;
     }
 
+#ifdef DEBUG
+    nl_msg_dump(netlinkMessage, stdout);
+#endif
+
     auto interfaceNameAttribute = nlmsg_find_attr(netlinkMessageHeader, sizeof *netlinkMessageHeader, IFLA_IFNAME);
     if (interfaceNameAttribute == nullptr) {
         LOG_ERROR << "Netlink message does not contain interface name attribute, ignoring message";
