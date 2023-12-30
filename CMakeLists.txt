@@ -56,8 +56,8 @@ include(grpc)
 include(protoc)
 include(cmake-properties)
 
-# Enable verbose output until project is bootstrapped.
-set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON" FORCE)
+# Enable to debug CMake issues.
+set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Verbose Makefile Generation")
 
 # Pull in external dependencies.
 # Look for protobuf-config.cmake.
