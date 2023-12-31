@@ -175,17 +175,20 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     }
 
     const char *interfaceName{ nullptr };
+    nl80211_iftype interfaceType{ NL80211_IFTYPE_UNSPECIFIED };
 
     switch (genlMessageHeader->cmd) {
     case NL80211_CMD_NEW_INTERFACE: {
         accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
         interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        interfaceType = static_cast<nl80211_iftype>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFTYPE]));
         LOG_VERBOSE << "Received netlink message with command NL80211_CMD_NEW_INTERFACE";
         break;
     }
     case NL80211_CMD_DEL_INTERFACE: {
         accessPointPresenceEvent = AccessPointPresenceEvent::Departed;
         interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        interfaceType = static_cast<nl80211_iftype>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFTYPE]));
         LOG_VERBOSE << "Received netlink message with command NL80211_CMD_DEL_INTERFACE";
         break;
     }
@@ -193,6 +196,12 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessageHeader->nlmsg_type);
         return NL_SKIP;
     }
+    }
+
+    // Only consider AP interfaces.
+    if (interfaceType != NL80211_IFTYPE_AP) {
+        LOG_VERBOSE << std::format("Ignoring netlink message for non-ap wi-fi interface (type={})", static_cast<uint32_t>(interfaceType));
+        return NL_SKIP;
     }
 
     if (interfaceName != nullptr) {
