@@ -178,6 +178,14 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     nl80211_iftype interfaceType{ NL80211_IFTYPE_UNSPECIFIED };
 
     switch (genlMessageHeader->cmd) {
+    case NL80211_CMD_SET_INTERFACE: {
+        accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
+        interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        interfaceType = static_cast<nl80211_iftype>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFTYPE]));
+        LOG_VERBOSE << "Received netlink message with command NL80211_CMD_SET_INTERFACE";
+        // TODO: need to check if this is a new interface or an existing one.
+        break;
+    }
     case NL80211_CMD_NEW_INTERFACE: {
         accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
         interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
