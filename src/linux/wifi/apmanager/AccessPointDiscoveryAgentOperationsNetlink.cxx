@@ -9,10 +9,10 @@
 #include <linux/if_link.h>
 #include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
-#include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
 #include <netlink/handlers.h>

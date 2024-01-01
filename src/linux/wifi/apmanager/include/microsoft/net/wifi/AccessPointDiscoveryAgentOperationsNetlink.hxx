@@ -98,7 +98,8 @@ private:
     int m_eventLoopStopFd{ -1 };
     std::jthread m_netlinkMessageProcessingThread;
 
-    struct WifiInterfaceInfo {
+    struct WifiInterfaceInfo
+    {
         std::string Name;
         nl80211_iftype Type;
     };
