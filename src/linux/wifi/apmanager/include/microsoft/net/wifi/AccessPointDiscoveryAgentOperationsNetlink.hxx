@@ -4,8 +4,11 @@
 
 #include <cstdint>
 #include <stop_token>
+#include <string>
 #include <thread>
+#include <unordered_map>
 
+#include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
@@ -94,6 +97,13 @@ private:
 
     int m_eventLoopStopFd{ -1 };
     std::jthread m_netlinkMessageProcessingThread;
+
+    struct WifiInterfaceInfo {
+        std::string Name;
+        nl80211_iftype Type;
+    };
+
+    std::unordered_map<int, WifiInterfaceInfo> m_interfaceInfo;
 };
 } // namespace Microsoft::Net::Wifi
 
