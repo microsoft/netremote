@@ -26,7 +26,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
     auto accessPointDiscoveryAgentOperationsNetlink{ std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>() };
     auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink)) };
     accessPointDiscoveryAgent->RegisterDiscoveryEventCallback([](auto&& presence, auto&& accessPointChanged) {
-        PLOG_INFO << std::format("{} {}", magic_enum::enum_name(presence), accessPointChanged != nullptr ? accessPointChanged->GetInterface() : "<unknown>");
+        PLOG_INFO << std::format("{} -> {}", accessPointChanged != nullptr ? accessPointChanged->GetInterface() : "<unknown>", magic_enum::enum_name(presence));
     });
 
     LOG_INFO << "starting access point discovery agent";

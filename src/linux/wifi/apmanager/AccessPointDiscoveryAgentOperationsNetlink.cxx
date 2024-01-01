@@ -1,13 +1,16 @@
 
+#include <array>
 #include <cerrno>
 #include <format>
 #include <stdexcept>
+#include <string_view>
 
 #include <linux/if.h>
 #include <linux/if_link.h>
-#include <linux/nl80211.h>
 #include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
+#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <netlink/genl/ctrl.h>
@@ -21,6 +24,7 @@
 #include <unistd.h>
 
 using namespace Microsoft::Net::Wifi;
+using namespace Microsoft::Net::Netlink::Nl80211;
 
 using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
@@ -94,7 +98,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     if (nl80211NetlinkId == -1) {
         nl80211NetlinkId = genl_ctrl_resolve(netlinkSocket, NL80211_GENL_NAME);
         if (nl80211NetlinkId < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {}", nl80211NetlinkId);
+            LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {} ({})", nl80211NetlinkId, nl_geterror(nl80211NetlinkId));
             return;
         }
         m_nl80211NetlinkId = nl80211NetlinkId;
@@ -103,11 +107,9 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     // Lookup the membership id for the "config" multicast group if not already done.
     int nl80211MulticastGroupIdConfig = m_nl80211MulticastGroupIdConfig;
     if (nl80211MulticastGroupIdConfig == -1) {
-        static constexpr auto NetlinkGenlControlFamilyName = "nlctrl";
-
-        nl80211MulticastGroupIdConfig = genl_ctrl_resolve_grp(netlinkSocket, NetlinkGenlControlFamilyName, NL80211_MULTICAST_GROUP_CONFIG);
+        nl80211MulticastGroupIdConfig = genl_ctrl_resolve_grp(netlinkSocket, NL80211_GENL_NAME, NL80211_MULTICAST_GROUP_CONFIG);
         if (nl80211MulticastGroupIdConfig < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 multicast group id for config with error {}", nl80211MulticastGroupIdConfig);
+            LOG_ERROR << std::format("Failed to resolve nl80211 multicast group id for config with error {} ({})", nl80211MulticastGroupIdConfig, nl_geterror(nl80211MulticastGroupIdConfig));
             return;
         }
         m_nl80211MulticastGroupIdConfig = nl80211MulticastGroupIdConfig;
@@ -156,41 +158,83 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 int
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
-    std::shared_ptr<IAccessPoint> accessPoint{ nullptr };
+    // Ensure the message has a genl header.
+    auto *netlinkMessageHeader{ static_cast<struct nlmsghdr *>(nlmsg_hdr(netlinkMessage)) };
+    if (genlmsg_valid_hdr(netlinkMessageHeader, 1) == 0) {
+        LOG_ERROR << "Netlink genl message header is invalid, ignoring message";
+        return NL_SKIP;
+    }
+
+    // Extract the nl80211 (genl) message header.
+    const auto *genlMessageHeader{ static_cast<struct genlmsghdr *>(nlmsg_data(netlinkMessageHeader)) };
+    const auto nl80211CommandName{ Nl80211CommandToString(static_cast<nl80211_commands>(genlMessageHeader->cmd)) };
+
+    // Parse the message attributes.
+    std::array<struct nlattr *, NL80211_ATTR_MAX + 1> netlinkMessageAttributes{};
+    int ret = nla_parse(std::data(netlinkMessageAttributes), std::size(netlinkMessageAttributes), genlmsg_attrdata(genlMessageHeader, 0), genlmsg_attrlen(genlMessageHeader, 0), nullptr);
+    if (ret < 0) {
+        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        return NL_SKIP;
+    }
+
+    int interfaceIndex{ -1 };
+    const char *interfaceName{ nullptr };
+    nl80211_iftype interfaceType{ NL80211_IFTYPE_UNSPECIFIED };
     AccessPointPresenceEvent accessPointPresenceEvent;
-    auto netlinkMessageHeader{ nlmsg_hdr(netlinkMessage) };
 
-    if (netlinkMessageHeader == nullptr) {
-        LOG_ERROR << "Netlink message header is null, ignoring message";
-        return NL_SKIP;
-    }
+    LOG_VERBOSE << std::format("Received {} nl80211 command message", nl80211CommandName);
 
-    auto interfaceNameAttribute = nlmsg_find_attr(netlinkMessageHeader, sizeof *netlinkMessageHeader, IFLA_IFNAME);
-    if (interfaceNameAttribute == nullptr) {
-        LOG_ERROR << "Netlink message does not contain interface name attribute, ignoring message";
-        return NL_SKIP;
-    }
-
-    const auto *interfaceName = static_cast<const char *>(RTA_DATA(interfaceNameAttribute));
-    const auto *interfaceInfoMessage{ static_cast<const struct ifinfomsg *>(NLMSG_DATA(netlinkMessageHeader)) };
-    LOG_VERBOSE << std::format("Received netlink message with type {}, interface {}, index {}", netlinkMessageHeader->nlmsg_type, interfaceName, interfaceInfoMessage->ifi_index);
-
-    switch (netlinkMessageHeader->nlmsg_type) {
-    case RTM_NEWLINK:
-        accessPointPresenceEvent = AccessPointPresenceEvent::Arrived;
-        // TODO: process message
+    switch (genlMessageHeader->cmd) {
+    case NL80211_CMD_NEW_INTERFACE:
+    case NL80211_CMD_DEL_INTERFACE: {
+        interfaceIndex = static_cast<int32_t>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFINDEX]));
+        interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        interfaceType = static_cast<nl80211_iftype>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFTYPE]));
+        if (interfaceType != NL80211_IFTYPE_AP) {
+            LOG_VERBOSE << std::format("Ignoring interface presence change nl80211 message for non-ap wi-fi interface (type={})", nL80211InterfaceTypeToString(interfaceType));
+            return NL_SKIP;
+        }
+        accessPointPresenceEvent = (genlMessageHeader->cmd == NL80211_CMD_NEW_INTERFACE) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
         break;
-    case RTM_DELLINK:
-        accessPointPresenceEvent = AccessPointPresenceEvent::Departed;
-        // TODO: process message
+    }
+    case NL80211_CMD_SET_INTERFACE: {
+        interfaceIndex = static_cast<int32_t>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFINDEX]));
+        interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
+        interfaceType = static_cast<nl80211_iftype>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFTYPE]));
+        accessPointPresenceEvent = (interfaceType == NL80211_IFTYPE_AP) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
         break;
-    default:
-        PLOG_VERBOSE << std::format("Ignoring netlink message with type {}", netlinkMessageHeader->nlmsg_type);
+    }
+    // case NL80211_CMD_NEW_BEACON: {
+    //     break;
+    // }
+    // case NL80211_CMD_DEL_BEACON: {
+    //     interfaceIndex = static_cast<int32_t>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFINDEX]));
+    //     break;
+    // }
+    default: {
+        PLOG_VERBOSE << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
         return NL_SKIP;
     }
+    }
 
+    // Update map tracking interface information. Handle the case where the
+    // interface is already present. This happens for NL80211_CMD_SET_INTERFACE
+    // when the interface type did not change.
+    auto interfaceInfo = m_interfaceInfo.find(interfaceIndex);
+    if (interfaceInfo == std::cend(m_interfaceInfo)) {
+        if (accessPointPresenceEvent == AccessPointPresenceEvent::Arrived) {
+            m_interfaceInfo[interfaceIndex] = { interfaceName, interfaceType };
+        }
+    } else {
+        if (accessPointPresenceEvent == AccessPointPresenceEvent::Departed) {
+            m_interfaceInfo.erase(interfaceInfo);
+        }
+    }
+
+    // Invoke presence event callback if present.
     if (accessPointPresenceEventCallback != nullptr) {
-        LOG_VERBOSE << std::format("Invoking access point presence event callback with event args 'presence={}, accessPointChanged={}'", magic_enum::enum_name(accessPointPresenceEvent), accessPoint != nullptr ? accessPoint->GetInterface() : "<unknown>");
+        auto accessPoint{ std::make_shared<AccessPoint>(interfaceName) };
+        LOG_VERBOSE << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", accessPoint->GetInterface(), magic_enum::enum_name(accessPointPresenceEvent));
         accessPointPresenceEventCallback(accessPointPresenceEvent, std::move(accessPoint));
     }
 

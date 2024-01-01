@@ -7,6 +7,7 @@ set(LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX ${LIBNL_HELPERS_PUBLIC_INCLUDE}/${LIBNL_
 
 target_sources(libnl-helpers
     PRIVATE
+        Netlink80211.cxx
         NetlinkSocket.cxx
         NetlinkMessage.cxx
     PUBLIC
@@ -15,6 +16,7 @@ target_sources(libnl-helpers
     FILES
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
 )
 
 target_link_libraries(libnl-helpers

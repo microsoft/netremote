@@ -125,12 +125,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
     endif()
   endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  # TODO
+  # Nothing special needed for MSVC at the moment.
 endif()
 
-if (CMAKE_BUILD_TYPE MATCHES "(Release|RelWithDebInfo|MinSizeRel)")
-  add_compile_definitions(_FORTIFY_SOURCE=2)
-endif()
+# Add conditional compile definitions based on build type.
+add_compile_definitions("$<$<CONFIG:Debug>:DEBUG>")
+add_compile_definitions("$<$<CONFIG:Release,RelWithDebInfo,MinSizeRel>:_FORTIFY_SOURCE=2>")
 
 # Common source directories
 set(NETREMOTE_DIR_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
