@@ -65,6 +65,9 @@ if [[ ! -f .config ]]; then
     ln -s ${WSL_SRC_CONFIG} .config
 fi
 
+# Supply defaults for any new/unspecified options in the configuration.
+make olddefconfig
+
 # Update the configuration to build the mac80211_hwsim module and its dependencies.
 echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
 ${KERNEL_CONFIG_UTIL} \
@@ -72,9 +75,6 @@ ${KERNEL_CONFIG_UTIL} \
     --module CONFIG_CFG80211 \
     --module CONFIG_MAC80211 \
     --module CONFIG_MAC80211_HWSIM
-
-# Supply defaults for any new/unspecified options in the configuration.
-make olddefconfig
 
 echo "Preparing kernel source tree for building external modules..."
 make prepare modules_prepare ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
