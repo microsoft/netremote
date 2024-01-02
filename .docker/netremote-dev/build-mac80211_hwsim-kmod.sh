@@ -50,9 +50,12 @@ if [[ ! -d ${WSL_SRC_DIRECTORY_BASE} ]]; then
     mkdir -p ${WSL_SRC_DIRECTORY_BASE}
 fi
 
-cd ${WSL_SRC_DIRECTORY_BASE}
-wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzvf -
-cd ${WSL_SRC_DIRECTORY}
+if [[ ! -d ${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY} ]]; then
+    cd ${WSL_SRC_DIRECTORY_BASE}
+    wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzvf -
+fi
+
+cd ${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY}
 
 # Prepare the kernel source with the configuration for the running kernel.
 echo "Preparing kernel source with configuration for running kernel..."
