@@ -18,9 +18,14 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
+using Microsoft::Net::Wifi::AccessPointManager;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherAlgorithm;
 using Microsoft::Net::Wifi::Dot11PhyType;
+
+NetRemoteService::NetRemoteService() :
+    m_accessPointManager(AccessPointManager::Create())
+{}
 
 ::grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response)
