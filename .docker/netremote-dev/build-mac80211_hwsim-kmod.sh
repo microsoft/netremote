@@ -50,9 +50,12 @@ if [[ ! -d ${WSL_SRC_DIRECTORY_BASE} ]]; then
     mkdir -p ${WSL_SRC_DIRECTORY_BASE}
 fi
 
-cd ${WSL_SRC_DIRECTORY_BASE}
-wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzvf -
-cd ${WSL_SRC_DIRECTORY}
+if [[ ! -d ${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY} ]]; then
+    cd ${WSL_SRC_DIRECTORY_BASE}
+    wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzvf -
+fi
+
+cd ${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY}
 
 # Prepare the kernel source with the configuration for the running kernel.
 echo "Preparing kernel source with configuration for running kernel..."
@@ -65,6 +68,9 @@ if [[ ! -f .config ]]; then
     ln -s ${WSL_SRC_CONFIG} .config
 fi
 
+# Supply defaults for any new/unspecified options in the configuration.
+make olddefconfig
+
 # Update the configuration to build the mac80211_hwsim module and its dependencies.
 echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
 ${KERNEL_CONFIG_UTIL} \
@@ -72,9 +78,6 @@ ${KERNEL_CONFIG_UTIL} \
     --module CONFIG_CFG80211 \
     --module CONFIG_MAC80211 \
     --module CONFIG_MAC80211_HWSIM
-
-# Supply defaults for any new/unspecified options in the configuration.
-make olddefconfig
 
 echo "Preparing kernel source tree for building external modules..."
 make prepare modules_prepare ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
