@@ -31,7 +31,7 @@ operator"" _GHz(long double value) noexcept
      * value is practically equal to the expected value, given the tolerance.
      * The below tolerance value(s) were defined empirically using a few
      * different processors. Since this function only needs to map to an
-     * enumeration value, the range the tolerance value need not be very
+     * enumeration value, the range of the tolerance value need not be very
      * precise.
      */
     constexpr auto TwoPointFourGHzTolerance = 8.89045781438113635886e-17L;
