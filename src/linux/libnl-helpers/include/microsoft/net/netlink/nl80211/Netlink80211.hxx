@@ -24,7 +24,7 @@ Nl80211CommandToString(nl80211_commands command) noexcept;
  * @return std::string_view The string representation of the enum value.
  */
 std::string_view
-nL80211InterfaceTypeToString(nl80211_iftype type) noexcept;
+Nl80211InterfaceTypeToString(nl80211_iftype type) noexcept;
 
 } // namespace Microsoft::Net::Netlink::80211
 
