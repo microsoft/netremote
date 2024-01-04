@@ -4,6 +4,7 @@ add_executable(wifi-core-test-unit)
 target_sources(wifi-core-test-unit
     PRIVATE
         TestAccessPoint.cxx
+        TestIeee80211.cxx
 )
 
 target_include_directories(wifi-core-test-unit
