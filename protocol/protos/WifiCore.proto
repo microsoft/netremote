@@ -79,10 +79,10 @@ enum Dot11CipherAlgorithm
     Dot11CipherAlgorithmBipCmac256 = 9;
     Dot11CipherAlgorithmGcmp = 10;
     Dot11CipherAlgorithmGcmp128 = 10;
-    Dot11CipherAlgorithmGcmp256 = 10;
-    Dot11CipherAlgorithmCcmp256 = 11;
-    Dot11CipherAlgorithmWpaUseGroup = 12;
-    Dot11CipherAlgorithmRsnUseGroup = 12;
+    Dot11CipherAlgorithmGcmp256 = 11;
+    Dot11CipherAlgorithmCcmp256 = 12;
+    Dot11CipherAlgorithmWpaUseGroup = 13;
+    Dot11CipherAlgorithmRsnUseGroup = 13;
 }
 
 message Dot11Ssid
