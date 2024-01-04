@@ -7,6 +7,7 @@
 #include <future>
 #include <memory>
 #include <shared_mutex>
+#include <string>
 
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 
@@ -50,7 +51,7 @@ struct AccessPointDiscoveryAgent :
      * @param onDevicePresenceChanged The callback to register.
      */
     void
-    RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged);
+    RegisterDiscoveryEventCallback(AccessPointPresenceEventCallback onDevicePresenceChanged);
 
     /**
      * @brief indicates the started/running state.
@@ -76,9 +77,9 @@ struct AccessPointDiscoveryAgent :
     /**
      * @brief Probe for all existing devices.
      *
-     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+     * @return std::future<std::vector<std::string>>
      */
-    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    std::future<std::vector<std::string>>
     ProbeAsync();
 
 protected:
@@ -93,17 +94,17 @@ protected:
      * @brief Wrapper for safely invoking any device presence changed registered callback.
      *
      * @param presence The presence change that occurred.
-     * @param accessPointChanged The device the change occurred for.
+     * @param interfaceName The name of the network interface of the access point that changed.
      */
     void
-    DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept;
+    DevicePresenceChanged(AccessPointPresenceEvent presence, std::string interfaceName) const noexcept;
 
 private:
     std::unique_ptr<IAccessPointDiscoveryAgentOperations> m_operations;
     std::atomic<bool> m_started{ false };
 
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
-    std::function<void(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)> m_onDevicePresenceChanged;
+    AccessPointPresenceEventCallback m_onDevicePresenceChanged;
 };
 
 } // namespace Microsoft::Net::Wifi

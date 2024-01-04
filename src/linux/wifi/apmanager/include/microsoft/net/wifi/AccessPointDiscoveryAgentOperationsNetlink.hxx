@@ -35,7 +35,7 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
     void
     Stop() override;
 
-    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    std::future<std::vector<std::string>>
     ProbeAsync() override;
 
 private:

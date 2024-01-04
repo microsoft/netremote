@@ -142,14 +142,14 @@ AccessPointDiscoveryAgentOperationsNetlink::Stop()
     }
 }
 
-std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+std::future<std::vector<std::string>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
-    std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
+    std::promise<std::vector<std::string>> probePromise{};
     auto probeFuture = probePromise.get_future();
 
     // TODO: implement this.
-    std::vector<std::shared_ptr<IAccessPoint>> accessPoints{};
+    std::vector<std::string> accessPoints{};
     probePromise.set_value(std::move(accessPoints));
 
     return probeFuture;
@@ -235,7 +235,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     if (accessPointPresenceEventCallback != nullptr) {
         auto accessPoint{ std::make_shared<AccessPoint>(interfaceName) };
         LOG_VERBOSE << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", accessPoint->GetInterface(), magic_enum::enum_name(accessPointPresenceEvent));
-        accessPointPresenceEventCallback(accessPointPresenceEvent, std::move(accessPoint));
+        accessPointPresenceEventCallback(accessPointPresenceEvent, interfaceName);
     }
 
     return NL_OK;
