@@ -12,8 +12,10 @@ namespace Microsoft::Net::Remote::Service
 class NetRemoteService :
     public NetRemote::Service
 {
+public:
     NetRemoteService();
 
+private:
     virtual ::grpc::Status
     WifiEnumerateAccessPoints(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;
 
