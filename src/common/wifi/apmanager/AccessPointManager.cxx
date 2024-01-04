@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iterator>
 
+#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -92,18 +93,19 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
     // be safely destroyed prior to the discovery agent. This allows the
     // callback to be registered indefinitely, safely checking whether this
     // instance is still valid upon each callback invocation.
-    discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<AccessPointManager>(GetInstance())](auto&& presence, auto&& accessPointChanged) {
+    discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<AccessPointManager>(GetInstance())](auto&& presence, auto&& interfaceName) {
         if (auto strongThis = weakThis.lock()) {
-            strongThis->OnAccessPointPresenceChanged(discoveryAgentPtr, presence, accessPointChanged);
+            std::shared_ptr<IAccessPoint> accessPointChanged{ std::make_shared<AccessPoint>(interfaceName) }; // TODO: use factory to create access point
+            strongThis->OnAccessPointPresenceChanged(discoveryAgentPtr, presence, std::move(accessPointChanged));
         }
     });
 
     // If this agent has already started, kick off a probe to ensure any access
     // points already found will be added to this manager.
-    std::future<std::vector<std::shared_ptr<IAccessPoint>>> existingAccessPointsProbe;
+    std::future<std::vector<std::string>> existingAccessPointInterfaceNamesProbe;
     const bool isStarted = discoveryAgent->IsStarted();
     if (isStarted) {
-        existingAccessPointsProbe = discoveryAgent->ProbeAsync();
+        existingAccessPointInterfaceNamesProbe = discoveryAgent->ProbeAsync();
     } else {
         discoveryAgent->Start();
     }
@@ -115,16 +117,17 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
-    if (existingAccessPointsProbe.valid()) {
+    if (existingAccessPointInterfaceNamesProbe.valid()) {
         static constexpr auto probeTimeout = 3s;
 
         // Wait for the operation to complete.
-        const auto waitResult = existingAccessPointsProbe.wait_for(probeTimeout);
+        const auto waitResult = existingAccessPointInterfaceNamesProbe.wait_for(probeTimeout);
 
         // If the operation completed, get the results and add those access points.
         if (waitResult == std::future_status::ready) {
-            auto existingAccessPoints = existingAccessPointsProbe.get();
-            for (auto& existingAccessPoint : existingAccessPoints) {
+            auto existingAccessPointInterfaceNames = existingAccessPointInterfaceNamesProbe.get();
+            for (const auto& existingAccessPointInterfaceName : existingAccessPointInterfaceNames) {
+                std::shared_ptr<IAccessPoint> existingAccessPoint{ std::make_shared<AccessPoint>(existingAccessPointInterfaceName) }; // TODO: use factory to create access point
                 AddAccessPoint(std::move(existingAccessPoint));
             }
         } else {

@@ -28,18 +28,18 @@ AccessPointDiscoveryAgent::GetInstance() noexcept
 }
 
 void
-AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(std::function<void(AccessPointPresenceEvent presence, const std::shared_ptr<IAccessPoint> accessPointChanged)> onDevicePresenceChanged)
+AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(AccessPointPresenceEventCallback onDevicePresenceChanged)
 {
     std::unique_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     m_onDevicePresenceChanged = std::move(onDevicePresenceChanged);
 }
 
 void
-AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged) const noexcept
+AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::string interfaceName) const noexcept
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) {
-        m_onDevicePresenceChanged(presence, std::move(accessPointChanged));
+        m_onDevicePresenceChanged(presence, std::move(interfaceName));
     }
 }
 
@@ -54,10 +54,10 @@ AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
-        m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPointChanged) {
+        m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& interfaceName) {
             // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
             if (auto strongThis = weakThis.lock(); strongThis) {
-                strongThis->DevicePresenceChanged(presence, std::move(accessPointChanged));
+                strongThis->DevicePresenceChanged(presence, std::move(interfaceName));
             }
         });
     }
@@ -72,7 +72,7 @@ AccessPointDiscoveryAgent::Stop()
     }
 }
 
-std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+std::future<std::vector<std::string>>
 AccessPointDiscoveryAgent::ProbeAsync()
 {
     return m_operations->ProbeAsync();

@@ -4,6 +4,9 @@
 
 #include <future>
 #include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
@@ -24,18 +27,18 @@ struct AccessPointDiscoveryAgentOperationsTest :
     void
     Stop() override;
 
-    std::future<std::vector<std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint>>>
+    std::future<std::vector<std::string>>
     ProbeAsync() override;
 
     void
-    AddAccessPoint(std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint> accessPointToAdd);
+    AddAccessPoint(std::string_view accessPointInterfaceNameToAdd);
 
     void
-    RemoveAccessPoint(std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint> accessPointToRemove);
+    RemoveAccessPoint(std::string_view accessPointInterfaceNameToRemove);
 
 private:
     AccessPointPresenceEventCallback m_callback;
-    std::vector<std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint>> m_accessPoints;
+    std::vector<std::string> m_accessPointInterfaceNames;
 };
 
 } // namespace Microsoft::Net::Wifi::Test
