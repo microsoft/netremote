@@ -23,6 +23,13 @@ struct AccessPointTest final :
         return m_interface;
     }
 
+    std::unique_ptr<IAccessPointController>
+    CreateController()
+    {
+        // TODO
+        return nullptr;
+    }
+
     std::string m_interface;
 };
 

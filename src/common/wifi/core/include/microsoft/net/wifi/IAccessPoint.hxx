@@ -2,10 +2,13 @@
 #ifndef I_ACCESS_POINT_HXX
 #define I_ACCESS_POINT_HXX
 
+#include <memory>
 #include <string_view>
 
 namespace Microsoft::Net::Wifi
 {
+struct IAccessPointController;
+
 /**
  * @brief Represents a wireless access point.
  */
@@ -23,6 +26,14 @@ struct IAccessPoint
      */
     virtual std::string_view
     GetInterface() const noexcept = 0;
+
+    /**
+     * @brief Create a new instance that can control the access point.
+     *
+     * @return std::unique_ptr<IAccessPointController>
+     */
+    virtual std::unique_ptr<IAccessPointController>
+    CreateController() = 0;
 };
 } // namespace Microsoft::Net::Wifi
 

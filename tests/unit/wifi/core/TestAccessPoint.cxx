@@ -1,8 +1,10 @@
 
 #include <optional>
+#include <stdexcept>
 
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/wifi/AccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/test/AccessPointFactoryTest.hxx>
 
 namespace Microsoft::Net::Wifi::Test
@@ -49,5 +51,15 @@ TEST_CASE("AccessPoint instance reflects basic properties", "[wifi][core][ap]")
     {
         AccessPoint accessPoint{ Test::InterfaceNameDefault };
         REQUIRE(accessPoint.GetInterface() == Test::InterfaceNameDefault);
+    }
+}
+
+TEST_CASE("AccessPoint unimplemented functions cause runtime errors")
+{
+    using namespace Microsoft::Net::Wifi;
+
+    SECTION("CreateController throws std::runtime_error")
+    {
+        REQUIRE_THROWS_AS(AccessPoint(Test::InterfaceNameDefault).CreateController(), std::runtime_error);
     }
 }
