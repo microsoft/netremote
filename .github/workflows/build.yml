@@ -20,7 +20,7 @@ on:
         description: 'Invoke CMake install for the project'
       test:
         required: false
-        default: true
+        default: false
         type: boolean
         description: 'Invoke CMake CTest for the project'
       package:
