@@ -2,8 +2,8 @@
 #ifndef MICROSOFT_NET_NETLINK_NETLINK_SOCKET_HXX
 #define MICROSOFT_NET_NETLINK_NETLINK_SOCKET_HXX
 
-#include <netlink/socket.h>
 #include <netlink/netlink.h>
+#include <netlink/socket.h>
 
 namespace Microsoft::Net::Netlink
 {
@@ -25,6 +25,9 @@ struct NetlinkSocket
      */
     static NetlinkSocket
     Allocate();
+
+    static NetlinkSocket
+    Create();
 
     /**
      * @brief Construct a default NetlinkSocket object that does not own a

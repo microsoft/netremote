@@ -191,7 +191,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         interfaceName = static_cast<const char *>(nla_data(netlinkMessageAttributes[NL80211_ATTR_IFNAME]));
         interfaceType = static_cast<nl80211_iftype>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFTYPE]));
         if (interfaceType != NL80211_IFTYPE_AP) {
-            LOG_VERBOSE << std::format("Ignoring interface presence change nl80211 message for non-ap wi-fi interface (type={})", nL80211InterfaceTypeToString(interfaceType));
+            LOG_VERBOSE << std::format("Ignoring interface presence change nl80211 message for non-ap wi-fi interface (type={})", Nl80211InterfaceTypeToString(interfaceType));
             return NL_SKIP;
         }
         accessPointPresenceEvent = (genlMessageHeader->cmd == NL80211_CMD_NEW_INTERFACE) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;

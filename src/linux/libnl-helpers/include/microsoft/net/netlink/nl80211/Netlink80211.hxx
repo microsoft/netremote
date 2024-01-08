@@ -3,14 +3,34 @@
 #define NETLINK_82011_HXX
 
 #include <string_view>
+#include <unordered_map>
 
 #include <linux/nl80211.h>
 
 namespace Microsoft::Net::Netlink::Nl80211
 {
+enum class Nl80211MulticastGroup {
+    Configuration,
+    Scan,
+    Regulatory,
+    Mlme,
+    Nan,
+};
+
+/**
+ * @brief Map of multicast group enum values to names.
+ */
+static const std::unordered_map<Nl80211MulticastGroup, std::string_view> Nl80211MulticastGroupNames{
+    { Nl80211MulticastGroup::Configuration, NL80211_MULTICAST_GROUP_CONFIG },
+    { Nl80211MulticastGroup::Scan, NL80211_MULTICAST_GROUP_SCAN },
+    { Nl80211MulticastGroup::Regulatory, NL80211_MULTICAST_GROUP_REG },
+    { Nl80211MulticastGroup::Mlme, NL80211_MULTICAST_GROUP_MLME },
+    { Nl80211MulticastGroup::Nan, NL80211_MULTICAST_GROUP_NAN },
+};
+
 /**
  * @brief Convert an nl80211_commands enum value to a string.
- * 
+ *
  * @param command The nl80211_commands enum value to convert.
  * @return std::string_view The string representation of the enum value.
  */
@@ -19,13 +39,13 @@ Nl80211CommandToString(nl80211_commands command) noexcept;
 
 /**
  * @brief Convert an nl80211_iftype enum value to a string.
- * 
+ *
  * @param type The nl80211_iftype enum value to convert.
  * @return std::string_view The string representation of the enum value.
  */
 std::string_view
 Nl80211InterfaceTypeToString(nl80211_iftype type) noexcept;
 
-} // namespace Microsoft::Net::Netlink::80211
+} // namespace Microsoft::Net::Netlink::Nl80211
 
 #endif // NETLINK_82011_HXX
