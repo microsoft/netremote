@@ -94,6 +94,18 @@
             ]
         },
         {
+            "name": "dev-windows-arm64",
+            "displayName": "Development (ARM64)",
+            "description": "Development build for inner-loop on Windows ARM64",
+            "inherits":[
+                "dev-windows"
+            ],
+            "architecture": {
+                "value": "ARM64",
+                "strategy": "set"
+            }
+        },
+        {
             "name": "release-base",
             "hidden": true,
             "inherits": [
