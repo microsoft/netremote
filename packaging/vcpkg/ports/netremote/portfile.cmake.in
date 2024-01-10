@@ -13,9 +13,10 @@ vcpkg_find_acquire_program(
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     INVERTED_FEATURES
-        no-server NETREMOTE_EXCLUDE_SERVER
-        no-tests NETREMOTE_EXCLUDE_TESTS
-        no-tools NETREMOTE_EXCLUDE_TOOLS
+        protocol NETREMOTE_EXCLUDE_PROTOCOL
+        server NETREMOTE_EXCLUDE_SERVER
+        tests NETREMOTE_EXCLUDE_TESTS
+        tools NETREMOTE_EXCLUDE_TOOLS
 )
 
 vcpkg_cmake_configure(

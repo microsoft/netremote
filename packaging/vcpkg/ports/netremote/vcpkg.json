@@ -23,28 +23,33 @@
     }
   ],
   "features": {
-    "no-server":{
-      "description": "Disable building the server",
+    "client": {
+      "description": "Enable building the client protocol",
+      "dependencies": [
+        "grpc",
+        "protobuf"
+      ]
+    },
+    "server":{
+      "description": "Enable building the server",
       "dependencies": [
         "netremote"
       ]
     },
-    "no-tests":{
-      "description": "Disable building the tests",
+    "tests":{
+      "description": "Enable building the tests",
       "dependencies": [
         "netremote"
       ]
     },
-    "no-tools":{
-      "description": "Disable building the tools",
+    "tools":{
+      "description": "Enable building the tools",
       "dependencies": [
         "netremote"
       ]
     }
   },
   "default-features": [
-    "no-server",
-    "no-tests",
-    "no-tools"
+    "protocol"
   ]
 }
