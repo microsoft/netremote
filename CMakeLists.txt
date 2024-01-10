@@ -112,7 +112,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
       -Wl,-z,relro
       -z noexecstack
     )
-    if (NOF_CODE_COVERAGE)
+    if (NETREMOTE_CODE_COVERAGE)
       add_compile_options(
         -fprofile-arcs
         -ftest-coverage
@@ -120,7 +120,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
     endif()
   # clang specific options
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    if (NOF_CODE_COVERAGE)
+    if (NETREMOTE_CODE_COVERAGE)
       add_compile_options(
         -fprofile-instr-generate
         -fcoverage-mapping
