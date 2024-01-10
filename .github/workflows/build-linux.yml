@@ -1,5 +1,5 @@
 
-name: 'Build Linux :penguin:'
+name: 'Build Linux 🐧'
 
 on: workflow_dispatch
 

@@ -1,5 +1,5 @@
 
-name: 'Build Windows :paperclip:'
+name: 'Build Windows 📎'
 
 on: 
   workflow_dispatch:
