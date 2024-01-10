@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.25)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
 option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
+option(NETREMOTE_FEATURE_PROTOCOL "Enable building the protocol library" ON)
+option(NETREMOTE_FEATURE_SERVER "Enable building the server" OFF)
+option(NETREMOTE_FEATURE_TOOLS "Enable building the tools" OFF)
 
 # vcpkg build target.
 # 
@@ -149,8 +152,11 @@ if (WERROR)
 endif()
 
 add_subdirectory(packaging)
-add_subdirectory(protocol)
 add_subdirectory(src)
+
+if (NOT NETREMOTE_VCPKG_BUILD_FOR_PORT OR NETREMOTE_FEATURE_PROTOCOL)
+  add_subdirectory(protocol)
+endif()
 
 if (NOT NETREMOTE_DISABLE_TESTS)
   add_subdirectory(tests)
