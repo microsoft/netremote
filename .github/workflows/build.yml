@@ -1,4 +1,4 @@
-name: Build [CMake]
+name: 'Build [CMake] 🛠️'
 
 on:
   workflow_dispatch:
