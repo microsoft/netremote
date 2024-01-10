@@ -1,4 +1,4 @@
-name: Build [CMake]
+name: 'Build [CMake] :hammer_and_wrench:'
 
 on:
   workflow_dispatch:
