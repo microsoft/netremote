@@ -154,7 +154,7 @@ endif()
 add_subdirectory(packaging)
 add_subdirectory(src)
 
-if (NOT NETREMOTE_VCPKG_BUILD_FOR_PORT OR NETREMOTE_FEATURE_PROTOCOL)
+if (NETREMOTE_FEATURE_PROTOCOL)
   add_subdirectory(protocol)
 endif()
 
