@@ -53,7 +53,7 @@ runs:
 
   - name: CMake Configure Cross-Compile ${{ inputs.arch }}
     if: ${{ inputs.arch }}
-    run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DNETREMOTE_DISABLE_TESTS=TRUE -A ${{ inputs.arch }}
+    run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DNETREMOTE_EXCLUDE_TESTS=TRUE -A ${{ inputs.arch }}
     shell: pwsh
 
   - name: CMake Build

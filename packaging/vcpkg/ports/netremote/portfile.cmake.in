@@ -12,16 +12,15 @@ vcpkg_find_acquire_program(
 
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
-    FEATURES
-        protocol NETREMOTE_FEATURE_PROTOCOL
-        server NETREMOTE_FEATURE_SERVER
-        tools NETREMOTE_FEATURE_TOOLS
+    INVERTED_FEATURES
+        no-server NETREMOTE_EXCLUDE_SERVER
+        no-tests NETREMOTE_EXCLUDE_TESTS
+        no-tools NETREMOTE_EXCLUDE_TOOLS
 )
 
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
-        -DNETREMOTE_DISABLE_TESTS=TRUE
         ${FEATURE_OPTIONS}
 )
 
