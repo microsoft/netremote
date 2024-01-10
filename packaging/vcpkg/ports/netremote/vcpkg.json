@@ -23,7 +23,7 @@
     }
   ],
   "features": {
-    "client": {
+    "protocol": {
       "description": "Enable building the client protocol",
       "dependencies": [
         "grpc",
