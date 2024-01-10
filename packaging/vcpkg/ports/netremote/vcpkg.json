@@ -42,5 +42,8 @@
         "netremote"
       ]
     }
-  }
+  },
+  "default-features": [
+    "protocol"
+  ]
 }
