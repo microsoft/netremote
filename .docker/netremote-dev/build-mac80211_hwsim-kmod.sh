@@ -78,7 +78,11 @@ fi
 
 # Update the configuration to build the mac80211_hwsim module and its dependencies.
 echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
-${KERNEL_CONFIG_UTIL} --module CONFIG_RFKILL --module CONFIG_CFG80211 --module CONFIG_MAC80211 --module CONFIG_MAC80211_HWSIM
+${KERNEL_CONFIG_UTIL} \
+    --module CONFIG_RFKILL \
+    --module CONFIG_CFG80211 \
+    --module CONFIG_MAC80211 \
+    --module CONFIG_MAC80211_HWSIM
 
 # Supply defaults for any new/unspecified options in the configuration.
 make olddefconfig
