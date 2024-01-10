@@ -17,4 +17,6 @@ add_compile_options(
     /bigobj
 )
 
-add_subdirectory(server)
+if (NOT NETREMOTE_EXCLUDE_SERVER)
+    add_subdirectory(server)
+endif()
