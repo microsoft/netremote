@@ -7,7 +7,7 @@
 # - https://github.com/microsoft/WSL2-Linux-Kernel#build-instructions
 #
 
-set -euxo pipefail
+set -eu -o pipefail
 
 # Determine active kernel version number.
 KERNEL_VERSION=`uname -r | grep -Eo '([0-9]+)*(\.?[0-9]+)*' | head -1`
@@ -19,19 +19,22 @@ KERNEL_FILE_NAME_SUFFIX=.tar.gz
 KERNEL_FILE_NAME=${KERNEL_FILE_NAME_STEM}${KERNEL_FILE_NAME_SUFFIX}
 KERNEL_URL_BASE=https://github.com/microsoft/WSL2-Linux-Kernel/archive/refs/tags
 KERNEL_URL_FILE=${KERNEL_URL_BASE}/${KERNEL_FILE_NAME}
-KERNEL_CONFIG_UTIL=scripts/config
 
-# WSL kernel source directory name.
+# WSL kernel source directory.
 WSL_SRC_DIRECTORY_BASE_DEFAULT=${HOME}/src
 WSL_SRC_DIRECTORY_BASE=${WSL_SRC_DIRECTORY_BASE:=${WSL_SRC_DIRECTORY_BASE_DEFAULT}}
 WSL_SRC_DIRECTORY_PREFIX=WSL2-Linux-Kernel-
-WSL_SRC_DIRECTORY=${WSL_SRC_DIRECTORY_PREFIX}${KERNEL_FILE_NAME_STEM}
+WSL_SRC_DIRECTORY_NAME=${WSL_SRC_DIRECTORY_PREFIX}${KERNEL_FILE_NAME_STEM}
+WSL_SRC_DIRECTORY=${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY_NAME}
+
+# WSL kernel configuration file.
 WSL_SRC_CONFIG_FILE_NAME=config-${KERNEL_VERSION}
 WSL_SRC_CONFIG_DIRECTORY=Microsoft
 WSL_SRC_CONFIG=${WSL_SRC_CONFIG_DIRECTORY}/${WSL_SRC_CONFIG_FILE_NAME}
 
 # WSL kernel compilation arguments.
-WSL_KERNEL_COMPILE_ARG_PARALLEL="-j $(expr $(nproc) - 1)"
+KERNEL_COMPILE_ARG_PARALLEL="-j $(expr $(nproc) - 1)"
+KERNEL_CONFIG_UTIL=${WSL_SRC_DIRECTORY}/scripts/config
 
 # Additional arguments passed to wget when downloading kernel source.
 # Mostly used for testing.
@@ -50,40 +53,38 @@ if [[ ! -d ${WSL_SRC_DIRECTORY_BASE} ]]; then
     mkdir -p ${WSL_SRC_DIRECTORY_BASE}
 fi
 
-if [[ ! -d ${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY} ]]; then
+if [[ ! -d ${WSL_SRC_DIRECTORY} ]]; then
     cd ${WSL_SRC_DIRECTORY_BASE}
-    wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzvf -
+    wget ${KERNEL_URL_FILE} ${WGET_XTRA_ARGS:+"${WGET_XTRA_ARGS}"} -O - | tar xzf -
+else
+    echo "Kernel source directory already exists, cleaning it"
+    cd ${WSL_SRC_DIRECTORY}
+    make -C ${WSL_SRC_DIRECTORY} mrproper
 fi
 
-cd ${WSL_SRC_DIRECTORY_BASE}/${WSL_SRC_DIRECTORY}
+cd ${WSL_SRC_DIRECTORY}
 
 # Prepare the kernel source with the configuration for the running kernel.
 echo "Preparing kernel source with configuration for running kernel..."
-if [[ ! -f ${WSL_SRC_CONFIG} ]]; then
-    cat /proc/config.gz | gzip -d > ${WSL_SRC_CONFIG}
+cat /proc/config.gz | gzip -d > .config
+
+echo "Preparing kernel source tree for building external modules..."
+make prepare modules_prepare ${KERNEL_COMPILE_ARG_PARALLEL}
+
+# Ensure kernel helper scripts are available.
+if [[ ! -f ${KERNEL_CONFIG_UTIL} ]]; then
+    make scripts
 fi
 
-# Create a link to where the kernel build expects the config file.
-if [[ ! -f .config ]]; then
-    ln -s ${WSL_SRC_CONFIG} .config
-fi
+# Update the configuration to build the mac80211_hwsim module and its dependencies.
+echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
+${KERNEL_CONFIG_UTIL} --module CONFIG_RFKILL --module CONFIG_CFG80211 --module CONFIG_MAC80211 --module CONFIG_MAC80211_HWSIM
 
 # Supply defaults for any new/unspecified options in the configuration.
 make olddefconfig
 
-# Update the configuration to build the mac80211_hwsim module and its dependencies.
-echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
-${KERNEL_CONFIG_UTIL} \
-    --module CONFIG_RFKILL \
-    --module CONFIG_CFG80211 \
-    --module CONFIG_MAC80211 \
-    --module CONFIG_MAC80211_HWSIM
-
-echo "Preparing kernel source tree for building external modules..."
-make prepare modules_prepare ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
-
 echo "Building kernel modules..."
-make modules ${WSL_KERNEL_COMPILE_ARG_PARALLEL}
+make modules ${KERNEL_COMPILE_ARG_PARALLEL}
 
 echo "Installing kernel modules..."
 sudo make modules_install
