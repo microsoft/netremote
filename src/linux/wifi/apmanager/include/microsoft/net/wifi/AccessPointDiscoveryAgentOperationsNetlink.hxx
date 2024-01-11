@@ -11,6 +11,7 @@
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <netlink/netlink.h>
 
@@ -105,6 +106,7 @@ private:
     };
 
     std::unordered_map<int, WifiInterfaceInfo> m_interfaceInfo;
+    Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState& m_netlink80211ProtocolState;
 };
 } // namespace Microsoft::Net::Wifi
 

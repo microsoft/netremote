@@ -28,9 +28,11 @@ using namespace Microsoft::Net::Netlink::Nl80211;
 
 using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
+using Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState;
 
 AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink() :
-    m_cookie(CookieValid)
+    m_cookie(CookieValid),
+    m_netlink80211ProtocolState(Nl80211ProtocolState::Instance())
 {}
 
 AccessPointDiscoveryAgentOperationsNetlink::~AccessPointDiscoveryAgentOperationsNetlink()
