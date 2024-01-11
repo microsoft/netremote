@@ -16,5 +16,5 @@ install(
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/hostapd.service
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
+    DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/systemd/system
 )
