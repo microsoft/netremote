@@ -6,7 +6,7 @@ After=sys-subsystem-net-devices-%i.device
 [Service]
 Type=forking
 Restart=on-failure
-ExecStart=${HOSTAP_BINARY_DIR}/hostapd -B -P /${CMAKE_INSTALL_RUNSTATEDIR}/hostapd/hostapd-%i.pid -i %i /${CMAKE_INSTALL_SYSCONFDIR}/hostapd/hostapd.conf
+ExecStart=${CMAKE_INSTALL_SBINDIR}/hostapd -B -P /${CMAKE_INSTALL_RUNSTATEDIR}/hostapd/hostapd-%i.pid -i %i /${CMAKE_INSTALL_SYSCONFDIR}/hostapd/hostapd.conf
 PIDFile=/${CMAKE_INSTALL_RUNSTATEDIR}/hostapd/hostapd.pid
 
 [Install]
