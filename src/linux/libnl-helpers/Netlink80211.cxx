@@ -413,7 +413,7 @@ Nl80211CommandToString(nl80211_commands command) noexcept
 }
 
 std::string_view
-nL80211InterfaceTypeToString(nl80211_iftype interfaceType) noexcept
+Nl80211InterfaceTypeToString(nl80211_iftype interfaceType) noexcept
 {
     switch (interfaceType) {
     case NL80211_IFTYPE_UNSPECIFIED:

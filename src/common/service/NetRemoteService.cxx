@@ -2,16 +2,44 @@
 #include <format>
 #include <iostream>
 #include <iterator>
+#include <string>
+#include <vector>
 
 #include <microsoft/net/remote/NetRemoteService.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::Service;
+using Microsoft::Net::Wifi::AccessPointManager;
+
+NetRemoteService::NetRemoteService() :
+    m_accessPointManager(AccessPointManager::Create())
+{}
 
 ::grpc::Status
-NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, [[maybe_unused]] ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response)
+NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response)
 {
+    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
+
     LOG_VERBOSE << std::format("Received WifiEnumerateAccessPoints request\n");
+
+    auto accessPoints = m_accessPointManager->GetAllAccessPoints();
+    std::vector<WifiEnumerateAccessPointsResultItem> accessPointResultItems(std::size(accessPoints));
+    std::ranges::transform(accessPoints, std::begin(accessPointResultItems), [](const auto& accessPointWeak) {
+        WifiEnumerateAccessPointsResultItem item{};
+        auto accessPoint = accessPointWeak.lock();
+        if (accessPoint != nullptr) {
+            auto interfaceName = accessPoint->GetInterface();
+            std::string accessPointId{ std::cbegin(interfaceName), std::cend(interfaceName) };
+            item.set_accesspointid(std::move(accessPointId));
+        }
+        return std::move(item);
+    });
+
+    *response->mutable_accesspoints() = {
+        std::make_move_iterator(std::begin(accessPointResultItems)),
+        std::make_move_iterator(std::end(accessPointResultItems))
+    };
 
     return grpc::Status::OK;
 }

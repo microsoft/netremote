@@ -8,12 +8,15 @@ set(WIFI_CORE_PUBLIC_INCLUDE_PREFIX ${WIFI_CORE_PUBLIC_INCLUDE}/${WIFI_CORE_PUBL
 target_sources(wifi-core
     PRIVATE
         AccessPoint.cxx
+        AccessPointController.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_PUBLIC_INCLUDE}
     FILES
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointFactory.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211.hxx
 )

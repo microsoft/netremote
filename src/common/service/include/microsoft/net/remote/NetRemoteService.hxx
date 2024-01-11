@@ -2,13 +2,20 @@
 #ifndef NET_REMOTE_SERVICE_HXX
 #define NET_REMOTE_SERVICE_HXX
 
+#include <memory>
+
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/wifi/AccessPointManager.hxx>
 
 namespace Microsoft::Net::Remote::Service
 {
 class NetRemoteService :
     public NetRemote::Service
 {
+public:
+    NetRemoteService();
+
+private:
     virtual ::grpc::Status
     WifiEnumerateAccessPoints(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;
 
@@ -21,6 +28,9 @@ class NetRemoteService :
 protected:
     bool
     ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status);
+
+private:
+    std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
 };
 } // namespace Microsoft::Net::Remote::Service
 
