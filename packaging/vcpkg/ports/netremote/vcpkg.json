@@ -21,5 +21,35 @@
       "name": "vcpkg-cmake-config",
       "host": true
     }
+  ],
+  "features": {
+    "protocol": {
+      "description": "Enable building the client protocol",
+      "dependencies": [
+        "grpc",
+        "protobuf"
+      ]
+    },
+    "server":{
+      "description": "Enable building the server",
+      "dependencies": [
+        "netremote"
+      ]
+    },
+    "tests":{
+      "description": "Enable building the tests",
+      "dependencies": [
+        "netremote"
+      ]
+    },
+    "tools":{
+      "description": "Enable building the tools",
+      "dependencies": [
+        "netremote"
+      ]
+    }
+  },
+  "default-features": [
+    "protocol"
   ]
 }

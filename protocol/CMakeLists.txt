@@ -49,8 +49,8 @@ target_sources(${PROJECT_NAME}-protocol
 target_link_libraries(${PROJECT_NAME}-protocol
     PUBLIC
         protobuf::libprotobuf
-        gRPC::grpc
-        gRPC::grpc++
+        gRPC::grpc_unsecure
+        gRPC::grpc++_unsecure
 )
 
 protobuf_generate(TARGET ${PROJECT_NAME}-protocol

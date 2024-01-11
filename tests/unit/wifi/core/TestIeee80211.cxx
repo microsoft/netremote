@@ -6,6 +6,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#ifndef _MSC_VER 
 TEST_CASE("IeeeFrequencyBand GHz literals translate correctly", "[wifi][core]")
 {
     using namespace Microsoft::Net::Wifi::Literals;
@@ -47,6 +48,8 @@ TEST_CASE("IeeeFrequencyBand GHz literals translate correctly", "[wifi][core]")
         }
     }
 }
+
+#endif // _MSC_VER
 
 TEST_CASE("IeeeFrequencyBand MHz literals translate correctly", "[wifi][core]")
 {

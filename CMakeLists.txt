@@ -5,6 +5,10 @@ cmake_minimum_required(VERSION 3.25)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(vcpkg)
 option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
+option(NETREMOTE_EXCLUDE_PROTOCOL "Disable building the protocol" OFF)
+option(NETREMOTE_EXCLUDE_SERVER "Disable building the server" OFF)
+option(NETREMOTE_EXCLUDE_TOOLS "Disable building the tools" OFF)
+option(NETREMOTE_EXCLUDE_TESTS "Disable building the tests" OFF)
 
 # vcpkg build target.
 # 
@@ -109,7 +113,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
       -Wl,-z,relro
       -z noexecstack
     )
-    if (NOF_CODE_COVERAGE)
+    if (NETREMOTE_CODE_COVERAGE)
       add_compile_options(
         -fprofile-arcs
         -ftest-coverage
@@ -117,7 +121,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
     endif()
   # clang specific options
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    if (NOF_CODE_COVERAGE)
+    if (NETREMOTE_CODE_COVERAGE)
       add_compile_options(
         -fprofile-instr-generate
         -fcoverage-mapping
@@ -149,9 +153,12 @@ if (WERROR)
 endif()
 
 add_subdirectory(packaging)
-add_subdirectory(protocol)
 add_subdirectory(src)
 
-if (NOT NETREMOTE_DISABLE_TESTS)
+if (NOT NETREMOTE_EXCLUDE_PROTOCOL)
+  add_subdirectory(protocol)
+endif()
+
+if (NOT NETREMOTE_EXCLUDE_TESTS)
   add_subdirectory(tests)
 endif()
