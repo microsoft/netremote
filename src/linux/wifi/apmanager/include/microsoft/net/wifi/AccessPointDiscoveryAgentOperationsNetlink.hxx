@@ -11,6 +11,7 @@
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <netlink/netlink.h>
 
@@ -89,9 +90,6 @@ private:
     // Cookie used to invalidate the callback context.
     static constexpr uint32_t CookieInvalid{ 0xDEADBEEFu };
 
-    int m_nl80211NetlinkId{ -1 };
-    int m_nl80211MulticastGroupIdConfig{ -1 };
-
     uint32_t m_cookie{ CookieInvalid };
     AccessPointPresenceEventCallback m_accessPointPresenceCallback{ nullptr };
 
@@ -105,6 +103,7 @@ private:
     };
 
     std::unordered_map<int, WifiInterfaceInfo> m_interfaceInfo;
+    Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState &m_netlink80211ProtocolState;
 };
 } // namespace Microsoft::Net::Wifi
 

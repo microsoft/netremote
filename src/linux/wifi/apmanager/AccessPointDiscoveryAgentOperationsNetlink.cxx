@@ -6,16 +6,15 @@
 #include <string_view>
 
 #include <linux/if.h>
-#include <linux/if_link.h>
-#include <linux/rtnetlink.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
-#include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
-#include <netlink/handlers.h>
+#include <netlink/msg.h>
+#include <netlink/netlink.h>
+#include <netlink/socket.h>
 #include <notstd/Scope.hxx>
 #include <plog/Log.h>
 #include <sys/epoll.h>
@@ -28,9 +27,11 @@ using namespace Microsoft::Net::Netlink::Nl80211;
 
 using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
+using Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState;
 
 AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink() :
-    m_cookie(CookieValid)
+    m_cookie(CookieValid),
+    m_netlink80211ProtocolState(Nl80211ProtocolState::Instance())
 {}
 
 AccessPointDiscoveryAgentOperationsNetlink::~AccessPointDiscoveryAgentOperationsNetlink()
@@ -93,29 +94,8 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
         return;
     }
 
-    // Lookup the nl80211 netlink id if not already done.
-    int nl80211NetlinkId = m_nl80211NetlinkId;
-    if (nl80211NetlinkId == -1) {
-        nl80211NetlinkId = genl_ctrl_resolve(netlinkSocket, NL80211_GENL_NAME);
-        if (nl80211NetlinkId < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {} ({})", nl80211NetlinkId, nl_geterror(nl80211NetlinkId));
-            return;
-        }
-        m_nl80211NetlinkId = nl80211NetlinkId;
-    }
-
-    // Lookup the membership id for the "config" multicast group if not already done.
-    int nl80211MulticastGroupIdConfig = m_nl80211MulticastGroupIdConfig;
-    if (nl80211MulticastGroupIdConfig == -1) {
-        nl80211MulticastGroupIdConfig = genl_ctrl_resolve_grp(netlinkSocket, NL80211_GENL_NAME, NL80211_MULTICAST_GROUP_CONFIG);
-        if (nl80211MulticastGroupIdConfig < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 multicast group id for config with error {} ({})", nl80211MulticastGroupIdConfig, nl_geterror(nl80211MulticastGroupIdConfig));
-            return;
-        }
-        m_nl80211MulticastGroupIdConfig = nl80211MulticastGroupIdConfig;
-    }
-
     // Subscribe to configuration messages.
+    int nl80211MulticastGroupIdConfig = m_netlink80211ProtocolState.MulticastGroupId[Nl80211MulticastGroup::Configuration];
     ret = nl_socket_add_membership(netlinkSocket, nl80211MulticastGroupIdConfig);
     if (ret < 0) {
         const auto err = errno;
