@@ -1,6 +1,6 @@
 
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/hostapd.conf
+    ${CMAKE_CURRENT_SOURCE_DIR}/hostapd.example.conf
     ${CMAKE_CURRENT_BINARY_DIR}/hostapd.example.conf
 )
 
@@ -11,7 +11,7 @@ configure_file(
 
 install(
     FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/hostapd.conf
+        ${CMAKE_CURRENT_BINARY_DIR}/hostapd.example.conf
     DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/hostapd
 )
 
