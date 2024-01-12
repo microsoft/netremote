@@ -5,7 +5,7 @@ Requires=hostapd.service
 [Service]
 Type=simple
 Restart=on-failure
-ExecStart=${CMAKE_INSTALL_FULL_SBINDIR}/netremote-server -d
+ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/netremote-server -d ${NETREMOTE_SERVER_XTRA_ARGS}
 
 [Install]
 WantedBy=default.target
