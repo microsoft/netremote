@@ -1,0 +1,13 @@
+[Unit]
+Description=Hostapd Daemon
+Requires=sys-subsystem-net-devices-%i.device
+After=sys-subsystem-net-devices-%i.device
+
+[Service]
+Type=forking
+Restart=on-failure
+ExecStart=${CMAKE_INSTALL_FULL_SBINDIR}/hostapd -B -P ${CMAKE_INSTALL_FULL_RUNSTATEDIR}/hostapd/hostapd-%i.pid -i %i ${CMAKE_INSTALL_FULL_SYSCONFDIR}/hostapd/hostapd-%i.conf
+PIDFile=${CMAKE_INSTALL_FULL_RUNSTATEDIR}/hostapd/hostapd-%i.pid
+
+[Install]
+WantedBy=default.target
