@@ -10,7 +10,6 @@
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 
 #include "AccessPointDiscoveryAgentOperationsTest.hxx"
-#include "AccessPointTest.hxx"
 
 using namespace Microsoft::Net::Wifi;
 using namespace std::chrono_literals;
