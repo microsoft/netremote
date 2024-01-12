@@ -1,6 +1,7 @@
 [Unit]
 Description=Netremote Daemon
-Requires=hostapd.service
+Wants=network-online.target
+After=network-online.target
 
 [Service]
 Type=simple
