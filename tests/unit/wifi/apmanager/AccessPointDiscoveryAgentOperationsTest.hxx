@@ -11,8 +11,6 @@
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 
-#include "AccessPointTest.hxx"
-
 namespace Microsoft::Net::Wifi::Test
 {
 /**

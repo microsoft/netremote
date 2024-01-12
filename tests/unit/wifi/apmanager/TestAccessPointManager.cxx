@@ -6,7 +6,6 @@
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 
 #include "AccessPointDiscoveryAgentOperationsTest.hxx"
-#include "AccessPointTest.hxx"
 
 TEST_CASE("Create an AccessPointManager instance", "[wifi][core][apmanager]")
 {
