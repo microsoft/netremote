@@ -10,7 +10,6 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <netlink/genl/genl.h>
-#include <netlink/msg.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Netlink::Nl80211;
@@ -18,7 +17,7 @@ using namespace Microsoft::Net::Netlink::Nl80211;
 using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
 
-Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index) :
+Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index) noexcept :
     Name(name),
     Type(type),
     Index(index)
@@ -33,7 +32,7 @@ Nl80211Interface::ToString() const
 
 /* static */
 std::optional<Nl80211Interface>
-Nl80211Interface::Parse(struct nl_msg *nl80211Message)
+Nl80211Interface::Parse(struct nl_msg* nl80211Message) noexcept
 {
     // Ensure the message is valid.
     if (nl80211Message == nullptr) {
