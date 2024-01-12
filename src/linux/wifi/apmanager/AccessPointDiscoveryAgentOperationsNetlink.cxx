@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <format>
@@ -8,6 +9,7 @@
 #include <linux/if.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -122,8 +124,12 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
     std::promise<std::vector<std::string>> probePromise{};
     auto probeFuture = probePromise.get_future();
 
-    // TODO: implement this.
-    std::vector<std::string> accessPoints{};
+    auto nl80211Interfaces{ Nl80211Interface::Enumerate() };
+    std::vector<std::string> accessPoints(std::size(nl80211Interfaces));
+    std::ranges::transform(nl80211Interfaces, std::begin(accessPoints), [](const auto &nl80211Interface) {
+        return nl80211Interface.Name;
+    });
+
     probePromise.set_value(std::move(accessPoints));
 
     return probeFuture;
