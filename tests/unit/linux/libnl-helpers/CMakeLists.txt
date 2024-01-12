@@ -3,6 +3,7 @@ add_executable(libnl-helpers-test-unit)
 
 target_sources(libnl-helpers-test-unit
     PRIVATE
+        TestNetlink80211Interface.cxx
         TestNetlink80211ProtocolState.cxx
 )
 
