@@ -20,13 +20,14 @@ namespace Microsoft::Net::Netlink::Nl80211
 struct Nl80211Interface
 {
     std::string Name;
-    nl80211_iftype Type{ nl80211_iftype::NL80211_IFTYPE_UNSPECIFIED};
+    nl80211_iftype Type{ nl80211_iftype::NL80211_IFTYPE_UNSPECIFIED };
     uint32_t Index;
+    uint32_t WiphyIndex;
 
     /**
      * @brief Parse a netlink message into an Nl80211Interface. The netlink message must contain a response to the
      * NL80211_CMD_GET_INTERFACE command, which is encoded as a NL80211_CMD_NEW_INTERFACE.
-     * 
+     *
      * @param nl80211Message The message to parse.
      * @return std::optional<Nl80211Interface> Will contain a valid Nl80211Interface if the message was parsed
      * successfully, otherwise has no value, indicating the message did not contain a valid NL80211_CMD_NEW_INTERFACE
@@ -37,7 +38,7 @@ struct Nl80211Interface
 
     /**
      * @brief Enumerate all netlink 802.11 interfaces on the system.
-     * 
+     *
      * @return std::vector<Nl80211Interface>
      */
     static std::vector<Nl80211Interface>
@@ -45,8 +46,8 @@ struct Nl80211Interface
 
     /**
      * @brief Convert the interface to a string representation.
-     * 
-     * @return std::string 
+     *
+     * @return std::string
      */
     std::string
     ToString() const;
@@ -54,12 +55,13 @@ struct Nl80211Interface
 private:
     /**
      * @brief Construct a new Nl80211Interface object with the specified attributes.
-     * 
+     *
      * @param name The name of the interface.
      * @param type The nl80211_iftype of the interface.
      * @param index The interface index in the kernel.
+     * @param wiphyIndex The phy interface index in the kernel.
      */
-    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index) noexcept;
+    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211
