@@ -178,13 +178,6 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         accessPointPresenceEvent = (interfaceType == NL80211_IFTYPE_AP) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
         break;
     }
-    // case NL80211_CMD_NEW_BEACON: {
-    //     break;
-    // }
-    // case NL80211_CMD_DEL_BEACON: {
-    //     interfaceIndex = static_cast<int32_t>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFINDEX]));
-    //     break;
-    // }
     default: {
         PLOG_VERBOSE << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
         return NL_SKIP;
