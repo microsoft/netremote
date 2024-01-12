@@ -83,4 +83,16 @@ set(HOSTAPD_BIN
     "hostapd daemon binary"
 )
 
+install(
+    FILES ${LIBWPA_CLIENT}
+    TYPE LIB
+)
+
+install(
+    PROGRAMS
+        ${HOSTAPD_BIN}
+    DESTINATION
+        ${CMAKE_INSTALL_SBINDIR}
+)
+
 add_subdirectory(systemd)
