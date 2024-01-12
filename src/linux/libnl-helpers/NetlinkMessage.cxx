@@ -3,6 +3,14 @@
 
 using namespace Microsoft::Net::Netlink;
 
+/* static */
+NetlinkMessage
+NetlinkMessage::Allocate()
+{
+    auto message = nlmsg_alloc();
+    return NetlinkMessage{ message };
+}
+
 NetlinkMessage::NetlinkMessage(struct nl_msg* message) :
     Message(message)
 {
