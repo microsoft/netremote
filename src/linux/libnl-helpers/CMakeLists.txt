@@ -8,6 +8,7 @@ set(LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX ${LIBNL_HELPERS_PUBLIC_INCLUDE}/${LIBNL_
 target_sources(libnl-helpers
     PRIVATE
         Netlink80211.cxx
+        Netlink80211Interface.cxx
         Netlink80211ProtocolState.cxx
         NetlinkMessage.cxx
         NetlinkSocket.cxx
@@ -18,6 +19,7 @@ target_sources(libnl-helpers
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Interface.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211ProtocolState.hxx
 )
 

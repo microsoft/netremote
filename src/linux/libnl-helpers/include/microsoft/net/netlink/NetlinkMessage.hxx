@@ -19,6 +19,14 @@ struct NetlinkMessage
     struct nl_msg* Message{ nullptr };
 
     /**
+     * @brief Allocate a new struct nl_msg, and wrap it in a NetlinkMessage.
+     *
+     * @return NetlinkMessage
+     */
+    static NetlinkMessage
+    Allocate();
+
+    /**
      * @brief Construct a new NetlinkMessage object that does not own a netlink
      * message object.
      */

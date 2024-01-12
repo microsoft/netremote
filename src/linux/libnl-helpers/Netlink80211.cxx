@@ -1,5 +1,9 @@
 
+#include <format>
+
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
+#include <netlink/genl/genl.h>
+#include <plog/Log.h>
 
 namespace Microsoft::Net::Netlink::Nl80211
 {
@@ -445,6 +449,28 @@ Nl80211InterfaceTypeToString(nl80211_iftype interfaceType) noexcept
     default:
         return "NL80211_IFTYPE_UNKNOWN";
     }
+}
+
+using Microsoft::Net::Netlink::NetlinkSocket;
+
+std::optional<NetlinkSocket>
+CreateNl80211Socket()
+{
+    // Allocate a new netlink socket.
+    auto netlinkSocket{ NetlinkSocket::Allocate() };
+    if (netlinkSocket == nullptr) {
+        LOGE << "Failed to allocate new netlink socket for nl control";
+        return std::nullopt;
+    }
+
+    // Connect the socket to the generic netlink family.
+    int ret = genl_connect(netlinkSocket);
+    if (ret < 0) {
+        LOGE << std::format("Failed to connect netlink socket for nl control with error {} ({})", ret, nl_geterror(ret));
+        return std::nullopt;
+    }
+
+    return std::move(netlinkSocket);
 }
 
 } // namespace Microsoft::Net::Netlink::Nl80211

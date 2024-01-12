@@ -26,9 +26,6 @@ struct NetlinkSocket
     static NetlinkSocket
     Allocate();
 
-    static NetlinkSocket
-    Create();
-
     /**
      * @brief Construct a default NetlinkSocket object that does not own a
      * netlink socket object.

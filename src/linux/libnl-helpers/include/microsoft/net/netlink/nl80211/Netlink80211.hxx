@@ -2,10 +2,12 @@
 #ifndef NETLINK_82011_HXX
 #define NETLINK_82011_HXX
 
+#include <optional>
 #include <string_view>
 #include <unordered_map>
 
 #include <linux/nl80211.h>
+#include <microsoft/net/netlink/NetlinkSocket.hxx>
 
 namespace Microsoft::Net::Netlink::Nl80211
 {
@@ -45,6 +47,16 @@ Nl80211CommandToString(nl80211_commands command) noexcept;
  */
 std::string_view
 Nl80211InterfaceTypeToString(nl80211_iftype type) noexcept;
+
+/**
+ * @brief Create a netlink socket for use with Nl80211.
+ *
+ * This creates a netlink socket and connects it to the nl80211 generic netlink family.
+ *
+ * @return std::optional<Microsoft::Net::Netlink::NetlinkSocket>
+ */
+std::optional<Microsoft::Net::Netlink::NetlinkSocket>
+CreateNl80211Socket();
 
 } // namespace Microsoft::Net::Netlink::Nl80211
 

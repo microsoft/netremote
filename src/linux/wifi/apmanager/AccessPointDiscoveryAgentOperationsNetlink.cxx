@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <format>
@@ -8,6 +9,7 @@
 #include <linux/if.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -79,24 +81,18 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
 
     // TODO: This function needs to signal errors either through its return type, or an exception.
 
-    // Allocate a new netlink socket.
-    auto netlinkSocket{ NetlinkSocket::Allocate() };
-    if (netlinkSocket == nullptr) {
+    // Allocate a new netlink socket for use with nl80211.
+    auto nl80211SocketOpt{ CreateNl80211Socket() };
+    if (nl80211SocketOpt == nullptr) {
         LOG_ERROR << "Failed to allocate new netlink socket for nl control";
         return;
     }
 
-    // Connect the socket to the generic netlink family.
-    int ret = genl_connect(netlinkSocket);
-    if (ret < 0) {
-        const auto err = errno;
-        LOG_ERROR << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err));
-        return;
-    }
+    auto nl80211Socket{ std::move(nl80211SocketOpt.value()) };
 
     // Subscribe to configuration messages.
     int nl80211MulticastGroupIdConfig = m_netlink80211ProtocolState.MulticastGroupId[Nl80211MulticastGroup::Configuration];
-    ret = nl_socket_add_membership(netlinkSocket, nl80211MulticastGroupIdConfig);
+    int ret = nl_socket_add_membership(nl80211Socket, nl80211MulticastGroupIdConfig);
     if (ret < 0) {
         const auto err = errno;
         LOG_ERROR << std::format("Failed to add netlink socket membership for '" NL80211_MULTICAST_GROUP_CONFIG "' group with error {} ({})", err, strerror(err));
@@ -106,7 +102,7 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     // Update the access point presence callback for the netlink message handler to use.
     // Note: This is not thread-safe.
     m_accessPointPresenceCallback = std::move(accessPointPresenceEventCallback);
-    m_netlinkMessageProcessingThread = std::jthread([this, netlinkSocket = std::move(netlinkSocket)](std::stop_token stopToken) mutable {
+    m_netlinkMessageProcessingThread = std::jthread([this, netlinkSocket = std::move(nl80211Socket)](std::stop_token stopToken) mutable {
         ProcessNetlinkMessagesThread(std::move(netlinkSocket), std::move(stopToken));
     });
 }
@@ -128,8 +124,12 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
     std::promise<std::vector<std::string>> probePromise{};
     auto probeFuture = probePromise.get_future();
 
-    // TODO: implement this.
-    std::vector<std::string> accessPoints{};
+    auto nl80211Interfaces{ Nl80211Interface::Enumerate() };
+    std::vector<std::string> accessPoints(std::size(nl80211Interfaces));
+    std::ranges::transform(nl80211Interfaces, std::begin(accessPoints), [](const auto &nl80211Interface) {
+        return nl80211Interface.Name;
+    });
+
     probePromise.set_value(std::move(accessPoints));
 
     return probeFuture;
@@ -184,13 +184,6 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         accessPointPresenceEvent = (interfaceType == NL80211_IFTYPE_AP) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
         break;
     }
-    // case NL80211_CMD_NEW_BEACON: {
-    //     break;
-    // }
-    // case NL80211_CMD_DEL_BEACON: {
-    //     interfaceIndex = static_cast<int32_t>(nla_get_u32(netlinkMessageAttributes[NL80211_ATTR_IFINDEX]));
-    //     break;
-    // }
     default: {
         PLOG_VERBOSE << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
         return NL_SKIP;
