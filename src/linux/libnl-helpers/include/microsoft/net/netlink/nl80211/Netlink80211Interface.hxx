@@ -12,6 +12,8 @@
 #include <linux/nl80211.h>
 #include <netlink/msg.h>
 
+#include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
+
 namespace Microsoft::Net::Netlink::Nl80211
 {
 /**
@@ -43,6 +45,14 @@ struct Nl80211Interface
      */
     static std::vector<Nl80211Interface>
     Enumerate();
+
+    /**
+     * @brief Get the Wiphy (PHY) object associated with this interface.
+     * 
+     * @return std::optional<Nl80211Wiphy> 
+     */
+    std::optional<Nl80211Wiphy>
+    GetWiphy() const;
 
     /**
      * @brief Convert the interface to a string representation.

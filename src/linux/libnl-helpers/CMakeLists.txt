@@ -10,6 +10,7 @@ target_sources(libnl-helpers
         Netlink80211.cxx
         Netlink80211Interface.cxx
         Netlink80211ProtocolState.cxx
+        Netlink80211Wiphy.cxx
         NetlinkMessage.cxx
         NetlinkSocket.cxx
     PUBLIC
@@ -21,6 +22,7 @@ target_sources(libnl-helpers
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Interface.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211ProtocolState.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Wiphy.hxx
 )
 
 target_link_libraries(libnl-helpers
