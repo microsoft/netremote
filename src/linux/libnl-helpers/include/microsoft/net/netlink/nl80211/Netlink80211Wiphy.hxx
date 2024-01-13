@@ -6,6 +6,8 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <vector>
 
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
@@ -14,12 +16,28 @@
 namespace Microsoft::Net::Netlink::Nl80211
 {
 /**
+ * @brief Represents a netlink 802.11 wiphy radio band and its properties.
+ * TODO: move to own file.
+ */
+struct Nl80211WiphyBand
+{
+    bool SupportsRoaming;
+
+    Nl80211WiphyBand(bool supportsRoaming) noexcept;
+
+    std::string
+    ToString() const;
+};
+
+/**
  * @brief Represents a netlink 802.11 wiphy.
  */
 struct Nl80211Wiphy
 {
     uint32_t Index;
     std::string Name;
+    std::vector<uint32_t> CipherSuites;
+    std::unordered_map<nl80211_band, Nl80211WiphyBand> Bands;
 
     /**
      * @brief Creates a new Nl80211Wiphy object from the specified wiphy index.
@@ -56,7 +74,7 @@ private:
      * @param index The wiphy index.
      * @param name The wiphy name.
      */
-    Nl80211Wiphy(uint32_t index, std::string_view name) noexcept;
+    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands) noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211
