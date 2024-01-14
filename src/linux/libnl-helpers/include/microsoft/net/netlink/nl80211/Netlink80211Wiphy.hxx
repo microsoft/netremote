@@ -27,6 +27,7 @@ struct Nl80211Wiphy
     std::string Name;
     std::vector<uint32_t> CipherSuites;
     std::unordered_map<nl80211_band, Nl80211WiphyBand> Bands;
+    std::vector<nl80211_iftype> SupportedInterfaceTypes;
     bool SupportsRoaming;
 
     /**
@@ -64,7 +65,7 @@ private:
      * @param index The wiphy index.
      * @param name The wiphy name.
      */
-    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, bool supportsRoaming) noexcept;
+    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211

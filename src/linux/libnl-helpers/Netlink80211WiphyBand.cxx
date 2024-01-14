@@ -37,7 +37,6 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
 
     std::vector<WiphyBandFrequency> frequencies{};
     if (wiphyBandAttributes[NL80211_BAND_ATTR_FREQS] != nullptr) {
-        LOGD << "Parsing frequencies ..";
         struct nlattr *wiphyBandFrequency;
         int remainingBandFrequencies;
         nla_for_each_nested(wiphyBandFrequency, wiphyBandAttributes[NL80211_BAND_ATTR_FREQS], remainingBandFrequencies)
