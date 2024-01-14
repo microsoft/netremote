@@ -14,9 +14,6 @@
 #include <netlink/genl/genl.h>
 #include <plog/Log.h>
 
-#include "ieee80211.h"
-#include <stdio.h>
-
 using namespace Microsoft::Net::Netlink::Nl80211;
 
 WiphyBandFrequency::WiphyBandFrequency(uint32_t frequency, std::optional<uint32_t> frequencyOffset, bool isDisabled) noexcept :

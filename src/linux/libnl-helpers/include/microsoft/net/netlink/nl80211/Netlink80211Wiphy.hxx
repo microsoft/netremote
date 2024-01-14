@@ -13,44 +13,10 @@
 #include <linux/nl80211.h>
 #include <netlink/msg.h>
 
+#include <microsoft/net/netlink/nl80211/Netlink80211WiphyBand.hxx>
+
 namespace Microsoft::Net::Netlink::Nl80211
 {
-struct WiphyBandFrequency
-{
-    uint32_t Frequency;
-    std::optional<uint32_t> FrequencyOffset;
-    bool IsDisabled;
-
-    static std::optional<WiphyBandFrequency>
-    Parse(struct nlattr* wiphyBandFrequency) noexcept;
-
-    std::string
-    ToString() const;
-
-private:
-    WiphyBandFrequency(uint32_t frequency, std::optional<uint32_t> frequencyOffset, bool isDisabled) noexcept;
-};
-
-/**
- * @brief Represents a netlink 802.11 wiphy radio band and its properties.
- * TODO: move to own file.
- */
-struct Nl80211WiphyBand
-{
-    std::vector<WiphyBandFrequency> Frequencies;
-    std::vector<uint32_t> Bitrates;
-    uint16_t HtCapabilities;
-
-    std::string
-    ToString() const;
-
-    static std::optional<Nl80211WiphyBand>
-    Parse(struct nlattr* wiphyBand) noexcept;
-
-private:
-    Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, std::vector<uint32_t> bitRates, uint16_t htCapabilities) noexcept;
-};
-
 /**
  * @brief Represents a netlink 802.11 wiphy.
  */

@@ -13,6 +13,8 @@ target_sources(libnl-helpers
         Netlink80211Wiphy.cxx
         NetlinkMessage.cxx
         NetlinkSocket.cxx
+        Netlink80211WiphyBand.cxx
+        Netlink80211WiphyBandFrequency.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${LIBNL_HELPERS_PUBLIC_INCLUDE}
