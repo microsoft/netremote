@@ -15,18 +15,40 @@
 
 namespace Microsoft::Net::Netlink::Nl80211
 {
+struct WiphyBandFrequency
+{
+    uint32_t Frequency;
+    std::optional<uint32_t> FrequencyOffset;
+    bool IsDisabled;
+
+    static std::optional<WiphyBandFrequency>
+    Parse(struct nlattr* wiphyBandFrequency) noexcept;
+
+    std::string
+    ToString() const;
+
+private:
+    WiphyBandFrequency(uint32_t frequency, std::optional<uint32_t> frequencyOffset, bool isDisabled) noexcept;
+};
+
 /**
  * @brief Represents a netlink 802.11 wiphy radio band and its properties.
  * TODO: move to own file.
  */
 struct Nl80211WiphyBand
 {
-    bool SupportsRoaming;
-
-    Nl80211WiphyBand(bool supportsRoaming) noexcept;
+    std::vector<WiphyBandFrequency> Frequencies;
+    std::vector<uint32_t> Bitrates;
+    uint16_t HtCapabilities;
 
     std::string
     ToString() const;
+
+    static std::optional<Nl80211WiphyBand>
+    Parse(struct nlattr* wiphyBand) noexcept;
+
+private:
+    Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, std::vector<uint32_t> bitRates, uint16_t htCapabilities) noexcept;
 };
 
 /**
@@ -38,6 +60,7 @@ struct Nl80211Wiphy
     std::string Name;
     std::vector<uint32_t> CipherSuites;
     std::unordered_map<nl80211_band, Nl80211WiphyBand> Bands;
+    bool SupportsRoaming;
 
     /**
      * @brief Creates a new Nl80211Wiphy object from the specified wiphy index.
@@ -74,7 +97,7 @@ private:
      * @param index The wiphy index.
      * @param name The wiphy name.
      */
-    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands) noexcept;
+    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, bool supportsRoaming) noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211
