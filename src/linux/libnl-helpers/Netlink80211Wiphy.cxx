@@ -16,133 +16,6 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
-WiphyBandFrequency::WiphyBandFrequency(uint32_t frequency, std::optional<uint32_t> frequencyOffset, bool isDisabled) noexcept :
-    Frequency(frequency),
-    FrequencyOffset(frequencyOffset),
-    IsDisabled(isDisabled)
-{
-}
-
-std::string
-WiphyBandFrequency::ToString() const
-{
-    std::ostringstream ss;
-    ss << std::format("{}.{} MHz", Frequency, FrequencyOffset.value_or(0));
-    if (IsDisabled) {
-        ss << " (disabled)";
-    }
-
-    return ss.str();
-}
-
-/* static */
-std::optional<WiphyBandFrequency>
-WiphyBandFrequency::Parse(struct nlattr *wiphyBandFrequencyNlAttribute) noexcept
-{
-    // Parse the attribute message.
-    std::array<struct nlattr *, NL80211_FREQUENCY_ATTR_MAX + 1> wiphyBandFrequenciesAttributes{};
-    int ret = nla_parse(std::data(wiphyBandFrequenciesAttributes), std::size(wiphyBandFrequenciesAttributes), static_cast<struct nlattr *>(nla_data(wiphyBandFrequencyNlAttribute)), nla_len(wiphyBandFrequencyNlAttribute), nullptr);
-    if (ret < 0) {
-        LOGE << std::format("Failed to parse wiphy band frequency attributes with error {} ({})", ret, nl_geterror(ret));
-        return std::nullopt;
-    }
-
-    if (wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_FREQ] == nullptr) {
-        LOGW << "Received null wiphy band frequency";
-        return std::nullopt;
-    }
-
-    auto isDisabled = wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_DISABLED] != nullptr;
-    auto frequency = static_cast<uint32_t>(nla_get_u32(wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_FREQ]));
-    std::optional<uint32_t> frequencyOffset{};
-    if (wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_OFFSET] != nullptr) {
-        frequencyOffset = static_cast<uint32_t>(nla_get_u32(wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_OFFSET]));
-    }
-
-    WiphyBandFrequency wiphyBandFrequency{ frequency, frequencyOffset, isDisabled };
-    return wiphyBandFrequency;
-}
-
-Nl80211WiphyBand::Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, std::vector<uint32_t> bitRates, uint16_t htCapabilities) noexcept :
-    Frequencies(std::move(frequencies)),
-    Bitrates(std::move(bitRates)),
-    HtCapabilities(htCapabilities)
-{
-}
-
-std::string
-Nl80211WiphyBand::ToString() const
-{
-    std::ostringstream ss;
-
-    ss << "   HT Capabilities: " << std::format("0x{:04x}\n", HtCapabilities);
-    ss << "   Frequencies:\n";
-    for (const auto &frequency : Frequencies) {
-        ss << std::format("    {}\n", frequency.ToString());
-    }
-    ss << "   Bitrates:\n";
-    for (const auto bitRate : Bitrates) {
-        ss << std::format("    {:2.1f} Mbps\n", 0.1 * bitRate);
-    }
-
-    return ss.str();
-}
-
-/* static */
-std::optional<Nl80211WiphyBand>
-Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
-{
-    // Parse the attribute message.
-    std::array<struct nlattr *, NL80211_BAND_ATTR_MAX + 1> wiphyBandAttributes{};
-    int ret = nla_parse(std::data(wiphyBandAttributes), std::size(wiphyBandAttributes), static_cast<struct nlattr *>(nla_data(wiphyBand)), nla_len(wiphyBand), nullptr);
-    if (ret < 0) {
-        LOGE << std::format("Failed to parse wiphy band attributes with error {} ({})", ret, nl_geterror(ret));
-        return std::nullopt;
-    }
-
-    uint16_t htCapabilities{ 0 };
-    if (wiphyBandAttributes[NL80211_BAND_ATTR_HT_CAPA] != nullptr) {
-        htCapabilities = nla_get_u16(wiphyBandAttributes[NL80211_BAND_ATTR_HT_CAPA]);
-    }
-
-    std::vector<WiphyBandFrequency> frequencies{};
-    if (wiphyBandAttributes[NL80211_BAND_ATTR_FREQS] != nullptr) {
-        LOGD << "Parsing frequencies ..";
-        struct nlattr *wiphyBandFrequency;
-        int remainingBandFrequencies;
-        nla_for_each_nested(wiphyBandFrequency, wiphyBandAttributes[NL80211_BAND_ATTR_FREQS], remainingBandFrequencies)
-        {
-            auto frequency = WiphyBandFrequency::Parse(wiphyBandFrequency);
-            if (frequency.has_value()) {
-                frequencies.emplace_back(std::move(frequency.value()));
-            }
-        }
-    } else {
-        LOGW << "No frequencies for band";
-    }
-
-    std::vector<uint32_t> bitRates{};
-    if (wiphyBandAttributes[NL80211_BAND_ATTR_RATES] != nullptr) {
-        int remainingBitRates;
-        struct nlattr *bitRate;
-        nla_for_each_nested(bitRate, wiphyBandAttributes[NL80211_BAND_ATTR_RATES], remainingBitRates) {
-            std::array<struct nlattr *, NL80211_BITRATE_ATTR_MAX + 1> bitRateAttributes{};
-            ret = nla_parse(std::data(bitRateAttributes), std::size(bitRateAttributes), static_cast<struct nlattr *>(nla_data(bitRate)), nla_len(bitRate), nullptr);
-            if (ret < 0) {
-                LOGW << std::format("Failed to parse wiphy band bit rate attributes with error {} ({})", ret, nl_geterror(ret));
-                return std::nullopt;
-            } else if (bitRateAttributes[NL80211_BITRATE_ATTR_RATE] == nullptr) {
-                continue;
-            }
-
-            auto bitRateValue = static_cast<uint32_t>(nla_get_u32(bitRateAttributes[NL80211_BITRATE_ATTR_RATE]));
-            bitRates.emplace_back(bitRateValue);
-        }
-    }
-
-    return Nl80211WiphyBand(std::move(frequencies), std::move(bitRates), htCapabilities);
-}
-
 Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, bool supportsRoaming) noexcept :
     Index(index),
     Name(name),
@@ -150,94 +23,6 @@ Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<ui
     Bands(std::move(bands)),
     SupportsRoaming(supportsRoaming)
 {
-}
-
-std::string
-Nl80211Wiphy::ToString() const
-{
-    std::ostringstream ss;
-
-    ss << std::format("[{}] {}\n", Index, Name);
-    ss << std::format(" Supports roaming: {}\n", SupportsRoaming);
-
-    ss << " Cipher Suites:\n  ";
-    for (const auto &cipherSuite : CipherSuites) {
-        ss << std::format("{:x} ", cipherSuite);
-    }
-
-    ss << "\n Bands:\n";
-    for (const auto &[band, wiphyBand] : Bands) {
-        ss << std::format("  {}:\n{}\n", magic_enum::enum_name(band), wiphyBand.ToString());
-    }
-
-    return ss.str();
-}
-
-/* static */
-std::optional<Nl80211Wiphy>
-Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
-{
-    // Ensure the message is valid.
-    if (nl80211Message == nullptr) {
-        LOGE << "Received null nl80211 message";
-        return std::nullopt;
-    }
-
-    // Ensure the message has a valid genl header.
-    auto *nl80211MessageHeader{ static_cast<struct nlmsghdr *>(nlmsg_hdr(nl80211Message)) };
-    if (genlmsg_valid_hdr(nl80211MessageHeader, 1) < 0) {
-        LOGE << "Received invalid nl80211 message header";
-        return std::nullopt;
-    }
-
-    // Extract the nl80211 (genl) message header.
-    const auto *genl80211MessageHeader{ static_cast<struct genlmsghdr *>(nlmsg_data(nl80211MessageHeader)) };
-
-    // Parse the message.
-    std::array<struct nlattr *, NL80211_ATTR_MAX + 1> wiphyAttributes{};
-    int ret = nla_parse(std::data(wiphyAttributes), std::size(wiphyAttributes), genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
-    if (ret < 0) {
-        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
-        return std::nullopt;
-    }
-
-    // Tease out parameters to populate the Nl80211Wiphy instance.
-    auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(wiphyAttributes[NL80211_ATTR_WIPHY]));
-    auto wiphyName = static_cast<const char *>(nla_data(wiphyAttributes[NL80211_ATTR_WIPHY_NAME]));
-    auto wiphyNumCipherSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES])) / sizeof(uint32_t);
-    auto *wiphyCipherSuites = static_cast<uint32_t *>(nla_data(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES]));
-    auto wiphySupportsRoaming = wiphyAttributes[NL80211_ATTR_ROAM_SUPPORT] != nullptr;
-    auto wiphyBands = wiphyAttributes[NL80211_ATTR_WIPHY_BANDS];
-
-    // Process bands.
-    std::unordered_map<nl80211_band, Nl80211WiphyBand> wiphyBandMap{};
-
-    if (wiphyBands != nullptr) {
-        int remainingBands;
-        struct nlattr *wiphyBand;
-
-        nla_for_each_nested(wiphyBand, wiphyBands, remainingBands)
-        {
-            auto nl80211BandType = static_cast<nl80211_band>(wiphyBand->nla_type);
-            if (nl80211BandType == nl80211_band::NUM_NL80211_BANDS) {
-                continue;
-            }
-
-            LOGD << std::format("processing band {}", magic_enum::enum_name(nl80211BandType));
-            auto nl80211Band = Nl80211WiphyBand::Parse(wiphyBand);
-            if (nl80211Band.has_value()) {
-                wiphyBandMap.emplace(nl80211BandType, std::move(nl80211Band.value()));
-            }
-        }
-    } else {
-        LOGW << "No wiphy bands";
-    }
-
-    // Process cipher suites.
-    std::vector<uint32_t> cipherSuites(wiphyCipherSuites, wiphyCipherSuites + wiphyNumCipherSuites);
-    Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(cipherSuites), std::move(wiphyBandMap), wiphySupportsRoaming };
-
-    return nl80211Wiphy;
 }
 
 namespace detail
@@ -318,4 +103,92 @@ Nl80211Wiphy::FromIndex(uint32_t wiphyIndex)
     }
 
     return nl80211Wiphy;
+}
+
+/* static */
+std::optional<Nl80211Wiphy>
+Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
+{
+    // Ensure the message is valid.
+    if (nl80211Message == nullptr) {
+        LOGE << "Received null nl80211 message";
+        return std::nullopt;
+    }
+
+    // Ensure the message has a valid genl header.
+    auto *nl80211MessageHeader{ static_cast<struct nlmsghdr *>(nlmsg_hdr(nl80211Message)) };
+    if (genlmsg_valid_hdr(nl80211MessageHeader, 1) < 0) {
+        LOGE << "Received invalid nl80211 message header";
+        return std::nullopt;
+    }
+
+    // Extract the nl80211 (genl) message header.
+    const auto *genl80211MessageHeader{ static_cast<struct genlmsghdr *>(nlmsg_data(nl80211MessageHeader)) };
+
+    // Parse the message.
+    std::array<struct nlattr *, NL80211_ATTR_MAX + 1> wiphyAttributes{};
+    int ret = nla_parse(std::data(wiphyAttributes), std::size(wiphyAttributes), genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
+    if (ret < 0) {
+        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        return std::nullopt;
+    }
+
+    // Tease out parameters to populate the Nl80211Wiphy instance.
+    auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(wiphyAttributes[NL80211_ATTR_WIPHY]));
+    auto wiphyName = static_cast<const char *>(nla_data(wiphyAttributes[NL80211_ATTR_WIPHY_NAME]));
+    auto wiphyNumCipherSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES])) / sizeof(uint32_t);
+    auto *wiphyCipherSuites = static_cast<uint32_t *>(nla_data(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES]));
+    auto wiphySupportsRoaming = wiphyAttributes[NL80211_ATTR_ROAM_SUPPORT] != nullptr;
+    auto wiphyBands = wiphyAttributes[NL80211_ATTR_WIPHY_BANDS];
+
+    // Process bands.
+    std::unordered_map<nl80211_band, Nl80211WiphyBand> wiphyBandMap{};
+
+    if (wiphyBands != nullptr) {
+        int remainingBands;
+        struct nlattr *wiphyBand;
+
+        nla_for_each_nested(wiphyBand, wiphyBands, remainingBands)
+        {
+            auto nl80211BandType = static_cast<nl80211_band>(wiphyBand->nla_type);
+            if (nl80211BandType == nl80211_band::NUM_NL80211_BANDS) {
+                continue;
+            }
+
+            LOGD << std::format("processing band {}", magic_enum::enum_name(nl80211BandType));
+            auto nl80211Band = Nl80211WiphyBand::Parse(wiphyBand);
+            if (nl80211Band.has_value()) {
+                wiphyBandMap.emplace(nl80211BandType, std::move(nl80211Band.value()));
+            }
+        }
+    } else {
+        LOGW << "No wiphy bands";
+    }
+
+    // Process cipher suites.
+    std::vector<uint32_t> cipherSuites(wiphyCipherSuites, wiphyCipherSuites + wiphyNumCipherSuites);
+    Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(cipherSuites), std::move(wiphyBandMap), wiphySupportsRoaming };
+
+    return nl80211Wiphy;
+}
+
+std::string
+Nl80211Wiphy::ToString() const
+{
+    std::ostringstream ss;
+
+    ss << std::format("[{}] {}\n", Index, Name);
+    ss << std::format(" Supports roaming: {}\n", SupportsRoaming);
+
+    ss << " Cipher Suites:\n  ";
+    for (const auto &cipherSuite : CipherSuites) {
+        ss << std::format("{:x} ", cipherSuite);
+    }
+
+    ss << "\n Bands:\n";
+    for (const auto &[band, wiphyBand] : Bands) {
+        ss << std::format("  {}:\n{}\n", magic_enum::enum_name(band), wiphyBand.ToString());
+    }
+
+    return ss.str();
 }

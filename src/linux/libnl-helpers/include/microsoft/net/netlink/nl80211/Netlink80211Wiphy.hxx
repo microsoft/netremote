@@ -18,7 +18,8 @@
 namespace Microsoft::Net::Netlink::Nl80211
 {
 /**
- * @brief Represents a netlink 802.11 wiphy.
+ * @brief Represents a netlink 802.11 wiphy. This is the interface to the physical radio and describes raw capabilities
+ * of the device, irrespective of how the device is being used (eg. in userspace via hostapd, etc.).
  */
 struct Nl80211Wiphy
 {

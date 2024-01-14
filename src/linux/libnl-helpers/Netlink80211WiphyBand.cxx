@@ -18,24 +18,6 @@ Nl80211WiphyBand::Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, 
 {
 }
 
-std::string
-Nl80211WiphyBand::ToString() const
-{
-    std::ostringstream ss;
-
-    ss << "   HT Capabilities: " << std::format("0x{:04x}\n", HtCapabilities);
-    ss << "   Frequencies:\n";
-    for (const auto &frequency : Frequencies) {
-        ss << std::format("    {}\n", frequency.ToString());
-    }
-    ss << "   Bitrates:\n";
-    for (const auto bitRate : Bitrates) {
-        ss << std::format("    {:2.1f} Mbps\n", 0.1 * bitRate);
-    }
-
-    return ss.str();
-}
-
 /* static */
 std::optional<Nl80211WiphyBand>
 Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
@@ -73,7 +55,8 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
     if (wiphyBandAttributes[NL80211_BAND_ATTR_RATES] != nullptr) {
         int remainingBitRates;
         struct nlattr *bitRate;
-        nla_for_each_nested(bitRate, wiphyBandAttributes[NL80211_BAND_ATTR_RATES], remainingBitRates) {
+        nla_for_each_nested(bitRate, wiphyBandAttributes[NL80211_BAND_ATTR_RATES], remainingBitRates)
+        {
             std::array<struct nlattr *, NL80211_BITRATE_ATTR_MAX + 1> bitRateAttributes{};
             ret = nla_parse(std::data(bitRateAttributes), std::size(bitRateAttributes), static_cast<struct nlattr *>(nla_data(bitRate)), nla_len(bitRate), nullptr);
             if (ret < 0) {
@@ -89,4 +72,22 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
     }
 
     return Nl80211WiphyBand(std::move(frequencies), std::move(bitRates), htCapabilities);
+}
+
+std::string
+Nl80211WiphyBand::ToString() const
+{
+    std::ostringstream ss;
+
+    ss << "   HT Capabilities: " << std::format("0x{:04x}\n", HtCapabilities);
+    ss << "   Frequencies:\n";
+    for (const auto &frequency : Frequencies) {
+        ss << std::format("    {}\n", frequency.ToString());
+    }
+    ss << "   Bitrates:\n";
+    for (const auto bitRate : Bitrates) {
+        ss << std::format("    {:2.1f} Mbps\n", BitRateUnitMbpsMultiplier * bitRate);
+    }
+
+    return ss.str();
 }

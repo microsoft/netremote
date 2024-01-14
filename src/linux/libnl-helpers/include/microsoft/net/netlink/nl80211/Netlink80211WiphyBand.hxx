@@ -24,29 +24,35 @@ struct Nl80211WiphyBand
     uint16_t HtCapabilities;
 
     /**
-     * @brief 
-     * 
-     * @return std::string 
-     */
-    std::string
-    ToString() const;
-
-    /**
-     * @brief 
-     * 
-     * @param wiphyBand 
-     * @return std::optional<Nl80211WiphyBand> 
+     * @brief Parses a netlink attribute into a Nl80211WiphyBand.
+     *
+     * @param wiphyBand The netlink attribute to parse.
+     * @return std::optional<Nl80211WiphyBand>
      */
     static std::optional<Nl80211WiphyBand>
     Parse(struct nlattr* wiphyBand) noexcept;
 
+    /**
+     * @brief Convert the wiphy band to a string representation.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
+
+private:
+    /**
+     * @brief The value to multiply the bitrate by to get the actual bitrate in Mbps.
+     */
+    static constexpr auto BitRateUnitMbpsMultiplier = 0.1;
+
 private:
     /**
      * @brief Construct a new Nl80211WiphyBand object.
-     * 
-     * @param frequencies 
-     * @param bitRates 
-     * @param htCapabilities 
+     *
+     * @param frequencies The frequencies supported by this band.
+     * @param bitRates The bitrates supported by this band.
+     * @param htCapabilities The high-throughput ('HT' aka 802.11n) capabilities of this band.
      */
     Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, std::vector<uint32_t> bitRates, uint16_t htCapabilities) noexcept;
 };

@@ -18,18 +18,6 @@ WiphyBandFrequency::WiphyBandFrequency(uint32_t frequency, std::optional<uint32_
 {
 }
 
-std::string
-WiphyBandFrequency::ToString() const
-{
-    std::ostringstream ss;
-    ss << std::format("{}.{} MHz", Frequency, FrequencyOffset.value_or(0));
-    if (IsDisabled) {
-        ss << " (disabled)";
-    }
-
-    return ss.str();
-}
-
 /* static */
 std::optional<WiphyBandFrequency>
 WiphyBandFrequency::Parse(struct nlattr *wiphyBandFrequencyNlAttribute) noexcept
@@ -56,4 +44,16 @@ WiphyBandFrequency::Parse(struct nlattr *wiphyBandFrequencyNlAttribute) noexcept
 
     WiphyBandFrequency wiphyBandFrequency{ frequency, frequencyOffset, isDisabled };
     return wiphyBandFrequency;
+}
+
+std::string
+WiphyBandFrequency::ToString() const
+{
+    std::ostringstream ss;
+    ss << std::format("{}.{} MHz", Frequency, FrequencyOffset.value_or(0));
+    if (IsDisabled) {
+        ss << " (disabled)";
+    }
+
+    return ss.str();
 }
