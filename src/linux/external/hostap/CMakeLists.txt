@@ -83,6 +83,12 @@ set(HOSTAPD_BIN
     "hostapd daemon binary"
 )
 
+set(HOSTAPD_CLI_BIN
+    ${HOSTAP_INSTALL_BIN_DIR}/hostapd_cli
+    CACHE FILEPATH    
+    "hostapd_cli binary"
+)
+
 install(
     FILES ${LIBWPA_CLIENT}
     TYPE LIB
@@ -91,6 +97,7 @@ install(
 install(
     PROGRAMS
         ${HOSTAPD_BIN}
+        ${HOSTAPD_CLI_BIN}
     DESTINATION
         ${CMAKE_INSTALL_SBINDIR}
 )

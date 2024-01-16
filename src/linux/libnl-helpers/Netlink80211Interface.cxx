@@ -17,22 +17,23 @@ using namespace Microsoft::Net::Netlink::Nl80211;
 using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
 
-Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index) noexcept :
+Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
     Name(name),
     Type(type),
-    Index(index)
+    Index(index),
+    WiphyIndex(wiphyIndex)
 {
 }
 
 std::string
 Nl80211Interface::ToString() const
 {
-    return std::format("[{}] {} {}", Index, Name, magic_enum::enum_name(Type));
+    return std::format("[{}/{}] {} {}", Index, WiphyIndex, Name, magic_enum::enum_name(Type));
 }
 
 /* static */
 std::optional<Nl80211Interface>
-Nl80211Interface::Parse(struct nl_msg* nl80211Message) noexcept
+Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
 {
     // Ensure the message is valid.
     if (nl80211Message == nullptr) {
@@ -62,18 +63,19 @@ Nl80211Interface::Parse(struct nl_msg* nl80211Message) noexcept
     auto *interfaceName = static_cast<const char *>(nla_data(newInterfaceMessageAttributes[NL80211_ATTR_IFNAME]));
     auto interfaceType = static_cast<nl80211_iftype>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_IFTYPE]));
     auto interfaceIndex = static_cast<uint32_t>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_IFINDEX]));
+    auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_WIPHY]));
 
-    return Nl80211Interface(interfaceName, interfaceType, interfaceIndex);
+    return Nl80211Interface(interfaceName, interfaceType, interfaceIndex, wiphyIndex);
 }
 
 namespace detail
 {
 /**
  * @brief Handler function for NL80211_CMD_GET_INTERFACE responses.
- * 
+ *
  * @param nl80211Message The response message to a NL80211_CMD_GET_INTERFACE dump request.
  * @param context The context pointer provided to nl_socket_modify_cb. This must be a std::vector<Nl80211Interface>*.
- * @return int 
+ * @return int
  */
 int
 HandleNl80211InterfaceDumpResponse(struct nl_msg *nl80211Message, void *context)
@@ -151,4 +153,10 @@ Nl80211Interface::Enumerate()
     }
 
     return nl80211Interfaces;
+}
+
+std::optional<Nl80211Wiphy>
+Nl80211Interface::GetWiphy() const
+{
+    return Nl80211Wiphy::FromIndex(WiphyIndex); 
 }
