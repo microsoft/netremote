@@ -1,5 +1,4 @@
 
-#include <array>
 #include <format>
 #include <sstream>
 
@@ -11,10 +10,12 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
-Nl80211WiphyBand::Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, std::vector<uint32_t> bitRates, uint16_t htCapabilities) noexcept :
+Nl80211WiphyBand::Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, std::vector<uint32_t> bitRates, uint16_t htCapabilities, uint32_t VhtCapabilities, std::optional<std::array<uint8_t, VhtMcsSetNumBytes>> vhtMcsSetOpt) noexcept :
     Frequencies(std::move(frequencies)),
     Bitrates(std::move(bitRates)),
-    HtCapabilities(htCapabilities)
+    HtCapabilities(htCapabilities),
+    VhtCapabilities(VhtCapabilities),
+    VhtMcsSet(std::move(vhtMcsSetOpt))
 {
 }
 
@@ -33,6 +34,17 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
     uint16_t htCapabilities{ 0 };
     if (wiphyBandAttributes[NL80211_BAND_ATTR_HT_CAPA] != nullptr) {
         htCapabilities = nla_get_u16(wiphyBandAttributes[NL80211_BAND_ATTR_HT_CAPA]);
+    }
+
+    uint32_t vhtCapabilities{ 0 };
+    std::optional<std::array<uint8_t, VhtMcsSetNumBytes>> vhtMcsSetOpt{};
+    if (wiphyBandAttributes[NL80211_BAND_ATTR_VHT_CAPA] != nullptr) {
+        vhtCapabilities = nla_get_u32(wiphyBandAttributes[NL80211_BAND_ATTR_VHT_CAPA]);
+        if (wiphyBandAttributes[NL80211_BAND_ATTR_VHT_MCS_SET] != nullptr) {
+            vhtMcsSetOpt.emplace();
+            auto& vhtMcsSet = vhtMcsSetOpt.value();
+            std::copy_n(static_cast<uint8_t *>(nla_data(wiphyBandAttributes[NL80211_BAND_ATTR_VHT_MCS_SET])), std::size(vhtMcsSet), std::begin(vhtMcsSet));
+        }
     }
 
     std::vector<WiphyBandFrequency> frequencies{};
@@ -68,7 +80,7 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
         }
     }
 
-    return Nl80211WiphyBand(std::move(frequencies), std::move(bitRates), htCapabilities);
+    return Nl80211WiphyBand(std::move(frequencies), std::move(bitRates), htCapabilities, vhtCapabilities, std::move(vhtMcsSetOpt));
 }
 
 std::string
@@ -77,6 +89,14 @@ Nl80211WiphyBand::ToString() const
     std::ostringstream ss;
 
     ss << "   HT Capabilities: " << std::format("0x{:04x}\n", HtCapabilities);
+    ss << "   VHT Capabilities: " << std::format("0x{:08x}\n", VhtCapabilities);
+    if (VhtMcsSet.has_value()) {
+        ss << "   VHT MCS Set: 0x";
+        for (const auto &mcs : VhtMcsSet.value()) {
+            ss << std::format("{:02x}", mcs);
+        }
+        ss << '\n';
+    }
     ss << "   Frequencies:\n";
     for (const auto &frequency : Frequencies) {
         ss << std::format("    {}\n", frequency.ToString());
