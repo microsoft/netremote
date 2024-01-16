@@ -46,8 +46,6 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
                 frequencies.emplace_back(std::move(frequency.value()));
             }
         }
-    } else {
-        LOGW << "No frequencies for band";
     }
 
     std::vector<uint32_t> bitRates{};

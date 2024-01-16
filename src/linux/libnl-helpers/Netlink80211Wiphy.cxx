@@ -44,9 +44,9 @@ HandleNl80211GetWiphyResponse(struct nl_msg *nl80211Message, void *context) noex
     if (!nl80211WiphyResult.has_value()) {
         LOGE << "Failed to parse nl80211 wiphy message";
         return NL_SKIP;
-    } else {
-        LOGD << std::format("Successfully parsed an nl80211 wiphy:\n{}", nl80211WiphyResult->ToString());
     }
+
+    LOGD << std::format("Successfully parsed an nl80211 wiphy:\n{}", nl80211WiphyResult->ToString());
 
     return NL_OK;
 }
@@ -135,6 +135,11 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     }
 
     // Process top-level identifiers.
+    if (wiphyAttributes[NL80211_ATTR_WIPHY] == nullptr || wiphyAttributes[NL80211_ATTR_WIPHY_NAME] == nullptr) {
+        LOGE << "Received nl80211 message with missing wiphy index or name";
+        return std::nullopt;
+    }
+
     auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(wiphyAttributes[NL80211_ATTR_WIPHY]));
     auto wiphyName = static_cast<const char *>(nla_data(wiphyAttributes[NL80211_ATTR_WIPHY_NAME]));
 
@@ -157,13 +162,12 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
                 wiphyBandMap.emplace(nl80211BandType, std::move(nl80211Band.value()));
             }
         }
-    } else {
-        LOGW << "No wiphy bands";
     }
 
     // Process cipher suites.
-    auto wiphyNumCipherSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES])) / sizeof(uint32_t);
-    auto *wiphyCipherSuites = static_cast<uint32_t *>(nla_data(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES]));
+    uint32_t *wiphyCipherSuites;
+    auto wiphyNumCipherSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES])) / sizeof(*wiphyCipherSuites);
+    wiphyCipherSuites = static_cast<uint32_t *>(nla_data(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES]));
     std::vector<uint32_t> cipherSuites(wiphyCipherSuites, wiphyCipherSuites + wiphyNumCipherSuites);
 
     // Process supported interface types.
@@ -176,8 +180,6 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
             auto interfaceType = static_cast<nl80211_iftype>(supportedInterfaceType->nla_type);
             supportedInterfaceTypes.emplace_back(interfaceType);
         }
-    } else {
-        LOGW << "No supported interface types";
     }
 
     // Process roaming support.
@@ -192,7 +194,7 @@ Nl80211Wiphy::ToString() const
 {
     std::ostringstream ss;
 
-    ss << std::format("[{}] {}\n", Index, Name);
+    ss << std::format("Wiphy {} [{}]\n", Name, Index);
     ss << std::format(" Supports roaming: {}\n", SupportsRoaming);
 
     ss << " Cipher Suites:\n  ";

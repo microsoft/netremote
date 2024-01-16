@@ -31,12 +31,11 @@ WiphyBandFrequency::Parse(struct nlattr *wiphyBandFrequencyNlAttribute) noexcept
     }
 
     if (wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_FREQ] == nullptr) {
-        LOGW << "Received null wiphy band frequency";
         return std::nullopt;
     }
 
-    auto isDisabled = wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_DISABLED] != nullptr;
-    auto frequency = static_cast<uint32_t>(nla_get_u32(wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_FREQ]));
+    const auto isDisabled = wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_DISABLED] != nullptr;
+    const auto frequency = static_cast<uint32_t>(nla_get_u32(wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_FREQ]));
     std::optional<uint32_t> frequencyOffset{};
     if (wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_OFFSET] != nullptr) {
         frequencyOffset = static_cast<uint32_t>(nla_get_u32(wiphyBandFrequenciesAttributes[NL80211_FREQUENCY_ATTR_OFFSET]));
