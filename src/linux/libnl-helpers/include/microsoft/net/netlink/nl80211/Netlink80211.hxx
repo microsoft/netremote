@@ -49,6 +49,14 @@ std::string_view
 Nl80211InterfaceTypeToString(nl80211_iftype type) noexcept;
 
 /**
+ * @brief Convert a cipher suite value to a string.
+ *
+ * @return std::string_view
+ */
+std::string_view
+Nl80211CipherSuiteToString(uint32_t cipherType) noexcept;
+
+/**
  * @brief Create a netlink socket for use with Nl80211.
  *
  * This creates a netlink socket and connects it to the nl80211 generic netlink family.

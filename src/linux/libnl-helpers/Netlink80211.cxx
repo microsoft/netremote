@@ -451,6 +451,52 @@ Nl80211InterfaceTypeToString(nl80211_iftype interfaceType) noexcept
     }
 }
 
+std::string_view
+Nl80211CipherSuiteToString(uint32_t cipherSuite) noexcept
+{
+    static constexpr uint32_t CipherTypeWep40 = 0x000fac01;
+    static constexpr uint32_t CipherTypeWep104 = 0x000fac05;
+    static constexpr uint32_t CipherTypeTkip = 0x000fac02;
+    static constexpr uint32_t CipherTypeCcmp128 = 0x000fac04;
+    static constexpr uint32_t CipherTypeCmac = 0x000fac06;
+    static constexpr uint32_t CipherTypeGcmp128 = 0x000fac08;
+    static constexpr uint32_t CipherTypeGcmp256 = 0x000fac09;
+    static constexpr uint32_t CipherTypeCcmp256 = 0x000fac0a;
+    static constexpr uint32_t CipherTypeGmac128 = 0x000fac0b;
+    static constexpr uint32_t CipherTypeGmac256 = 0x000fac0c;
+    static constexpr uint32_t CipherTypeCmac256 = 0x000fac0d;
+    static constexpr uint32_t CipherTypeWpiSms4 = 0x00147201;
+
+    switch (cipherSuite) {
+    case CipherTypeWep40:
+        return "WEP40";
+    case CipherTypeWep104:
+        return "WEP104";
+    case CipherTypeTkip:
+        return "TKIP";
+    case CipherTypeCcmp128:
+        return "CCMP-128";
+    case CipherTypeCmac:
+        return "CMAC";
+    case CipherTypeGcmp128:
+        return "GCMP-128";
+    case CipherTypeGcmp256:
+        return "GCMP-256";
+    case CipherTypeCcmp256:
+        return "CCMP-256";
+    case CipherTypeGmac128:
+        return "GMAC-128";
+    case CipherTypeGmac256:
+        return "GMAC-256";
+    case CipherTypeCmac256:
+        return "CMAC-256";
+    case CipherTypeWpiSms4:
+        return "WPI-SMS4";
+    default:
+        return "Uknown";
+    }
+}
+
 using Microsoft::Net::Netlink::NetlinkSocket;
 
 std::optional<NetlinkSocket>

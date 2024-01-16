@@ -199,7 +199,7 @@ Nl80211Wiphy::ToString() const
 
     ss << " Cipher Suites:\n  ";
     for (const auto &cipherSuite : CipherSuites) {
-        ss << std::format("{:x} ", cipherSuite);
+        ss << std::format("{} ", Nl80211CipherSuiteToString(cipherSuite));
     }
 
     constexpr auto IfTypePrefixLength = std::size(std::string_view("NL80211_IFTYPE_"));
