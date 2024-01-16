@@ -4,9 +4,9 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-Type=simple
+Type=forking
 Restart=on-failure
-ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/netremote-server -d ${NETREMOTE_SERVER_XTRA_ARGS}
+ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/netremote-server ${NETREMOTE_SERVER_XTRA_ARGS} -d 
 
 [Install]
 WantedBy=default.target
