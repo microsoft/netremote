@@ -4,10 +4,9 @@ Requires=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
 
 [Service]
-Type=forking
+Type=simple
 Restart=on-failure
-ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/hostapd -B -P @CMAKE_INSTALL_FULL_RUNSTATEDIR@/hostapd/hostapd-%i.pid -i %i ${HOSTAPD_XTRA_ARGS} @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
-PIDFile=@CMAKE_INSTALL_FULL_RUNSTATEDIR@/hostapd/hostapd-%i.pid
+ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/hostapd -i %i @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
 
 [Install]
 WantedBy=default.target
