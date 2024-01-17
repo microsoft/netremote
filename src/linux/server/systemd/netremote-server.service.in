@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 Type=simple
 Restart=on-failure
-ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/netremote-server
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/netremote-server ${NETREMOTE_SERVER_XTRA_ARGS}
 
 [Install]
 WantedBy=default.target
