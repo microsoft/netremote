@@ -102,4 +102,8 @@ install(
         ${CMAKE_INSTALL_SBINDIR}
 )
 
+install(
+    DIRECTORY DESTINATION ${CMAKE_INSTALL_FULL_RUNSTATEDIR}
+)
+
 add_subdirectory(systemd)
