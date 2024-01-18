@@ -3,6 +3,7 @@
 #define ACCESS_POINT_HXX
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointFactory.hxx>
 
 #include <string>
 #include <string_view>
@@ -34,14 +35,30 @@ struct AccessPoint :
 
     /**
      * @brief Create a controller object.
-     * 
-     * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController> 
+     *
+     * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
      */
     virtual std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
     CreateController() override;
 
 private:
     const std::string m_interface;
+};
+
+/**
+ * @brief Creates instances of the AccessPoint class.
+ */
+struct AccessPointFactory :
+    public IAccessPointFactory
+{
+    /**
+     * @brief Create a new access point object for the given network interface.
+     *
+     * @param interface
+     * @return std::shared_ptr<AccessPoint>
+     */
+    virtual std::shared_ptr<IAccessPoint>
+    Create(std::string_view interface) override;
 };
 } // namespace Microsoft::Net::Wifi
 

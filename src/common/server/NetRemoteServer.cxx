@@ -43,7 +43,7 @@ NetRemoteServer::Run()
     builder.RegisterService(&m_service);
 
     m_server = builder.BuildAndStart();
-    LOG_INFO << std::format("Netremote server started listening on {}", m_serverAddress);
+    LOGI << std::format("Netremote server started listening on {}", m_serverAddress);
 }
 
 void

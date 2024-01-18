@@ -10,6 +10,7 @@
 namespace Microsoft::Net::Wifi
 {
 struct IAccessPoint;
+struct IAccessPointFactory;
 struct AccessPointDiscoveryAgent;
 enum class AccessPointPresenceEvent;
 
@@ -26,12 +27,22 @@ class AccessPointManager :
 {
 public:
     /**
-     * @brief Safely create an instance of the access point manager.
+     * @brief Safely create an instance of the access point manager with a default access point factory that creates
+     * AccessPoint instances.
      *
      * @return std::shared_ptr<AccessPointManager>
      */
     [[nodiscard]] static std::shared_ptr<AccessPointManager>
     Create();
+
+    /**
+     * @brief Safely create an instance of the access point manager.
+     *
+     * @param accessPointFactory
+     * @return std::shared_ptr<AccessPointManager>
+     */
+    [[nodiscard]] static std::shared_ptr<AccessPointManager>
+    Create(std::unique_ptr<IAccessPointFactory> accessPointFactory);
 
     /**
      * @brief Get an instance of this access point manager.
@@ -95,7 +106,7 @@ protected:
      * Consequently, the = default implementation is done in the source file
      * instead.
      */
-    AccessPointManager();
+    AccessPointManager(std::unique_ptr<IAccessPointFactory> accessPointFactory);
 
 private:
     /**
@@ -125,6 +136,8 @@ private:
     RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
 
 private:
+    std::unique_ptr<IAccessPointFactory> m_accessPointFactory;
+
     mutable std::mutex m_accessPointGate;
     std::vector<std::shared_ptr<IAccessPoint>> m_accessPoints{};
 
