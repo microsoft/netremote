@@ -24,6 +24,12 @@ NetRemoteServer::GetGrpcServer() noexcept
     return m_server;
 }
 
+Service::NetRemoteService&
+NetRemoteServer::GetService() noexcept
+{
+    return m_service;
+}
+
 void
 NetRemoteServer::Run()
 {

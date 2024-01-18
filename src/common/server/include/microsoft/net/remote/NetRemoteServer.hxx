@@ -34,6 +34,14 @@ struct NetRemoteServer
     GetGrpcServer() noexcept;
 
     /**
+     * @brief Get the NetRemoteService object instance.
+     * 
+     * @return Service::NetRemoteService& 
+     */
+    Service::NetRemoteService&
+    GetService() noexcept;
+
+    /**
      * @brief Start the server if not already started.
      */
     void
