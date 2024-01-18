@@ -9,11 +9,32 @@
 
 namespace Microsoft::Net::Remote::Service
 {
+/**
+ * @brief Implementation of the NetRemote::Service gRPC service.
+ */
 class NetRemoteService :
     public NetRemote::Service
 {
 public:
+    /**
+     * @brief Construct a new NetRemoteService object.
+     */
     NetRemoteService();
+
+    /**
+     * @brief Construct a new NetRemoteService object with the specified access point manager.
+     *
+     * @param accessPointManager The access point manager to use.
+     */
+    NetRemoteService(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager);
+
+    /**
+     * @brief Get the AccessPointManager object for this service.
+     *
+     * @return std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager>
+     */
+    std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager>
+    GetAccessPointManager() noexcept;
 
 private:
     virtual ::grpc::Status

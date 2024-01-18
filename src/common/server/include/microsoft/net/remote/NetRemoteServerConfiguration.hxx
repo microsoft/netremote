@@ -3,11 +3,20 @@
 #define NET_REMOTE_SERVER_CONFIGURATION_HXX
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
+namespace Microsoft::Net::Wifi
+{
+class AccessPointManager;
+} // namespace Microsoft::Net::Wifi
+
 namespace Microsoft::Net::Remote
 {
+/**
+ * @brief Collects configuration options for the NetRemoteServer class.
+ */
 struct NetRemoteServerConfiguration
 {
     /**
@@ -54,7 +63,12 @@ struct NetRemoteServerConfiguration
      * show all info messages, and a level of 2 will show all debug messages,
      * and a level of 3 or above will show all verbose messages.
      */
-    uint8_t LogVerbosity{ 0 };
+    uint32_t LogVerbosity{ 0 };
+
+    /**
+     * @brief Access point manager instance.
+     */
+    std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> AccessPointManager;
 };
 
 } // namespace Microsoft::Net::Remote

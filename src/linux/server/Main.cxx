@@ -5,6 +5,9 @@
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
+#include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
+#include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <notstd/Utility.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
@@ -16,6 +19,10 @@
 
 using namespace Microsoft::Net::Remote;
 
+using Microsoft::Net::Wifi::AccessPointDiscoveryAgent;
+using Microsoft::Net::Wifi::AccessPointDiscoveryAgentOperationsNetlink;
+using Microsoft::Net::Wifi::AccessPointManager;
+
 enum class LogInstanceId : int {
     // Default logger is 0 and is omitted from this enumeration.
     Console = 1,
@@ -23,14 +30,14 @@ enum class LogInstanceId : int {
 };
 
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
     static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("server").c_str());
 
     // Parse command line arguments.
-    const auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
+    auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
     const auto logSeverity = logging::LogVerbosityToPlogSeverity(configuration.LogVerbosity);
 
     // Configure logging, appending all loggers to the default instance.
@@ -40,8 +47,21 @@ main(int argc, char* argv[])
         .addAppender(plog::get<notstd::to_underlying(LogInstanceId::Console)>())
         .addAppender(plog::get<notstd::to_underlying(LogInstanceId::File)>());
 
+    // Create an access point manager and discovery agent.
+    {
+        configuration.AccessPointManager = AccessPointManager::Create();
+
+        auto &accessPointManager = configuration.AccessPointManager;
+        auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>();
+        auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));
+        accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+    }
+
+    // Create the server.
+    NetRemoteServer server{ std::move(configuration) };
+
     // Start the server.
-    NetRemoteServer server{ configuration.ServerAddress };
+    LOGI << "Netremote server starting";
     server.Run();
 
     // If running in the background, daemonize the process.
@@ -51,8 +71,8 @@ main(int argc, char* argv[])
 
         if (daemon(nochdir, noclose) != 0) {
             const int error = errno;
-            const auto what = std::format("failed to daemonize (error={})", error);
-            LOG_ERROR << what;
+            const auto what = std::format("Failed to daemonize (error={})", error);
+            LOGE << what;
             throw std::runtime_error(what);
         }
     }
@@ -61,7 +81,7 @@ main(int argc, char* argv[])
         server.GetGrpcServer()->Wait();
     }
 
-    LOG_INFO << "Server exiting.";
+    LOGI << "Netremote server stopping";
 
     return 0;
 }

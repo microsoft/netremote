@@ -7,7 +7,9 @@
 #include <string_view>
 
 #include <grpcpp/server.h>
+#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/NetRemoteService.hxx>
+#include <microsoft/net/wifi/AccessPointManager.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -19,11 +21,11 @@ struct NetRemoteServer
     virtual ~NetRemoteServer();
 
     /**
-     * @brief Construct a new NetRemoteServer object.
+     * @brief Construct a new NetRemoteServer object with the specified configuration.
      *
-     * @param serverAddress
+     * @param configuration
      */
-    NetRemoteServer(std::string_view serverAddress);
+    NetRemoteServer(NetRemoteServerConfiguration configuration);
 
     /**
      * @brief Get the GrpcServer object.
@@ -32,6 +34,14 @@ struct NetRemoteServer
      */
     std::unique_ptr<grpc::Server>&
     GetGrpcServer() noexcept;
+
+    /**
+     * @brief Get the NetRemoteService object instance.
+     *
+     * @return Service::NetRemoteService&
+     */
+    Service::NetRemoteService&
+    GetService() noexcept;
 
     /**
      * @brief Start the server if not already started.

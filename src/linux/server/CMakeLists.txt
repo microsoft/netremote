@@ -8,10 +8,11 @@ target_sources(${PROJECT_NAME}-server-linux
 
 target_link_libraries(${PROJECT_NAME}-server-linux
     PRIVATE
-        logging-utils
         ${PROJECT_NAME}-server
+        logging-utils
         notstd
         plog::plog
+        wifi-apmanager-linux
 )
 
 set_target_properties(${PROJECT_NAME}-server-linux

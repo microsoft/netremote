@@ -2,6 +2,7 @@
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <notstd/Memory.hxx>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Wifi;
 
@@ -39,6 +40,7 @@ AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presen
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) {
+        LOGD << "Access point discovery agent detected a device presence change";
         m_onDevicePresenceChanged(presence, std::move(interfaceName));
     }
 }
@@ -54,6 +56,7 @@ AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
+        LOGD << "Access point discovery agent starting";
         m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& interfaceName) {
             // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
             if (auto strongThis = weakThis.lock(); strongThis) {
@@ -68,6 +71,7 @@ AccessPointDiscoveryAgent::Stop()
 {
     bool expected = true;
     if (m_started.compare_exchange_weak(expected, false)) {
+        LOGD << "Access point discovery agent stopping";
         m_operations->Stop();
     }
 }
@@ -75,5 +79,6 @@ AccessPointDiscoveryAgent::Stop()
 std::future<std::vector<std::string>>
 AccessPointDiscoveryAgent::ProbeAsync()
 {
+    LOGD << "Access point discovery agent probing for devices";
     return m_operations->ProbeAsync();
 }
