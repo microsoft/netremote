@@ -21,6 +21,7 @@ target_sources(wifi-apmanager
 target_link_libraries(wifi-apmanager
     PRIVATE
         notstd
+        plog::plog
     PUBLIC
         ${PROJECT_NAME}-protocol
         wifi-core
