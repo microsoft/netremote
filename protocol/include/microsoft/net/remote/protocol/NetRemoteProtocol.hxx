@@ -16,17 +16,20 @@ static constexpr std::string_view NetRemoteAddressHttpDefault = "localhost:5047"
  */
 struct NetRemoteProtocol
 {
-#define IP_DEFAULT   "localhost"
-#define PORT_DEFAULT 5047
-#define xstr(s)      str(s)
-#define str(s)       #s
+#define IP_DEFAULT     "localhost"
+#define PORT_DEFAULT   5047
+#define PORT_SEPARATOR ""
+#define xstr(s)        str(s)
+#define str(s)         #s
 
     static constexpr uint32_t PortDefault{ 5047 };
+    static constexpr std::string_view PortSeparator{ ":" };
     static constexpr std::string_view IpDefault{ "localhost" };
-    static constexpr std::string_view AddressDefault{ IP_DEFAULT ":" xstr(PORT_DEFAULT) };
+    static constexpr std::string_view AddressDefault{ IP_DEFAULT PORT_SEPARATOR xstr(PORT_DEFAULT) };
 
 #undef IP_DEFAULT
 #undef PORT_DEFAULT
+#undef PORT_SEPARATOR
 #undef xstr
 #undef str
 };

@@ -1,7 +1,9 @@
 
+#include <format>
 #include <string>
 
 #include <microsoft/net/remote/NetRemoteCli.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>
 
@@ -60,7 +62,7 @@ NetRemoteCli::CreateParser() noexcept
     auto optionServer = app->add_option_function<std::string>("-s,--server", [this](const std::string& serverAddress) {
         OnServerAddressChanged(serverAddress);
     });
-    optionServer->description("The address of the netremote server to connect to");
+    optionServer->description("The address of the netremote server to connect to, with format '<hostname>[:port]");
 
     m_cliAppServerAddress = optionServer;
     m_cliAppWifi = AddSubcommandWifi(app.get());
@@ -94,11 +96,19 @@ NetRemoteCli::AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent)
 }
 
 void
-NetRemoteCli::OnServerAddressChanged(const std::string& serverAddress)
+NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 {
-    m_cliData->ServerAddress = serverAddress;
+    using Protocol::NetRemoteProtocol;
 
-    auto connection = NetRemoteServerConnection::TryEstablishConnection(serverAddress);
+    // Append the default port if not specified in command-line argument.
+    auto serverAddress = serverAddressArg;
+    if (serverAddress.find(':') == serverAddress.npos) {
+        serverAddress += std::format("{}{}", NetRemoteProtocol::PortSeparator, NetRemoteProtocol::PortDefault);
+    }
+
+    m_cliData->ServerAddress = std::move(serverAddress);
+
+    auto connection = NetRemoteServerConnection::TryEstablishConnection(m_cliData->ServerAddress);
     if (connection == nullptr) {
         LOGE << "Failed to create server connection";
         return;
