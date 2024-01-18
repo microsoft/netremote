@@ -54,7 +54,7 @@ struct NetRemoteServerConfiguration
      * show all info messages, and a level of 2 will show all debug messages,
      * and a level of 3 or above will show all verbose messages.
      */
-    uint8_t LogVerbosity{ 0 };
+    uint32_t LogVerbosity{ 0 };
 };
 
 } // namespace Microsoft::Net::Remote

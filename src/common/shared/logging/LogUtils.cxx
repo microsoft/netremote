@@ -22,7 +22,7 @@ logging::GetLogName(std::string_view componentName)
 }
 
 plog::Severity
-logging::LogVerbosityToPlogSeverity(uint8_t verbosity) noexcept
+logging::LogVerbosityToPlogSeverity(uint32_t verbosity) noexcept
 {
     switch (verbosity) {
     case 0:

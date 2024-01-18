@@ -29,7 +29,7 @@ GetLogName(std::string_view componentName);
  * @return plog::Severity
  */
 plog::Severity
-LogVerbosityToPlogSeverity(uint8_t verbosity) noexcept;
+LogVerbosityToPlogSeverity(uint32_t verbosity) noexcept;
 
 } // namespace logging
 
