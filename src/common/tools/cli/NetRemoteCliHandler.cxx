@@ -6,8 +6,8 @@
 
 using namespace Microsoft::Net::Remote;
 
-NetRemoteCliHandler::NetRemoteCliHandler(std::shared_ptr<INetRemoteCliHandlerOperations> operations) :
-    m_operations(std::move(operations))
+NetRemoteCliHandler::NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory) :
+    m_operationsFactory(std::move(operationsFactory))
 {
 }
 
@@ -15,6 +15,13 @@ void
 NetRemoteCliHandler::SetParent(std::weak_ptr<NetRemoteCli> parent)
 {
     m_parent = parent;
+}
+
+void
+NetRemoteCliHandler::SetConnection(std::shared_ptr<NetRemoteServerConnection> connection)
+{
+    m_connection = connection;
+    m_operations = m_operationsFactory->Create(m_connection);
 }
 
 std::shared_ptr<NetRemoteCli>

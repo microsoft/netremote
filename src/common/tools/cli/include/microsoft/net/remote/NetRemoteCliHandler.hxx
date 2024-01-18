@@ -4,9 +4,12 @@
 
 #include <memory>
 
+#include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+
 namespace Microsoft::Net::Remote
 {
 struct INetRemoteCliHandlerOperations;
+struct INetRemoteCliHandlerOperationsFactory;
 struct NetRemoteCli;
 
 /**
@@ -19,9 +22,9 @@ struct NetRemoteCliHandler
     /**
      * @brief Construct a new NetRemoteCliHandler object.
      *
-     * @param operations The operations instance to use for handling commands.
+     * @param operationsFactory The factory to use to create the operations instance to use for handling commands.
      */
-    NetRemoteCliHandler(std::shared_ptr<INetRemoteCliHandlerOperations> operations);
+    NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory);
 
     /**
      * @brief Assign the parent NetRemoteCli object.
@@ -30,6 +33,14 @@ struct NetRemoteCliHandler
      */
     void
     SetParent(std::weak_ptr<NetRemoteCli> parent);
+
+    /**
+     * @brief Set the connection object to use.
+     *
+     * @param connection
+     */
+    void
+    SetConnection(std::shared_ptr<NetRemoteServerConnection> connection);
 
     /**
      * @brief Handle a command request to enumerate available Wi-Fi access points.
@@ -49,7 +60,9 @@ private:
 
 private:
     std::weak_ptr<NetRemoteCli> m_parent;
+    std::unique_ptr<INetRemoteCliHandlerOperationsFactory> m_operationsFactory;
     std::shared_ptr<INetRemoteCliHandlerOperations> m_operations;
+    std::shared_ptr<NetRemoteServerConnection> m_connection;
 };
 } // namespace Microsoft::Net::Remote
 

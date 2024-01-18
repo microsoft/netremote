@@ -9,6 +9,7 @@ target_sources(${PROJECT_NAME}-cli
     PRIVATE
         NetRemoteCli.cxx
         NetRemoteCliHandler.cxx
+        NetRemoteCliHandlerOperations.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NETREMOTE_CLI_PUBLIC_INCLUDE}
@@ -17,6 +18,7 @@ target_sources(${PROJECT_NAME}-cli
         ${NETREMOTE_CLI_PUBLIC_INCLUDE_PREFIX}/NetRemoteCli.hxx
         ${NETREMOTE_CLI_PUBLIC_INCLUDE_PREFIX}/NetRemoteCliData.hxx
         ${NETREMOTE_CLI_PUBLIC_INCLUDE_PREFIX}/NetRemoteCliHandler.hxx
+        ${NETREMOTE_CLI_PUBLIC_INCLUDE_PREFIX}/NetRemoteCliHandlerOperations.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-cli
