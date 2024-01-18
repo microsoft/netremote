@@ -107,7 +107,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
     // instance is still valid upon each callback invocation.
     discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<AccessPointManager>(GetInstance())](auto&& presence, auto&& interfaceName) {
         if (auto strongThis = weakThis.lock()) {
-            std::shared_ptr<IAccessPoint> accessPointChanged{ std::make_shared<AccessPoint>(interfaceName) }; // TODO: use factory to create access point
+            auto accessPointChanged = strongThis->m_accessPointFactory->Create(interfaceName);
             strongThis->OnAccessPointPresenceChanged(discoveryAgentPtr, presence, std::move(accessPointChanged));
         }
     });
@@ -136,7 +136,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
         if (waitResult == std::future_status::ready) {
             auto existingAccessPointInterfaceNames = existingAccessPointInterfaceNamesProbe.get();
             for (const auto& existingAccessPointInterfaceName : existingAccessPointInterfaceNames) {
-                std::shared_ptr<IAccessPoint> existingAccessPoint{ std::make_shared<AccessPoint>(existingAccessPointInterfaceName) }; // TODO: use factory to create access point
+                auto existingAccessPoint = m_accessPointFactory->Create(existingAccessPointInterfaceName);
                 AddAccessPoint(std::move(existingAccessPoint));
             }
         } else {
