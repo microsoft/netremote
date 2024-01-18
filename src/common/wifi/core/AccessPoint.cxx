@@ -20,3 +20,9 @@ AccessPoint::CreateController()
 {
     throw std::runtime_error("this function must be overridden by a derived class");
 }
+
+std::shared_ptr<IAccessPoint>
+AccessPointFactory::Create(std::string_view interface)
+{
+    return std::make_shared<AccessPoint>(interface);
+}
