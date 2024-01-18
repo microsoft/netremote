@@ -57,6 +57,7 @@ main(int argc, char *argv[])
     }
 
     // Start the server.
+    LOGI << "Starting netremote server";
     server.Run();
 
     // If running in the background, daemonize the process.
@@ -66,7 +67,7 @@ main(int argc, char *argv[])
 
         if (daemon(nochdir, noclose) != 0) {
             const int error = errno;
-            const auto what = std::format("failed to daemonize (error={})", error);
+            const auto what = std::format("Failed to daemonize (error={})", error);
             LOG_ERROR << what;
             throw std::runtime_error(what);
         }
@@ -76,7 +77,7 @@ main(int argc, char *argv[])
         server.GetGrpcServer()->Wait();
     }
 
-    LOG_INFO << "Server exiting.";
+    LOGI << "Server exiting";
 
     return 0;
 }
