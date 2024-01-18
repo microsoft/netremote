@@ -15,6 +15,14 @@ class NetRemoteService :
 public:
     NetRemoteService();
 
+    /**
+     * @brief Get the AccessPointManager object for this service.
+     * 
+     * @return std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> 
+     */
+    std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager>
+    GetAccessPointManager() noexcept;
+
 private:
     virtual ::grpc::Status
     WifiEnumerateAccessPoints(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;

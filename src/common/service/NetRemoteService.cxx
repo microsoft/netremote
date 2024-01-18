@@ -16,6 +16,12 @@ NetRemoteService::NetRemoteService() :
     m_accessPointManager(AccessPointManager::Create())
 {}
 
+std::shared_ptr<AccessPointManager>
+NetRemoteService::GetAccessPointManager() noexcept
+{
+    return m_accessPointManager;
+}
+
 ::grpc::Status
 NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response)
 {
