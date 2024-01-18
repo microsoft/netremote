@@ -18,7 +18,7 @@ NetRemoteServerConnection::NetRemoteServerConnection(std::string_view address, s
 }
 
 /* static */
-std::optional<NetRemoteServerConnection>
+std::shared_ptr<NetRemoteServerConnection>
 NetRemoteServerConnection::TryEstablishConnection(std::string_view address)
 {
     // Attempt to establish a connection (channel) to the server.
@@ -26,17 +26,17 @@ NetRemoteServerConnection::TryEstablishConnection(std::string_view address)
     auto channel = grpc::CreateChannel(std::data(address), grpc::InsecureChannelCredentials());
     if (channel == nullptr || channel->GetState(DontTryToConnect) != GRPC_CHANNEL_IDLE) {
         LOGE << "Failed to establish connection channel";
-        return std::nullopt;
+        return nullptr;
     }
 
     // Attempt to create a new client API stub.
     auto client = NetRemote::NewStub(channel);
     if (client == nullptr) {
         LOGE << "Failed to create NetRemote API stub";
-        return std::nullopt;
+        return nullptr;
     }
 
     // Return a new connection object.
-    NetRemoteServerConnection netRemoteServerConnection(address, channel, std::move(client));
+    auto netRemoteServerConnection = std::make_shared<NetRemoteServerConnection>(address, channel, std::move(client));
     return netRemoteServerConnection;
 }
