@@ -9,6 +9,7 @@
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/wifi/AccessPointManager.hxx>
 
 #include "TestNetRemoteCommon.hxx"
 
@@ -17,8 +18,14 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
 
-    NetRemoteServer server{ Test::RemoteServiceAddressHttp };
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
+
+    NetRemoteServer server{ Configuration };
     server.Run();
 
     auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -63,7 +70,12 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     constexpr auto SsidName{ "TestWifiAccessPointEnable" };
 
-    NetRemoteServer server{ Test::RemoteServiceAddressHttp };
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
+
+    NetRemoteServer server{ Configuration };
     server.Run();
 
     auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());

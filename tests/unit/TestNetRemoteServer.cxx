@@ -12,10 +12,16 @@
 TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Wifi;
+
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
 
     SECTION("Create doesn't cause a crash")
     {
-        REQUIRE_NOTHROW(NetRemoteServer{ Test::RemoteServiceAddressHttp });
+        REQUIRE_NOTHROW(NetRemoteServer{ Configuration });
     }
 }
 
@@ -23,8 +29,14 @@ TEST_CASE("Destroy a NetRemoteServer instance", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Wifi;
 
-    std::optional<NetRemoteServer> server{ Test::RemoteServiceAddressHttp };
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
+
+    std::optional<NetRemoteServer> server{ Configuration };
     server->Run();
 
     SECTION("Destroy doesn't cause a crash")
@@ -48,8 +60,14 @@ TEST_CASE("NetRemoteServer can be reached", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Wifi;
 
-    NetRemoteServer server{ Test::RemoteServiceAddressHttp };
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
+
+    NetRemoteServer server{ Configuration };
     server.Run();
 
     SECTION("Can be reached using insecure channel")
@@ -65,8 +83,14 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Wifi;
 
-    NetRemoteServer server{ Test::RemoteServiceAddressHttp };
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
+
+    NetRemoteServer server{ Configuration };
     server.Run();
 
     SECTION("Stop() doesn't cause a crash with no connected clients")
@@ -114,8 +138,14 @@ TEST_CASE("NetRemoteServer can be cycled through run/stop states", "[basic][rpc]
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Wifi;
 
-    NetRemoteServer server{ Test::RemoteServiceAddressHttp };
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = Test::RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(),
+    };
+
+    NetRemoteServer server{ Configuration };
     REQUIRE_NOTHROW(server.Run());
 
     SECTION("Can be cycled multiple times")

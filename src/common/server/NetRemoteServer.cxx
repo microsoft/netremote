@@ -9,8 +9,9 @@
 
 using namespace Microsoft::Net::Remote;
 
-NetRemoteServer::NetRemoteServer(std::string_view serverAddress) :
-    m_serverAddress{ serverAddress }
+NetRemoteServer::NetRemoteServer(NetRemoteServerConfiguration configuration) :
+    m_serverAddress(configuration.ServerAddress),
+    m_service(configuration.AccessPointManager)
 {}
 
 NetRemoteServer::~NetRemoteServer()
@@ -42,7 +43,7 @@ NetRemoteServer::Run()
     builder.RegisterService(&m_service);
 
     m_server = builder.BuildAndStart();
-    LOG_INFO << std::format("netremote server started listening on {}", m_serverAddress);
+    LOG_INFO << std::format("Netremote server started listening on {}", m_serverAddress);
 }
 
 void

@@ -1,6 +1,5 @@
 
 #include <format>
-#include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
@@ -13,7 +12,11 @@ using namespace Microsoft::Net::Remote::Service;
 using Microsoft::Net::Wifi::AccessPointManager;
 
 NetRemoteService::NetRemoteService() :
-    m_accessPointManager(AccessPointManager::Create())
+    NetRemoteService(AccessPointManager::Create())
+{}
+
+NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
+    m_accessPointManager(std::move(accessPointManager))
 {}
 
 std::shared_ptr<AccessPointManager>
@@ -27,7 +30,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 {
     using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
 
-    LOG_VERBOSE << std::format("Received WifiEnumerateAccessPoints request\n");
+    LOGD << std::format("Received WifiEnumerateAccessPoints request");
 
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
     std::vector<WifiEnumerateAccessPointsResultItem> accessPointResultItems(std::size(accessPoints));
@@ -59,7 +62,7 @@ using Microsoft::Net::Wifi::Dot11PhyType;
 ::grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response)
 {
-    LOG_VERBOSE << std::format("Received WifiAccessPointEnable request for access point id {}\n", request->accesspointid());
+    LOGD << std::format("Received WifiAccessPointEnable request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
 
@@ -78,7 +81,7 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* 
 ::grpc::Status
 NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* response)
 {
-    LOG_VERBOSE << std::format("Received WifiAccessPointDisable request for access point id {}\n", request->accesspointid());
+    LOGD << std::format("Received WifiAccessPointDisable request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
     // TODO: Disable the access point.
