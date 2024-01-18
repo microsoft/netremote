@@ -89,6 +89,8 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
 {
     using namespace std::chrono_literals;
 
+    // Register a discovery event callback.
+    //
     // Use a weak_ptr below to ensure that the access point manager can
     // be safely destroyed prior to the discovery agent. This allows the
     // callback to be registered indefinitely, safely checking whether this
@@ -100,28 +102,25 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
         }
     });
 
-    // If this agent has already started, kick off a probe to ensure any access
-    // points already found will be added to this manager.
-    std::future<std::vector<std::string>> existingAccessPointInterfaceNamesProbe;
-    const bool isStarted = discoveryAgent->IsStarted();
-    if (isStarted) {
-        existingAccessPointInterfaceNamesProbe = discoveryAgent->ProbeAsync();
-    } else {
+    // Start the agent if not done already.
+    if (!discoveryAgent->IsStarted()) {
         discoveryAgent->Start();
     }
 
-    // If the agent hasn't yet been started, start it now, then probe for
-    // existing access points in case they've already been discovered.
+    // Kick off a probe to ensure any access points already present will be added to this manager.
+    auto existingAccessPointInterfaceNamesProbe = discoveryAgent->ProbeAsync();
+
+    // Add the agent.
     {
         std::unique_lock<std::shared_mutex> discoveryAgentLock{ m_discoveryAgentsGate };
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
     if (existingAccessPointInterfaceNamesProbe.valid()) {
-        static constexpr auto probeTimeout = 3s;
+        static constexpr auto ProbeTimeout = 3s;
 
         // Wait for the operation to complete.
-        const auto waitResult = existingAccessPointInterfaceNamesProbe.wait_for(probeTimeout);
+        const auto waitResult = existingAccessPointInterfaceNamesProbe.wait_for(ProbeTimeout);
 
         // If the operation completed, get the results and add those access points.
         if (waitResult == std::future_status::ready) {
