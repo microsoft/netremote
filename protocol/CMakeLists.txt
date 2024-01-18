@@ -1,7 +1,10 @@
 
+set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
+set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote/protocol)
+set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
+
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos)
-set(PROTO_DIR_BINARY_SUFFIX microsoft/net/remote/protocol) 
-set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${PROTO_DIR_BINARY_SUFFIX})
+set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 set(PROTO_FILES
     ${PROTO_DIR}/NetRemote.proto
     ${PROTO_DIR}/NetRemoteService.proto
@@ -13,7 +16,7 @@ set(PROTO_FILES
 # we've encountered intermittent errors when building with external vcpkg (eg.
 # via port) which results in empty file lists and thus, the generated headers
 # are not installed. It appears to be some sort of race condition in CMake
-# itself
+# itself.
 #
 # file(GLOB PROTO_FILES_GENERATED "${PROTO_DIR_BINARY}/*.pb.h")
 # string(REGEX REPLACE "[.]proto$" ".pb.h" PROTO_HEADERS_GENERATED "${PROTO_FILES_GENERATED}")
@@ -40,10 +43,13 @@ target_sources(${PROJECT_NAME}-protocol
         ${PROTO_FILES}
     PUBLIC
     FILE_SET HEADERS
-    BASE_DIRS ${CMAKE_CURRENT_BINARY_DIR}
+    BASE_DIRS 
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}
     FILES
         ${PROTO_HEADERS_GENERATED}
         ${PROTO_HEADERS_GENERATED_GRPC}
+        ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX}/NetRemoteProtocol.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-protocol
