@@ -8,6 +8,7 @@
         "davidanson.vscode-markdownlint",
         "ms-vscode-remote.vscode-remote-extensionpack",
         "coolbear.systemd-unit-file",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "vadimcn.vscode-lldb"
     ]
 }
