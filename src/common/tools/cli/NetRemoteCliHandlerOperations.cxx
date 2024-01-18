@@ -29,6 +29,12 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
         LOGE << std::format("Failed to enumerate WiFi access points, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
         return;
     }
+
+    LOGI << std::format("{} access points discovered", result.accesspoints_size());
+
+    for (const auto& accessPoint : result.accesspoints()) {
+        LOGI << std::format(" - [{}]", accessPoint.accesspointid());
+    }
 }
 
 std::unique_ptr<INetRemoteCliHandlerOperations>
