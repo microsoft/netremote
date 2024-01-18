@@ -5,6 +5,8 @@
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
+#include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <notstd/Utility.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
@@ -16,6 +18,9 @@
 
 using namespace Microsoft::Net::Remote;
 
+using Microsoft::Net::Wifi::AccessPointDiscoveryAgent;
+using Microsoft::Net::Wifi::AccessPointDiscoveryAgentOperationsNetlink;
+
 enum class LogInstanceId : int {
     // Default logger is 0 and is omitted from this enumeration.
     Console = 1,
@@ -23,7 +28,7 @@ enum class LogInstanceId : int {
 };
 
 int
-main(int argc, char* argv[])
+main(int argc, char *argv[])
 {
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
@@ -40,8 +45,18 @@ main(int argc, char* argv[])
         .addAppender(plog::get<notstd::to_underlying(LogInstanceId::Console)>())
         .addAppender(plog::get<notstd::to_underlying(LogInstanceId::File)>());
 
-    // Start the server.
+    // Create the server.
     NetRemoteServer server{ configuration.ServerAddress };
+
+    // Create an access point discovery agent, and register it with the server's access point manager.
+    {
+        auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>();
+        auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));
+        auto accessPointManager = server.GetService().GetAccessPointManager();
+        accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+    }
+
+    // Start the server.
     server.Run();
 
     // If running in the background, daemonize the process.
