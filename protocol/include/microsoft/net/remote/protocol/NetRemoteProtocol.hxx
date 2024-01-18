@@ -6,7 +6,7 @@
 #include <ranges>
 #include <string_view>
 
-namespace Microsoft::Net::Remote
+namespace Microsoft::Net::Remote::Protocol
 {
 static constexpr uint32_t NetRemotePortDefault = 5047;
 static constexpr std::string_view NetRemoteAddressHttpDefault = "localhost:5047";
@@ -31,6 +31,6 @@ struct NetRemoteProtocol
 #undef str
 };
 
-} // namespace Microsoft::Net::Remote
+} // namespace Microsoft::Net::Remote::Protocol
 
 #endif // NET_REMOTE_PROTOCOL_HXX
