@@ -9,7 +9,7 @@ AccessPointControllerHostapd::AccessPointControllerHostapd(std::string_view inte
 {
 }
 
-AccessPointCapabilities2
+Ieee80211AccessPointCapabilities
 AccessPointControllerHostapd::GetCapabilities()
 {
     // TODO: Implement this method.

@@ -17,7 +17,7 @@ struct AccessPointControllerTest final :
     virtual std::string_view
     GetInterfaceName() const noexcept override;
 
-    virtual AccessPointCapabilities2
+    virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
 
     std::string InterfaceName;

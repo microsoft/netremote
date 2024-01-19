@@ -29,9 +29,9 @@ struct AccessPointControllerHostapd :
     /**
      * @brief Get the Capabilities object
      *
-     * @return AccessPointCapabilities2
+     * @return Ieee80211AccessPointCapabilities
      */
-    virtual AccessPointCapabilities2
+    virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
 
 private:

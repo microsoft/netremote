@@ -6,7 +6,7 @@
 #include <memory>
 #include <string_view>
 
-#include <microsoft/net/wifi/AccessPointCapabilities.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -39,10 +39,10 @@ struct IAccessPointController
 
     /**
      * @brief Get the capabilities of the access point.
-     * 
-     * @return AccessPointCapabilities 
+     *
+     * @return Ieee80211AccessPointCapabilities
      */
-    virtual AccessPointCapabilities2
+    virtual Ieee80211AccessPointCapabilities
     GetCapabilities() = 0;
 };
 
@@ -53,8 +53,8 @@ struct IAccessPointControllerFactory
 {
     /**
      * @brief Create a new IAccessPointController object.
-     * 
-     * @return std::unique_ptr<IAccessPointController> 
+     *
+     * @return std::unique_ptr<IAccessPointController>
      */
     virtual std::unique_ptr<IAccessPointController>
     Create(std::string_view interfaceName) = 0;
