@@ -34,6 +34,14 @@ struct IAccessPointController
      */
     virtual std::string_view
     GetInterfaceName() const noexcept = 0;
+
+    /**
+     * @brief Get the capabilities of the access point.
+     * 
+     * @return AccessPointCapabilities 
+     */
+    virtual AccessPointCapabilities
+    GetCapabilities() = 0;
 };
 } // namespace Microsoft::Net::Wifi
 

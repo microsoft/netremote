@@ -14,6 +14,7 @@ target_sources(wifi-core
     BASE_DIRS ${WIFI_CORE_PUBLIC_INCLUDE}
     FILES
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointCapabilities.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointController.hxx
