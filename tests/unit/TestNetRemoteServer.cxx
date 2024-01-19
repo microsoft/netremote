@@ -1,4 +1,5 @@
 
+#include <memory>
 #include <optional>
 
 #include <catch2/catch_test_macros.hpp>
@@ -6,8 +7,14 @@
 #include <grpcpp/create_channel.h>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 #include "TestNetRemoteCommon.hxx"
+
+using Microsoft::Net::Remote::Test::EstablishClientConnections;
+using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+using Microsoft::Net::Remote::Test::RemoteServiceConnectionTimeout;
+using Microsoft::Net::Wifi::Test::AccessPointFactoryTest;
 
 TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 {
@@ -15,8 +22,8 @@ TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Wifi;
 
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     SECTION("Create doesn't cause a crash")
@@ -32,8 +39,8 @@ TEST_CASE("Destroy a NetRemoteServer instance", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Wifi;
 
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     std::optional<NetRemoteServer> server{ Configuration };
@@ -50,7 +57,7 @@ TEST_CASE("Destroy a NetRemoteServer instance", "[basic][rpc][remote]")
         const auto numClientsToCreate = Catch::Generators::range(1, 2);
 
         // Establish client connections to the server.
-        const auto clients = Test::EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
+        const auto clients = EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
 
         REQUIRE_NOTHROW(server.reset());
     }
@@ -63,8 +70,8 @@ TEST_CASE("NetRemoteServer can be reached", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Wifi;
 
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     NetRemoteServer server{ Configuration };
@@ -72,10 +79,10 @@ TEST_CASE("NetRemoteServer can be reached", "[basic][rpc][remote]")
 
     SECTION("Can be reached using insecure channel")
     {
-        auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+        auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
         auto client = NetRemote::NewStub(channel);
 
-        REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + Test::RemoteServiceConnectionTimeout));
+        REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + RemoteServiceConnectionTimeout));
     }
 }
 
@@ -86,8 +93,8 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Wifi;
 
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     NetRemoteServer server{ Configuration };
@@ -104,7 +111,7 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
         const auto numClientsToCreate = Catch::Generators::range(1, 3);
 
         // Establish client connections to the server.
-        const auto clients = Test::EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
+        const auto clients = EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
 
         // Stop the server.
         REQUIRE_NOTHROW(server.Stop());
@@ -127,7 +134,7 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
         const auto numClientsToCreate = Catch::Generators::range(1, 3);
 
         // Establish client connections to the server.
-        const auto clients = Test::EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
+        const auto clients = EstablishClientConnections(static_cast<std::size_t>(numClientsToCreate.get()));
 
         REQUIRE_NOTHROW(server.Stop());
         REQUIRE(server.GetGrpcServer() == nullptr);
@@ -141,8 +148,8 @@ TEST_CASE("NetRemoteServer can be cycled through run/stop states", "[basic][rpc]
     using namespace Microsoft::Net::Wifi;
 
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     NetRemoteServer server{ Configuration };
@@ -156,9 +163,9 @@ TEST_CASE("NetRemoteServer can be cycled through run/stop states", "[basic][rpc]
             REQUIRE_NOTHROW(server.Stop());
             REQUIRE_NOTHROW(server.Run());
 
-            auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+            auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
             auto client = NetRemote::NewStub(channel);
-            REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + Test::RemoteServiceConnectionTimeout));
+            REQUIRE(channel->WaitForConnected(std::chrono::system_clock::now() + RemoteServiceConnectionTimeout));
         }
     }
 }

@@ -1,8 +1,9 @@
 
 #include <format>
 #include <iostream>
-#include <string>
+#include <memory>
 #include <string_view>
+#include <string>
 
 #include <catch2/catch_test_macros.hpp>
 #include <grpcpp/create_channel.h>
@@ -10,8 +11,12 @@
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 #include "TestNetRemoteCommon.hxx"
+
+using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+using Microsoft::Net::Wifi::Test::AccessPointFactoryTest;
 
 TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 {
@@ -20,15 +25,17 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
 
+    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     NetRemoteServer server{ Configuration };
     server.Run();
 
-    auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemote::NewStub(channel);
 
     SECTION("Can be called")
@@ -71,14 +78,14 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
     constexpr auto SsidName{ "TestWifiAccessPointEnable" };
 
     NetRemoteServerConfiguration Configuration{
-        .ServerAddress = Test::RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
     };
 
     NetRemoteServer server{ Configuration };
     server.Run();
 
-    auto channel = grpc::CreateChannel(Test::RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemote::NewStub(channel);
 
     SECTION("Can be called")
