@@ -9,6 +9,7 @@ target_sources(${PROJECT_NAME}-server-windows
 target_link_libraries(${PROJECT_NAME}-server-windows
     PRIVATE
         ${PROJECT_NAME}-server
+        wifi-apmanager
 )
 
 set_target_properties(${PROJECT_NAME}-server-windows
