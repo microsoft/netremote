@@ -6,7 +6,6 @@
 #include <string_view>
 
 #include <microsoft/net/wifi/AccessPoint.hxx>
-#include <microsoft/net/wifi/IAccessPointFactory.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -29,16 +28,28 @@ struct AccessPointLinux :
  * @brief IAccessPoint factory for Linux.
  */
 struct AccessPointFactoryLinux :
-    public IAccessPointFactory
+    public AccessPointFactory
 {
+    using AccessPointFactory::AccessPointFactory;
+
     /**
-     * @brief Create an access point object for the given network interface.
-     *
-     * @param interface
-     * @return std::shared_ptr<IAccessPoint>
+     * @brief Create a new access point object for the given network interface.
+     * 
+     * @param interfaceName The name of the interface.
+     * @return std::shared_ptr<IAccessPoint> 
      */
-    std::shared_ptr<IAccessPoint>
-    Create(std::string_view interface) override;
+    virtual std::shared_ptr<IAccessPoint>
+    Create(std::string_view interfaceName) override;
+
+    /**
+     * @brief Create a new access point object for the given network interface with the specified creation arguments.
+     * 
+     * @param interfaceName The name of the interface.
+     * @param createArgs Arguments to be passed to the access point during creation.
+     * @return std::shared_ptr<IAccessPoint> 
+     */
+    virtual std::shared_ptr<IAccessPoint>
+    Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
 };
 } // namespace Microsoft::Net::Wifi
 

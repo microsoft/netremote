@@ -13,6 +13,7 @@ target_link_libraries(${PROJECT_NAME}-server-linux
         notstd
         plog::plog
         wifi-apmanager-linux
+        wifi-core-linux
 )
 
 set_target_properties(${PROJECT_NAME}-server-linux

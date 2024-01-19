@@ -23,11 +23,18 @@ struct AccessPointControllerHostapd :
      */
     AccessPointControllerHostapd(std::string_view interfaceName);
 
-    virtual AccessPointCapabilities
+    virtual AccessPointCapabilities2
     GetCapabilities() override;
 
 private:
     Wpa::WpaController m_wpaController;
+};
+
+struct AccessPointControllerHostapdFactory :
+    public IAccessPointControllerFactory
+{
+    virtual std::unique_ptr<IAccessPointController>
+    Create(std::string_view interfaceName) override;
 };
 } // namespace Microsoft::Net::Wifi
 

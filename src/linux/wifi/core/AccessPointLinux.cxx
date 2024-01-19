@@ -11,7 +11,13 @@ AccessPointLinux::CreateController()
 }
 
 std::shared_ptr<IAccessPoint>
-AccessPointFactoryLinux::Create(std::string_view interface)
+AccessPointFactoryLinux::Create(std::string_view interfaceName)
 {
-    return std::make_shared<AccessPointLinux>(interface);
+    return Create(interfaceName, nullptr);
+}
+
+std::shared_ptr<IAccessPoint>
+AccessPointFactoryLinux::Create(std::string_view interfaceName, [[maybe_unused]] std::unique_ptr<IAccessPointCreateArgs> createArgs)
+{
+    return std::make_shared<AccessPointLinux>(interfaceName, GetControllerFactory());
 }

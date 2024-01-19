@@ -10,7 +10,6 @@
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
-#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <netlink/genl/genl.h>
@@ -206,8 +205,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
 
     // Invoke presence event callback if present.
     if (accessPointPresenceEventCallback != nullptr) {
-        auto accessPoint{ std::make_shared<AccessPoint>(interfaceName) };
-        LOG_VERBOSE << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", accessPoint->GetInterface(), magic_enum::enum_name(accessPointPresenceEvent));
+        LOGV << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", interfaceName, magic_enum::enum_name(accessPointPresenceEvent));
         accessPointPresenceEventCallback(accessPointPresenceEvent, interfaceName);
     }
 

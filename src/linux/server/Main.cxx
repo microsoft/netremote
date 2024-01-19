@@ -5,8 +5,10 @@
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/wifi/AccessPointControllerHostapd.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
+#include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <notstd/Utility.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
@@ -18,10 +20,7 @@
 #include <unistd.h>
 
 using namespace Microsoft::Net::Remote;
-
-using Microsoft::Net::Wifi::AccessPointDiscoveryAgent;
-using Microsoft::Net::Wifi::AccessPointDiscoveryAgentOperationsNetlink;
-using Microsoft::Net::Wifi::AccessPointManager;
+using namespace Microsoft::Net::Wifi;
 
 enum class LogInstanceId : int {
     // Default logger is 0 and is omitted from this enumeration.
@@ -49,7 +48,9 @@ main(int argc, char *argv[])
 
     // Create an access point manager and discovery agent.
     {
-        configuration.AccessPointManager = AccessPointManager::Create();
+        auto accessPointControllerFactory = std::make_unique<AccessPointControllerHostapdFactory>();
+        auto accessPointFactory = std::make_unique<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
+        configuration.AccessPointManager = AccessPointManager::Create(std::move(accessPointFactory));
 
         auto &accessPointManager = configuration.AccessPointManager;
         auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>();

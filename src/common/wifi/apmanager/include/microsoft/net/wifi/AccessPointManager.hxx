@@ -27,15 +27,6 @@ class AccessPointManager :
 {
 public:
     /**
-     * @brief Safely create an instance of the access point manager with a default access point factory that creates
-     * AccessPoint instances.
-     *
-     * @return std::shared_ptr<AccessPointManager>
-     */
-    [[nodiscard]] static std::shared_ptr<AccessPointManager>
-    Create();
-
-    /**
      * @brief Safely create an instance of the access point manager.
      *
      * @param accessPointFactory

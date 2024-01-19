@@ -18,7 +18,6 @@ target_sources(wifi-core
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointController.hxx
-        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointFactory.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211.hxx
 )
 

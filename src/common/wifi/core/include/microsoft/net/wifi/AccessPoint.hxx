@@ -3,7 +3,7 @@
 #define ACCESS_POINT_HXX
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
-#include <microsoft/net/wifi/IAccessPointFactory.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 
 #include <string>
 #include <string_view>
@@ -18,12 +18,13 @@ struct AccessPoint :
     public IAccessPoint
 {
     /**
-     * @brief Construct a new AccessPoint object with the given network
-     * interface name.
-     *
-     * @param interface The network interface name representing the access point.
+     * @brief Construct a new AccessPoint object with the given network interface name.
+     * 
+     * @param interfaceName The network interface name representing the access point.
+     * 
+     * @param accessPointControllerFactory 
      */
-    AccessPoint(std::string_view interface);
+    AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory);
 
     /**
      * @brief Get the network interface name representing the access point.
@@ -42,7 +43,8 @@ struct AccessPoint :
     CreateController() override;
 
 private:
-    const std::string m_interface;
+    const std::string m_interfaceName;
+    std::shared_ptr<IAccessPointControllerFactory> m_accessPointControllerFactory;
 };
 
 /**
@@ -52,13 +54,42 @@ struct AccessPointFactory :
     public IAccessPointFactory
 {
     /**
+     * @brief Construct a new Access Point Factory object
+     * 
+     * @param accessPointControllerFactory 
+     */
+    AccessPointFactory(std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory);
+
+     /**
      * @brief Create a new access point object for the given network interface.
-     *
-     * @param interface
-     * @return std::shared_ptr<AccessPoint>
+     * 
+     * @param interfaceName 
+     * @return std::shared_ptr<IAccessPoint> 
      */
     virtual std::shared_ptr<IAccessPoint>
-    Create(std::string_view interface) override;
+    Create(std::string_view interfaceName) override;
+
+    /**
+     * @brief Create a new access point object for the given network interface with the specified creation arguments.
+     * 
+     * @param interfaceName 
+     * @param createArgs 
+     * @return std::shared_ptr<IAccessPoint> 
+     */
+    virtual std::shared_ptr<IAccessPoint>
+    Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
+
+protected:
+    /**
+     * @brief Get the ControllerFactory object.
+     * 
+     * @return std::shared_ptr<IAccessPointControllerFactory> 
+     */
+    std::shared_ptr<IAccessPointControllerFactory>
+    GetControllerFactory() const noexcept;
+
+private:
+    std::shared_ptr<IAccessPointControllerFactory> m_accessPointControllerFactory;
 };
 } // namespace Microsoft::Net::Wifi
 

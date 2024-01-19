@@ -58,7 +58,7 @@ struct NetRemoteServer
 private:
     std::string m_serverAddress;
     std::unique_ptr<grpc::Server> m_server;
-    Service::NetRemoteService m_service{};
+    Service::NetRemoteService m_service;
 };
 } // namespace Microsoft::Net::Remote
 
