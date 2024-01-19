@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-#include <Wpa/WpaController.hxx>
+#include <Wpa/Hostapd.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -35,7 +35,7 @@ struct AccessPointControllerHostapd :
     GetCapabilities() override;
 
 private:
-    Wpa::WpaController m_wpaController;
+    Wpa::Hostapd m_hostapd;
 };
 
 /**
