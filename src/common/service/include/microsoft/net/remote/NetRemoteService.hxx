@@ -17,11 +17,6 @@ class NetRemoteService :
 {
 public:
     /**
-     * @brief Construct a new NetRemoteService object.
-     */
-    NetRemoteService();
-
-    /**
      * @brief Construct a new NetRemoteService object with the specified access point manager.
      *
      * @param accessPointManager The access point manager to use.

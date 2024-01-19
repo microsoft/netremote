@@ -11,10 +11,6 @@
 using namespace Microsoft::Net::Remote::Service;
 using Microsoft::Net::Wifi::AccessPointManager;
 
-NetRemoteService::NetRemoteService() :
-    NetRemoteService(AccessPointManager::Create())
-{}
-
 NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
     m_accessPointManager(std::move(accessPointManager))
 {}

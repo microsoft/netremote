@@ -5,24 +5,41 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPoint::AccessPoint(std::string_view id) :
-    m_interface(id)
+AccessPoint::AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory) :
+    m_interfaceName(interfaceName),
+    m_accessPointControllerFactory(std::move(accessPointControllerFactory))
 {}
 
 std::string_view
 AccessPoint::GetInterface() const noexcept
 {
-    return m_interface;
+    return m_interfaceName;
 }
 
-std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
+std::unique_ptr<IAccessPointController>
 AccessPoint::CreateController()
 {
-    throw std::runtime_error("this function must be overridden by a derived class");
+    return m_accessPointControllerFactory->Create(m_interfaceName);
+}
+
+AccessPointFactory::AccessPointFactory(std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory) :
+    m_accessPointControllerFactory(std::move(accessPointControllerFactory))
+{}
+
+std::shared_ptr<IAccessPointControllerFactory>
+AccessPointFactory::GetControllerFactory() const noexcept
+{
+    return m_accessPointControllerFactory;
 }
 
 std::shared_ptr<IAccessPoint>
-AccessPointFactory::Create(std::string_view interface)
+AccessPointFactory::Create(std::string_view interfaceName)
 {
-    return std::make_shared<AccessPoint>(interface);
+    return Create(interfaceName, nullptr);
+}
+
+std::shared_ptr<IAccessPoint>
+AccessPointFactory::Create(std::string_view interfaceName, [[maybe_unused]] std::unique_ptr<IAccessPointCreateArgs> accessPointCreateArgs)
+{
+    return std::make_shared<AccessPoint>(interfaceName, GetControllerFactory());
 }

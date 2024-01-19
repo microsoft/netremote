@@ -6,7 +6,7 @@
 
 namespace Microsoft::Net::Wifi
 {
-struct AccessPointCapabilities
+struct AccessPointCapabilities2 // FIXME
 {
 
 };

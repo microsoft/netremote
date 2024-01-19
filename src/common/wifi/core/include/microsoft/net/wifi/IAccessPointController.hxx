@@ -3,14 +3,16 @@
 #define I_ACCESS_POINT_CONTROLLER_HXX
 
 #include <exception>
+#include <memory>
 #include <string_view>
 
 #include <microsoft/net/wifi/AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
 {
-struct IAccessPoint;
-
+/**
+ * @brief Top-level exception type that may ber thrown by IAccessPointController operations.
+ */
 struct AccessPointControllerException :
     public std::exception
 {
@@ -40,8 +42,22 @@ struct IAccessPointController
      * 
      * @return AccessPointCapabilities 
      */
-    virtual AccessPointCapabilities
+    virtual AccessPointCapabilities2
     GetCapabilities() = 0;
+};
+
+/**
+ * @brief Factory for creating IAccessPointController objects.
+ */
+struct IAccessPointControllerFactory
+{
+    /**
+     * @brief Create a new IAccessPointController object.
+     * 
+     * @return std::unique_ptr<IAccessPointController> 
+     */
+    virtual std::unique_ptr<IAccessPointController>
+    Create(std::string_view interfaceName) = 0;
 };
 } // namespace Microsoft::Net::Wifi
 

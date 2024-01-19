@@ -22,13 +22,6 @@ AccessPointManager::Create(std::unique_ptr<IAccessPointFactory> accessPointFacto
     return std::make_shared<notstd::enable_make_protected<AccessPointManager>>(std::move(accessPointFactory));
 }
 
-/* static */
-std::shared_ptr<AccessPointManager>
-AccessPointManager::Create()
-{
-    return Create(std::make_unique<AccessPointFactory>());
-}
-
 std::shared_ptr<AccessPointManager>
 AccessPointManager::GetInstance() noexcept
 {
