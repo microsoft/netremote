@@ -2,11 +2,20 @@
 #ifndef I_ACCESS_POINT_CONTROLLER_HXX
 #define I_ACCESS_POINT_CONTROLLER_HXX
 
+#include <exception>
 #include <string_view>
+
+#include <microsoft/net/wifi/AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
 {
 struct IAccessPoint;
+
+struct AccessPointControllerException :
+    public std::exception
+{
+    using std::exception::exception;
+};
 
 /**
  * @brief Class allowing control of an access point.
