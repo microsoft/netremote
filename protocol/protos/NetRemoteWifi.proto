@@ -61,3 +61,39 @@ message WifiAccessPointDisableResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointSetPhyTypeRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11PhyType PhyType = 2;
+}
+
+message WifiAccessPointSetPhyTypeResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiAccessPointSetAuthenticationMethodRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 2;
+}
+
+message WifiAccessPointSetAuthenticationMethodResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiAccessPointSetEncryptionMethodRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11CipherAlgorithm CipherAlgorithm = 2;
+}
+
+message WifiAccessPointSetEncryptionMethodResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
