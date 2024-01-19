@@ -8,6 +8,7 @@ set(WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX ${WPA_CONTROLLER_PUBLIC_INCLUDE}/${WPA_
 target_sources(wpa-controller
     PRIVATE
         Hostapd.cxx
+        HostapdException.cxx
         ProtocolHostapd.cxx
         ProtocolWpa.cxx
         WpaCommand.cxx
