@@ -114,3 +114,65 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         REQUIRE(result.status().has_details() == false);
     }
 }
+
+TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+
+    constexpr auto SsidName{ "TestWifiAccessPointSetPhyType" };
+
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    AccessPointConfiguration apConfiguration{};
+    apConfiguration.mutable_ssid()->set_name(SsidName);
+    apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
+    apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
+    apConfiguration.set_encryptionalgorithm(Dot11CipherAlgorithm::Dot11CipherAlgorithmCcmp256);
+    apConfiguration.mutable_bands()->Add(RadioBand::RadioBand2_4GHz);
+    apConfiguration.mutable_bands()->Add(RadioBand::RadioBand5_0GHz);
+
+    WifiAccessPointEnableRequest request{};
+    request.set_accesspointid("TestWifiAccessPointSetPhyType");
+    *request.mutable_configuration() = std::move(apConfiguration);
+
+    WifiAccessPointEnableResult result{};
+    grpc::ClientContext clientContext{};
+
+    auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+    REQUIRE(status.ok());
+    REQUIRE(result.accesspointid() == request.accesspointid());
+    REQUIRE(result.has_status());
+    REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    REQUIRE(result.status().message().empty());
+    REQUIRE(result.status().has_details() == false);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointSetPhyTypeRequest setPhyTypeRequest{};
+        setPhyTypeRequest.set_accesspointid("TestWifiAccessPointSetPhyType");
+        setPhyTypeRequest.set_phytype(Dot11PhyType::Dot11PhyTypeB);
+
+        WifiAccessPointSetPhyTypeResult setPhyTypeResult{};
+        grpc::ClientContext setPhyTypeClientContext{};
+
+        auto setPhyTypeStatus = client->WifiAccessPointSetPhyType(&setPhyTypeClientContext, setPhyTypeRequest, &setPhyTypeResult);
+        REQUIRE(setPhyTypeStatus.ok());
+        REQUIRE(setPhyTypeResult.accesspointid() == setPhyTypeRequest.accesspointid());
+        REQUIRE(setPhyTypeResult.has_status());
+        REQUIRE(setPhyTypeResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(setPhyTypeResult.status().message().empty());
+        REQUIRE(setPhyTypeResult.status().has_details() == false);
+    }
+}
