@@ -24,6 +24,11 @@ AccessPointTest::CreateController()
 std::shared_ptr<IAccessPoint>
 AccessPointFactoryTest::Create(std::string_view interface)
 {
-    return std::make_shared<AccessPointTest>(interface);
+    return Create(interface, nullptr);
 }
 
+std::shared_ptr<IAccessPoint>
+AccessPointFactoryTest::Create(std::string_view interfaceName, [[maybe_unused]] std::unique_ptr<IAccessPointCreateArgs> createArgs)
+{
+    return std::make_shared<AccessPointTest>(interfaceName);
+}
