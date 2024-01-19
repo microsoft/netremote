@@ -1,6 +1,5 @@
 
 #include <microsoft/net/wifi/AccessPointControllerHostapd.hxx>
-#include <Wpa/WpaCommandGet.hxx>
 
 using namespace Microsoft::Net::Wifi;
 

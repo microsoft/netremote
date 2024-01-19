@@ -5,8 +5,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
-#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {
