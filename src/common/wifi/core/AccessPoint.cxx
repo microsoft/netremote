@@ -19,7 +19,9 @@ AccessPoint::GetInterfaceName() const noexcept
 std::unique_ptr<IAccessPointController>
 AccessPoint::CreateController()
 {
-    return m_accessPointControllerFactory->Create(m_interfaceName);
+    return (m_accessPointControllerFactory != nullptr)
+        ? m_accessPointControllerFactory->Create(m_interfaceName)
+        : nullptr;
 }
 
 AccessPointFactory::AccessPointFactory(std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory) :
