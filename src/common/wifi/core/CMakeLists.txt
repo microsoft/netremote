@@ -9,6 +9,7 @@ target_sources(wifi-core
     PRIVATE
         AccessPoint.cxx
         AccessPointController.cxx
+        AccessPointControllerException.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_PUBLIC_INCLUDE}
