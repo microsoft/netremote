@@ -20,14 +20,13 @@ struct AccessPointController :
 {
     virtual ~AccessPointController() = default;
 
-    AccessPointController(std::string_view interface);
+    AccessPointController(std::string_view interfaceName);
 
-private:
     std::string_view
-    GetInterface() const noexcept;
+    GetInterfaceName() const noexcept override;
 
 private:
-    std::string m_interface;
+    std::string m_interfaceName;
 };
 } // namespace Microsoft::Net::Wifi
 
