@@ -27,6 +27,15 @@ struct AccessPointControllerHostapd :
     AccessPointControllerHostapd(std::string_view interfaceName);
 
     /**
+     * @brief Get whether the access point is enabled.
+     * 
+     * @return true 
+     * @return false 
+     */
+    virtual bool
+    GetIsEnabled() override;
+
+    /**
      * @brief Get the Capabilities object
      *
      * @return Ieee80211AccessPointCapabilities

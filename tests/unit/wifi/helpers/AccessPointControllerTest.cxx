@@ -14,6 +14,12 @@ AccessPointControllerTest::GetInterfaceName() const noexcept
     return InterfaceName;
 }
 
+bool
+AccessPointControllerTest::GetIsEnabled()
+{
+    return IsEnabled;
+}
+
 Ieee80211AccessPointCapabilities
 AccessPointControllerTest::GetCapabilities()
 {
