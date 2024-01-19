@@ -2,7 +2,8 @@
 #ifndef ACCESS_POINT_CONTROLLER_HXX
 #define ACCESS_POINT_CONTROLLER_HXX
 
-#include <memory>
+#include <string>
+#include <string_view>
 
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 
@@ -19,13 +20,14 @@ struct AccessPointController :
 {
     virtual ~AccessPointController() = default;
 
-    AccessPointController(std::weak_ptr<IAccessPoint> accessPointWeak);
-
-    virtual std::weak_ptr<Microsoft::Net::Wifi::IAccessPoint>
-    GetAccessPoint() const noexcept override;
+    AccessPointController(std::string_view interface);
 
 private:
-    std::weak_ptr<Microsoft::Net::Wifi::IAccessPoint> m_accessPointWeak;
+    std::string_view
+    GetInterface() const noexcept;
+
+private:
+    std::string m_interface;
 };
 } // namespace Microsoft::Net::Wifi
 
