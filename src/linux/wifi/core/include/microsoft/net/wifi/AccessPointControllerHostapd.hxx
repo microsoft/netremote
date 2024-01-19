@@ -33,6 +33,8 @@ private:
 struct AccessPointControllerHostapdFactory :
     public IAccessPointControllerFactory
 {
+    virtual ~AccessPointControllerHostapdFactory() = default;
+
     virtual std::unique_ptr<IAccessPointController>
     Create(std::string_view interfaceName) override;
 };

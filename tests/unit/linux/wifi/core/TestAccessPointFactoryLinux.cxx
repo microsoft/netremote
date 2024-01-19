@@ -72,6 +72,6 @@ TEST_CASE("Create() function", "[wifi][core][ap][linux]")
     {
         AccessPointFactoryLinux accessPointFactory{ std::make_unique<Test::AccessPointControllerFactoryTest>() };
         const auto accessPoint = accessPointFactory.Create(Test::InterfaceNameDefault);
-        REQUIRE(accessPoint->GetInterface() == Test::InterfaceNameDefault);
+        REQUIRE(accessPoint->GetInterfaceName() == Test::InterfaceNameDefault);
     }
 }

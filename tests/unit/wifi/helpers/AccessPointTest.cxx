@@ -10,7 +10,7 @@ AccessPointTest::AccessPointTest(std::string_view interfaceName) :
 {}
 
 std::string_view
-AccessPointTest::GetInterface() const noexcept
+AccessPointTest::GetInterfaceName() const noexcept
 {
     return InterfaceName;
 }
@@ -22,9 +22,9 @@ AccessPointTest::CreateController()
 }
 
 std::shared_ptr<IAccessPoint>
-AccessPointFactoryTest::Create(std::string_view interface)
+AccessPointFactoryTest::Create(std::string_view interfaceName)
 {
-    return Create(interface, nullptr);
+    return Create(interfaceName, nullptr);
 }
 
 std::shared_ptr<IAccessPoint>

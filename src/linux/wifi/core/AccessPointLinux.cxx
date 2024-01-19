@@ -7,7 +7,7 @@ using namespace Microsoft::Net::Wifi;
 std::unique_ptr<IAccessPointController>
 AccessPointLinux::CreateController()
 {
-    return std::make_unique<AccessPointControllerHostapd>(GetInterface());
+    return std::make_unique<AccessPointControllerHostapd>(GetInterfaceName());
 }
 
 std::shared_ptr<IAccessPoint>
