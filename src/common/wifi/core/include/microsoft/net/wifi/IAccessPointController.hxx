@@ -5,6 +5,7 @@
 #include <exception>
 #include <memory>
 #include <string_view>
+#include <string>
 
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
@@ -16,7 +17,13 @@ namespace Microsoft::Net::Wifi
 struct AccessPointControllerException :
     public std::exception
 {
-    using std::exception::exception;
+    AccessPointControllerException(std::string_view what);
+
+    virtual const char*
+    what() const noexcept override;
+
+private:
+    std::string m_what;
 };
 
 /**
@@ -36,6 +43,15 @@ struct IAccessPointController
      */
     virtual std::string_view
     GetInterfaceName() const noexcept = 0;
+
+    /**
+     * @brief Get whether the access point is enabled.
+     * 
+     * @return true 
+     * @return false 
+     */
+    virtual bool
+    GetIsEnabled() = 0;
 
     /**
      * @brief Get the capabilities of the access point.
