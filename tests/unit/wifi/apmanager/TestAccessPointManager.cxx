@@ -4,6 +4,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 #include "AccessPointDiscoveryAgentOperationsTest.hxx"
 
@@ -13,7 +15,7 @@ TEST_CASE("Create an AccessPointManager instance", "[wifi][core][apmanager]")
 
     SECTION("Create doesn't cause a crash")
     {
-        REQUIRE_NOTHROW(AccessPointManager::Create());
+        REQUIRE_NOTHROW(AccessPointManager::Create(std::make_unique<Test::AccessPointFactoryTest>()));
     }
 }
 
@@ -25,7 +27,7 @@ TEST_CASE("Destroy an AccessPointManager instance", "[wifi][core][apmanager]")
 
     SECTION("Destroy doesn't cause a crash")
     {
-        auto accessPointManager{ AccessPointManager::Create() };
+        auto accessPointManager{ AccessPointManager::Create(std::make_unique<Test::AccessPointFactoryTest>()) };
         REQUIRE_NOTHROW(accessPointManager.reset());
     }
 
@@ -34,7 +36,7 @@ TEST_CASE("Destroy an AccessPointManager instance", "[wifi][core][apmanager]")
         auto accessPointDiscoveryAgent1{ AccessPointDiscoveryAgent::Create(std::make_unique<AccessPointDiscoveryAgentOperationsTest>()) };
         auto accessPointDiscoveryAgent2{ AccessPointDiscoveryAgent::Create(std::make_unique<AccessPointDiscoveryAgentOperationsTest>()) };
 
-        auto accessPointManager{ AccessPointManager::Create() };
+        auto accessPointManager{ AccessPointManager::Create(std::make_unique<Test::AccessPointFactoryTest>()) };
         accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent1));
         accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent2));
         REQUIRE_NOTHROW(accessPointManager.reset());
@@ -47,7 +49,7 @@ TEST_CASE("AccessPointManager instance reflects basic properties", "[wifi][core]
 
     SECTION("GetAllAccessPoints() returns an empty list")
     {
-        auto accessPointManager{ AccessPointManager::Create() };
+        auto accessPointManager{ AccessPointManager::Create(std::make_unique<Test::AccessPointFactoryTest>()) };
         REQUIRE(std::empty(accessPointManager->GetAllAccessPoints()));
     }
 }
@@ -64,7 +66,7 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
     auto* accessPointDiscoveryAgentOperationsTestPtr{ accessPointDiscoveryAgentOperationsTest.get() };
     auto accessPointDiscoveryAgentTest{ AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsTest)) };
 
-    auto accessPointManager{ AccessPointManager::Create() };
+    auto accessPointManager{ AccessPointManager::Create(std::make_unique<Test::AccessPointFactoryTest>()) };
     accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgentTest));
 
     SECTION("Access points from arrival events are persisted via GetAccessPoint()")
@@ -129,7 +131,7 @@ TEST_CASE("AccessPointManager discards access points reported to have departed b
     auto* accessPointDiscoveryAgentOperationsTestPtr{ accessPointDiscoveryAgentOperationsTest.get() };
     auto accessPointDiscoveryAgentTest{ AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsTest)) };
 
-    auto accessPointManager{ AccessPointManager::Create() };
+    auto accessPointManager{ AccessPointManager::Create(std::make_unique<Test::AccessPointFactoryTest>()) };
     accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgentTest));
 
     SECTION("Access points reported to have departed are not accessible via GetAccessPoint()")
