@@ -3,12 +3,13 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointController::AccessPointController(std::weak_ptr<IAccessPoint> accessPointWeak) :
-    m_accessPointWeak(accessPointWeak)
-{}
-
-std::weak_ptr<IAccessPoint>
-AccessPointController::GetAccessPoint() const noexcept
+AccessPointController::AccessPointController(std::string_view interface) :
+    m_interface(interface)
 {
-    return m_accessPointWeak;
+}
+
+std::string_view
+AccessPointController::GetInterface() const noexcept
+{
+    return m_interface;
 }
