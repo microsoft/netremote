@@ -1,5 +1,6 @@
 
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
+#include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
@@ -23,5 +24,5 @@ AccessPointControllerTest::GetCapabilities()
 std::unique_ptr<IAccessPointController>
 AccessPointControllerFactoryTest::Create(std::string_view interfaceName)
 {
-    return nullptr;
+    return std::make_unique<AccessPointControllerTest>(interfaceName);
 }
