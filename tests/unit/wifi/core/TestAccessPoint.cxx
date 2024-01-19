@@ -51,6 +51,6 @@ TEST_CASE("AccessPoint instance reflects basic properties", "[wifi][core][ap]")
     SECTION("GetInterface() returns the interface name")
     {
         AccessPoint accessPoint{ Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        REQUIRE(accessPoint.GetInterface() == Test::InterfaceNameDefault);
+        REQUIRE(accessPoint.GetInterfaceName() == Test::InterfaceNameDefault);
     }
 }

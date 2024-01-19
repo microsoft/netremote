@@ -33,7 +33,7 @@ AccessPointManager::AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 {
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPointExists = std::ranges::any_of(m_accessPoints, [&](const auto& accessPointExisting) {
-        return (accessPointExisting->GetInterface() == accessPoint->GetInterface());
+        return (accessPointExisting->GetInterfaceName() == accessPoint->GetInterfaceName());
     });
 
     if (accessPointExists) {
@@ -48,7 +48,7 @@ AccessPointManager::RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 {
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPointToRemove = std::ranges::find_if(m_accessPoints, [&](const auto& accessPointExisting) {
-        return (accessPointExisting->GetInterface() == accessPoint->GetInterface());
+        return (accessPointExisting->GetInterfaceName() == accessPoint->GetInterfaceName());
     });
 
     if (accessPointToRemove == std::cend(m_accessPoints)) {
@@ -63,7 +63,7 @@ AccessPointManager::GetAccessPoint(std::string_view interfaceName) const
 {
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPoint = std::ranges::find_if(m_accessPoints, [&](const auto& accessPointExisting) {
-        return (accessPointExisting->GetInterface() == interfaceName);
+        return (accessPointExisting->GetInterfaceName() == interfaceName);
     });
 
     if (accessPoint == std::cend(m_accessPoints)) {

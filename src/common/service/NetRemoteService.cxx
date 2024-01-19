@@ -34,7 +34,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
         WifiEnumerateAccessPointsResultItem item{};
         auto accessPoint = accessPointWeak.lock();
         if (accessPoint != nullptr) {
-            auto interfaceName = accessPoint->GetInterface();
+            auto interfaceName = accessPoint->GetInterfaceName();
             std::string accessPointId{ std::cbegin(interfaceName), std::cend(interfaceName) };
             item.set_accesspointid(std::move(accessPointId));
         }

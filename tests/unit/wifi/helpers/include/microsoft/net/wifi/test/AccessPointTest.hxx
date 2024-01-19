@@ -15,7 +15,7 @@ struct AccessPointTest final :
     AccessPointTest(std::string_view interfaceName);
 
     virtual std::string_view
-    GetInterface() const noexcept override;
+    GetInterfaceName() const noexcept override;
 
     /**
      * @brief Create a new instance that can control the access point.

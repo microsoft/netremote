@@ -76,7 +76,7 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
         auto accessPointRetrievedWeak{ accessPointManager->GetAccessPoint(accessPointInterfaceName1) };
         auto accessPointRetrieved{ accessPointRetrievedWeak.lock() };
         REQUIRE(accessPointRetrieved != nullptr);
-        REQUIRE(accessPointRetrieved->GetInterface() == accessPointInterfaceName1);
+        REQUIRE(accessPointRetrieved->GetInterfaceName() == accessPointInterfaceName1);
     }
 
     SECTION("Access points from arrival events are persisted via GetAllAccessPoints()")
@@ -90,7 +90,7 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
         REQUIRE_NOTHROW(accessPointRetrievedWeak = accessPointsAll[0]);
         auto accessPointRetrieved{ accessPointRetrievedWeak.lock() };
         REQUIRE(accessPointRetrieved != nullptr);
-        REQUIRE(accessPointRetrieved->GetInterface() == accessPointInterfaceName1);
+        REQUIRE(accessPointRetrieved->GetInterfaceName() == accessPointInterfaceName1);
     }
 
     SECTION("Access points from arrival events are persisted via GetAccessPoint() after additional access points have been added")
@@ -101,7 +101,7 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
         auto accessPointRetrievedWeak{ accessPointManager->GetAccessPoint(accessPointInterfaceName1) };
         auto accessPointRetrieved{ accessPointRetrievedWeak.lock() };
         REQUIRE(accessPointRetrieved != nullptr);
-        REQUIRE(accessPointRetrieved->GetInterface() == accessPointInterfaceName1);
+        REQUIRE(accessPointRetrieved->GetInterfaceName() == accessPointInterfaceName1);
     }
 
     SECTION("Access points from arrival events are persisted via GetAllAccessPoints() after additional access points have been added")
@@ -116,7 +116,7 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
         REQUIRE_NOTHROW(accessPointRetrievedWeak = accessPointsAll[0]);
         auto accessPointRetrieved{ accessPointRetrievedWeak.lock() };
         REQUIRE(accessPointRetrieved != nullptr);
-        REQUIRE(accessPointRetrieved->GetInterface() == accessPointInterfaceName1);
+        REQUIRE(accessPointRetrieved->GetInterfaceName() == accessPointInterfaceName1);
     }
 }
 

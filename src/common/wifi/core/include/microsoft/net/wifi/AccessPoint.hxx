@@ -32,7 +32,7 @@ struct AccessPoint :
      * @return std::string_view
      */
     std::string_view
-    GetInterface() const noexcept override;
+    GetInterfaceName() const noexcept override;
 
     /**
      * @brief Create a controller object.
