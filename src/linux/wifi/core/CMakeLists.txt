@@ -20,11 +20,5 @@ target_sources(wifi-core-linux
 target_link_libraries(wifi-core-linux
     PUBLIC
         wifi-core
-)
-
-install(
-    TARGETS wifi-core-linux
-    EXPORT ${PROJECT_NAME}
-    FILE_SET HEADERS
-    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_PUBLIC_HEADER_BASE}/${WIFI_CORE_LINUX_PUBLIC_INCLUDE_SUFFIX}"
+        wpa-controller
 )
