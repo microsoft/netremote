@@ -5,7 +5,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
-#include <microsoft/net/wifi/test/AccessPointFactoryTest.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
+#include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {
@@ -19,16 +20,16 @@ TEST_CASE("Create an AccessPoint instance", "[wifi][core][ap]")
     SECTION("Create doesn't cause a crash")
     {
         std::optional<AccessPoint> accessPoint;
-        REQUIRE_NOTHROW(accessPoint.emplace(Test::InterfaceNameDefault));
+        REQUIRE_NOTHROW(accessPoint.emplace(Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>()));
     }
 
     SECTION("Create multiple for same interface doesn't cause a crash")
     {
         std::optional<AccessPoint> accessPoint1;
-        REQUIRE_NOTHROW(accessPoint1.emplace(Test::InterfaceNameDefault));
+        REQUIRE_NOTHROW(accessPoint1.emplace(Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>()));
 
         std::optional<AccessPoint> accessPoint2;
-        REQUIRE_NOTHROW(accessPoint2.emplace(Test::InterfaceNameDefault));
+        REQUIRE_NOTHROW(accessPoint2.emplace(Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>()));
     }
 }
 
@@ -38,7 +39,7 @@ TEST_CASE("Destroy an AccessPoint instance", "[wifi][core][ap]")
 
     SECTION("Destroy doesn't cause a crash")
     {
-        AccessPoint accessPoint{ Test::InterfaceNameDefault };
+        AccessPoint accessPoint{ Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>() };
         REQUIRE_NOTHROW(accessPoint.~AccessPoint());
     }
 }
@@ -49,17 +50,7 @@ TEST_CASE("AccessPoint instance reflects basic properties", "[wifi][core][ap]")
 
     SECTION("GetInterface() returns the interface name")
     {
-        AccessPoint accessPoint{ Test::InterfaceNameDefault };
+        AccessPoint accessPoint{ Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>() };
         REQUIRE(accessPoint.GetInterface() == Test::InterfaceNameDefault);
-    }
-}
-
-TEST_CASE("AccessPoint unimplemented functions cause runtime errors")
-{
-    using namespace Microsoft::Net::Wifi;
-
-    SECTION("CreateController throws std::runtime_error")
-    {
-        REQUIRE_THROWS_AS(AccessPoint(Test::InterfaceNameDefault).CreateController(), std::runtime_error);
     }
 }
