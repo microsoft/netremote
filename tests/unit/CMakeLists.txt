@@ -16,10 +16,11 @@ target_sources(${PROJECT_NAME}-test-unit
 
 target_link_libraries(${PROJECT_NAME}-test-unit
     PRIVATE
+        ${PROJECT_NAME}-server
         Catch2::Catch2WithMain
         gRPC::grpc++
         magic_enum::magic_enum
-        ${PROJECT_NAME}-server
+        wifi-test-helpers
 )
 
 catch_discover_tests(${PROJECT_NAME}-test-unit)
