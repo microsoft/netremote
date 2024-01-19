@@ -25,7 +25,7 @@ struct AccessPointLinux :
 };
 
 /**
- * @brief IAccessPoint factory for Linux.
+ * @brief Factory to create AccessPointLinux instances.
  */
 struct AccessPointFactoryLinux :
     public AccessPointFactory
@@ -34,19 +34,19 @@ struct AccessPointFactoryLinux :
 
     /**
      * @brief Create a new access point object for the given network interface.
-     * 
+     *
      * @param interfaceName The name of the interface.
-     * @return std::shared_ptr<IAccessPoint> 
+     * @return std::shared_ptr<IAccessPoint>
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName) override;
 
     /**
      * @brief Create a new access point object for the given network interface with the specified creation arguments.
-     * 
+     *
      * @param interfaceName The name of the interface.
      * @param createArgs Arguments to be passed to the access point during creation.
-     * @return std::shared_ptr<IAccessPoint> 
+     * @return std::shared_ptr<IAccessPoint>
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;

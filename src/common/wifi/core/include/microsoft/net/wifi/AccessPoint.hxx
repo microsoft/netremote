@@ -21,8 +21,7 @@ struct AccessPoint :
      * @brief Construct a new AccessPoint object with the given network interface name.
      * 
      * @param interfaceName The network interface name representing the access point.
-     * 
-     * @param accessPointControllerFactory 
+     * @param accessPointControllerFactory The factory used to create controller objects.
      */
     AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory);
 
@@ -72,8 +71,8 @@ struct AccessPointFactory :
     /**
      * @brief Create a new access point object for the given network interface with the specified creation arguments.
      * 
-     * @param interfaceName 
-     * @param createArgs 
+     * @param interfaceName The name of the interface.
+     * @param createArgs Arguments to be passed to the access point during creation.
      * @return std::shared_ptr<IAccessPoint> 
      */
     virtual std::shared_ptr<IAccessPoint>

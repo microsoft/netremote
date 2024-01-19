@@ -2,8 +2,8 @@
 #include <format>
 #include <iostream>
 #include <memory>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <catch2/catch_test_macros.hpp>
 #include <grpcpp/create_channel.h>
