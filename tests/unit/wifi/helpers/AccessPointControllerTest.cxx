@@ -1,6 +1,5 @@
 
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
-#include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
@@ -15,7 +14,13 @@ AccessPointControllerTest::GetInterfaceName() const noexcept
     return InterfaceName;
 }
 
-AccessPointCapabilities2
+bool
+AccessPointControllerTest::GetIsEnabled()
+{
+    return IsEnabled;
+}
+
+Ieee80211AccessPointCapabilities
 AccessPointControllerTest::GetCapabilities()
 {
     return {}; // TODO: return something

@@ -99,18 +99,13 @@ struct IHostapd
  * @brief Generic exception that may be thrown by any of the functions in
  * IHostapd.
  */
-struct HostapdException : std::exception
+struct HostapdException : 
+    public std::exception
 {
-    HostapdException(std::string_view message) :
-        m_message(message)
-    {
-    }
+    HostapdException(std::string_view message);
 
     const char*
-    what() const noexcept override
-    {
-        return m_message.c_str();
-    }
+    what() const noexcept override;
 
 private:
     const std::string m_message;

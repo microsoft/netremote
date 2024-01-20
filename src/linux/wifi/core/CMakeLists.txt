@@ -18,6 +18,8 @@ target_sources(wifi-core-linux
 )
 
 target_link_libraries(wifi-core-linux
+    PRIVATE
+        plog::plog
     PUBLIC
         wifi-core
         wpa-controller

@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-#include <Wpa/WpaController.hxx>
+#include <Wpa/Hostapd.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -27,15 +27,24 @@ struct AccessPointControllerHostapd :
     AccessPointControllerHostapd(std::string_view interfaceName);
 
     /**
+     * @brief Get whether the access point is enabled.
+     * 
+     * @return true 
+     * @return false 
+     */
+    virtual bool
+    GetIsEnabled() override;
+
+    /**
      * @brief Get the Capabilities object
      *
-     * @return AccessPointCapabilities2
+     * @return Ieee80211AccessPointCapabilities
      */
-    virtual AccessPointCapabilities2
+    virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
 
 private:
-    Wpa::WpaController m_wpaController;
+    Wpa::Hostapd m_hostapd;
 };
 
 /**
