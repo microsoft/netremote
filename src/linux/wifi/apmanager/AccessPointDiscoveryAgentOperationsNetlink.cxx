@@ -155,7 +155,10 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
     // Enumerate all nl80211 interfaces and filter out those that are not APs.
     auto nl80211Interfaces{ Nl80211Interface::Enumerate() };
     auto nl80211ApInterfaceNames = nl80211Interfaces | std::views::filter(detail::IsNl80211InterfaceTypeAp) | std::views::transform(detail::Nl80211InterfaceName);
-    std::vector<std::string> accessPoints(std::begin(nl80211ApInterfaceNames), std::end(nl80211ApInterfaceNames));
+    std::vector<std::string> accessPoints(std::make_move_iterator(std::begin(nl80211ApInterfaceNames)), std::make_move_iterator(std::end(nl80211ApInterfaceNames)));
+
+    // Clear the vector since most of the items were moved out.
+    nl80211Interfaces.clear();
 
     probePromise.set_value(std::move(accessPoints));
 
