@@ -3,6 +3,7 @@
 #include <array>
 #include <cerrno>
 #include <format>
+#include <ranges>
 #include <stdexcept>
 #include <string_view>
 
@@ -117,17 +118,47 @@ AccessPointDiscoveryAgentOperationsNetlink::Stop()
     }
 }
 
+namespace detail
+{
+/**
+ * @brief Helper function to determine if an nl80211 interface is an AP. To be used in range expressions.
+ *
+ * @param nl80211Interface
+ * @return true
+ * @return false
+ */
+bool
+IsNl80211InterfaceTypeAp(const Nl80211Interface &nl80211Interface)
+{
+    return (nl80211Interface.Type == nl80211_iftype::NL80211_IFTYPE_AP);
+}
+
+/**
+ * @brief Helper function returning the name of an nl80211 interface. To be used in range expressions.
+ *
+ * @param nl80211Interface
+ * @return std::string
+ */
+std::string
+Nl80211InterfaceName(const Nl80211Interface &nl80211Interface)
+{
+    return nl80211Interface.Name;
+}
+} // namespace detail
+
 std::future<std::vector<std::string>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
     std::promise<std::vector<std::string>> probePromise{};
     auto probeFuture = probePromise.get_future();
 
+    // Enumerate all nl80211 interfaces and filter out those that are not APs.
     auto nl80211Interfaces{ Nl80211Interface::Enumerate() };
-    std::vector<std::string> accessPoints(std::size(nl80211Interfaces));
-    std::ranges::transform(nl80211Interfaces, std::begin(accessPoints), [](const auto &nl80211Interface) {
-        return nl80211Interface.Name;
-    });
+    auto nl80211ApInterfaceNames = nl80211Interfaces | std::views::filter(detail::IsNl80211InterfaceTypeAp) | std::views::transform(detail::Nl80211InterfaceName);
+    std::vector<std::string> accessPoints(std::make_move_iterator(std::begin(nl80211ApInterfaceNames)), std::make_move_iterator(std::end(nl80211ApInterfaceNames)));
+
+    // Clear the vector since most of the items were moved out.
+    nl80211Interfaces.clear();
 
     probePromise.set_value(std::move(accessPoints));
 

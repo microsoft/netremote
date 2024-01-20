@@ -34,6 +34,7 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
 
     for (const auto& accessPoint : result.accesspoints()) {
         LOGI << std::format(" - [{}]", accessPoint.accesspointid());
+        LOGI << std::format("   - {}", accessPoint.isenabled() ? "enabled" : "disabled");
     }
 }
 
