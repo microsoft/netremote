@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <format>
 #include <iterator>
 #include <string>
@@ -11,9 +12,9 @@
 
 using namespace Microsoft::Net::Remote::Service;
 
+using Microsoft::Net::Wifi::AccessPointControllerException;
 using Microsoft::Net::Wifi::AccessPointManager;
 using Microsoft::Net::Wifi::IAccessPoint;
-using Microsoft::Net::Wifi::AccessPointControllerException;
 
 NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
     m_accessPointManager(std::move(accessPointManager))
@@ -69,8 +70,15 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
 
     auto accessPointController = accessPoint.CreateController();
-    if (accessPointController != nullptr) {
+    if (accessPointController == nullptr) {
         LOGE << std::format("Failed to create controller for access point {}", interfaceName);
+        return MakeInvalidAccessPointResultItem();
+    }
+
+    try {
+        isEnabled = accessPointController->GetIsEnabled();
+    } catch (const AccessPointControllerException& apce) {
+        LOGE << std::format("Failed to get enabled state for access point {} ({})", interfaceName, apce.what());
         return MakeInvalidAccessPointResultItem();
     }
 
@@ -106,6 +114,12 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<Microsoft::Net::W
 
     return item;
 }
+
+bool
+NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
+{
+    return (item.accesspointid() == AccessPointIdInvalid);
+}
 } // namespace detail
 
 ::grpc::Status
@@ -115,12 +129,17 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
     LOGD << std::format("Received WifiEnumerateAccessPoints request");
 
+    // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
     std::vector<WifiEnumerateAccessPointsResultItem> accessPointResultItems(std::size(accessPoints));
     std::ranges::transform(accessPoints, std::begin(accessPointResultItems), [](auto& accessPointWeak) {
         return detail::IAccessPointWeakToNetRemoteAccessPointResultItem(accessPointWeak);
     });
 
+    // Remove any invalid items.
+    accessPointResultItems.erase(std::begin(std::ranges::remove_if(accessPointResultItems, detail::NetRemoteAccessPointResultItemIsInvalid)), std::end(accessPointResultItems));
+
+    // Update result.
     *response->mutable_accesspoints() = {
         std::make_move_iterator(std::begin(accessPointResultItems)),
         std::make_move_iterator(std::end(accessPointResultItems))
