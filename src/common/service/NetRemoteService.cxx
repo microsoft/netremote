@@ -285,7 +285,7 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<Microsoft::Net::W
     if (accessPoint != nullptr) {
         item = IAccessPointToNetRemoteAccessPointResultItem(*accessPoint.get());
     } else {
-        item.set_accesspointid(AccessPointIdInvalid);
+        item = detail::MakeInvalidAccessPointResultItem();
     }
 
     return item;
