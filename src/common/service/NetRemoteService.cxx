@@ -29,7 +29,7 @@ NetRemoteService::GetAccessPointManager() noexcept
 namespace detail
 {
 Microsoft::Net::Wifi::Dot11PhyType
-IeeeProtocolToNetRemotePhyType(const Microsoft::Net::Wifi::IeeeProtocol& ieeeProtocol)
+IeeeProtocolToNetRemotePhyType(Microsoft::Net::Wifi::IeeeProtocol ieeeProtocol)
 {
     using Microsoft::Net::Wifi::Dot11PhyType;
     using Microsoft::Net::Wifi::IeeeProtocol;
@@ -69,7 +69,7 @@ IeeeProtocolToNetRemotePhyType(const Microsoft::Net::Wifi::IeeeProtocol& ieeePro
 }
 
 Microsoft::Net::Wifi::RadioBand
-IeeeFrequencyBandToNetRemoteRadioBand(const Microsoft::Net::Wifi::IeeeFrequencyBand& ieeeFrequencyBand)
+IeeeFrequencyBandToNetRemoteRadioBand(Microsoft::Net::Wifi::IeeeFrequencyBand ieeeFrequencyBand)
 {
     using Microsoft::Net::Wifi::IeeeFrequencyBand;
     using Microsoft::Net::Wifi::RadioBand;
@@ -94,7 +94,7 @@ IeeeFrequencyBandToNetRemoteRadioBand(const Microsoft::Net::Wifi::IeeeFrequencyB
 }
 
 Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm
-IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(const Microsoft::Net::Wifi::IeeeAuthenticationAlgorithm& ieeeAuthenticationAlgorithm)
+IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Microsoft::Net::Wifi::IeeeAuthenticationAlgorithm ieeeAuthenticationAlgorithm)
 {
     using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
     using Microsoft::Net::Wifi::IeeeAuthenticationAlgorithm;
@@ -128,7 +128,7 @@ IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(const Microsoft::N
 }
 
 Microsoft::Net::Wifi::Dot11CipherAlgorithm
-IeeeCipherAlgorithmToNetRemoteCipherAlgorithm(const Microsoft::Net::Wifi::IeeeCipherSuite& ieeeCipherSuite)
+IeeeCipherAlgorithmToNetRemoteCipherAlgorithm(Microsoft::Net::Wifi::IeeeCipherSuite ieeeCipherSuite)
 {
     using Microsoft::Net::Wifi::Dot11CipherAlgorithm;
     using Microsoft::Net::Wifi::IeeeCipherSuite;
@@ -178,7 +178,7 @@ IeeeCipherAlgorithmToNetRemoteCipherAlgorithm(const Microsoft::Net::Wifi::IeeeCi
 }
 
 Microsoft::Net::Wifi::AccessPointCapabilities
-IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities([[maybe_unused]] const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
+IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
 {
     using Microsoft::Net::Wifi::AccessPointCapabilities;
     using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
