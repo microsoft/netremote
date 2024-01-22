@@ -33,7 +33,7 @@ TEST_CASE("Destroy an AccessPointFactoryLinux instance", "[wifi][core][ap][linux
 {
     using namespace Microsoft::Net::Wifi;
 
-    SECTION("Destroy doesn't cause a crashk with null controller factory")
+    SECTION("Destroy doesn't cause a crash with null controller factory")
     {
         AccessPointFactoryLinux accessPointFactory{ nullptr };
         REQUIRE_NOTHROW(accessPointFactory.~AccessPointFactoryLinux());
