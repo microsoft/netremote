@@ -10,7 +10,6 @@
 #include <linux/if.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
-#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <netlink/genl/genl.h>
@@ -128,7 +127,7 @@ namespace detail
 /**
  * @brief Helper function to determine if an nl80211 interface is an AP. To be used in range expressions.
  *
- * @param nl80211Interface
+ * @param nl80211Interface The nl80211 interface to check.
  * @return true
  * @return false
  */
@@ -139,42 +138,38 @@ IsNl80211InterfaceTypeAp(const Nl80211Interface &nl80211Interface)
 }
 
 /**
- * @brief Helper function returning the name of an nl80211 interface. To be used in range expressions.
+ * @brief Helper function to create an access point instance from an nl80211 interface. To be used in range expressions.
  *
- * @param nl80211Interface
- * @return std::string
+ * @param accessPointFactory The factory to use for creating the access point instance.
+ * @param nl80211Interface The nl80211 interface to create the access point instance from.
+ * @return std::shared_ptr<IAccessPoint>
  */
-std::string
-Nl80211InterfaceName(const Nl80211Interface &nl80211Interface)
+std::shared_ptr<IAccessPoint>
+MakeAccessPoint(std::shared_ptr<IAccessPointFactory> accessPointFactory, const Nl80211Interface &nl80211Interface)
 {
-    return nl80211Interface.Name;
+    return accessPointFactory->Create(nl80211Interface.Name);
 }
 } // namespace detail
 
-std::future<std::vector<std::string>>
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
-    std::promise<std::vector<std::string>> probePromise{};
+    const auto MakeAccessPoint = [this](const Nl80211Interface &nl80211Interface) {
+        return detail::MakeAccessPoint(m_accessPointFactory, nl80211Interface);
+    };
+
+    std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
     auto probeFuture = probePromise.get_future();
 
     // Enumerate all nl80211 interfaces and filter out those that are not APs.
     auto nl80211Interfaces{ Nl80211Interface::Enumerate() };
-    auto nl80211ApInterfaceNames = nl80211Interfaces | std::views::filter(detail::IsNl80211InterfaceTypeAp) | std::views::transform(detail::Nl80211InterfaceName);
-    std::vector<std::string> accessPoints(std::make_move_iterator(std::begin(nl80211ApInterfaceNames)), std::make_move_iterator(std::end(nl80211ApInterfaceNames)));
+    auto accessPointsView = nl80211Interfaces | std::views::filter(detail::IsNl80211InterfaceTypeAp) | std::views::transform(MakeAccessPoint);
+    std::vector<std::shared_ptr<IAccessPoint>> accessPoints(std::make_move_iterator(std::begin(accessPointsView)), std::make_move_iterator(std::end(accessPointsView)));
 
     // Clear the vector since most of the items were moved out.
     nl80211Interfaces.clear();
 
     probePromise.set_value(std::move(accessPoints));
-
-    return probeFuture;
-}
-
-std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync2()
-{
-    std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
-    auto probeFuture = probePromise.get_future();
 
     return probeFuture;
 }

@@ -7,7 +7,6 @@
 #include <future>
 #include <memory>
 #include <shared_mutex>
-#include <string>
 
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 
@@ -75,20 +74,12 @@ struct AccessPointDiscoveryAgent :
     Stop();
 
     /**
-     * @brief Probe for all existing devices.
-     *
-     * @return std::future<std::vector<std::string>>
-     */
-    std::future<std::vector<std::string>>
-    ProbeAsync();
-
-    /**
      * @brief Perform an asynchronous discovery probe.
      *
      * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */
     std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-    ProbeAsync2();
+    ProbeAsync();
 
 protected:
     /**

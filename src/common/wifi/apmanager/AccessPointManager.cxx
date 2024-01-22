@@ -3,23 +3,21 @@
 #include <chrono>
 #include <iterator>
 
+#include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <notstd/Memory.hxx>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointManager::AccessPointManager(std::shared_ptr<IAccessPointFactory> accessPointFactory) :
-    m_accessPointFactory(std::move(accessPointFactory))
-{}
-
 /* static */
 std::shared_ptr<AccessPointManager>
-AccessPointManager::Create(std::shared_ptr<IAccessPointFactory> accessPointFactory)
+AccessPointManager::Create()
 {
-    return std::make_shared<notstd::enable_make_protected<AccessPointManager>>(std::move(accessPointFactory));
+    return std::make_shared<notstd::enable_make_protected<AccessPointManager>>();
 }
 
 std::shared_ptr<AccessPointManager>
@@ -110,7 +108,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
     }
 
     // Kick off a probe to ensure any access points already present will be added to this manager.
-    auto existingAccessPointInterfaceNamesProbe = discoveryAgent->ProbeAsync();
+    auto existingAccessPointsProbe = discoveryAgent->ProbeAsync();
 
     // Add the agent.
     {
@@ -118,21 +116,20 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
-    if (existingAccessPointInterfaceNamesProbe.valid()) {
+    if (existingAccessPointsProbe.valid()) {
         static constexpr auto ProbeTimeout = 3s;
 
         // Wait for the operation to complete.
-        const auto waitResult = existingAccessPointInterfaceNamesProbe.wait_for(ProbeTimeout);
+        const auto waitResult = existingAccessPointsProbe.wait_for(ProbeTimeout);
 
         // If the operation completed, get the results and add those access points.
         if (waitResult == std::future_status::ready) {
-            auto existingAccessPointInterfaceNames = existingAccessPointInterfaceNamesProbe.get();
-            for (const auto& existingAccessPointInterfaceName : existingAccessPointInterfaceNames) {
-                auto existingAccessPoint = m_accessPointFactory->Create(existingAccessPointInterfaceName);
+            auto existingAccessPoints = existingAccessPointsProbe.get();
+            for (const auto& existingAccessPoint : existingAccessPoints) {
                 AddAccessPoint(std::move(existingAccessPoint));
             }
         } else {
-            // TODO: log error
+            LOGE << std::format("Access point discovery agent probe failed ({})", magic_enum::enum_name(waitResult));
         }
     }
 }

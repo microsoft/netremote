@@ -16,8 +16,7 @@ main(int argc, char* argv[])
 {
     auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
     {
-        auto accessPointFactory = std::make_unique<AccessPointFactory>(nullptr);
-        auto accessPointManager = AccessPointManager::Create(std::move(accessPointFactory));
+        auto accessPointManager = AccessPointManager::Create();
         configuration.AccessPointManager = accessPointManager;
     }
 

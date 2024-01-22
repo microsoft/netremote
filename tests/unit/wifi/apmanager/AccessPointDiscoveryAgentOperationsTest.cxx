@@ -23,17 +23,8 @@ AccessPointDiscoveryAgentOperationsTest::Stop()
     m_callback = nullptr;
 }
 
-std::future<std::vector<std::string>>
-AccessPointDiscoveryAgentOperationsTest::ProbeAsync()
-{
-    return std::async(std::launch::async, [&]() {
-        // return m_accessPointInterfaceNames;
-        return std::vector<std::string>();
-    });
-}
-
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-AccessPointDiscoveryAgentOperationsTest::ProbeAsync2()
+AccessPointDiscoveryAgentOperationsTest::ProbeAsync()
 {
     return std::async(std::launch::async, [&]() {
         return m_accessPoints;

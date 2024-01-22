@@ -28,11 +28,8 @@ struct AccessPointDiscoveryAgentOperationsTest :
     void
     Stop() override;
 
-    std::future<std::vector<std::string>>
-    ProbeAsync() override;
-
     std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-    ProbeAsync2() override;
+    ProbeAsync() override;
 
     void
     AddAccessPoint(std::string_view accessPointInterfaceNameToAdd);

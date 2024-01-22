@@ -12,6 +12,7 @@
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
@@ -40,11 +41,8 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
     void
     Stop() override;
 
-    std::future<std::vector<std::string>>
-    ProbeAsync() override;
-
     std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-    ProbeAsync2() override;
+    ProbeAsync() override;
 
 private:
     /**
@@ -90,6 +88,8 @@ private:
      */
     int
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
+
+
 
 private:
     std::shared_ptr<IAccessPointFactory> m_accessPointFactory;

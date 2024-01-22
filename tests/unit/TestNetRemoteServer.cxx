@@ -23,7 +23,7 @@ TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     SECTION("Create doesn't cause a crash")
@@ -40,7 +40,7 @@ TEST_CASE("Destroy a NetRemoteServer instance", "[basic][rpc][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     std::optional<NetRemoteServer> server{ Configuration };
@@ -71,7 +71,7 @@ TEST_CASE("NetRemoteServer can be reached", "[basic][rpc][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     NetRemoteServer server{ Configuration };
@@ -94,7 +94,7 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     NetRemoteServer server{ Configuration };
@@ -149,7 +149,7 @@ TEST_CASE("NetRemoteServer can be cycled through run/stop states", "[basic][rpc]
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     NetRemoteServer server{ Configuration };

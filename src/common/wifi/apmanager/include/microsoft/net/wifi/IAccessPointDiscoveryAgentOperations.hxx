@@ -5,7 +5,6 @@
 #include <functional>
 #include <future>
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace Microsoft::Net::Wifi
@@ -47,18 +46,10 @@ struct IAccessPointDiscoveryAgentOperations
     /**
      * @brief Perform an asynchronous discovery probe.
      *
-     * @return std::future<std::vector<std::string>>
-     */
-    virtual std::future<std::vector<std::string>>
-    ProbeAsync() = 0;
-
-    /**
-     * @brief Perform an asynchronous discovery probe.
-     *
      * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */
     virtual std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-    ProbeAsync2() = 0;
+    ProbeAsync() = 0;
 };
 
 } // namespace Microsoft::Net::Wifi

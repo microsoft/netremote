@@ -33,7 +33,7 @@ public:
      * @return std::shared_ptr<AccessPointManager>
      */
     [[nodiscard]] static std::shared_ptr<AccessPointManager>
-    Create(std::shared_ptr<IAccessPointFactory> accessPointFactory);
+    Create();
 
     /**
      * @brief Get an instance of this access point manager.
@@ -84,11 +84,11 @@ public:
 
 protected:
     /**
-     * @brief Construct a new AccessPointManager object with the specified access point factory.
+     * @brief Construct a new AccessPointManager object.
      * 
      * @param accessPointFactory 
      */
-    AccessPointManager(std::shared_ptr<IAccessPointFactory> accessPointFactory);
+    AccessPointManager() = default;
 
 private:
     /**

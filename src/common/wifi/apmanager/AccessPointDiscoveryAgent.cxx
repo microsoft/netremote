@@ -76,15 +76,8 @@ AccessPointDiscoveryAgent::Stop()
     }
 }
 
-std::future<std::vector<std::string>>
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgent::ProbeAsync()
 {
-    LOGD << "Access point discovery agent probing for devices";
     return m_operations->ProbeAsync();
-}
-
-std::future<std::vector<std::shared_ptr<IAccessPoint>>>
-AccessPointDiscoveryAgent::ProbeAsync2()
-{
-    return m_operations->ProbeAsync2();
 }
