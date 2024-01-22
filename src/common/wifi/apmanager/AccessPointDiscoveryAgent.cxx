@@ -57,7 +57,7 @@ AccessPointDiscoveryAgent::Start()
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
         LOGD << "Access point discovery agent starting";
-         m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPoint) {
+        m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPoint) {
             // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
             if (auto strongThis = weakThis.lock(); strongThis) {
                 strongThis->DevicePresenceChanged(presence, std::move(accessPoint));

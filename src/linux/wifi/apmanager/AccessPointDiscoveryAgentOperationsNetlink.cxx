@@ -30,10 +30,6 @@ using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
 using Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState;
 
-AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink() :
-    AccessPointDiscoveryAgentOperationsNetlink(nullptr) // FIXME: this c'tor should probably be removed
-{}
-
 AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<IAccessPointFactory> accessPointFactory) :
     m_accessPointFactory(std::move(accessPointFactory)),
     m_cookie(CookieValid),

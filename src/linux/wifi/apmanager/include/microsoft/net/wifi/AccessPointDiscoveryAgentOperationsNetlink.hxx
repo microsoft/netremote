@@ -29,18 +29,29 @@ namespace Microsoft::Net::Wifi
 struct AccessPointDiscoveryAgentOperationsNetlink :
     public IAccessPointDiscoveryAgentOperations
 {
-
-    AccessPointDiscoveryAgentOperationsNetlink();
     AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<IAccessPointFactory> accessPointFactory);
 
     virtual ~AccessPointDiscoveryAgentOperationsNetlink();
 
+    /**
+     * @brief Start the discovery process.
+     *
+     * @param callback The callback to invoke when an access point is discovered or removed.
+     */
     void
     Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback) override;
 
+    /**
+     * @brief Stop the discovery process.
+     */
     void
     Stop() override;
 
+    /**
+     * @brief Perform an asynchronous discovery probe.
+     *
+     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+     */
     std::future<std::vector<std::shared_ptr<IAccessPoint>>>
     ProbeAsync() override;
 
@@ -88,8 +99,6 @@ private:
      */
     int
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
-
-
 
 private:
     std::shared_ptr<IAccessPointFactory> m_accessPointFactory;

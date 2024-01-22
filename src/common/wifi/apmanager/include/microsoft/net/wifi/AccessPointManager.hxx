@@ -85,8 +85,8 @@ public:
 protected:
     /**
      * @brief Construct a new AccessPointManager object.
-     * 
-     * @param accessPointFactory 
+     *
+     * @param accessPointFactory
      */
     AccessPointManager() = default;
 
