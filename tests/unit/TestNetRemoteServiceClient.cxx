@@ -126,7 +126,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     NetRemoteServer server{ Configuration };
