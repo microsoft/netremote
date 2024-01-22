@@ -5,7 +5,7 @@
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
-#include <microsoft/net/wifi/AccessPointControllerHostapd.hxx>
+#include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>

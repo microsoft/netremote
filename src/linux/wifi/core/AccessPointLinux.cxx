@@ -1,5 +1,5 @@
 
-#include <microsoft/net/wifi/AccessPointControllerHostapd.hxx>
+#include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 
 using namespace Microsoft::Net::Wifi;
