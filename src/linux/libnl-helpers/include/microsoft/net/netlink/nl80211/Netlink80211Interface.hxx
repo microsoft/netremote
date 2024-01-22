@@ -26,6 +26,18 @@ struct Nl80211Interface
     uint32_t Index;
     uint32_t WiphyIndex;
 
+    Nl80211Interface() = default;
+
+    /**
+     * @brief Construct a new Nl80211Interface object with the specified attributes.
+     *
+     * @param name The name of the interface.
+     * @param type The nl80211_iftype of the interface.
+     * @param index The interface index in the kernel.
+     * @param wiphyIndex The phy interface index in the kernel.
+     */
+    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept;
+
     /**
      * @brief Parse a netlink message into an Nl80211Interface. The netlink message must contain a response to the
      * NL80211_CMD_GET_INTERFACE command, which is encoded as a NL80211_CMD_NEW_INTERFACE.
@@ -48,8 +60,8 @@ struct Nl80211Interface
 
     /**
      * @brief Get the Wiphy (PHY) object associated with this interface.
-     * 
-     * @return std::optional<Nl80211Wiphy> 
+     *
+     * @return std::optional<Nl80211Wiphy>
      */
     std::optional<Nl80211Wiphy>
     GetWiphy() const;
@@ -61,17 +73,6 @@ struct Nl80211Interface
      */
     std::string
     ToString() const;
-
-private:
-    /**
-     * @brief Construct a new Nl80211Interface object with the specified attributes.
-     *
-     * @param name The name of the interface.
-     * @param type The nl80211_iftype of the interface.
-     * @param index The interface index in the kernel.
-     * @param wiphyIndex The phy interface index in the kernel.
-     */
-    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211
