@@ -41,6 +41,15 @@ private:
     virtual ::grpc::Status
     WifiAccessPointDisable(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* response) override;
 
+    virtual ::grpc::Status
+    WifiAccessPointSetPhyType(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response) override;
+
+    virtual ::grpc::Status
+    WifiAccessPointSetAuthenticationMethod(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodResult* response) override;
+
+    virtual ::grpc::Status
+    WifiAccessPointSetEncryptionMethod(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetEncryptionMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetEncryptionMethodResult* response) override;
+
 protected:
     bool
     ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status);

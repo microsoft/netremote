@@ -389,6 +389,78 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
     return grpc::Status::OK;
 }
 
+::grpc::Status
+NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response)
+{
+    LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown)
+    {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("No PHY type provided");
+    }
+    else
+    {
+        // TODO: Set the PHY type.
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
+::grpc::Status
+NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodResult* response)
+{
+    LOGD << std::format("Received WifiAccessPointSetAuthenticationMethod request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    if (request->authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
+    {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("No authentication algorithm provided");
+    }
+    else
+    {
+        // TODO: Set the authentication algorithm.
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
+::grpc::Status
+NetRemoteService::WifiAccessPointSetEncryptionMethod([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetEncryptionMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetEncryptionMethodResult* response)
+{
+    LOGD << std::format("Received WifiAccessPointSetEncryptionMethod request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    if (request->cipheralgorithm() == Dot11CipherAlgorithm::Dot11CipherAlgorithmUnknown)
+    {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("No encryption algorithm provided");
+    }
+    else
+    {
+        // TODO: Set the encryption algorithm.
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
 bool
 NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status)
 {
