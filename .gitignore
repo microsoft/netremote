@@ -1,5 +1,6 @@
 # VS and VSCode
 .vs
+.vscode/launch.json
 .vscode/settings.json
 bin/
 obj/
