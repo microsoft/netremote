@@ -5,7 +5,6 @@
 #include <functional>
 #include <future>
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace Microsoft::Net::Wifi
@@ -20,7 +19,7 @@ struct IAccessPoint;
 /**
  * @brief Prototype for the callback invoked when an access point is discovered or removed.
  */
-using AccessPointPresenceEventCallback = std::function<void(AccessPointPresenceEvent, std::string interfaceName)>;
+using AccessPointPresenceEventCallback = std::function<void(AccessPointPresenceEvent, std::shared_ptr<IAccessPoint> accessPoint)>;
 
 /**
  * @brief Operations used to perform discovery of access points, used by
@@ -47,9 +46,9 @@ struct IAccessPointDiscoveryAgentOperations
     /**
      * @brief Perform an asynchronous discovery probe.
      *
-     * @return std::future<std::vector<std::string>>
+     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */
-    virtual std::future<std::vector<std::string>>
+    virtual std::future<std::vector<std::shared_ptr<IAccessPoint>>>
     ProbeAsync() = 0;
 };
 

@@ -29,7 +29,7 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     NetRemoteServer server{ Configuration };
@@ -79,7 +79,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(std::make_unique<AccessPointFactoryTest>()),
+        .AccessPointManager = AccessPointManager::Create(),
     };
 
     NetRemoteServer server{ Configuration };

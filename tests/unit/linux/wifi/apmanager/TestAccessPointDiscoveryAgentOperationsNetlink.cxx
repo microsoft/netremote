@@ -5,24 +5,27 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 TEST_CASE("Create AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][apmanager]")
 {
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
     SECTION("Create doesn't cause a crash")
     {
-        using namespace Microsoft::Net::Wifi;
-
-        REQUIRE_NOTHROW(AccessPointDiscoveryAgentOperationsNetlink{});
+        REQUIRE_NOTHROW(AccessPointDiscoveryAgentOperationsNetlink{ std::make_shared<AccessPointFactoryTest>() });
     }
 }
 
 TEST_CASE("Destroy AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][apmanager]")
 {
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     SECTION("Destroy doesn't cause a crash")
     {
-        std::optional<AccessPointDiscoveryAgentOperationsNetlink> accessPointDiscoveryAgent(std::in_place);
+        std::optional<AccessPointDiscoveryAgentOperationsNetlink> accessPointDiscoveryAgent(std::make_shared<AccessPointFactoryTest>());
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.reset());
     }
 }
@@ -30,23 +33,24 @@ TEST_CASE("Destroy AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][ap
 TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Start", "[wifi][core][apmanager]")
 {
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     SECTION("Start doesn't cause a crash")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent;
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Start([](auto &&, auto &&) {}));
     }
 
     SECTION("Start doesn't cause a crash when called twice")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent;
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start([](auto &&, auto &&) {});
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Start([](auto &&, auto &&) {}));
     }
 
     SECTION("Start doesn't cause a crash when called with a null callback")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent;
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Start(nullptr));
     }
 }
@@ -54,23 +58,24 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Start", "[wifi][core][apm
 TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Stop", "[wifi][core][apmanager]")
 {
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     SECTION("Stop doesn't cause a crash when Start hasn't been called")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Stop());
     }
 
     SECTION("Stop doesn't cause a crash when Start has been called")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start([](auto &&, auto &&) {});
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Stop());
     }
 
     SECTION("Stop doesn't cause a crash when called twice")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start([](auto &&, auto &&) {});
         accessPointDiscoveryAgent.Stop();
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Stop());
@@ -78,7 +83,7 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Stop", "[wifi][core][apma
 
     SECTION("Stop doesn't cause a crash when called with a null callback")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start(nullptr);
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.Stop());
     }
@@ -87,30 +92,31 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Stop", "[wifi][core][apma
 TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync", "[wifi][core][apmanager]")
 {
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     SECTION("ProbeAsync doesn't cause a crash when Start hasn't been called")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync());
     }
 
     SECTION("ProbeAsync doesn't cause a crash when Start has been called")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start([](auto &&, auto &&) {});
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync());
     }
 
     SECTION("ProbeAsync doesn't cause a crash when Stop has been called")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Stop();
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync());
     }
 
     SECTION("ProbeAsync doesn't cause a crash when called twice")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start([](auto &&, auto &&) {});
         accessPointDiscoveryAgent.ProbeAsync();
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync());
@@ -118,7 +124,7 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync", "[wifi][core
 
     SECTION("ProbeAsync doesn't cause a crash when called after a Start/Stop sequence")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start(nullptr);
         accessPointDiscoveryAgent.Stop();
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync());
@@ -126,20 +132,20 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync", "[wifi][core
 
     SECTION("ProbeAsync returns a valid future")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         accessPointDiscoveryAgent.Start(nullptr);
         REQUIRE(accessPointDiscoveryAgent.ProbeAsync().valid());
     }
 
     SECTION("ProbeAsync result can be obtained without causing a crash")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync().get());
     }
 
     SECTION("ProbeAsync result is valid")
     {
-        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{};
+        AccessPointDiscoveryAgentOperationsNetlink accessPointDiscoveryAgent{ std::make_shared<AccessPointFactoryTest>() };
         REQUIRE_NOTHROW(accessPointDiscoveryAgent.ProbeAsync().get().clear());
     }
 }

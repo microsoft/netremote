@@ -7,7 +7,6 @@
 #include <future>
 #include <memory>
 #include <shared_mutex>
-#include <string>
 
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 
@@ -75,11 +74,11 @@ struct AccessPointDiscoveryAgent :
     Stop();
 
     /**
-     * @brief Probe for all existing devices.
+     * @brief Perform an asynchronous discovery probe.
      *
-     * @return std::future<std::vector<std::string>>
+     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
      */
-    std::future<std::vector<std::string>>
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
     ProbeAsync();
 
 protected:
@@ -94,10 +93,10 @@ protected:
      * @brief Wrapper for safely invoking any device presence changed registered callback.
      *
      * @param presence The presence change that occurred.
-     * @param interfaceName The name of the network interface of the access point that changed.
+     * @param accessPoint The access point instance that changed.
      */
     void
-    DevicePresenceChanged(AccessPointPresenceEvent presence, std::string interfaceName) const noexcept;
+    DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPoint) const noexcept;
 
 private:
     std::unique_ptr<IAccessPointDiscoveryAgentOperations> m_operations;

@@ -36,12 +36,12 @@ AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(AccessPointPresenceEve
 }
 
 void
-AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::string interfaceName) const noexcept
+AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPoint) const noexcept
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) {
         LOGD << "Access point discovery agent detected a device presence change";
-        m_onDevicePresenceChanged(presence, std::move(interfaceName));
+        m_onDevicePresenceChanged(presence, std::move(accessPoint));
     }
 }
 
@@ -57,10 +57,10 @@ AccessPointDiscoveryAgent::Start()
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
         LOGD << "Access point discovery agent starting";
-        m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& interfaceName) {
+        m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPoint) {
             // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
             if (auto strongThis = weakThis.lock(); strongThis) {
-                strongThis->DevicePresenceChanged(presence, std::move(interfaceName));
+                strongThis->DevicePresenceChanged(presence, std::move(accessPoint));
             }
         });
     }
@@ -76,9 +76,8 @@ AccessPointDiscoveryAgent::Stop()
     }
 }
 
-std::future<std::vector<std::string>>
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgent::ProbeAsync()
 {
-    LOGD << "Access point discovery agent probing for devices";
     return m_operations->ProbeAsync();
 }

@@ -3,6 +3,7 @@
 #define ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_NETLINK_HXX
 
 #include <cstdint>
+#include <memory>
 #include <stop_token>
 #include <string>
 #include <thread>
@@ -11,7 +12,9 @@
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <netlink/netlink.h>
 
@@ -26,17 +29,30 @@ namespace Microsoft::Net::Wifi
 struct AccessPointDiscoveryAgentOperationsNetlink :
     public IAccessPointDiscoveryAgentOperations
 {
-    AccessPointDiscoveryAgentOperationsNetlink();
+    AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<IAccessPointFactory> accessPointFactory);
 
     virtual ~AccessPointDiscoveryAgentOperationsNetlink();
 
+    /**
+     * @brief Start the discovery process.
+     *
+     * @param callback The callback to invoke when an access point is discovered or removed.
+     */
     void
     Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback) override;
 
+    /**
+     * @brief Stop the discovery process.
+     */
     void
     Stop() override;
 
-    std::future<std::vector<std::string>>
+    /**
+     * @brief Perform an asynchronous discovery probe.
+     *
+     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+     */
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
     ProbeAsync() override;
 
 private:
@@ -85,6 +101,8 @@ private:
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
 private:
+    std::shared_ptr<IAccessPointFactory> m_accessPointFactory;
+
     // Cookie used to validate that the callback context is valid.
     static constexpr uint32_t CookieValid{ 0x8BADF00Du };
     // Cookie used to invalidate the callback context.
