@@ -50,28 +50,34 @@ TEST_CASE("Create() function", "[wifi][core][ap][linux]")
 {
     using namespace Microsoft::Net::Wifi;
 
+    using Microsoft::Net::Netlink::Nl80211::Nl80211Interface;
+
     SECTION("Create() doesn't cause a crash")
     {
+        auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(Nl80211Interface{});
         AccessPointFactoryLinux accessPointFactory{ std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        REQUIRE_NOTHROW(accessPointFactory.Create(Test::InterfaceNameDefault));
+        REQUIRE_NOTHROW(accessPointFactory.Create(Test::InterfaceNameDefault, std::move(createArgs)));
     }
 
     SECTION("Create() with empty/null inteface doesn't cause a crash")
     {
+        auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(Nl80211Interface{});
         AccessPointFactoryLinux accessPointFactory{ std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        REQUIRE_NOTHROW(accessPointFactory.Create({}));
+        REQUIRE_NOTHROW(accessPointFactory.Create({}, std::move(createArgs)));
     }
 
     SECTION("Create() with valid input arguments returns non-nullptr instance")
     {
+        auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(Nl80211Interface{});
         AccessPointFactoryLinux accessPointFactory{ std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        REQUIRE(accessPointFactory.Create(Test::InterfaceNameDefault) != nullptr);
+        REQUIRE(accessPointFactory.Create(Test::InterfaceNameDefault, std::move(createArgs)) != nullptr);
     }
 
     SECTION("Create() instance reflects basic properties from base class")
     {
+        auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(Nl80211Interface{});
         AccessPointFactoryLinux accessPointFactory{ std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        const auto accessPoint = accessPointFactory.Create(Test::InterfaceNameDefault);
+        const auto accessPoint = accessPointFactory.Create(Test::InterfaceNameDefault, std::move(createArgs));
         REQUIRE(accessPoint->GetInterfaceName() == Test::InterfaceNameDefault);
     }
 }
