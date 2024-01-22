@@ -27,6 +27,14 @@ AccessPointDiscoveryAgentOperationsTest::ProbeAsync()
     });
 }
 
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+AccessPointDiscoveryAgentOperationsTest::ProbeAsync2()
+{
+    return std::async(std::launch::async, [&]() {
+        return m_accessPoints;
+    });
+}
+
 void
 AccessPointDiscoveryAgentOperationsTest::AddAccessPoint(std::string_view interfaceNameToAdd)
 {

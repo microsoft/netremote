@@ -82,6 +82,14 @@ struct AccessPointDiscoveryAgent :
     std::future<std::vector<std::string>>
     ProbeAsync();
 
+    /**
+     * @brief Perform an asynchronous discovery probe.
+     *
+     * @return std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+     */
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    ProbeAsync2();
+
 protected:
     /**
      * @brief Construct a new AccessPointDiscoveryAgent object with the specified operations.

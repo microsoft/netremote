@@ -28,6 +28,9 @@ struct AccessPointDiscoveryAgentOperationsTest :
     std::future<std::vector<std::string>>
     ProbeAsync() override;
 
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    ProbeAsync2() override;
+
     void
     AddAccessPoint(std::string_view accessPointInterfaceNameToAdd);
 
@@ -37,6 +40,7 @@ struct AccessPointDiscoveryAgentOperationsTest :
 private:
     AccessPointPresenceEventCallback m_callback;
     std::vector<std::string> m_accessPointInterfaceNames;
+    std::vector<std::shared_ptr<IAccessPoint>> m_accessPoints;
 };
 
 } // namespace Microsoft::Net::Wifi::Test

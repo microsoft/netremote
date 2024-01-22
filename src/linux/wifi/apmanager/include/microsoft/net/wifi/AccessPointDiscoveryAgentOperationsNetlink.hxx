@@ -39,6 +39,9 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
     std::future<std::vector<std::string>>
     ProbeAsync() override;
 
+    std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+    ProbeAsync2() override;
+
 private:
     /**
      * @brief Request that the netlink processing loop stop.

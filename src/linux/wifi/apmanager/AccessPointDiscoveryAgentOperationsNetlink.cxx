@@ -165,6 +165,15 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
     return probeFuture;
 }
 
+std::future<std::vector<std::shared_ptr<IAccessPoint>>>
+AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync2()
+{
+    std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
+    auto probeFuture = probePromise.get_future();
+
+    return probeFuture;
+}
+
 int
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback)
 {
