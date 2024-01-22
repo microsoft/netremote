@@ -23,7 +23,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     plog::init(plog::verbose, &colorConsoleAppender);
 
     // Configure monitoring with the netlink protocol.
-    auto accessPointControllerFactory = std::make_unique<AccessPointControllerHostapdFactory>();
+    auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
     auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
     auto accessPointDiscoveryAgentOperationsNetlink{ std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory) };
     auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink)) };

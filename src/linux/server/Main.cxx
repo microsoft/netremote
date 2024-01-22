@@ -50,7 +50,7 @@ main(int argc, char *argv[])
     {
         configuration.AccessPointManager = AccessPointManager::Create();
 
-        auto accessPointControllerFactory = std::make_unique<AccessPointControllerHostapdFactory>();
+        auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
         auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
         auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory);
         auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));

@@ -10,21 +10,21 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointControllerHostapd::AccessPointControllerHostapd(std::string_view interfaceName) :
+AccessPointControllerLinux::AccessPointControllerLinux(std::string_view interfaceName) :
     AccessPointController(interfaceName),
     m_hostapd(interfaceName)
 {
 }
 
 Ieee80211AccessPointCapabilities
-AccessPointControllerHostapd::GetCapabilities()
+AccessPointControllerLinux::GetCapabilities()
 {
     // TODO: Implement this method.
     return {};
 }
 
 bool
-AccessPointControllerHostapd::GetIsEnabled()
+AccessPointControllerLinux::GetIsEnabled()
 {
     bool isEnabled{ false };
 
@@ -39,7 +39,7 @@ AccessPointControllerHostapd::GetIsEnabled()
 }
 
 std::unique_ptr<IAccessPointController>
-AccessPointControllerHostapdFactory::Create(std::string_view interfaceName)
+AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {
-    return std::make_unique<AccessPointControllerHostapd>(interfaceName);
+    return std::make_unique<AccessPointControllerLinux>(interfaceName);
 }

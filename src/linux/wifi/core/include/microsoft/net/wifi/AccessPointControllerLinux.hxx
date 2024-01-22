@@ -1,6 +1,6 @@
 
-#ifndef ACCESS_POINT_CONTROLLER_HOSTAPD_HXX
-#define ACCESS_POINT_CONTROLLER_HOSTAPD_HXX
+#ifndef ACCESS_POINT_CONTROLLER_LINUX_HXX
+#define ACCESS_POINT_CONTROLLER_LINUX_HXX
 
 #include <string_view>
 
@@ -12,19 +12,19 @@ namespace Microsoft::Net::Wifi
 /**
  * @brief Implementation of IAccessPointController which uses the hostapd daemon to control the access point.
  */
-struct AccessPointControllerHostapd :
+struct AccessPointControllerLinux :
     public AccessPointController
 {
-    virtual ~AccessPointControllerHostapd() = default;
+    virtual ~AccessPointControllerLinux() = default;
 
-    AccessPointControllerHostapd() = delete;
+    AccessPointControllerLinux() = delete;
 
     /**
-     * @brief Construct a new AccessPointControllerHostapd object for the specified interface.
+     * @brief Construct a new AccessPointControllerLinux object for the specified interface.
      *
      * @param interfaceName The name of the interface to control.
      */
-    AccessPointControllerHostapd(std::string_view interfaceName);
+    AccessPointControllerLinux(std::string_view interfaceName);
 
     /**
      * @brief Get whether the access point is enabled.
@@ -48,12 +48,12 @@ private:
 };
 
 /**
- * @brief Factory to create AccessPointControllerHostapd objects.
+ * @brief Factory to create AccessPointControllerLinux objects.
  */
-struct AccessPointControllerHostapdFactory :
+struct AccessPointControllerLinuxFactory :
     public IAccessPointControllerFactory
 {
-    virtual ~AccessPointControllerHostapdFactory() = default;
+    virtual ~AccessPointControllerLinuxFactory() = default;
 
     /**
      * @brief Create a new IAccessPointController object.
@@ -65,4 +65,4 @@ struct AccessPointControllerHostapdFactory :
 };
 } // namespace Microsoft::Net::Wifi
 
-#endif // ACCESS_POINT_CONTROLLER_HOSTAPD_HXX
+#endif // ACCESS_POINT_CONTROLLER_LINUX_HXX
