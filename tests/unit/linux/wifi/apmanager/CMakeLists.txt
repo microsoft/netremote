@@ -19,7 +19,7 @@ target_link_libraries(wifi-apmanager-linux-test-unit
         plog::plog
         strings
         wifi-apmanager-linux
-        wifi-test-helpers
+        wifi-test-helpers-linux
 )
 
 catch_discover_tests(wifi-apmanager-linux-test-unit)

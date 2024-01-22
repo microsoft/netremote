@@ -14,6 +14,7 @@
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
+#include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <netlink/netlink.h>
@@ -29,7 +30,12 @@ namespace Microsoft::Net::Wifi
 struct AccessPointDiscoveryAgentOperationsNetlink :
     public IAccessPointDiscoveryAgentOperations
 {
-    AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<IAccessPointFactory> accessPointFactory);
+    /**
+     * @brief Construct a new AccessPointDiscoveryAgentOperationsNetlink object with the specified access point factory.
+     *
+     * @param accessPointFactory The access point factory to use for creating access points.
+     */
+    AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory);
 
     virtual ~AccessPointDiscoveryAgentOperationsNetlink();
 
@@ -101,7 +107,7 @@ private:
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
 private:
-    std::shared_ptr<IAccessPointFactory> m_accessPointFactory;
+    std::shared_ptr<AccessPointFactoryLinux> m_accessPointFactory;
 
     // Cookie used to validate that the callback context is valid.
     static constexpr uint32_t CookieValid{ 0x8BADF00Du };

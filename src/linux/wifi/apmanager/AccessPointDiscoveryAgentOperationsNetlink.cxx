@@ -30,7 +30,7 @@ using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
 using Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState;
 
-AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<IAccessPointFactory> accessPointFactory) :
+AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory) :
     m_accessPointFactory(std::move(accessPointFactory)),
     m_cookie(CookieValid),
     m_netlink80211ProtocolState(Nl80211ProtocolState::Instance())
@@ -141,9 +141,10 @@ IsNl80211InterfaceTypeAp(const Nl80211Interface &nl80211Interface)
  * @return std::shared_ptr<IAccessPoint>
  */
 std::shared_ptr<IAccessPoint>
-MakeAccessPoint(std::shared_ptr<IAccessPointFactory> accessPointFactory, const Nl80211Interface &nl80211Interface)
+MakeAccessPoint(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory, const Nl80211Interface &nl80211Interface)
 {
-    return accessPointFactory->Create(nl80211Interface.Name);
+    auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface));
+    return accessPointFactory->Create(nl80211Interface.Name, std::move(createArgs));
 }
 } // namespace detail
 
