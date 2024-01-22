@@ -36,12 +36,29 @@ AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(AccessPointPresenceEve
 }
 
 void
+AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback2(AccessPointPresenceEventCallback2 onDevicePresenceChanged2)
+{
+    std::unique_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
+    m_onDevicePresenceChanged2 = std::move(onDevicePresenceChanged2);
+}
+
+void
 AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::string interfaceName) const noexcept
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) {
         LOGD << "Access point discovery agent detected a device presence change";
         m_onDevicePresenceChanged(presence, std::move(interfaceName));
+    }
+}
+
+void
+AccessPointDiscoveryAgent::DevicePresenceChanged2(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPoint) const noexcept
+{
+    std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
+    if (m_onDevicePresenceChanged2) {
+        LOGD << "Access point discovery agent detected a device presence change";
+        m_onDevicePresenceChanged2(presence, std::move(accessPoint));
     }
 }
 
@@ -61,6 +78,13 @@ AccessPointDiscoveryAgent::Start()
             // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
             if (auto strongThis = weakThis.lock(); strongThis) {
                 strongThis->DevicePresenceChanged(presence, std::move(interfaceName));
+            }
+        });
+
+         m_operations->Start2([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPoint) {
+            // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
+            if (auto strongThis = weakThis.lock(); strongThis) {
+                strongThis->DevicePresenceChanged2(presence, std::move(accessPoint));
             }
         });
     }

@@ -10,6 +10,7 @@ target_link_libraries(apmonitor-cli-linux
     PRIVATE
         plog::plog
         wifi-apmanager-linux
+        wifi-core-linux
 )
 
 set_target_properties(apmonitor-cli-linux

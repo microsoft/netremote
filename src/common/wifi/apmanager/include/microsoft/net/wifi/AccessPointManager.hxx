@@ -33,7 +33,7 @@ public:
      * @return std::shared_ptr<AccessPointManager>
      */
     [[nodiscard]] static std::shared_ptr<AccessPointManager>
-    Create(std::unique_ptr<IAccessPointFactory> accessPointFactory);
+    Create(std::shared_ptr<IAccessPointFactory> accessPointFactory);
 
     /**
      * @brief Get an instance of this access point manager.
@@ -84,20 +84,11 @@ public:
 
 protected:
     /**
-     * @brief Default constructor.
-     *
-     * It's intentional that this is *declared* here and default-implemented
-     * in the source file. This is required because IAccessPoint
-     * and AccessPointDiscoveryAgent are used as incomplete
-     * types with std::unique_ptr and std::shared_ptr. In case an exception is
-     * thrown in the constructor, their destructors may be called, and the
-     * wrapped type must be complete at that time. As such, defining the
-     * constructor implementation as default here would require the type to be
-     * complete, which is impossible due to the forward declaration.
-     * Consequently, the = default implementation is done in the source file
-     * instead.
+     * @brief Construct a new AccessPointManager object with the specified access point factory.
+     * 
+     * @param accessPointFactory 
      */
-    AccessPointManager(std::unique_ptr<IAccessPointFactory> accessPointFactory);
+    AccessPointManager(std::shared_ptr<IAccessPointFactory> accessPointFactory);
 
 private:
     /**
@@ -127,7 +118,7 @@ private:
     RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
 
 private:
-    std::unique_ptr<IAccessPointFactory> m_accessPointFactory;
+    std::shared_ptr<IAccessPointFactory> m_accessPointFactory;
 
     mutable std::mutex m_accessPointGate;
     std::vector<std::shared_ptr<IAccessPoint>> m_accessPoints{};

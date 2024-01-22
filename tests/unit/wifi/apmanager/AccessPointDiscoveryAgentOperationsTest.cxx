@@ -14,6 +14,12 @@ AccessPointDiscoveryAgentOperationsTest::Start(AccessPointPresenceEventCallback 
 }
 
 void
+AccessPointDiscoveryAgentOperationsTest::Start2(AccessPointPresenceEventCallback2 callback2)
+{
+    m_callback2 = callback2;
+}
+
+void
 AccessPointDiscoveryAgentOperationsTest::Stop()
 {
     m_callback = nullptr;

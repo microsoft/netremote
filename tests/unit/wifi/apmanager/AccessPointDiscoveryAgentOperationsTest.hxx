@@ -23,6 +23,9 @@ struct AccessPointDiscoveryAgentOperationsTest :
     Start(AccessPointPresenceEventCallback callback) override;
 
     void
+    Start2(AccessPointPresenceEventCallback2 callback) override;
+
+    void
     Stop() override;
 
     std::future<std::vector<std::string>>
@@ -39,6 +42,7 @@ struct AccessPointDiscoveryAgentOperationsTest :
 
 private:
     AccessPointPresenceEventCallback m_callback;
+    AccessPointPresenceEventCallback2 m_callback2;
     std::vector<std::string> m_accessPointInterfaceNames;
     std::vector<std::shared_ptr<IAccessPoint>> m_accessPoints;
 };

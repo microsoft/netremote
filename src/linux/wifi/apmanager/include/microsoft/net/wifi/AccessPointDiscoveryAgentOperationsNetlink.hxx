@@ -3,6 +3,7 @@
 #define ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_NETLINK_HXX
 
 #include <cstdint>
+#include <memory>
 #include <stop_token>
 #include <string>
 #include <thread>
@@ -12,6 +13,7 @@
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <netlink/netlink.h>
 
@@ -26,12 +28,17 @@ namespace Microsoft::Net::Wifi
 struct AccessPointDiscoveryAgentOperationsNetlink :
     public IAccessPointDiscoveryAgentOperations
 {
+
     AccessPointDiscoveryAgentOperationsNetlink();
+    AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<IAccessPointFactory> accessPointFactory);
 
     virtual ~AccessPointDiscoveryAgentOperationsNetlink();
 
     void
     Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback) override;
+
+    void
+    Start2(AccessPointPresenceEventCallback2 accessPointPresenceEventCallback) override;
 
     void
     Stop() override;
@@ -87,7 +94,18 @@ private:
     int
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
+    /**
+     * @brief Process a single netlink message.
+     *
+     * @param netlinkMessage The netlink message to process.
+     * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
+     */
+    int
+    ProcessNetlinkMessage2(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback2 &accessPointPresenceEventCallback);
+
 private:
+    std::shared_ptr<IAccessPointFactory> m_accessPointFactory;
+
     // Cookie used to validate that the callback context is valid.
     static constexpr uint32_t CookieValid{ 0x8BADF00Du };
     // Cookie used to invalidate the callback context.
@@ -95,6 +113,7 @@ private:
 
     uint32_t m_cookie{ CookieInvalid };
     AccessPointPresenceEventCallback m_accessPointPresenceCallback{ nullptr };
+    AccessPointPresenceEventCallback2 m_accessPointPresenceCallback2{ nullptr };
 
     int m_eventLoopStopFd{ -1 };
     std::jthread m_netlinkMessageProcessingThread;

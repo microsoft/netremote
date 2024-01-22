@@ -11,13 +11,13 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointManager::AccessPointManager(std::unique_ptr<IAccessPointFactory> accessPointFactory) :
+AccessPointManager::AccessPointManager(std::shared_ptr<IAccessPointFactory> accessPointFactory) :
     m_accessPointFactory(std::move(accessPointFactory))
 {}
 
 /* static */
 std::shared_ptr<AccessPointManager>
-AccessPointManager::Create(std::unique_ptr<IAccessPointFactory> accessPointFactory)
+AccessPointManager::Create(std::shared_ptr<IAccessPointFactory> accessPointFactory)
 {
     return std::make_shared<notstd::enable_make_protected<AccessPointManager>>(std::move(accessPointFactory));
 }
