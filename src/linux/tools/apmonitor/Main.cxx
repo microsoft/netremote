@@ -27,11 +27,8 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
     auto accessPointDiscoveryAgentOperationsNetlink{ std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory) };
     auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink)) };
-    accessPointDiscoveryAgent->RegisterDiscoveryEventCallback([](auto&& presence, auto&& interfaceName) {
-        PLOG_INFO << std::format("{} -> {}", interfaceName, magic_enum::enum_name(presence));
-    });
-    accessPointDiscoveryAgent->RegisterDiscoveryEventCallback2([](auto&& presence, auto&& accessPoint) {
-        LOGI <<  std::format("{} -> {}", accessPoint->GetInterfaceName(), magic_enum::enum_name(presence));
+    accessPointDiscoveryAgent->RegisterDiscoveryEventCallback([](auto&& presence, auto&& accessPointChanged) {
+        LOGI <<  std::format("{} -> {}", accessPointChanged->GetInterfaceName(), magic_enum::enum_name(presence));
     });
 
     LOG_INFO << "starting access point discovery agent";

@@ -54,16 +54,6 @@ struct AccessPointDiscoveryAgent :
     RegisterDiscoveryEventCallback(AccessPointPresenceEventCallback onDevicePresenceChanged);
 
     /**
-     * @brief Register a callback for device presence change events.
-     *
-     * The caller must ensure the validity of this callback during the lifetime of this object instance.
-     *
-     * @param onDevicePresenceChanged The callback to register.
-     */
-    void
-    RegisterDiscoveryEventCallback2(AccessPointPresenceEventCallback2 onDevicePresenceChanged);
-
-    /**
      * @brief indicates the started/running state.
      *
      * @return true
@@ -112,19 +102,10 @@ protected:
      * @brief Wrapper for safely invoking any device presence changed registered callback.
      *
      * @param presence The presence change that occurred.
-     * @param interfaceName The name of the network interface of the access point that changed.
-     */
-    void
-    DevicePresenceChanged(AccessPointPresenceEvent presence, std::string interfaceName) const noexcept;
-
-    /**
-     * @brief Wrapper for safely invoking any device presence changed registered callback.
-     *
-     * @param presence The presence change that occurred.
      * @param accessPoint The access point instance that changed.
      */
     void
-    DevicePresenceChanged2(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPoint) const noexcept;
+    DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPoint) const noexcept;
 
 private:
     std::unique_ptr<IAccessPointDiscoveryAgentOperations> m_operations;
@@ -132,7 +113,6 @@ private:
 
     mutable std::shared_mutex m_onDevicePresenceChangedGate;
     AccessPointPresenceEventCallback m_onDevicePresenceChanged;
-    AccessPointPresenceEventCallback2 m_onDevicePresenceChanged2;
 };
 
 } // namespace Microsoft::Net::Wifi

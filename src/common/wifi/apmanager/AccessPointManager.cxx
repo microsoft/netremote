@@ -98,9 +98,8 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
     // be safely destroyed prior to the discovery agent. This allows the
     // callback to be registered indefinitely, safely checking whether this
     // instance is still valid upon each callback invocation.
-    discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<AccessPointManager>(GetInstance())](auto&& presence, auto&& interfaceName) {
+    discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<AccessPointManager>(GetInstance())](auto&& presence, auto&& accessPointChanged) {
         if (auto strongThis = weakThis.lock()) {
-            auto accessPointChanged = strongThis->m_accessPointFactory->Create(interfaceName);
             strongThis->OnAccessPointPresenceChanged(discoveryAgentPtr, presence, std::move(accessPointChanged));
         }
     });

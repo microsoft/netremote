@@ -10,6 +10,7 @@
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {
@@ -19,11 +20,10 @@ namespace Microsoft::Net::Wifi::Test
 struct AccessPointDiscoveryAgentOperationsTest :
     public Microsoft::Net::Wifi::IAccessPointDiscoveryAgentOperations
 {
-    void
-    Start(AccessPointPresenceEventCallback callback) override;
+    AccessPointDiscoveryAgentOperationsTest();
 
     void
-    Start2(AccessPointPresenceEventCallback2 callback) override;
+    Start(AccessPointPresenceEventCallback callback) override;
 
     void
     Stop() override;
@@ -42,9 +42,8 @@ struct AccessPointDiscoveryAgentOperationsTest :
 
 private:
     AccessPointPresenceEventCallback m_callback;
-    AccessPointPresenceEventCallback2 m_callback2;
-    std::vector<std::string> m_accessPointInterfaceNames;
     std::vector<std::shared_ptr<IAccessPoint>> m_accessPoints;
+    std::unique_ptr<IAccessPointFactory> m_accessPointFactory;
 };
 
 } // namespace Microsoft::Net::Wifi::Test

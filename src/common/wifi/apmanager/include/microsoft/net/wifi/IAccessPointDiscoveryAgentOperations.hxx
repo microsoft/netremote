@@ -20,9 +20,7 @@ struct IAccessPoint;
 /**
  * @brief Prototype for the callback invoked when an access point is discovered or removed.
  */
-using AccessPointPresenceEventCallback = std::function<void(AccessPointPresenceEvent, std::string interfaceName)>;
-
-using AccessPointPresenceEventCallback2 = std::function<void(AccessPointPresenceEvent, std::shared_ptr<IAccessPoint> accessPoint)>;
+using AccessPointPresenceEventCallback = std::function<void(AccessPointPresenceEvent, std::shared_ptr<IAccessPoint> accessPoint)>;
 
 /**
  * @brief Operations used to perform discovery of access points, used by
@@ -39,14 +37,6 @@ struct IAccessPointDiscoveryAgentOperations
      */
     virtual void
     Start(AccessPointPresenceEventCallback callback) = 0;
-
-    /**
-     * @brief Start the discovery process.
-     *
-     * @param callback The callback to invoke when an access point is discovered or removed.
-     */
-    virtual void
-    Start2(AccessPointPresenceEventCallback2 callback) = 0;
 
     /**
      * @brief Stop the discovery process.

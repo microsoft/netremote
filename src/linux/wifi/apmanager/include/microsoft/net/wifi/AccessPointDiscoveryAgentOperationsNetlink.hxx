@@ -38,9 +38,6 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
     Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback) override;
 
     void
-    Start2(AccessPointPresenceEventCallback2 accessPointPresenceEventCallback) override;
-
-    void
     Stop() override;
 
     std::future<std::vector<std::string>>
@@ -94,15 +91,6 @@ private:
     int
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
-    /**
-     * @brief Process a single netlink message.
-     *
-     * @param netlinkMessage The netlink message to process.
-     * @param accessPointPresenceEventCallback The callback to invoke when an access point presence event occurs.
-     */
-    int
-    ProcessNetlinkMessage2(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback2 &accessPointPresenceEventCallback);
-
 private:
     std::shared_ptr<IAccessPointFactory> m_accessPointFactory;
 
@@ -113,7 +101,6 @@ private:
 
     uint32_t m_cookie{ CookieInvalid };
     AccessPointPresenceEventCallback m_accessPointPresenceCallback{ nullptr };
-    AccessPointPresenceEventCallback2 m_accessPointPresenceCallback2{ nullptr };
 
     int m_eventLoopStopFd{ -1 };
     std::jthread m_netlinkMessageProcessingThread;

@@ -131,7 +131,7 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
     auto accessPointDiscoveryAgent{ AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperations)) };
 
     // Create a promise to capture the presence event callback invocation data.
-    std::promise<std::pair<AccessPointPresenceEvent, std::string>> presenceEventRaised;
+    std::promise<std::pair<AccessPointPresenceEvent, std::shared_ptr<IAccessPoint>>> presenceEventRaised;
     auto presenceEventRaisedFuture{ presenceEventRaised.get_future() };
 
     SECTION("Arrival event is raised")
@@ -148,9 +148,9 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
         REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::ready);
 
         // Verify the callback fired with the expected event and access point.
-        const auto [presenceEvent, accessPointInterfaceNameChanged]{ presenceEventRaisedFuture.get() };
+        const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
         REQUIRE(presenceEvent == AccessPointPresenceEvent::Arrived);
-        REQUIRE(accessPointInterfaceNameChanged == accessPointInterfaceName);
+        REQUIRE(accessPointChanged->GetInterfaceName() == accessPointInterfaceName);
     }
 
     SECTION("Arrival event is raised after toggling start/stop")
@@ -170,9 +170,9 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
         REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::ready);
 
         // Verify the callback fired with the expected event and access point.
-        const auto [presenceEvent, accessPointInterfaceNameChanged]{ presenceEventRaisedFuture.get() };
+        const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
         REQUIRE(presenceEvent == AccessPointPresenceEvent::Arrived);
-        REQUIRE(accessPointInterfaceNameChanged == accessPointInterfaceName);
+        REQUIRE(accessPointChanged->GetInterfaceName() == accessPointInterfaceName);
     }
 
     SECTION("Departed event is raised")
@@ -191,9 +191,9 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
         REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::ready);
 
         // Verify the callback fired with the expected event and access point.
-        const auto [presenceEvent, accessPointInterfaceNameChanged]{ presenceEventRaisedFuture.get() };
+        const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
         REQUIRE(presenceEvent == AccessPointPresenceEvent::Departed);
-        REQUIRE(accessPointInterfaceNameChanged == accessPointInterfaceName);
+        REQUIRE(accessPointChanged->GetInterfaceName() == accessPointInterfaceName);
     }
 
     SECTION("Departed event is raised after start/stop")
@@ -216,9 +216,9 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
         REQUIRE(presenceEventRaisedFuture.wait_for(PresenceEventCallbackWaitTime) == std::future_status::ready);
 
         // Verify the callback fired with the expected event and access point.
-        const auto [presenceEvent, accessPointInterfaceNameChanged]{ presenceEventRaisedFuture.get() };
+        const auto [presenceEvent, accessPointChanged]{ presenceEventRaisedFuture.get() };
         REQUIRE(presenceEvent == AccessPointPresenceEvent::Departed);
-        REQUIRE(accessPointInterfaceNameChanged == accessPointInterfaceName);
+        REQUIRE(accessPointChanged->GetInterfaceName() == accessPointInterfaceName);
     }
 
     SECTION("Arrival event is not raised when stoppped")

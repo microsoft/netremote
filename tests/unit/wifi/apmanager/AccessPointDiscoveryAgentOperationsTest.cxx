@@ -7,16 +7,14 @@ using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
 using Microsoft::Net::Wifi::AccessPointPresenceEvent;
 
+AccessPointDiscoveryAgentOperationsTest::AccessPointDiscoveryAgentOperationsTest() :
+    m_accessPointFactory(std::make_unique<AccessPointFactoryTest>())
+{}
+
 void
 AccessPointDiscoveryAgentOperationsTest::Start(AccessPointPresenceEventCallback callback)
 {
     m_callback = callback;
-}
-
-void
-AccessPointDiscoveryAgentOperationsTest::Start2(AccessPointPresenceEventCallback2 callback2)
-{
-    m_callback2 = callback2;
 }
 
 void
@@ -29,7 +27,8 @@ std::future<std::vector<std::string>>
 AccessPointDiscoveryAgentOperationsTest::ProbeAsync()
 {
     return std::async(std::launch::async, [&]() {
-        return m_accessPointInterfaceNames;
+        // return m_accessPointInterfaceNames;
+        return std::vector<std::string>();
     });
 }
 
@@ -44,25 +43,26 @@ AccessPointDiscoveryAgentOperationsTest::ProbeAsync2()
 void
 AccessPointDiscoveryAgentOperationsTest::AddAccessPoint(std::string_view interfaceNameToAdd)
 {
-    m_accessPointInterfaceNames.push_back(std::string(interfaceNameToAdd));
+    auto accessPointToAdd = m_accessPointFactory->Create(interfaceNameToAdd);
+    m_accessPoints.push_back(accessPointToAdd);
 
     if (m_callback != nullptr) {
-        m_callback(AccessPointPresenceEvent::Arrived, m_accessPointInterfaceNames.back());
+        m_callback(AccessPointPresenceEvent::Arrived, m_accessPoints.back());
     }
 }
 
 void
 AccessPointDiscoveryAgentOperationsTest::RemoveAccessPoint(std::string_view interfaceNameToRemove)
 {
-    auto interfaceNameToRemoveIterator = std::ranges::find_if(m_accessPointInterfaceNames, [&](const auto& interfaceName) {
-        return (interfaceNameToRemove == interfaceName);
+    auto accessPointToRemoveIterator = std::ranges::find_if(m_accessPoints, [&](const auto& accessPoint) {
+        return (interfaceNameToRemove == accessPoint->GetInterfaceName());
     });
 
-    if (interfaceNameToRemoveIterator != std::end(m_accessPointInterfaceNames)) {
+    if (accessPointToRemoveIterator != std::end(m_accessPoints)) {
         if (m_callback != nullptr) {
-            m_callback(Microsoft::Net::Wifi::AccessPointPresenceEvent::Departed, *interfaceNameToRemoveIterator);
+            m_callback(Microsoft::Net::Wifi::AccessPointPresenceEvent::Departed, *accessPointToRemoveIterator);
         }
 
-        m_accessPointInterfaceNames.erase(interfaceNameToRemoveIterator);
+        m_accessPoints.erase(accessPointToRemoveIterator);
     }
 }
