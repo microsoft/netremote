@@ -90,7 +90,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        AccessPointConfiguration apConfiguration{};
+        Dot11AccessPointConfiguration apConfiguration{};
         apConfiguration.mutable_ssid()->set_name(SsidName);
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
         apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);

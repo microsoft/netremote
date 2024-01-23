@@ -202,13 +202,13 @@ IeeeCipherAlgorithmToNetRemoteCipherSuite(IeeeCipherSuite ieeeCipherSuite)
     return Dot11CipherSuite::Dot11CipherSuiteUnknown;
 }
 
-Microsoft::Net::Wifi::AccessPointCapabilities
+Microsoft::Net::Wifi::Dot11AccessPointCapabilities
 IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
 {
-    using Microsoft::Net::Wifi::AccessPointCapabilities;
+    using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
     using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
-    AccessPointCapabilities capabilities{};
+    Dot11AccessPointCapabilities capabilities{};
 
     std::vector<Microsoft::Net::Wifi::Dot11PhyType> phyTypes(std::size(ieeeCapabilities.Protocols));
     std::ranges::transform(ieeeCapabilities.Protocols, std::begin(phyTypes), IeeeProtocolToNetRemotePhyType);
@@ -246,7 +246,7 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
 }
 
 using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-using Microsoft::Net::Wifi::AccessPointCapabilities;
+using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
 
 static constexpr auto AccessPointIdInvalid{ "invalid" };
 
@@ -265,7 +265,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 
     bool isEnabled{ false };
     std::string id{};
-    Microsoft::Net::Wifi::AccessPointCapabilities capabilities{};
+    Microsoft::Net::Wifi::Dot11AccessPointCapabilities capabilities{};
 
     auto interfaceName = accessPoint.GetInterfaceName();
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));

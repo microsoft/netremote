@@ -118,7 +118,7 @@ message Dot11MacAddress
     bytes Value = 1;
 }
 
-message SharedKey
+message Dot11SharedKey
 {
     oneof Value
     {
@@ -127,7 +127,7 @@ message SharedKey
     }
 }
 
-message AccessPointConfiguration
+message Dot11AccessPointConfiguration
 {
     Dot11Ssid Ssid = 1;
     Dot11MacAddress Bssid = 2;
@@ -137,7 +137,7 @@ message AccessPointConfiguration
     repeated Dot11FrequencyBand Bands = 6;
 }
 
-message AccessPointCapabilities
+message Dot11AccessPointCapabilities
 {
     repeated Microsoft.Net.Wifi.Dot11FrequencyBand Bands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
@@ -145,7 +145,7 @@ message AccessPointCapabilities
     repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;
 }
 
-enum AccessPointState
+enum Dot11AccessPointState
 {
     AccessPointStateUnknown = 0;
 }

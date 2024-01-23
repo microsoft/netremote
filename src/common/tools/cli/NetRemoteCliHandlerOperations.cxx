@@ -22,7 +22,7 @@ NetRemoteCliHandlerOperations::NetRemoteCliHandlerOperations(std::shared_ptr<Net
 namespace detail
 {
 /**
- * @brief Generate a string representation of a AccessPointCapabilities object.
+ * @brief Generate a string representation of a Dot11AccessPointCapabilities object.
  * 
  * @param accessPointCapabilities The object to generate a string representation of.
  * @param indentationLevel The indentation level to use.
@@ -30,7 +30,7 @@ namespace detail
  * @return std::string 
  */
 std::string
-NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::AccessPointCapabilities& accessPointCapabilities, std::size_t indentationLevel = 1, std::size_t indentation = 2)
+NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities& accessPointCapabilities, std::size_t indentationLevel = 1, std::size_t indentation = 2)
 {
     const auto indent0 = std::string((indentationLevel + 0) * indentation, ' ');
     const auto indent1 = std::string((indentationLevel + 1) * indentation, ' ');
