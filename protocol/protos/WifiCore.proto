@@ -62,7 +62,8 @@ enum Dot11AuthenticationAlgorithm
     Dot11AuthenticationAlgorithmOwe = 11;
 }
 
-// 802.11 Authentication and Key Management (AKM) Suites.
+// 802.11 Authentication and Key Management (AKM) suites.
+// Values map to those defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
 enum Dot11AkmSuite
 {
     Dot11AkmSuiteReserved0 = 0;
@@ -88,27 +89,24 @@ enum Dot11AkmSuite
     Dot11AkmSuitePskSha384 = 20;
 }
 
-enum Dot11CipherAlgorithm
+// 802.11 Cipher suites.
+// Values map to those defined in IEEE 802.11-2020, Section 9.4.2.24.2, Table 9-149.
+enum Dot11CipherSuite
 {
-    option allow_alias = true;
-
-    Dot11CipherAlgorithmUnknown = 0;
-    Dot11CipherAlgorithmNone = 1;
-    Dot11CipherAlgorithmWep = 2;
-    Dot11CipherAlgorithmWep40 = 3;
-    Dot11CipherAlgorithmWep104 = 4;
-    Dot11CipherAlgorithmTkip = 5;
-    Dot11CipherAlgorithmBip = 6;
-    Dot11CipherAlgorithmBipCmac128 = 6;
-    Dot11CipherAlgorithmBipGmac128 = 7;
-    Dot11CipherAlgorithmBipGmac256 = 8;
-    Dot11CipherAlgorithmBipCmac256 = 9;
-    Dot11CipherAlgorithmGcmp = 10;
-    Dot11CipherAlgorithmGcmp128 = 10;
-    Dot11CipherAlgorithmGcmp256 = 11;
-    Dot11CipherAlgorithmCcmp256 = 12;
-    Dot11CipherAlgorithmWpaUseGroup = 13;
-    Dot11CipherAlgorithmRsnUseGroup = 13;
+    Dot11CipherSuiteUnknown = 0;
+    Dot11CipherSuiteBipCmac128 = 1;
+    Dot11CipherSuiteBipCmac256 = 2;
+    Dot11CipherSuiteBipGmac128 = 3;
+    Dot11CipherSuiteBipGmac256 = 4;
+    Dot11CipherSuiteCcmp128 = 5;
+    Dot11CipherSuiteCcmp256 = 6;
+    Dot11CipherSuiteGcmp128 = 7;
+    Dot11CipherSuiteGcmp256 = 8;
+    Dot11CipherSuiteGroupAddressesTrafficNotAllowed = 9;
+    Dot11CipherSuiteTkip = 10;
+    Dot11CipherSuiteUseGroup = 11;
+    Dot11CipherSuiteWep104 = 12;
+    Dot11CipherSuiteWep40 = 13;
 }
 
 message Dot11Ssid
@@ -141,7 +139,7 @@ message AccessPointConfiguration
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
     Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 4;
-    Dot11CipherAlgorithm EncryptionAlgorithm = 5;
+    Dot11CipherSuite CipherSuite = 5;
     repeated RadioBand Bands = 6;
 }
 
@@ -150,7 +148,7 @@ message AccessPointCapabilities
     repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
     repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
-    repeated Microsoft.Net.Wifi.Dot11CipherAlgorithm EncryptionAlgorithms = 4;
+    repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;
 }
 
 enum AccessPointState

@@ -94,7 +94,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         apConfiguration.mutable_ssid()->set_name(SsidName);
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
         apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
-        apConfiguration.set_encryptionalgorithm(Dot11CipherAlgorithm::Dot11CipherAlgorithmCcmp256);
+        apConfiguration.set_ciphersuite(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
         apConfiguration.mutable_bands()->Add(RadioBand::RadioBand2_4GHz);
         apConfiguration.mutable_bands()->Add(RadioBand::RadioBand5_0GHz);
 

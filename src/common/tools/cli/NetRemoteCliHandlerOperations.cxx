@@ -66,10 +66,10 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::AccessPoint
     ss << '\n'
        << indent0
        << "Cipher Algorithms:";
-    for (const auto& ciperAlgorithm : accessPointCapabilities.encryptionalgorithms()) {
+    for (const auto& ciperSuite : accessPointCapabilities.ciphersuites()) {
         ss << '\n'
            << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherAlgorithm>(ciperAlgorithm));
+           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherSuite>(ciperSuite));
     }
 
     return ss.str();

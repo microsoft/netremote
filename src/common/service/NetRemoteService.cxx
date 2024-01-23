@@ -127,54 +127,62 @@ IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Microsoft::Net::Wi
     return authenticationAlgorithm;
 }
 
-Microsoft::Net::Wifi::Dot11CipherAlgorithm
-IeeeCipherAlgorithmToNetRemoteCipherAlgorithm(Microsoft::Net::Wifi::IeeeCipherSuite ieeeCipherSuite)
+Microsoft::Net::Wifi::Dot11CipherSuite
+IeeeCipherAlgorithmToNetRemoteCipherSuite(Microsoft::Net::Wifi::IeeeCipherSuite ieeeCipherSuite)
 {
-    using Microsoft::Net::Wifi::Dot11CipherAlgorithm;
+    using Microsoft::Net::Wifi::Dot11CipherSuite;
     using Microsoft::Net::Wifi::IeeeCipherSuite;
 
-    Dot11CipherAlgorithm cipherAlgorithm{ Dot11CipherAlgorithm::Dot11CipherAlgorithmUnknown };
+    Dot11CipherSuite cipherSuite{ Dot11CipherSuite::Dot11CipherSuiteUnknown };
 
     switch (ieeeCipherSuite) {
     case IeeeCipherSuite::Unknown:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmNone;
-        break;
-    case IeeeCipherSuite::Wep40:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmWep40;
-        break;
-    case IeeeCipherSuite::Tkip:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmTkip;
-        break;
-    // case IeeeCipherSuite::Ccmp128: // FIXME
-    case IeeeCipherSuite::Wep104:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmWep104;
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteUnknown;
         break;
     case IeeeCipherSuite::BipCmac128:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipCmac128;
-        break;
-    case IeeeCipherSuite::Gcmp128:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmGcmp128;
-        break;
-    case IeeeCipherSuite::Gcmp256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmGcmp256;
-        break;
-    case IeeeCipherSuite::Ccmp256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmCcmp256;
-        break;
-    case IeeeCipherSuite::BipGmac128:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipGmac128;
-        break;
-    case IeeeCipherSuite::BipGmac256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipGmac256;
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
         break;
     case IeeeCipherSuite::BipCmac256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipCmac256;
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteBipCmac256;
+        break;
+    case IeeeCipherSuite::BipGmac128:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteBipGmac128;
+        break;
+    case IeeeCipherSuite::BipGmac256:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteBipGmac256;
+        break;
+    case IeeeCipherSuite::Ccmp128:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteCcmp128;
+        break;
+    case IeeeCipherSuite::Ccmp256:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteCcmp256;
+        break;
+    case IeeeCipherSuite::Gcmp128:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteGcmp128;
+        break;
+    case IeeeCipherSuite::Gcmp256:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteGcmp256;
+        break;
+    case IeeeCipherSuite::GroupAddressesTrafficNotAllowed:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed;
+        break;
+    case IeeeCipherSuite::Tkip:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteTkip;
+        break;
+    case IeeeCipherSuite::UseGroup:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteUseGroup;
+        break;
+    case IeeeCipherSuite::Wep104:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteWep104;
+        break;
+    case IeeeCipherSuite::Wep40:
+        cipherSuite = Dot11CipherSuite::Dot11CipherSuiteWep40;
         break;
     default:
         break;
     }
 
-    return cipherAlgorithm;
+    return cipherSuite;
 }
 
 Microsoft::Net::Wifi::AccessPointCapabilities
@@ -209,12 +217,12 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
         std::make_move_iterator(std::end(authenticationAlgorithms))
     };
 
-    std::vector<Microsoft::Net::Wifi::Dot11CipherAlgorithm> encryptionAlgorithms(std::size(ieeeCapabilities.EncryptionAlgorithms));
-    std::ranges::transform(ieeeCapabilities.EncryptionAlgorithms, std::begin(encryptionAlgorithms), IeeeCipherAlgorithmToNetRemoteCipherAlgorithm);
+    std::vector<Microsoft::Net::Wifi::Dot11CipherSuite> cipherSuites(std::size(ieeeCapabilities.CipherSuites));
+    std::ranges::transform(ieeeCapabilities.CipherSuites, std::begin(cipherSuites), IeeeCipherAlgorithmToNetRemoteCipherSuite);
 
-    *capabilities.mutable_encryptionalgorithms() = {
-        std::make_move_iterator(std::begin(encryptionAlgorithms)),
-        std::make_move_iterator(std::end(encryptionAlgorithms))
+    *capabilities.mutable_ciphersuites() = {
+        std::make_move_iterator(std::begin(cipherSuites)),
+        std::make_move_iterator(std::end(cipherSuites))
     };
 
     return capabilities;
@@ -327,7 +335,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherAlgorithm;
+using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Dot11PhyType;
 
 ::grpc::Status
@@ -391,9 +399,9 @@ NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::R
         status.set_message("No authentication algorithm provided");
         return false;
     }
-    if (configuration.encryptionalgorithm() == Dot11CipherAlgorithm::Dot11CipherAlgorithmUnknown) {
+    if (configuration.ciphersuite() == Dot11CipherSuite::Dot11CipherSuiteUnknown) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No encryption algorithm provided");
+        status.set_message("No cipher suite provided");
         return false;
     }
     if (std::empty(configuration.bands())) {
