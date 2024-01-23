@@ -407,8 +407,6 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
 ::grpc::Status
 NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response)
 {
-    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-
     LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
