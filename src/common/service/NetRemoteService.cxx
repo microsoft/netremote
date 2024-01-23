@@ -29,49 +29,49 @@ NetRemoteService::GetAccessPointManager() noexcept
 namespace detail
 {
 using Microsoft::Net::Wifi::Dot11PhyType;
-using Microsoft::Net::Wifi::IeeeProtocol;
+using Microsoft::Net::Wifi::Ieee80211Protocol;
 
 Dot11PhyType
-IeeeProtocolToNetRemotePhyType(IeeeProtocol ieeeProtocol)
+IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
 {
     switch (ieeeProtocol) {
-    case IeeeProtocol::Unknown:
+    case Ieee80211Protocol::Unknown:
         return Dot11PhyType::Dot11PhyTypeUnknown;
-    case IeeeProtocol::B:
+    case Ieee80211Protocol::B:
         return Dot11PhyType::Dot11PhyTypeB;
-    case IeeeProtocol::G:
+    case Ieee80211Protocol::G:
         return Dot11PhyType::Dot11PhyTypeG;
-    case IeeeProtocol::N:
+    case Ieee80211Protocol::N:
         return Dot11PhyType::Dot11PhyTypeN;
-    case IeeeProtocol::A:
+    case Ieee80211Protocol::A:
         return Dot11PhyType::Dot11PhyTypeA;
-    case IeeeProtocol::AC:
+    case Ieee80211Protocol::AC:
         return Dot11PhyType::Dot11PhyTypeAC;
-    case IeeeProtocol::AD:
+    case Ieee80211Protocol::AD:
         return Dot11PhyType::Dot11PhyTypeAD;
-    case IeeeProtocol::AX:
+    case Ieee80211Protocol::AX:
         return Dot11PhyType::Dot11PhyTypeAX;
-    case IeeeProtocol::BE:
+    case Ieee80211Protocol::BE:
         return Dot11PhyType::Dot11PhyTypeBE;
     }
 
     return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
-using Microsoft::Net::Wifi::IeeeDot11FrequencyBand;
+using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 using Microsoft::Net::Wifi::Dot11FrequencyBand;
 
 Dot11FrequencyBand
-IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(IeeeDot11FrequencyBand ieeeDot11FrequencyBand)
+IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
 {
     switch (ieeeDot11FrequencyBand) {
-    case IeeeDot11FrequencyBand::Unknown:
+    case Ieee80211FrequencyBand::Unknown:
         return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
-    case IeeeDot11FrequencyBand::TwoPointFourGHz:
+    case Ieee80211FrequencyBand::TwoPointFourGHz:
         return Dot11FrequencyBand::Dot11FrequencyBandTwoPoint4GHz;
-    case IeeeDot11FrequencyBand::FiveGHz:
+    case Ieee80211FrequencyBand::FiveGHz:
         return Dot11FrequencyBand::Dot11FrequencyBandFiveGHz;
-    case IeeeDot11FrequencyBand::SixGHz:
+    case Ieee80211FrequencyBand::SixGHz:
         return Dot11FrequencyBand::Dot11FrequencyBandSixGHz;
     }
 
@@ -79,29 +79,29 @@ IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(IeeeDot11FrequencyBand ieeeD
 }
 
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::IeeeAuthenticationAlgorithm;
+using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
 
 Dot11AuthenticationAlgorithm
-IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(IeeeAuthenticationAlgorithm ieeeAuthenticationAlgorithm)
+IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieeeAuthenticationAlgorithm)
 {
     switch (ieeeAuthenticationAlgorithm) {
-    case IeeeAuthenticationAlgorithm::Unknown:
+    case Ieee80211AuthenticationAlgorithm::Unknown:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
-    case IeeeAuthenticationAlgorithm::OpenSystem:
+    case Ieee80211AuthenticationAlgorithm::OpenSystem:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem;
-    case IeeeAuthenticationAlgorithm::SharedKey:
+    case Ieee80211AuthenticationAlgorithm::SharedKey:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey;
-    case IeeeAuthenticationAlgorithm::FastBssTransition:
+    case Ieee80211AuthenticationAlgorithm::FastBssTransition:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFastBssTransition;
-    case IeeeAuthenticationAlgorithm::Sae:
+    case Ieee80211AuthenticationAlgorithm::Sae:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae;
-    case IeeeAuthenticationAlgorithm::Fils:
+    case Ieee80211AuthenticationAlgorithm::Fils:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFils;
-    case IeeeAuthenticationAlgorithm::FilsPfs:
+    case Ieee80211AuthenticationAlgorithm::FilsPfs:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPfs;
-    case IeeeAuthenticationAlgorithm::FilsPublicKey:
+    case Ieee80211AuthenticationAlgorithm::FilsPublicKey:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPublicKey;
-    case IeeeAuthenticationAlgorithm::VendorSpecific:
+    case Ieee80211AuthenticationAlgorithm::VendorSpecific:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmVendorSpecific;
     }
 
@@ -109,53 +109,53 @@ IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(IeeeAuthentication
 }
 
 using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::IeeeAkmSuite;
+using Microsoft::Net::Wifi::Ieee80211AkmSuite;
 
 Dot11AkmSuite
-IeeeAkmSuiteToNetRemoteAkm(IeeeAkmSuite akmSuite)
+Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
 {
     switch (akmSuite) {
-    case IeeeAkmSuite::Reserved0:
+    case Ieee80211AkmSuite::Reserved0:
         return Dot11AkmSuite::Dot11AkmSuiteReserved0;
-    case IeeeAkmSuite::Ieee8021x:
+    case Ieee80211AkmSuite::Ieee8021x:
         return Dot11AkmSuite::Dot11AkmSuite8021x;
-    case IeeeAkmSuite::Psk:
+    case Ieee80211AkmSuite::Psk:
         return Dot11AkmSuite::Dot11AkmSuitePsk;
-    case IeeeAkmSuite::Ft8021x:
+    case Ieee80211AkmSuite::Ft8021x:
         return Dot11AkmSuite::Dot11AkmSuiteFt8021x;
-    case IeeeAkmSuite::FtPsk:
+    case Ieee80211AkmSuite::FtPsk:
         return Dot11AkmSuite::Dot11AkmSuiteFtPsk;
-    case IeeeAkmSuite::Ieee8021xSha256:
+    case Ieee80211AkmSuite::Ieee8021xSha256:
         return Dot11AkmSuite::Dot11AkmSuite8021xSha256;
-    case IeeeAkmSuite::PskSha256:
+    case Ieee80211AkmSuite::PskSha256:
         return Dot11AkmSuite::Dot11AkmSuitePskSha256;
-    case IeeeAkmSuite::Tdls:
+    case Ieee80211AkmSuite::Tdls:
         return Dot11AkmSuite::Dot11AkmSuiteTdls;
-    case IeeeAkmSuite::Sae:
+    case Ieee80211AkmSuite::Sae:
         return Dot11AkmSuite::Dot11AkmSuiteSae;
-    case IeeeAkmSuite::FtSae:
+    case Ieee80211AkmSuite::FtSae:
         return Dot11AkmSuite::Dot11AkmSuiteFtSae;
-    case IeeeAkmSuite::ApPeerKey:
+    case Ieee80211AkmSuite::ApPeerKey:
         return Dot11AkmSuite::Dot11AkmSuiteApPeerKey;
-    case IeeeAkmSuite::Ieee8021xSuiteB:
+    case Ieee80211AkmSuite::Ieee8021xSuiteB:
         return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB;
-    case IeeeAkmSuite::Ieee8011xSuiteB192:
+    case Ieee80211AkmSuite::Ieee8011xSuiteB192:
         return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192;
-    case IeeeAkmSuite::Ft8021xSha384:
+    case Ieee80211AkmSuite::Ft8021xSha384:
         return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
-    case IeeeAkmSuite::FilsSha256:
+    case Ieee80211AkmSuite::FilsSha256:
         return Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
-    case IeeeAkmSuite::FilsSha284:
+    case Ieee80211AkmSuite::FilsSha284:
         return Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
-    case IeeeAkmSuite::FtFilsSha256:
+    case Ieee80211AkmSuite::FtFilsSha256:
         return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;
-    case IeeeAkmSuite::FtFilsSha384:
+    case Ieee80211AkmSuite::FtFilsSha384:
         return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha384;
-    case IeeeAkmSuite::Owe:
+    case Ieee80211AkmSuite::Owe:
         return Dot11AkmSuite::Dot11AkmSuiteOwe;
-    case IeeeAkmSuite::FtPskSha384:
+    case Ieee80211AkmSuite::FtPskSha384:
         return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
-    case IeeeAkmSuite::PskSha384:
+    case Ieee80211AkmSuite::PskSha384:
         return Dot11AkmSuite::Dot11AkmSuitePskSha384;
     }
 
@@ -163,39 +163,39 @@ IeeeAkmSuiteToNetRemoteAkm(IeeeAkmSuite akmSuite)
 }
 
 using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::IeeeCipherSuite;
+using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
 Dot11CipherSuite
-IeeeCipherAlgorithmToNetRemoteCipherSuite(IeeeCipherSuite ieeeCipherSuite)
+IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
 {
     switch (ieeeCipherSuite) {
-    case IeeeCipherSuite::Unknown:
+    case Ieee80211CipherSuite::Unknown:
         return Dot11CipherSuite::Dot11CipherSuiteUnknown;
-    case IeeeCipherSuite::BipCmac128:
+    case Ieee80211CipherSuite::BipCmac128:
         return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
-    case IeeeCipherSuite::BipCmac256:
+    case Ieee80211CipherSuite::BipCmac256:
         return Dot11CipherSuite::Dot11CipherSuiteBipCmac256;
-    case IeeeCipherSuite::BipGmac128:
+    case Ieee80211CipherSuite::BipGmac128:
         return Dot11CipherSuite::Dot11CipherSuiteBipGmac128;
-    case IeeeCipherSuite::BipGmac256:
+    case Ieee80211CipherSuite::BipGmac256:
         return Dot11CipherSuite::Dot11CipherSuiteBipGmac256;
-    case IeeeCipherSuite::Ccmp128:
+    case Ieee80211CipherSuite::Ccmp128:
         return Dot11CipherSuite::Dot11CipherSuiteCcmp128;
-    case IeeeCipherSuite::Ccmp256:
+    case Ieee80211CipherSuite::Ccmp256:
         return Dot11CipherSuite::Dot11CipherSuiteCcmp256;
-    case IeeeCipherSuite::Gcmp128:
+    case Ieee80211CipherSuite::Gcmp128:
         return Dot11CipherSuite::Dot11CipherSuiteGcmp128;
-    case IeeeCipherSuite::Gcmp256:
+    case Ieee80211CipherSuite::Gcmp256:
         return Dot11CipherSuite::Dot11CipherSuiteGcmp256;
-    case IeeeCipherSuite::GroupAddressesTrafficNotAllowed:
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
         return Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed;
-    case IeeeCipherSuite::Tkip:
+    case Ieee80211CipherSuite::Tkip:
         return Dot11CipherSuite::Dot11CipherSuiteTkip;
-    case IeeeCipherSuite::UseGroup:
+    case Ieee80211CipherSuite::UseGroup:
         return Dot11CipherSuite::Dot11CipherSuiteUseGroup;
-    case IeeeCipherSuite::Wep104:
+    case Ieee80211CipherSuite::Wep104:
         return Dot11CipherSuite::Dot11CipherSuiteWep104;
-    case IeeeCipherSuite::Wep40:
+    case Ieee80211CipherSuite::Wep40:
         return Dot11CipherSuite::Dot11CipherSuiteWep40;
     }
 

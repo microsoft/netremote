@@ -7,7 +7,7 @@
 
 namespace Microsoft::Net::Wifi
 {
-enum class IeeeDot11FrequencyBand {
+enum class Ieee80211FrequencyBand {
     Unknown,
     TwoPointFourGHz,
     FiveGHz,
@@ -21,7 +21,7 @@ namespace Literals
  * @brief User-defined literal operator for allowing use of _GHz to specify
  * frequency band enumeration values.
  */
-inline constexpr Microsoft::Net::Wifi::IeeeDot11FrequencyBand
+inline constexpr Microsoft::Net::Wifi::Ieee80211FrequencyBand
 operator"" _GHz(long double value) noexcept
 {
     /**
@@ -39,13 +39,13 @@ operator"" _GHz(long double value) noexcept
     constexpr auto TwoPointFourGHzTolerance = 8.89045781438113635886e-17L;
 
     if (std::fabs(value - 2.4) <= TwoPointFourGHzTolerance) {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::TwoPointFourGHz;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::TwoPointFourGHz;
     } else if (value == 5.0) {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::FiveGHz;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::FiveGHz;
     } else if (value == 6.0) {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::SixGHz;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::SixGHz;
     } else {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::Unknown;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::Unknown;
     }
 }
 
@@ -55,22 +55,22 @@ operator"" _GHz(long double value) noexcept
  * @brief User-defined literal operator for allowing use of _MHz to specify
  * frequency band enumeration values.
  */
-inline constexpr Microsoft::Net::Wifi::IeeeDot11FrequencyBand
+inline constexpr Microsoft::Net::Wifi::Ieee80211FrequencyBand
 operator"" _MHz(unsigned long long int value) noexcept
 {
     if (value == 2400) {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::TwoPointFourGHz;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::TwoPointFourGHz;
     } else if (value == 5000) {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::FiveGHz;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::FiveGHz;
     } else if (value == 6000) {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::SixGHz;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::SixGHz;
     } else {
-        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::Unknown;
+        return Microsoft::Net::Wifi::Ieee80211FrequencyBand::Unknown;
     }
 }
 } // namespace Literals
 
-enum class IeeeProtocol {
+enum class Ieee80211Protocol {
     Unknown,
     B,
     G,
@@ -127,7 +127,7 @@ MakeIeee80211Suite(uint8_t suiteId)
  *
  * Defined in IEEE 802.11-2020, Section 9.4.1.1, Figure 9-82.
  */
-enum class IeeeAuthenticationAlgorithm : uint16_t {
+enum class Ieee80211AuthenticationAlgorithm : uint16_t {
     Unknown = 0x0000,
     OpenSystem = 0x0001,
     SharedKey = 0x0002,
@@ -144,55 +144,55 @@ enum class IeeeAuthenticationAlgorithm : uint16_t {
  *
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
  */
-static constexpr uint8_t IeeeAkmSuiteIdReserved0 = 0;
-static constexpr uint8_t IeeeAkmSuiteId8021x = 1;
-static constexpr uint8_t IeeeAkmSuiteIdPsk = 2;
-static constexpr uint8_t IeeeAkmSuiteIdFt8021x = 3;
-static constexpr uint8_t IeeeAkmSuiteIdFtPsk = 4;
-static constexpr uint8_t IeeeAkmSuiteId8021xSha256 = 5;
-static constexpr uint8_t IeeeAkmSuiteIdPskSha256 = 6;
-static constexpr uint8_t IeeeAkmSuiteIdTdls = 7;
-static constexpr uint8_t IeeeAkmSuiteIdSae = 8;
-static constexpr uint8_t IeeeAkmSuiteIdFtSae = 9;
-static constexpr uint8_t IeeeAkmSuiteIdApPeerKey = 10;
-static constexpr uint8_t IeeeAkmSuiteId8021xSuiteB = 11;
-static constexpr uint8_t IeeeAkmSuiteId8021xSuiteB192 = 12;
-static constexpr uint8_t IeeeAkmSuiteIdFt8021xSha384 = 13;
-static constexpr uint8_t IeeeAkmSuiteIdFilsSha256 = 14;
-static constexpr uint8_t IeeeAkmSuiteIdFilsSha384 = 15;
-static constexpr uint8_t IeeeAkmSuiteIdFtFilsSha256 = 16;
-static constexpr uint8_t IeeeAkmSuiteIdFtFilsSha384 = 17;
-static constexpr uint8_t IeeeAkmSuiteIdOwe = 18;
-static constexpr uint8_t IeeeAkmSuiteIdFtPskSha384 = 19;
-static constexpr uint8_t IeeeAkmSuiteIdPskSha384 = 20;
+static constexpr uint8_t Ieee80211AkmSuiteIdReserved0 = 0;
+static constexpr uint8_t Ieee80211AkmSuiteId8021x = 1;
+static constexpr uint8_t Ieee80211AkmSuiteIdPsk = 2;
+static constexpr uint8_t Ieee80211AkmSuiteIdFt8021x = 3;
+static constexpr uint8_t Ieee80211AkmSuiteIdFtPsk = 4;
+static constexpr uint8_t Ieee80211AkmSuiteId8021xSha256 = 5;
+static constexpr uint8_t Ieee80211AkmSuiteIdPskSha256 = 6;
+static constexpr uint8_t Ieee80211AkmSuiteIdTdls = 7;
+static constexpr uint8_t Ieee80211AkmSuiteIdSae = 8;
+static constexpr uint8_t Ieee80211AkmSuiteIdFtSae = 9;
+static constexpr uint8_t Ieee80211AkmSuiteIdApPeerKey = 10;
+static constexpr uint8_t Ieee80211AkmSuiteId8021xSuiteB = 11;
+static constexpr uint8_t Ieee80211AkmSuiteId8021xSuiteB192 = 12;
+static constexpr uint8_t Ieee80211AkmSuiteIdFt8021xSha384 = 13;
+static constexpr uint8_t Ieee80211AkmSuiteIdFilsSha256 = 14;
+static constexpr uint8_t Ieee80211AkmSuiteIdFilsSha384 = 15;
+static constexpr uint8_t Ieee80211AkmSuiteIdFtFilsSha256 = 16;
+static constexpr uint8_t Ieee80211AkmSuiteIdFtFilsSha384 = 17;
+static constexpr uint8_t Ieee80211AkmSuiteIdOwe = 18;
+static constexpr uint8_t Ieee80211AkmSuiteIdFtPskSha384 = 19;
+static constexpr uint8_t Ieee80211AkmSuiteIdPskSha384 = 20;
 
 /**
  * @brief IEEE 802.11 Authentication and Key Management (AKM) Suites.
  *
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
  */
-enum class IeeeAkmSuite : uint32_t {
-    Reserved0 = MakeIeee80211Suite(IeeeAkmSuiteIdReserved0),
-    Ieee8021x = MakeIeee80211Suite(IeeeAkmSuiteId8021x),
-    Psk = MakeIeee80211Suite(IeeeAkmSuiteIdPsk),
-    Ft8021x = MakeIeee80211Suite(IeeeAkmSuiteIdFt8021x),
-    FtPsk = MakeIeee80211Suite(IeeeAkmSuiteIdFtPsk),
-    Ieee8021xSha256 = MakeIeee80211Suite(IeeeAkmSuiteId8021xSha256),
-    PskSha256 = MakeIeee80211Suite(IeeeAkmSuiteIdPskSha256),
-    Tdls = MakeIeee80211Suite(IeeeAkmSuiteIdTdls),
-    Sae = MakeIeee80211Suite(IeeeAkmSuiteIdSae),
-    FtSae = MakeIeee80211Suite(IeeeAkmSuiteIdFtSae),
-    ApPeerKey = MakeIeee80211Suite(IeeeAkmSuiteIdApPeerKey),
-    Ieee8021xSuiteB = MakeIeee80211Suite(IeeeAkmSuiteId8021xSuiteB),
-    Ieee8011xSuiteB192 = MakeIeee80211Suite(IeeeAkmSuiteId8021xSuiteB192),
-    Ft8021xSha384 = MakeIeee80211Suite(IeeeAkmSuiteIdFt8021xSha384),
-    FilsSha256 = MakeIeee80211Suite(IeeeAkmSuiteIdFilsSha256),
-    FilsSha284 = MakeIeee80211Suite(IeeeAkmSuiteIdFilsSha384),
-    FtFilsSha256 = MakeIeee80211Suite(IeeeAkmSuiteIdFtFilsSha256),
-    FtFilsSha384 = MakeIeee80211Suite(IeeeAkmSuiteIdFtFilsSha384),
-    Owe = MakeIeee80211Suite(IeeeAkmSuiteIdOwe),
-    FtPskSha384 = MakeIeee80211Suite(IeeeAkmSuiteIdFtPskSha384),
-    PskSha384 = MakeIeee80211Suite(IeeeAkmSuiteIdPskSha384),
+enum class Ieee80211AkmSuite : uint32_t {
+    Reserved0 = MakeIeee80211Suite(Ieee80211AkmSuiteIdReserved0),
+    Ieee8021x = MakeIeee80211Suite(Ieee80211AkmSuiteId8021x),
+    Psk = MakeIeee80211Suite(Ieee80211AkmSuiteIdPsk),
+    Ft8021x = MakeIeee80211Suite(Ieee80211AkmSuiteIdFt8021x),
+    FtPsk = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtPsk),
+    Ieee8021xSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSha256),
+    PskSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteIdPskSha256),
+    Tdls = MakeIeee80211Suite(Ieee80211AkmSuiteIdTdls),
+    Sae = MakeIeee80211Suite(Ieee80211AkmSuiteIdSae),
+    FtSae = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtSae),
+    ApPeerKey = MakeIeee80211Suite(Ieee80211AkmSuiteIdApPeerKey),
+    Ieee8021xSuiteB = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSuiteB),
+    Ieee8011xSuiteB192 = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSuiteB192),
+    Ft8021xSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFt8021xSha384),
+    FilsSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha256),
+    FilsSha284 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha384),
+    FtFilsSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtFilsSha256),
+    FtFilsSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtFilsSha384),
+    Owe = MakeIeee80211Suite(Ieee80211AkmSuiteIdOwe),
+    FtPskSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtPskSha384),
+    PskSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdPskSha384),
 };
 
 /**
@@ -220,7 +220,7 @@ static constexpr uint8_t Ieee80211CipherSuiteIdBipCmac256 = 13;
  *
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.2, Table 9-149.
  */
-enum class IeeeCipherSuite : uint32_t {
+enum class Ieee80211CipherSuite : uint32_t {
     Unknown = MakeIeeeSuite(OuiInvalid, 0),
     BipCmac128 = MakeIeee80211Suite(Ieee80211CipherSuiteIdBipCmac128),
     BipCmac256 = MakeIeee80211Suite(Ieee80211CipherSuiteIdBipCmac256),
