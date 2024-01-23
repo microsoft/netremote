@@ -102,24 +102,33 @@ IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Microsoft::Net::Wi
     Dot11AuthenticationAlgorithm authenticationAlgorithm{ Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown };
 
     switch (ieeeAuthenticationAlgorithm) {
+    case IeeeAuthenticationAlgorithm::Unknown:
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
+        break;
     case IeeeAuthenticationAlgorithm::OpenSystem:
-        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpen;
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem;
         break;
     case IeeeAuthenticationAlgorithm::SharedKey:
         authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey;
         break;
+    case IeeeAuthenticationAlgorithm::FastBssTransition:
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFastBssTransition;
+        break;
     case IeeeAuthenticationAlgorithm::Sae:
         authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae;
         break;
-    // The following cases do not map to Dot11AuthenticationAlgorithm types. This appears to be because the Microsoft
-    // authentication algorithm definitions do not map 1-1 with the 802.11 definitions. Instead, they more resemble an
-    // 802.11 AKM. Fixing this requires a breaking API change, so will be deferred.
-    //
-    // case IeeeAuthenticationAlgorithm::FastBssTransition:
-    // case IeeeAuthenticationAlgorithm::Fils:
-    // case IeeeAuthenticationAlgorithm::FilsPfs:
-    // case IeeeAuthenticationAlgorithm::FilsPublicKey:
-    //
+    case IeeeAuthenticationAlgorithm::Fils:
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFils;
+        break;
+    case IeeeAuthenticationAlgorithm::FilsPfs:
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPfs;
+        break;
+    case IeeeAuthenticationAlgorithm::FilsPublicKey:
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPublicKey;
+        break;
+    case IeeeAuthenticationAlgorithm::VendorSpecific:
+        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmVendorSpecific;
+        break;
     default:
         break;
     }
@@ -202,7 +211,7 @@ IeeeAkmSuiteToNetRemoteAkm(Microsoft::Net::Wifi::IeeeAkmSuite akmSuite)
     default:
         break;
     }
-    
+
     return akm;
 }
 

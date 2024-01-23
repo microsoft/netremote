@@ -44,22 +44,15 @@ enum Dot11PhyType
 
 enum Dot11AuthenticationAlgorithm
 {
-    option allow_alias = true;
-
     Dot11AuthenticationAlgorithmUnknown = 0;
-    Dot11AuthenticationAlgorithmOpen = 1;
-    Dot11AuthenticationAlgorithmSharedKey = 2;
-    Dot11AuthenticationAlgorithmWpa = 3;
-    Dot11AuthenticationAlgorithmWpaPsk = 4;
-    Dot11AuthenticationAlgorithmWpaNone = 5;
-    Dot11AuthenticationAlgorithmRsna = 6;
-    Dot11AuthenticationAlgorithmRsnaPsk = 7;
-    Dot11AuthenticationAlgorithmWpa3 = 8;
-    Dot11AuthenticationAlgorithmWpa3Enterprise192 = 8;
-    Dot11AuthenticationAlgorithmWpa3Enterprise = 9;
-    Dot11AuthenticationAlgorithmSae = 10;
-    Dot11AuthenticationAlgorithmWpa3Personal = 10;
-    Dot11AuthenticationAlgorithmOwe = 11;
+    Dot11AuthenticationAlgorithmSharedKey = 1;
+    Dot11AuthenticationAlgorithmOpenSystem = 2;
+    Dot11AuthenticationAlgorithmFastBssTransition = 3;
+    Dot11AuthenticationAlgorithmSae = 4;
+    Dot11AuthenticationAlgorithmFils = 5;
+    Dot11AuthenticationAlgorithmFilsPfs = 6;
+    Dot11AuthenticationAlgorithmFilsPublicKey = 7;
+    Dot11AuthenticationAlgorithmVendorSpecific = 8;
 }
 
 // 802.11 Authentication and Key Management (AKM) suites.

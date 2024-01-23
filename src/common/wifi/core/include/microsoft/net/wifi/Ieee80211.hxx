@@ -128,6 +128,7 @@ MakeIeee80211Suite(uint8_t suiteId)
  * Defined in IEEE 802.11-2020, Section 9.4.1.1, Figure 9-82.
  */
 enum class IeeeAuthenticationAlgorithm : uint16_t {
+    Unknown = 0x0000,
     OpenSystem = 0x0001,
     SharedKey = 0x0002,
     FastBssTransition = 0x0003,
