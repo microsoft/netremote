@@ -157,3 +157,31 @@ enum Dot11AccessPointState
 {
     AccessPointStateUnknown = 0;
 }
+
+message WifiAuthenticationMethodConfigurationNone
+{
+
+}
+
+message WifiAuthenticationMethodConfigurationSharedKey
+{
+    Microsoft.Net.Wifi.SharedKey SharedKey = 1;
+}
+
+message WifiAuthenticationMethodConfigurationEnterprise
+{
+    string RadiusServerAddress = 1;
+    string RadiusServerPort = 2;
+    string RadiusServerSharedSecret = 3;
+}
+
+message WifiAuthenticationMethodConfiguration
+{
+    Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 1;
+    oneof Configuration
+    {
+        WifiAuthenticationMethodConfigurationNone ConfigurationNone = 2;
+        WifiAuthenticationMethodConfigurationSharedKey ConfigurationSharedKey = 3;
+        WifiAuthenticationMethodConfigurationEnterprise ConfigurationEnterprise = 4;
+    }
+}
