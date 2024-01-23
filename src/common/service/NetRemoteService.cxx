@@ -316,6 +316,19 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<Microsoft::Net::W
     return item;
 }
 
+std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
+IAccessPointWeakToAccessPointController(std::weak_ptr<Microsoft::Net::Wifi::IAccessPoint>& accessPointWeak)
+{
+    auto accessPoint = accessPointWeak.lock();
+    if (accessPoint != nullptr) {
+        return accessPoint->CreateController();
+    } else {
+        LOGE << "Failed to retrieve access point";
+    }
+
+    return nullptr;
+}
+
 bool
 NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
 {
@@ -392,6 +405,8 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
 ::grpc::Status
 NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response)
 {
+    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
+
     LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
@@ -403,7 +418,16 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     }
     else
     {
-        // TODO: Set the PHY type.
+        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+        if (!accessPointController)
+        {
+            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
+            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
+        }
+
+        // TODO: Use accessPointController to set PHY type.
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 
@@ -427,7 +451,16 @@ NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc
     }
     else
     {
-        // TODO: Set the authentication algorithm.
+        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+        if (!accessPointController)
+        {
+            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
+            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
+        }
+
+        // TODO: Use accessPointController to set authentication algorithm.
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 
@@ -451,7 +484,16 @@ NetRemoteService::WifiAccessPointSetEncryptionMethod([[maybe_unused]] ::grpc::Se
     }
     else
     {
-        // TODO: Set the encryption algorithm.
+        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+        if (!accessPointController)
+        {
+            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
+            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
+        }
+
+        // TODO: Use accessPointController to set encryption algorithm.
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 
