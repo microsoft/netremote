@@ -442,7 +442,7 @@ NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc
 
     WifiAccessPointOperationStatus status{};
 
-    if (request->authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
+    if (request->authenticationmethodconfiguration().authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
     {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No authentication algorithm provided");
