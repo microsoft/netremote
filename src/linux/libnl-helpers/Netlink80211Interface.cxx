@@ -158,5 +158,5 @@ Nl80211Interface::Enumerate()
 std::optional<Nl80211Wiphy>
 Nl80211Interface::GetWiphy() const
 {
-    return Nl80211Wiphy::FromIndex(WiphyIndex); 
+    return Nl80211Wiphy::FromIndex(WiphyIndex);
 }

@@ -25,11 +25,5 @@ target_link_libraries(wifi-apmanager-linux
         libnl-helpers
         wifi-apmanager
         wifi-core
-)
-
-install(
-    TARGETS wifi-apmanager-linux
-    EXPORT ${PROJECT_NAME}
-    FILE_SET HEADERS
-    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${WIFI_APMANAGER_LINUX_PUBLIC_INCLUDE_SUFFIX}"
+        wifi-core-linux
 )

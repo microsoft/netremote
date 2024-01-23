@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include <microsoft/net/wifi/AccessPoint.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -16,12 +17,25 @@ struct AccessPointLinux :
     public AccessPoint
 {
     /**
-     * @brief Inherit the constructors from the base class.
+     * @brief Construct a new AccessPointLinux object with the specified interface name, access point controller
+     * factory, and nl80211 interface.
+     * 
+     * @param interfaceName The name of the interface.
+     * @param accessPointControllerFactory The access point controller factory to use for creating access point.
+     * @param nl80211Interface The nl80211 interface object.
      */
-    using AccessPoint::AccessPoint;
+    AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
 
+    /**
+     * @brief Create a IAccessPointController object of type AccessPointControllerLinux.
+     * 
+     * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController> 
+     */
     virtual std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
     CreateController() override;
+
+private:
+    Microsoft::Net::Netlink::Nl80211::Nl80211Interface m_nl80211Interface;
 };
 
 /**
@@ -50,6 +64,22 @@ struct AccessPointFactoryLinux :
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
+};
+
+/**
+ * @brief Arguments to be passed to the Linux access point during creation.
+ */
+struct AccessPointCreateArgsLinux :
+    public IAccessPointCreateArgs
+{
+    /**
+     * @brief Construct a new AccessPointCreateArgsLinux object with the specified nl80211 interface.
+     * 
+     * @param nl80211Interface The nl80211 interface object.
+     */
+    AccessPointCreateArgsLinux(Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
+
+    Microsoft::Net::Netlink::Nl80211::Nl80211Interface Interface;
 };
 } // namespace Microsoft::Net::Wifi
 

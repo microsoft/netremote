@@ -21,6 +21,7 @@ target_link_libraries(wifi-core-linux
     PRIVATE
         plog::plog
     PUBLIC
+        libnl-helpers
         wifi-core
         wpa-controller
 )
