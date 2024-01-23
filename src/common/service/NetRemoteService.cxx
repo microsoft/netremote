@@ -477,10 +477,33 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
         return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
     }
 
-    // Set the Ieee80211 protocol.
-    try {
-        if (!accessPointController->SetProtocol(ieeeProtocol)) {
-            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
+::grpc::Status
+NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodResult* response)
+{
+    LOGD << std::format("Received WifiAccessPointSetAuthenticationMethod request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    if (request->authenticationmethodconfiguration().authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
+    {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("No authentication algorithm provided");
+    }
+    else
+    {
+        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+        if (!accessPointController)
+        {
+            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
+            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to set Ieee80211 protocol for access point {} ({})", request->accesspointid(), apce.what());
