@@ -62,6 +62,32 @@ enum Dot11AuthenticationAlgorithm
     Dot11AuthenticationAlgorithmOwe = 11;
 }
 
+// 802.11 Authentication and Key Management (AKM) Suites.
+enum Dot11AkmSuite
+{
+    Dot11AkmSuiteReserved0 = 0;
+    Dot11AkmSuite8021x = 1;
+    Dot11AkmSuitePsk = 2;
+    Dot11AkmSuiteFt8021x = 3;
+    Dot11AkmSuiteFtPsk = 4;
+    Dot11AkmSuite8021xSha256 = 5;
+    Dot11AkmSuitePskSha256 = 6;
+    Dot11AkmSuiteTdls = 7;
+    Dot11AkmSuiteSae = 8;
+    Dot11AkmSuiteFtSae = 9;
+    Dot11AkmSuiteApPeerKey = 10;
+    Dot11AkmSuite8021xSuiteB = 11;
+    Dot11AkmSuite8021xSuiteB192 = 12;
+    Dot11AkmSuiteFt8021xSha384 = 13;
+    Dot11AkmSuiteFilsSha256 = 14;
+    Dot11AkmSuiteFilsSha384 = 15;
+    Dot11AkmSuiteFtFilsSha256 = 16;
+    Dot11AkmSuiteFtFilsSha384 = 17;
+    Dot11AkmSuiteOwe = 18;
+    Dot11AkmSuiteFtPskSha384 = 19;
+    Dot11AkmSuitePskSha384 = 20;
+}
+
 enum Dot11CipherAlgorithm
 {
     option allow_alias = true;
