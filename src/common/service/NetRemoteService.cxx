@@ -127,6 +127,85 @@ IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Microsoft::Net::Wi
     return authenticationAlgorithm;
 }
 
+Microsoft::Net::Wifi::Dot11AkmSuite
+IeeeAkmSuiteToNetRemoteAkm(Microsoft::Net::Wifi::IeeeAkmSuite akmSuite)
+{
+    using Microsoft::Net::Wifi::Dot11AkmSuite;
+    using Microsoft::Net::Wifi::IeeeAkmSuite;
+
+    Dot11AkmSuite akm{ Dot11AkmSuite::Dot11AkmSuiteUnknown };
+
+    switch (akmSuite) {
+    case IeeeAkmSuite::Reserved0:
+        akm = Dot11AkmSuite::Dot11AkmSuiteReserved0;
+        break;
+    case IeeeAkmSuite::Ieee8021x:
+        akm = Dot11AkmSuite::Dot11AkmSuite8021x;
+        break;
+    case IeeeAkmSuite::Psk:
+        akm = Dot11AkmSuite::Dot11AkmSuitePsk;
+        break;
+    case IeeeAkmSuite::Ft8021x:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFt8021x;
+        break;
+    case IeeeAkmSuite::FtPsk:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFtPsk;
+        break;
+    case IeeeAkmSuite::Ieee8021xSha256:
+        akm = Dot11AkmSuite::Dot11AkmSuite8021xSha256;
+        break;
+    case IeeeAkmSuite::PskSha256:
+        akm = Dot11AkmSuite::Dot11AkmSuitePskSha256;
+        break;
+    case IeeeAkmSuite::Tdls:
+        akm = Dot11AkmSuite::Dot11AkmSuiteTdls;
+        break;
+    case IeeeAkmSuite::Sae:
+        akm = Dot11AkmSuite::Dot11AkmSuiteSae;
+        break;
+    case IeeeAkmSuite::FtSae:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFtSae;
+        break;
+    case IeeeAkmSuite::ApPeerKey:
+        akm = Dot11AkmSuite::Dot11AkmSuiteApPeerKey;
+        break;
+    case IeeeAkmSuite::Ieee8021xSuiteB:
+        akm = Dot11AkmSuite::Dot11AkmSuite8021xSuiteB;
+        break;
+    case IeeeAkmSuite::Ieee8011xSuiteB192:
+        akm = Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192;
+        break;
+    case IeeeAkmSuite::Ft8021xSha384:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
+        break;
+    case IeeeAkmSuite::FilsSha256:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
+        break;
+    case IeeeAkmSuite::FilsSha284:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
+        break;
+    case IeeeAkmSuite::FtFilsSha256:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;
+        break;
+    case IeeeAkmSuite::FtFilsSha384:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFtFilsSha384;
+        break;
+    case IeeeAkmSuite::Owe:
+        akm = Dot11AkmSuite::Dot11AkmSuiteOwe;
+        break;
+    case IeeeAkmSuite::FtPskSha384:
+        akm = Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
+        break;
+    case IeeeAkmSuite::PskSha384:
+        akm = Dot11AkmSuite::Dot11AkmSuitePskSha384;
+        break;
+    default:
+        break;
+    }
+    
+    return akm;
+}
+
 Microsoft::Net::Wifi::Dot11CipherSuite
 IeeeCipherAlgorithmToNetRemoteCipherSuite(Microsoft::Net::Wifi::IeeeCipherSuite ieeeCipherSuite)
 {

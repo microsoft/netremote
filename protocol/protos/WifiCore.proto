@@ -66,27 +66,28 @@ enum Dot11AuthenticationAlgorithm
 // Values map to those defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
 enum Dot11AkmSuite
 {
-    Dot11AkmSuiteReserved0 = 0;
-    Dot11AkmSuite8021x = 1;
-    Dot11AkmSuitePsk = 2;
-    Dot11AkmSuiteFt8021x = 3;
-    Dot11AkmSuiteFtPsk = 4;
-    Dot11AkmSuite8021xSha256 = 5;
-    Dot11AkmSuitePskSha256 = 6;
-    Dot11AkmSuiteTdls = 7;
-    Dot11AkmSuiteSae = 8;
-    Dot11AkmSuiteFtSae = 9;
-    Dot11AkmSuiteApPeerKey = 10;
-    Dot11AkmSuite8021xSuiteB = 11;
-    Dot11AkmSuite8021xSuiteB192 = 12;
-    Dot11AkmSuiteFt8021xSha384 = 13;
-    Dot11AkmSuiteFilsSha256 = 14;
-    Dot11AkmSuiteFilsSha384 = 15;
-    Dot11AkmSuiteFtFilsSha256 = 16;
-    Dot11AkmSuiteFtFilsSha384 = 17;
-    Dot11AkmSuiteOwe = 18;
-    Dot11AkmSuiteFtPskSha384 = 19;
-    Dot11AkmSuitePskSha384 = 20;
+    Dot11AkmSuiteUnknown = 0;
+    Dot11AkmSuiteReserved0 = 1;
+    Dot11AkmSuite8021x = 2;
+    Dot11AkmSuitePsk = 3;
+    Dot11AkmSuiteFt8021x = 4;
+    Dot11AkmSuiteFtPsk = 5;
+    Dot11AkmSuite8021xSha256 = 6;
+    Dot11AkmSuitePskSha256 = 7;
+    Dot11AkmSuiteTdls = 8;
+    Dot11AkmSuiteSae = 9;
+    Dot11AkmSuiteFtSae = 10;
+    Dot11AkmSuiteApPeerKey = 11;
+    Dot11AkmSuite8021xSuiteB = 12;
+    Dot11AkmSuite8021xSuiteB192 = 13;
+    Dot11AkmSuiteFt8021xSha384 = 14;
+    Dot11AkmSuiteFilsSha256 = 15;
+    Dot11AkmSuiteFilsSha384 = 16;
+    Dot11AkmSuiteFtFilsSha256 = 17;
+    Dot11AkmSuiteFtFilsSha384 = 18;
+    Dot11AkmSuiteOwe = 19;
+    Dot11AkmSuiteFtPskSha384 = 20;
+    Dot11AkmSuitePskSha384 = 21;
 }
 
 // 802.11 Cipher suites.
