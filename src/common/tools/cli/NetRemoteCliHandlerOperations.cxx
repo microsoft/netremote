@@ -51,7 +51,7 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::AccessPoint
     for (const auto& band : accessPointCapabilities.bands()) {
         ss << '\n'
            << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::RadioBand>(band));
+           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11FrequencyBand>(band));
     }
 
     ss << '\n'

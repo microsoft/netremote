@@ -7,7 +7,7 @@
 
 namespace Microsoft::Net::Wifi
 {
-enum class IeeeFrequencyBand {
+enum class IeeeDot11FrequencyBand {
     Unknown,
     TwoPointFourGHz,
     FiveGHz,
@@ -21,7 +21,7 @@ namespace Literals
  * @brief User-defined literal operator for allowing use of _GHz to specify
  * frequency band enumeration values.
  */
-inline constexpr Microsoft::Net::Wifi::IeeeFrequencyBand
+inline constexpr Microsoft::Net::Wifi::IeeeDot11FrequencyBand
 operator"" _GHz(long double value) noexcept
 {
     /**
@@ -39,13 +39,13 @@ operator"" _GHz(long double value) noexcept
     constexpr auto TwoPointFourGHzTolerance = 8.89045781438113635886e-17L;
 
     if (std::fabs(value - 2.4) <= TwoPointFourGHzTolerance) {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::TwoPointFourGHz;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::TwoPointFourGHz;
     } else if (value == 5.0) {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::FiveGHz;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::FiveGHz;
     } else if (value == 6.0) {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::SixGHz;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::SixGHz;
     } else {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::Unknown;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::Unknown;
     }
 }
 
@@ -55,17 +55,17 @@ operator"" _GHz(long double value) noexcept
  * @brief User-defined literal operator for allowing use of _MHz to specify
  * frequency band enumeration values.
  */
-inline constexpr Microsoft::Net::Wifi::IeeeFrequencyBand
+inline constexpr Microsoft::Net::Wifi::IeeeDot11FrequencyBand
 operator"" _MHz(unsigned long long int value) noexcept
 {
     if (value == 2400) {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::TwoPointFourGHz;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::TwoPointFourGHz;
     } else if (value == 5000) {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::FiveGHz;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::FiveGHz;
     } else if (value == 6000) {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::SixGHz;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::SixGHz;
     } else {
-        return Microsoft::Net::Wifi::IeeeFrequencyBand::Unknown;
+        return Microsoft::Net::Wifi::IeeeDot11FrequencyBand::Unknown;
     }
 }
 } // namespace Literals

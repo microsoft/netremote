@@ -3,20 +3,20 @@ syntax = "proto3";
 
 package Microsoft.Net.Wifi;
 
-enum RadioBand
+enum Dot11FrequencyBand
 {
     option allow_alias = true;
     
-    RadioBandUnknown = 0;
-    RadioBand2400MHz = 1;
-    RadioBand2_4GHz = 1;
-    RadioBandTwoPoint4GHz = 1;
-    RadioBand5000MHz = 2;
-    RadioBand5_0GHz = 2;
-    RadioBandFiveGHz = 2;
-    RadioBand6000MHz = 3;
-    RadioBand6_0GHz = 3;
-    RadioBandSixGHz = 3;
+    Dot11FrequencyBandUnknown = 0;
+    Dot11FrequencyBand2400MHz = 1;
+    Dot11FrequencyBand2_4GHz = 1;
+    Dot11FrequencyBandTwoPoint4GHz = 1;
+    Dot11FrequencyBand5000MHz = 2;
+    Dot11FrequencyBand5_0GHz = 2;
+    Dot11FrequencyBandFiveGHz = 2;
+    Dot11FrequencyBand6000MHz = 3;
+    Dot11FrequencyBand6_0GHz = 3;
+    Dot11FrequencyBandSixGHz = 3;
 }
 
 enum Dot11PhyType
@@ -134,12 +134,12 @@ message AccessPointConfiguration
     Dot11PhyType PhyType = 3;
     Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 4;
     Dot11CipherSuite CipherSuite = 5;
-    repeated RadioBand Bands = 6;
+    repeated Dot11FrequencyBand Bands = 6;
 }
 
 message AccessPointCapabilities
 {
-    repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
+    repeated Microsoft.Net.Wifi.Dot11FrequencyBand Bands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
     repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
     repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;

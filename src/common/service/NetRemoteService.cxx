@@ -58,24 +58,24 @@ IeeeProtocolToNetRemotePhyType(IeeeProtocol ieeeProtocol)
     return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
-using Microsoft::Net::Wifi::IeeeFrequencyBand;
-using Microsoft::Net::Wifi::RadioBand;
+using Microsoft::Net::Wifi::IeeeDot11FrequencyBand;
+using Microsoft::Net::Wifi::Dot11FrequencyBand;
 
-RadioBand
-IeeeFrequencyBandToNetRemoteRadioBand(IeeeFrequencyBand ieeeFrequencyBand)
+Dot11FrequencyBand
+IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(IeeeDot11FrequencyBand ieeeDot11FrequencyBand)
 {
-    switch (ieeeFrequencyBand) {
-    case IeeeFrequencyBand::Unknown:
-        return RadioBand::RadioBandUnknown;
-    case IeeeFrequencyBand::TwoPointFourGHz:
-        return RadioBand::RadioBandTwoPoint4GHz;
-    case IeeeFrequencyBand::FiveGHz:
-        return RadioBand::RadioBandFiveGHz;
-    case IeeeFrequencyBand::SixGHz:
-        return RadioBand::RadioBandSixGHz;
+    switch (ieeeDot11FrequencyBand) {
+    case IeeeDot11FrequencyBand::Unknown:
+        return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
+    case IeeeDot11FrequencyBand::TwoPointFourGHz:
+        return Dot11FrequencyBand::Dot11FrequencyBandTwoPoint4GHz;
+    case IeeeDot11FrequencyBand::FiveGHz:
+        return Dot11FrequencyBand::Dot11FrequencyBandFiveGHz;
+    case IeeeDot11FrequencyBand::SixGHz:
+        return Dot11FrequencyBand::Dot11FrequencyBandSixGHz;
     }
 
-    return RadioBand::RadioBandUnknown;
+    return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
 }
 
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
@@ -218,8 +218,8 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
         std::make_move_iterator(std::end(phyTypes))
     };
 
-    std::vector<Microsoft::Net::Wifi::RadioBand> bands(std::size(ieeeCapabilities.FrequencyBands));
-    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), IeeeFrequencyBandToNetRemoteRadioBand);
+    std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.Dot11FrequencyBands));
+    std::ranges::transform(ieeeCapabilities.Dot11FrequencyBands, std::begin(bands), IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand);
 
     *capabilities.mutable_bands() = {
         std::make_move_iterator(std::begin(bands)),
