@@ -25,20 +25,22 @@ enum Dot11PhyType
 
     Dot11PhyTypeUnknown = 0;
     Dot11PhyTypeB = 1;
-    Dot11PhyTypeHrdsss = 1;
     Dot11PhyTypeG = 2;
-    Dot11PhyTypeErp = 2;
     Dot11PhyTypeN = 3;
-    Dot11PhyTypeHt = 3;
     Dot11PhyTypeA = 4;
-    Dot11PhyTypeOfdm = 4;
     Dot11PhyTypeAC = 5;
-    Dot11PhyTypeVht = 5;
     Dot11PhyTypeAD = 6;
-    Dot11PhyTypeDmg = 6;
     Dot11PhyTypeAX = 7;
-    Dot11PhyTypeHe = 7;
     Dot11PhyTypeBE = 8;
+
+    // Modulation type aliases.
+    Dot11PhyTypeHrdsss = 1;
+    Dot11PhyTypeErp = 2;
+    Dot11PhyTypeHt = 3;
+    Dot11PhyTypeOfdm = 4;
+    Dot11PhyTypeVht = 5;
+    Dot11PhyTypeDmg = 6;
+    Dot11PhyTypeHe = 7;
     Dot11PhyTypeEht = 8;
 }
 
