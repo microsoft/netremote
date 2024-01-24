@@ -9,8 +9,6 @@
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
-
-using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Wifi;
 
@@ -60,7 +58,7 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
            << indent1 << bandName;
     }
 
-    constexpr auto AkmSuitePrefixLength = std::size(std::string_view("Dot11AuthenticationAlgorithm"));
+    constexpr auto AkmSuitePrefixLength = std::size(std::string_view("Dot11AkmSuite"));
     ss << '\n'
        << indent0
        << "Authentication and Key Management (AKM) Suites:";

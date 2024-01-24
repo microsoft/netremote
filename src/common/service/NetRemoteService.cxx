@@ -145,7 +145,7 @@ Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
         return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
     case Ieee80211AkmSuite::FilsSha256:
         return Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
-    case Ieee80211AkmSuite::FilsSha284:
+    case Ieee80211AkmSuite::FilsSha384:
         return Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
     case Ieee80211AkmSuite::FtFilsSha256:
         return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;

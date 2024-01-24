@@ -31,6 +31,7 @@ target_link_libraries(libnl-helpers
     PRIVATE
         magic_enum::magic_enum
         plog::plog
+        wifi-core
     PUBLIC
         nl
         nl-genl
