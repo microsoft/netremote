@@ -1,4 +1,7 @@
 
+#include <format>
+
+#include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <notstd/Memory.hxx>
@@ -40,7 +43,7 @@ AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presen
 {
     std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) {
-        LOGD << "Access point discovery agent detected a device presence change";
+        LOGI << std::format("Access Point Discovery Event: Interface {} {}", accessPoint->GetInterfaceName(), magic_enum::enum_name(presence));
         m_onDevicePresenceChanged(presence, std::move(accessPoint));
     }
 }
@@ -56,11 +59,13 @@ AccessPointDiscoveryAgent::Start()
 {
     bool expected = false;
     if (m_started.compare_exchange_weak(expected, true)) {
-        LOGD << "Access point discovery agent starting";
+        LOGI << "Access point discovery agent starting";
         m_operations->Start([weakThis = std::weak_ptr<AccessPointDiscoveryAgent>(GetInstance())](auto&& presence, auto&& accessPoint) {
             // Attempt to promote the weak pointer to a shared pointer to ensure this instance is still valid.
             if (auto strongThis = weakThis.lock(); strongThis) {
                 strongThis->DevicePresenceChanged(presence, std::move(accessPoint));
+            } else {
+                LOGW << "Access point discovery agent instance no longer valid; ignoring presence change event";
             }
         });
     }
@@ -71,7 +76,7 @@ AccessPointDiscoveryAgent::Stop()
 {
     bool expected = true;
     if (m_started.compare_exchange_weak(expected, false)) {
-        LOGD << "Access point discovery agent stopping";
+        LOGI << "Access point discovery agent stopping";
         m_operations->Stop();
     }
 }

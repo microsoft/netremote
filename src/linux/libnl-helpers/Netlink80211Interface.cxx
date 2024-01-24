@@ -160,3 +160,9 @@ Nl80211Interface::GetWiphy() const
 {
     return Nl80211Wiphy::FromIndex(WiphyIndex);
 }
+
+bool
+Nl80211Interface::IsAccessPoint() const noexcept
+{
+    return (Type == nl80211_iftype::NL80211_IFTYPE_AP);
+}
