@@ -60,13 +60,15 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
            << indent1 << bandName;
     }
 
+    constexpr auto AkmSuitePrefixLength = std::size(std::string_view("Dot11AuthenticationAlgorithm"));
     ss << '\n'
        << indent0
-       << "Authentication Algorithms:";
-    for (const auto& authenticationAlgorithm : accessPointCapabilities.authenticationalgorithms()) {
+       << "Authentication and Key Management (AKM) Suites:";
+    for (const auto& akmSuite : accessPointCapabilities.akmsuites()) {
+        std::string_view akmSuiteName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11AkmSuite>(akmSuite)));
+        akmSuiteName.remove_prefix(AkmSuitePrefixLength);
         ss << '\n'
-           << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>(authenticationAlgorithm));
+           << indent1 << akmSuiteName;
     }
 
     constexpr auto CipherAlgorithmPrefixLength = std::size(std::string_view("Dot11CipherSuite"));
