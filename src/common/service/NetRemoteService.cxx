@@ -364,6 +364,8 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
+using Microsoft::Net::Wifi::WifiAccessPointAuthenticationConfiguration;
+using Microsoft::Net::Wifi::WifiAuthenticationMethodConfiguration;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Dot11PhyType;
@@ -436,13 +438,17 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 }
 
 ::grpc::Status
-NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodResult* response)
+NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationResult* response)
 {
-    LOGD << std::format("Received WifiAccessPointSetAuthenticationMethod request for access point id {}", request->accesspointid());
+    LOGD << std::format("Received WifiAccessPointSetAuthenticationConfiguration request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
 
-    if (request->authenticationmethodconfiguration().authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
+    auto authenticationConfiguration = request->authenticationconfiguration();
+    auto authenticationMethodConfiguration = authenticationConfiguration.authenticationmethodconfiguration();
+    auto encryptionMethodConfiguration = authenticationConfiguration.encryptionmethodconfiguration();
+
+    if (authenticationMethodConfiguration.authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
     {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No authentication algorithm provided");
@@ -459,39 +465,6 @@ NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc
         }
 
         // TODO: Use accessPointController to set authentication algorithm.
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-    }
-
-    response->set_accesspointid(request->accesspointid());
-    *response->mutable_status() = std::move(status);
-
-    return grpc::Status::OK;
-}
-
-::grpc::Status
-NetRemoteService::WifiAccessPointSetEncryptionMethod([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetEncryptionMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetEncryptionMethodResult* response)
-{
-    LOGD << std::format("Received WifiAccessPointSetEncryptionMethod request for access point id {}", request->accesspointid());
-
-    WifiAccessPointOperationStatus status{};
-
-    if (request->cipheralgorithm() == Dot11CipherAlgorithm::Dot11CipherAlgorithmUnknown)
-    {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No encryption algorithm provided");
-    }
-    else
-    {
-        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
-        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
-        if (!accessPointController)
-        {
-            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
-            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
-            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
-        }
-
-        // TODO: Use accessPointController to set encryption algorithm.
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 

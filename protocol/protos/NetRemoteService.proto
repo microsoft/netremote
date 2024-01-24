@@ -12,6 +12,5 @@ service NetRemote
     rpc WifiAccessPointEnable (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableResult);
     rpc WifiAccessPointDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableResult);
     rpc WifiAccessPointSetPhyType (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeResult);
-    rpc WifiAccessPointSetAuthenticationMethod (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationMethodRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationMethodResult);
-    rpc WifiAccessPointSetEncryptionMethod (Microsoft.Net.Remote.Wifi.WifiAccessPointSetEncryptionMethodRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetEncryptionMethodResult);
+    rpc WifiAccessPointSetAuthenticationConfiguration (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationConfigurationRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationConfigurationResult);
 }
