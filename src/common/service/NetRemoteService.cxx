@@ -218,8 +218,8 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
         std::make_move_iterator(std::end(phyTypes))
     };
 
-    std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.Dot11FrequencyBands));
-    std::ranges::transform(ieeeCapabilities.Dot11FrequencyBands, std::begin(bands), IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand);
+    std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.FrequencyBands));
+    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand);
 
     *capabilities.mutable_bands() = {
         std::make_move_iterator(std::begin(bands)),
