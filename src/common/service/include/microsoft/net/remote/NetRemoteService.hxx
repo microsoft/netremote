@@ -47,6 +47,9 @@ private:
     virtual ::grpc::Status
     WifiAccessPointSetAuthenticationConfiguration(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationResult* response) override;
 
+    virtual ::grpc::Status
+    WifiAccessPointSetFrequencyBands(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* response) override;
+
 protected:
     bool
     ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status);
