@@ -158,6 +158,13 @@ enum Dot11AccessPointState
     AccessPointStateUnknown = 0;
 }
 
+message RadiusServerConfiguration
+{
+    string Address = 1;
+    uint32 Port = 2;
+    Microsoft.Net.Wifi.SharedKey SharedSecret = 3;
+}
+
 message WifiAuthenticationMethodConfigurationNone
 {
 
@@ -170,9 +177,7 @@ message WifiAuthenticationMethodConfigurationSharedKey
 
 message WifiAuthenticationMethodConfigurationEnterprise
 {
-    string RadiusServerAddress = 1;
-    string RadiusServerPort = 2;
-    string RadiusServerSharedSecret = 3;
+    Microsoft.Net.Wifi.RadiusServerConfiguration RadiusServerConfiguration = 1;
 }
 
 message WifiAuthenticationMethodConfiguration
