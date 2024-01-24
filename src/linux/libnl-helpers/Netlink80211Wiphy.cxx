@@ -10,6 +10,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
+#include <net/if.h>
 #include <netlink/attr.h>
 #include <netlink/genl/genl.h>
 #include <plog/Log.h>
@@ -54,7 +55,7 @@ HandleNl80211GetWiphyResponse(struct nl_msg *nl80211Message, void *context) noex
 
 /* static */
 std::optional<Nl80211Wiphy>
-Nl80211Wiphy::FromIndex(uint32_t wiphyIndex)
+Nl80211Wiphy::FromId(std::function<void(Microsoft::Net::Netlink::NetlinkMessage &)> addWiphyIdentifier)
 {
     // Allocate a new netlink socket.
     auto nl80211SocketOpt{ CreateNl80211Socket() };
@@ -79,11 +80,11 @@ Nl80211Wiphy::FromIndex(uint32_t wiphyIndex)
         return std::nullopt;
     }
 
-    // Add the wiphy index attribute so nl80211 knows what to lookup.
-    nla_put_u32(nl80211MessageGetWiphy, NL80211_ATTR_WIPHY, wiphyIndex);
+    // Add the identifier to the message so nl80211 knows what to lookup.
+    addWiphyIdentifier(nl80211MessageGetWiphy);
+
     std::optional<Nl80211Wiphy> nl80211Wiphy{};
     int ret = nl_socket_modify_cb(nl80211Socket, NL_CB_VALID, NL_CB_CUSTOM, detail::HandleNl80211GetWiphyResponse, &nl80211Wiphy);
-
     if (ret < 0) {
         LOGE << std::format("Failed to modify socket callback with error {} ({})", ret, nl_geterror(ret));
         return std::nullopt;
@@ -104,6 +105,32 @@ Nl80211Wiphy::FromIndex(uint32_t wiphyIndex)
     }
 
     return nl80211Wiphy;
+}
+
+/* static */
+std::optional<Nl80211Wiphy>
+Nl80211Wiphy::FromIndex(uint32_t wiphyIndex)
+{
+    return FromId([wiphyIndex](NetlinkMessage &nl80211MessageGetWiphy) {
+        nla_put_u32(nl80211MessageGetWiphy, NL80211_ATTR_WIPHY, wiphyIndex);
+    });
+}
+
+/* static */
+std::optional<Nl80211Wiphy>
+Nl80211Wiphy::FromInterfaceName(std::string_view interfaceName)
+{
+    // Look up the interface index from the interface name.
+    auto interfaceIndex = if_nametoindex(std::data(interfaceName));
+    if (interfaceIndex == 0) {
+        const auto error = errno;
+        LOGE << std::format("Failed to get interface index for interface name {} ({})", interfaceName, error);
+        return std::nullopt;
+    }
+
+    return FromId([interfaceIndex](NetlinkMessage &nl80211MessageGetWiphy) {
+        nla_put_u32(nl80211MessageGetWiphy, NL80211_ATTR_IFINDEX, interfaceIndex);
+    });
 }
 
 /* static */
