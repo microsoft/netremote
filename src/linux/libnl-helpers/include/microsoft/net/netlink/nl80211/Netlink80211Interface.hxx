@@ -28,6 +28,9 @@ struct Nl80211Interface
 
     Nl80211Interface() = default;
 
+    auto
+    operator <=>(const Nl80211Interface&) const = default;
+
     /**
      * @brief Construct a new Nl80211Interface object with the specified attributes.
      *
@@ -73,8 +76,30 @@ struct Nl80211Interface
      */
     std::string
     ToString() const;
+
+    /**
+     * @brief Indicates if the interface is an access point.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsAccessPoint() const noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211
+
+namespace std
+{
+template <>
+struct hash<Microsoft::Net::Netlink::Nl80211::Nl80211Interface>
+{
+    size_t
+    operator()(const Microsoft::Net::Netlink::Nl80211::Nl80211Interface& interface) const noexcept
+    {
+        return std::hash<std::string_view>()(interface.Name);
+    }
+};
+} // namespace std
 
 #endif // NETLINK_82011_INTERFACE_HXX
