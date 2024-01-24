@@ -28,6 +28,21 @@ Nl80211CipherSuiteToIeee80211CipherSuite(uint32_t nl80211CipherSuite) noexcept
 {
     return static_cast<Ieee80211CipherSuite>(nl80211CipherSuite);
 }
+
+Ieee80211FrequencyBand
+Nl80211BandToIeee80211FrequencyBand(nl80211_band nl80211Band) noexcept
+{
+    switch (nl80211Band) {
+    case NL80211_BAND_2GHZ:
+        return Ieee80211FrequencyBand::TwoPointFourGHz;
+    case NL80211_BAND_5GHZ:
+        return Ieee80211FrequencyBand::FiveGHz;
+    case NL80211_BAND_60GHZ:
+        return Ieee80211FrequencyBand::SixGHz;
+    default:
+        return Ieee80211FrequencyBand::Unknown;
+    }
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
@@ -39,6 +54,10 @@ AccessPointControllerLinux::GetCapabilities()
     }
 
     Ieee80211AccessPointCapabilities capabilities;
+
+    // Convert frequency bands.
+    capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
+    std::ranges::transform(std::views::keys(wiphy->Bands), std::begin(capabilities.FrequencyBands), detail::Nl80211BandToIeee80211FrequencyBand);
 
     // Convert cipher suites.
     capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
