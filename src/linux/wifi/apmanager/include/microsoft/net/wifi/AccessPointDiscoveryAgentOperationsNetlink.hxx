@@ -7,7 +7,7 @@
 #include <stop_token>
 #include <string>
 #include <thread>
-#include <unordered_map>
+#include <unordered_set>
 
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
@@ -120,13 +120,7 @@ private:
     int m_eventLoopStopFd{ -1 };
     std::jthread m_netlinkMessageProcessingThread;
 
-    struct WifiInterfaceInfo
-    {
-        std::string Name;
-        nl80211_iftype Type;
-    };
-
-    std::unordered_map<int, WifiInterfaceInfo> m_interfaceInfo;
+    std::unordered_set<Microsoft::Net::Netlink::Nl80211::Nl80211Interface> m_interfacesSeen;
     Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState &m_netlink80211ProtocolState;
 };
 } // namespace Microsoft::Net::Wifi
