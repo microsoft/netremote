@@ -389,8 +389,8 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::WifiAccessPointAuthenticationConfiguration;
-using Microsoft::Net::Wifi::WifiAuthenticationMethodConfiguration;
+using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
+using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Dot11PhyType;
@@ -493,10 +493,10 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
     WifiAccessPointOperationStatus status{};
 
     auto authenticationConfiguration = request->authenticationconfiguration();
-    auto authenticationMethodConfiguration = authenticationConfiguration.authenticationmethodconfiguration();
-    auto encryptionMethodConfiguration = authenticationConfiguration.encryptionmethodconfiguration();
+    auto akmSuites = authenticationConfiguration.akmsuites();
+    auto cipherSuites = authenticationConfiguration.ciphersuites();
 
-    if (authenticationMethodConfiguration.authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
+    if (akmSuites[0].authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
     {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No authentication algorithm provided");

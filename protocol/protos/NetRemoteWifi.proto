@@ -77,7 +77,7 @@ message WifiAccessPointSetPhyTypeResult
 message WifiAccessPointSetAuthenticationConfigurationRequest
 {
     string AccessPointId = 1;
-    Microsoft.Net.Wifi.WifiAccessPointAuthenticationConfiguration AuthenticationConfiguration = 2;
+    Microsoft.Net.Wifi.Dot11AccessPointAuthenticationConfiguration AuthenticationConfiguration = 2;
 }
 
 message WifiAccessPointSetAuthenticationConfigurationResult

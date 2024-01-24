@@ -158,55 +158,42 @@ enum Dot11AccessPointState
     AccessPointStateUnknown = 0;
 }
 
-message RadiusServerConfiguration
+message Dot11RadiusServerConfiguration
 {
     string Address = 1;
     uint32 Port = 2;
-    Microsoft.Net.Wifi.SharedKey SharedSecret = 3;
+    Microsoft.Net.Wifi.Dot11SharedKey SharedSecret = 3;
 }
 
-message WifiAuthenticationMethodConfigurationNone
+message Dot11AkmSuiteConfigurationNone
 {
 
 }
 
-message WifiAuthenticationMethodConfigurationSharedKey
+message Dot11AkmSuiteConfigurationSharedKey
 {
-    Microsoft.Net.Wifi.SharedKey SharedKey = 1;
+    Microsoft.Net.Wifi.Dot11SharedKey SharedKey = 1;
 }
 
-message WifiAuthenticationMethodConfigurationEnterprise
+message Dot11AkmSuiteConfigurationEnterprise
 {
-    Microsoft.Net.Wifi.RadiusServerConfiguration RadiusServerConfiguration = 1;
+    Microsoft.Net.Wifi.Dot11RadiusServerConfiguration RadiusServerConfiguration = 1;
 }
 
-message WifiAuthenticationMethodConfiguration
+message Dot11AkmSuiteConfiguration
 {
     Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 1;
     oneof Configuration
     {
-        WifiAuthenticationMethodConfigurationNone ConfigurationNone = 2;
-        WifiAuthenticationMethodConfigurationSharedKey ConfigurationSharedKey = 3;
-        WifiAuthenticationMethodConfigurationEnterprise ConfigurationEnterprise = 4;
+        Dot11AkmSuiteConfigurationNone ConfigurationNone = 2;
+        Dot11AkmSuiteConfigurationSharedKey ConfigurationSharedKey = 3;
+        Dot11AkmSuiteConfigurationEnterprise ConfigurationEnterprise = 4;
     }
 }
 
-message WifiEncryptionMethodConfigurationNone
-{
 
-}
-
-message WifiEncryptionMethodConfiguration
+message Dot11AccessPointAuthenticationConfiguration
 {
-    Microsoft.Net.Wifi.Dot11CipherAlgorithm CipherAlgorithm = 1;
-    oneof Configuration
-    {
-        WifiEncryptionMethodConfigurationNone ConfigurationNone = 2;
-    }
-}
-
-message WifiAccessPointAuthenticationConfiguration
-{
-    Microsoft.Net.Wifi.WifiAuthenticationMethodConfiguration AuthenticationMethodConfiguration = 1;
-    Microsoft.Net.Wifi.WifiEncryptionMethodConfiguration EncryptionMethodConfiguration = 2;
+    repeated Microsoft.Net.Wifi.Dot11AkmSuiteConfiguration AkmSuites = 1;
+    repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 2;
 }
