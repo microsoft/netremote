@@ -37,12 +37,16 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
 
     std::stringstream ss;
 
+    constexpr auto PhyTypePrefixLength = std::size(std::string_view("Dot11PhyType"));
     ss << indent0
-       << "Phy Types:";
+       << "Phy Types: ";
     for (const auto& phyType : accessPointCapabilities.phytypes()) {
-        ss << '\n'
-           << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11PhyType>(phyType));
+        std::string_view phyTypeName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11PhyType>(phyType)));
+        phyTypeName.remove_prefix(PhyTypePrefixLength);
+        if (phyType != accessPointCapabilities.phytypes()[0]) {
+            ss << ' ';
+        }
+        ss << phyTypeName;
     }
 
     constexpr auto BandPrefixLength = std::size(std::string_view("Dot11FrequencyBand"));

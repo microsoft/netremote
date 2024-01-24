@@ -43,6 +43,33 @@ Nl80211BandToIeee80211FrequencyBand(nl80211_band nl80211Band) noexcept
         return Ieee80211FrequencyBand::Unknown;
     }
 }
+
+std::vector<Ieee80211Protocol>
+Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
+{
+    // Ieee80211 B & G are always supported.
+    std::vector<Ieee80211Protocol> protocols{ 
+        Ieee80211Protocol::B,
+        Ieee80211Protocol::G,
+    };
+
+    for (const auto& band : std::views::values(nl80211Wiphy.Bands)) {
+        if (band.HtCapabilities != 0) {
+            protocols.push_back(Ieee80211Protocol::N);
+        }
+        if (band.VhtCapabilities != 0) {
+            protocols.push_back(Ieee80211Protocol::AC);
+        }
+        // TODO: once Nl80211WiphyBand is updated to support HE (AX) and EHT (BE), add them here.
+    }
+
+
+    // Remove duplicates.
+    std::ranges::sort(protocols);
+    protocols.erase(std::ranges::begin(std::ranges::unique(protocols)), std::ranges::end(protocols));
+
+    return protocols;
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
@@ -54,6 +81,9 @@ AccessPointControllerLinux::GetCapabilities()
     }
 
     Ieee80211AccessPointCapabilities capabilities;
+
+    // Convert protocols.
+    capabilities.Protocols = detail::Nl80211WiphyToIeee80211Protocols(wiphy.value());
 
     // Convert frequency bands.
     capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
