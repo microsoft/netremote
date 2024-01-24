@@ -496,17 +496,13 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
     auto akmSuites = authenticationConfiguration.akmsuites();
     auto cipherSuites = authenticationConfiguration.ciphersuites();
 
-    if (akmSuites[0].authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
-    {
+    if (akmSuites[0].authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No authentication algorithm provided");
-    }
-    else
-    {
+    } else {
         auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
         auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
-        if (!accessPointController)
-        {
+        if (!accessPointController) {
             LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
             status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
             status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
