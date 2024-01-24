@@ -44,6 +44,8 @@ enum Dot11PhyType
     Dot11PhyTypeEht = 8;
 }
 
+// 802.11 Authentication Algorithms.
+// Values map to those defined in IEEE 802.11-2020, Section 9.4.1.1.
 enum Dot11AuthenticationAlgorithm
 {
     Dot11AuthenticationAlgorithmUnknown = 0;
