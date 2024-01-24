@@ -389,6 +389,8 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
+using Microsoft::Net::Wifi::WifiAccessPointAuthenticationConfiguration;
+using Microsoft::Net::Wifi::WifiAuthenticationMethodConfiguration;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Dot11PhyType;
@@ -484,13 +486,17 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 }
 
 ::grpc::Status
-NetRemoteService::WifiAccessPointSetAuthenticationMethod([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationMethodResult* response)
+NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationResult* response)
 {
-    LOGD << std::format("Received WifiAccessPointSetAuthenticationMethod request for access point id {}", request->accesspointid());
+    LOGD << std::format("Received WifiAccessPointSetAuthenticationConfiguration request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
 
-    if (request->authenticationmethodconfiguration().authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
+    auto authenticationConfiguration = request->authenticationconfiguration();
+    auto authenticationMethodConfiguration = authenticationConfiguration.authenticationmethodconfiguration();
+    auto encryptionMethodConfiguration = authenticationConfiguration.encryptionmethodconfiguration();
+
+    if (authenticationMethodConfiguration.authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
     {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No authentication algorithm provided");

@@ -190,3 +190,23 @@ message WifiAuthenticationMethodConfiguration
         WifiAuthenticationMethodConfigurationEnterprise ConfigurationEnterprise = 4;
     }
 }
+
+message WifiEncryptionMethodConfigurationNone
+{
+
+}
+
+message WifiEncryptionMethodConfiguration
+{
+    Microsoft.Net.Wifi.Dot11CipherAlgorithm CipherAlgorithm = 1;
+    oneof Configuration
+    {
+        WifiEncryptionMethodConfigurationNone ConfigurationNone = 2;
+    }
+}
+
+message WifiAccessPointAuthenticationConfiguration
+{
+    Microsoft.Net.Wifi.WifiAuthenticationMethodConfiguration AuthenticationMethodConfiguration = 1;
+    Microsoft.Net.Wifi.WifiEncryptionMethodConfiguration EncryptionMethodConfiguration = 2;
+}
