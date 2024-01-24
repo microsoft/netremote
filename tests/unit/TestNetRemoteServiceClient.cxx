@@ -239,7 +239,7 @@ TEST_CASE("WifiAccessPointSetAuthenticationConfiguration API", "[basic][rpc][cli
         auto* akmSuiteConfiguration2 = apAuthConfiguration.mutable_akmsuites()->Add();
         akmSuiteConfiguration2->set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae);
         akmSuiteConfiguration2->set_akmsuite(Dot11AkmSuite::Dot11AkmSuiteFtSae);
-        
+
         Dot11SharedKey sharedKey2{};
         sharedKey2.set_passphrase("passphrase2");
         Dot11AkmSuiteConfigurationSharedKey akmSuiteConfigurationSharedKey2{};

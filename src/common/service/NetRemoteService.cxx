@@ -58,8 +58,8 @@ IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
     return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
-using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 using Microsoft::Net::Wifi::Dot11FrequencyBand;
+using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 
 Dot11FrequencyBand
 IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
@@ -411,17 +411,13 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 
     WifiAccessPointOperationStatus status{};
 
-    if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown)
-    {
+    if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No PHY type provided");
-    }
-    else
-    {
+    } else {
         auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
         auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
-        if (!accessPointController)
-        {
+        if (!accessPointController) {
             LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
             status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
             status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
@@ -448,17 +444,13 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
     auto akmSuites = authenticationConfiguration.akmsuites();
     auto cipherSuites = authenticationConfiguration.ciphersuites();
 
-    if (akmSuites[0].authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)
-    {
+    if (akmSuites[0].authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No authentication algorithm provided");
-    }
-    else
-    {
+    } else {
         auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
         auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
-        if (!accessPointController)
-        {
+        if (!accessPointController) {
             LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
             status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
             status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
