@@ -85,3 +85,15 @@ message WifiAccessPointSetAuthenticationConfigurationResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointSetFrequencyBandsRequest
+{
+    string AccessPointId = 1;
+    repeated Microsoft.Net.Wifi.Dot11FrequencyBand FrequencyBands = 2;
+}
+
+message WifiAccessPointSetFrequencyBandsResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
