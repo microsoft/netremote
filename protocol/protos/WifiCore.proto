@@ -183,11 +183,12 @@ message Dot11AkmSuiteConfigurationEnterprise
 message Dot11AkmSuiteConfiguration
 {
     Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 1;
+    Microsoft.Net.Wifi.Dot11AkmSuite AkmSuite = 2;
     oneof Configuration
     {
-        Dot11AkmSuiteConfigurationNone ConfigurationNone = 2;
-        Dot11AkmSuiteConfigurationSharedKey ConfigurationSharedKey = 3;
-        Dot11AkmSuiteConfigurationEnterprise ConfigurationEnterprise = 4;
+        Dot11AkmSuiteConfigurationNone ConfigurationNone = 3;
+        Dot11AkmSuiteConfigurationSharedKey ConfigurationSharedKey = 4;
+        Dot11AkmSuiteConfigurationEnterprise ConfigurationEnterprise = 5;
     }
 }
 
