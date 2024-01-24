@@ -17,9 +17,10 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
-Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept :
+Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept :
     Index(index),
     Name(name),
+    AkmSuites(std::move(akmSuites)),
     CipherSuites(std::move(cipherSuites)),
     Bands(std::move(bands)),
     SupportedInterfaceTypes(std::move(supportedInterfaceTypes)),
@@ -191,6 +192,9 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
         }
     }
 
+    // Process akm suites.
+    std::vector<uint32_t> akmSuites{};
+
     // Process cipher suites.
     uint32_t *wiphyCipherSuites;
     auto wiphyNumCipherSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES])) / sizeof(*wiphyCipherSuites);
@@ -212,7 +216,7 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     // Process roaming support.
     auto wiphySupportsRoaming = wiphyAttributes[NL80211_ATTR_ROAM_SUPPORT] != nullptr;
 
-    Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(cipherSuites), std::move(wiphyBandMap), std::move(supportedInterfaceTypes), wiphySupportsRoaming };
+    Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(akmSuites), std::move(cipherSuites), std::move(wiphyBandMap), std::move(supportedInterfaceTypes), wiphySupportsRoaming };
     return nl80211Wiphy;
 }
 
