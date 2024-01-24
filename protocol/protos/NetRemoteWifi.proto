@@ -74,25 +74,13 @@ message WifiAccessPointSetPhyTypeResult
     WifiAccessPointOperationStatus Status = 2;
 }
 
-message WifiAccessPointSetAuthenticationMethodRequest
+message WifiAccessPointSetAuthenticationConfigurationRequest
 {
     string AccessPointId = 1;
-    Microsoft.Net.Wifi.WifiAuthenticationMethodConfiguration AuthenticationMethodConfiguration = 2;
+    Microsoft.Net.Wifi.WifiAccessPointAuthenticationConfiguration AuthenticationConfiguration = 2;
 }
 
-message WifiAccessPointSetAuthenticationMethodResult
-{
-    string AccessPointId = 1;
-    WifiAccessPointOperationStatus Status = 2;
-}
-
-message WifiAccessPointSetEncryptionMethodRequest
-{
-    string AccessPointId = 1;
-    Microsoft.Net.Wifi.Dot11CipherAlgorithm CipherAlgorithm = 2;
-}
-
-message WifiAccessPointSetEncryptionMethodResult
+message WifiAccessPointSetAuthenticationConfigurationResult
 {
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
