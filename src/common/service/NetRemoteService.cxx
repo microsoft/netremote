@@ -145,7 +145,7 @@ Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
         return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
     case Ieee80211AkmSuite::FilsSha256:
         return Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
-    case Ieee80211AkmSuite::FilsSha284:
+    case Ieee80211AkmSuite::FilsSha384:
         return Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
     case Ieee80211AkmSuite::FtFilsSha256:
         return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;
@@ -226,12 +226,12 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
         std::make_move_iterator(std::end(bands))
     };
 
-    std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm> authenticationAlgorithms(std::size(ieeeCapabilities.AuthenticationAlgorithms));
-    std::ranges::transform(ieeeCapabilities.AuthenticationAlgorithms, std::begin(authenticationAlgorithms), IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm);
+    std::vector<Microsoft::Net::Wifi::Dot11AkmSuite> akmSuites(std::size(ieeeCapabilities.AkmSuites));
+    std::ranges::transform(ieeeCapabilities.AkmSuites, std::begin(akmSuites), Ieee80211AkmSuiteToNetRemoteAkm);
 
-    *capabilities.mutable_authenticationalgorithms() = {
-        std::make_move_iterator(std::begin(authenticationAlgorithms)),
-        std::make_move_iterator(std::end(authenticationAlgorithms))
+    *capabilities.mutable_akmsuites() = {
+        std::make_move_iterator(std::begin(akmSuites)),
+        std::make_move_iterator(std::end(akmSuites))
     };
 
     std::vector<Microsoft::Net::Wifi::Dot11CipherSuite> cipherSuites(std::size(ieeeCapabilities.CipherSuites));

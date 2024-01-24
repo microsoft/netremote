@@ -3,13 +3,12 @@
 #include <format>
 #include <ranges>
 
-#include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
-#include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
-#include <plog/Log.h>
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
+#include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 
 using namespace Microsoft::Net::Wifi;
 
@@ -27,6 +26,12 @@ Ieee80211CipherSuite
 Nl80211CipherSuiteToIeee80211CipherSuite(uint32_t nl80211CipherSuite) noexcept
 {
     return static_cast<Ieee80211CipherSuite>(nl80211CipherSuite);
+}
+
+Ieee80211AkmSuite
+Nl80211AkmSuiteToIeee80211AkmSuite(uint32_t nl80211AkmSuite) noexcept
+{
+    return static_cast<Ieee80211AkmSuite>(nl80211AkmSuite);
 }
 
 Ieee80211FrequencyBand
@@ -48,7 +53,7 @@ std::vector<Ieee80211Protocol>
 Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
 {
     // Ieee80211 B & G are always supported.
-    std::vector<Ieee80211Protocol> protocols{ 
+    std::vector<Ieee80211Protocol> protocols{
         Ieee80211Protocol::B,
         Ieee80211Protocol::G,
     };
@@ -62,7 +67,6 @@ Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
         }
         // TODO: once Nl80211WiphyBand is updated to support HE (AX) and EHT (BE), add them here.
     }
-
 
     // Remove duplicates.
     std::ranges::sort(protocols);
@@ -88,6 +92,10 @@ AccessPointControllerLinux::GetCapabilities()
     // Convert frequency bands.
     capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
     std::ranges::transform(std::views::keys(wiphy->Bands), std::begin(capabilities.FrequencyBands), detail::Nl80211BandToIeee80211FrequencyBand);
+
+    // Convert AKM suites.
+    capabilities.AkmSuites = std::vector<Ieee80211AkmSuite>(std::size(wiphy->AkmSuites));
+    std::ranges::transform(wiphy->AkmSuites, std::begin(capabilities.AkmSuites), detail::Nl80211AkmSuiteToIeee80211AkmSuite);
 
     // Convert cipher suites.
     capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));

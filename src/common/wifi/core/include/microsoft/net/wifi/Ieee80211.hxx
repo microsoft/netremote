@@ -4,6 +4,9 @@
 
 #include <cmath>
 #include <cstdint>
+#include <initializer_list>
+
+#include <notstd/Utility.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -187,12 +190,40 @@ enum class Ieee80211AkmSuite : uint32_t {
     Ieee8011xSuiteB192 = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSuiteB192),
     Ft8021xSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFt8021xSha384),
     FilsSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha256),
-    FilsSha284 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha384),
+    FilsSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha384),
     FtFilsSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtFilsSha256),
     FtFilsSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtFilsSha384),
     Owe = MakeIeee80211Suite(Ieee80211AkmSuiteIdOwe),
     FtPskSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtPskSha384),
     PskSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdPskSha384),
+};
+
+/**
+ * @brief A listing of all known AKMs. Normally, these would be enumerated with magic_enum::enum_values(), however, that
+ * only supports enums with values up to UINT16_MAX-1, and the AKM suite underlying type is uint32_t, so cannot be used.
+ */
+constexpr std::initializer_list<uint32_t> AllIeee80211Akms{
+    notstd::to_underlying(Ieee80211AkmSuite::Reserved0),
+    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021x),
+    notstd::to_underlying(Ieee80211AkmSuite::Psk),
+    notstd::to_underlying(Ieee80211AkmSuite::Ft8021x),
+    notstd::to_underlying(Ieee80211AkmSuite::FtPsk),
+    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021xSha256),
+    notstd::to_underlying(Ieee80211AkmSuite::PskSha256),
+    notstd::to_underlying(Ieee80211AkmSuite::Tdls),
+    notstd::to_underlying(Ieee80211AkmSuite::Sae),
+    notstd::to_underlying(Ieee80211AkmSuite::FtSae),
+    notstd::to_underlying(Ieee80211AkmSuite::ApPeerKey),
+    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021xSuiteB),
+    notstd::to_underlying(Ieee80211AkmSuite::Ieee8011xSuiteB192),
+    notstd::to_underlying(Ieee80211AkmSuite::Ft8021xSha384),
+    notstd::to_underlying(Ieee80211AkmSuite::FilsSha256),
+    notstd::to_underlying(Ieee80211AkmSuite::FilsSha384),
+    notstd::to_underlying(Ieee80211AkmSuite::FtFilsSha256),
+    notstd::to_underlying(Ieee80211AkmSuite::FtFilsSha384),
+    notstd::to_underlying(Ieee80211AkmSuite::Owe),
+    notstd::to_underlying(Ieee80211AkmSuite::FtPskSha384),
+    notstd::to_underlying(Ieee80211AkmSuite::PskSha384),
 };
 
 /**

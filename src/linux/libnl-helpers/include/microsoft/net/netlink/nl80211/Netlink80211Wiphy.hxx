@@ -26,6 +26,9 @@ struct Nl80211Wiphy
 {
     uint32_t Index;
     std::string Name;
+    // TODO: Add parsing for AKM suites via NL80211_ATTR_AKM_SUITES (count), NL80211_ATTR_IFTYPE_AKM_SUITES,
+    // NL80211_IFTYPE_AKM_ATTR_IFTYPES, NL80211_IFTYPE_AKM_ATTR_SUITES.
+    std::vector<uint32_t> AkmSuites;
     std::vector<uint32_t> CipherSuites;
     std::unordered_map<nl80211_band, Nl80211WiphyBand> Bands;
     std::vector<nl80211_iftype> SupportedInterfaceTypes;
@@ -75,7 +78,7 @@ private:
      * @param index The wiphy index.
      * @param name The wiphy name.
      */
-    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept;
+    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept;
 
     /**
      * @brief Creates a new Nl80211Wiphy object, using the specified function to add an identifier to the message,

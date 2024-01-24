@@ -22,6 +22,11 @@ target_sources(wifi-core
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211AccessPointCapabilities.hxx
 )
 
+target_link_libraries(wifi-core
+    PUBLIC
+        notstd
+)
+
 install(
     TARGETS wifi-core
     EXPORT ${PROJECT_NAME}
