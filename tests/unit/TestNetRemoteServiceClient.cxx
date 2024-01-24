@@ -90,13 +90,13 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        AccessPointConfiguration apConfiguration{};
+        Dot11AccessPointConfiguration apConfiguration{};
         apConfiguration.mutable_ssid()->set_name(SsidName);
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
         apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
-        apConfiguration.set_encryptionalgorithm(Dot11CipherAlgorithm::Dot11CipherAlgorithmCcmp256);
-        apConfiguration.mutable_bands()->Add(RadioBand::RadioBand2_4GHz);
-        apConfiguration.mutable_bands()->Add(RadioBand::RadioBand5_0GHz);
+        apConfiguration.set_ciphersuite(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+        apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
+        apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
 
         WifiAccessPointEnableRequest request{};
         request.set_accesspointid("TestWifiAccessPointEnable");

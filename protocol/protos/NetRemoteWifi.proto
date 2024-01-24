@@ -9,7 +9,7 @@ import "WifiCore.proto";
 message WifiEnumerateAccessPointsResultItem
 {
     string AccessPointId = 1;
-    Microsoft.Net.Wifi.AccessPointCapabilities Capabilities = 2;
+    Microsoft.Net.Wifi.Dot11AccessPointCapabilities Capabilities = 2;
     bool IsEnabled = 3;
 }
 
@@ -42,7 +42,7 @@ message WifiAccessPointOperationStatus
 message WifiAccessPointEnableRequest
 {
     string AccessPointId = 1;
-    Microsoft.Net.Wifi.AccessPointConfiguration Configuration = 2;
+    Microsoft.Net.Wifi.Dot11AccessPointConfiguration Configuration = 2;
 }
 
 message WifiAccessPointEnableResult

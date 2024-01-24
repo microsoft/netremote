@@ -7,22 +7,22 @@
 #include <catch2/catch_test_macros.hpp>
 
 #ifndef _MSC_VER 
-TEST_CASE("IeeeFrequencyBand GHz literals translate correctly", "[wifi][core]")
+TEST_CASE("IeeeDot11FrequencyBand GHz literals translate correctly", "[wifi][core]")
 {
     using namespace Microsoft::Net::Wifi::Literals;
 
-    using Microsoft::Net::Wifi::IeeeFrequencyBand;
+    using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 
     SECTION("Valid literal values are correct")
     {
-        REQUIRE(2.4_GHz == IeeeFrequencyBand::TwoPointFourGHz);
-        REQUIRE(5.0_GHz == IeeeFrequencyBand::FiveGHz);
-        REQUIRE(6.0_GHz == IeeeFrequencyBand::SixGHz);
+        REQUIRE(2.4_GHz == Ieee80211FrequencyBand::TwoPointFourGHz);
+        REQUIRE(5.0_GHz == Ieee80211FrequencyBand::FiveGHz);
+        REQUIRE(6.0_GHz == Ieee80211FrequencyBand::SixGHz);
     }
 
     SECTION("Invalid literal values translate to 'Unknown'")
     {
-        static constexpr std::initializer_list<IeeeFrequencyBand> InvalidBandValues{
+        static constexpr std::initializer_list<Ieee80211FrequencyBand> InvalidBandValues{
             0.0_GHz,
             1.0_GHz,
             2.0_GHz,
@@ -44,29 +44,29 @@ TEST_CASE("IeeeFrequencyBand GHz literals translate correctly", "[wifi][core]")
         };
 
         for (const auto& invalidBand : InvalidBandValues) {
-            REQUIRE(invalidBand == IeeeFrequencyBand::Unknown);
+            REQUIRE(invalidBand == Ieee80211FrequencyBand::Unknown);
         }
     }
 }
 
 #endif // _MSC_VER
 
-TEST_CASE("IeeeFrequencyBand MHz literals translate correctly", "[wifi][core]")
+TEST_CASE("Ieee80211FrequencyBand MHz literals translate correctly", "[wifi][core]")
 {
     using namespace Microsoft::Net::Wifi::Literals;
 
-    using Microsoft::Net::Wifi::IeeeFrequencyBand;
+    using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 
     SECTION("Valid literal values are correct")
     {
-        REQUIRE(2400_MHz == IeeeFrequencyBand::TwoPointFourGHz);
-        REQUIRE(5000_MHz == IeeeFrequencyBand::FiveGHz);
-        REQUIRE(6000_MHz == IeeeFrequencyBand::SixGHz);
+        REQUIRE(2400_MHz == Ieee80211FrequencyBand::TwoPointFourGHz);
+        REQUIRE(5000_MHz == Ieee80211FrequencyBand::FiveGHz);
+        REQUIRE(6000_MHz == Ieee80211FrequencyBand::SixGHz);
     }
 
     SECTION("Invalid literal values translate to 'Unknown'")
     {
-        static constexpr std::initializer_list<IeeeFrequencyBand> InvalidBandValues{
+        static constexpr std::initializer_list<Ieee80211FrequencyBand> InvalidBandValues{
             0_MHz,
             1_MHz,
             2_MHz,
@@ -84,7 +84,7 @@ TEST_CASE("IeeeFrequencyBand MHz literals translate correctly", "[wifi][core]")
         };
 
         for (const auto& invalidBand : InvalidBandValues) {
-            REQUIRE(invalidBand == IeeeFrequencyBand::Unknown);
+            REQUIRE(invalidBand == Ieee80211FrequencyBand::Unknown);
         }
     }
 }

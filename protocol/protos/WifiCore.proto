@@ -3,86 +3,112 @@ syntax = "proto3";
 
 package Microsoft.Net.Wifi;
 
-enum RadioBand
+enum Dot11FrequencyBand
 {
     option allow_alias = true;
     
-    RadioBandUnknown = 0;
-    RadioBand2400MHz = 1;
-    RadioBand2_4GHz = 1;
-    RadioBandTwoPoint4GHz = 1;
-    RadioBand5000MHz = 2;
-    RadioBand5_0GHz = 2;
-    RadioBandFiveGHz = 2;
-    RadioBand6000MHz = 3;
-    RadioBand6_0GHz = 3;
-    RadioBandSixGHz = 3;
+    Dot11FrequencyBandUnknown = 0;
+    Dot11FrequencyBand2400MHz = 1;
+    Dot11FrequencyBand5000MHz = 2;
+    Dot11FrequencyBand6000MHz = 3;
+
+    Dot11FrequencyBand2_4GHz = 1;
+    Dot11FrequencyBand6_0GHz = 3;
+    Dot11FrequencyBand5_0GHz = 2;
+
+    Dot11FrequencyBandTwoPoint4GHz = 1;
+    Dot11FrequencyBandFiveGHz = 2;
+    Dot11FrequencyBandSixGHz = 3;
 }
 
+// 802.11 PHY Types.
+// Values map to those defined in IEEE 802.11-2020, Annex C, Page 3934, 'dot11PHYType'.
 enum Dot11PhyType
 {
     option allow_alias = true;
 
     Dot11PhyTypeUnknown = 0;
     Dot11PhyTypeB = 1;
-    Dot11PhyTypeHrdsss = 1;
     Dot11PhyTypeG = 2;
-    Dot11PhyTypeErp = 2;
     Dot11PhyTypeN = 3;
-    Dot11PhyTypeHt = 3;
     Dot11PhyTypeA = 4;
-    Dot11PhyTypeOfdm = 4;
     Dot11PhyTypeAC = 5;
-    Dot11PhyTypeVht = 5;
     Dot11PhyTypeAD = 6;
-    Dot11PhyTypeDmg = 6;
     Dot11PhyTypeAX = 7;
-    Dot11PhyTypeHe = 7;
     Dot11PhyTypeBE = 8;
+
+    // Modulation type aliases.
+    Dot11PhyTypeHrdsss = 1;
+    Dot11PhyTypeErp = 2;
+    Dot11PhyTypeHt = 3;
+    Dot11PhyTypeOfdm = 4;
+    Dot11PhyTypeVht = 5;
+    Dot11PhyTypeDmg = 6;
+    Dot11PhyTypeHe = 7;
     Dot11PhyTypeEht = 8;
 }
 
+// 802.11 Authentication Algorithms.
+// Values map to those defined in IEEE 802.11-2020, Section 9.4.1.1.
 enum Dot11AuthenticationAlgorithm
 {
-    option allow_alias = true;
-
     Dot11AuthenticationAlgorithmUnknown = 0;
-    Dot11AuthenticationAlgorithmOpen = 1;
-    Dot11AuthenticationAlgorithmSharedKey = 2;
-    Dot11AuthenticationAlgorithmWpa = 3;
-    Dot11AuthenticationAlgorithmWpaPsk = 4;
-    Dot11AuthenticationAlgorithmWpaNone = 5;
-    Dot11AuthenticationAlgorithmRsna = 6;
-    Dot11AuthenticationAlgorithmRsnaPsk = 7;
-    Dot11AuthenticationAlgorithmWpa3 = 8;
-    Dot11AuthenticationAlgorithmWpa3Enterprise192 = 8;
-    Dot11AuthenticationAlgorithmWpa3Enterprise = 9;
-    Dot11AuthenticationAlgorithmSae = 10;
-    Dot11AuthenticationAlgorithmWpa3Personal = 10;
-    Dot11AuthenticationAlgorithmOwe = 11;
+    Dot11AuthenticationAlgorithmSharedKey = 1;
+    Dot11AuthenticationAlgorithmOpenSystem = 2;
+    Dot11AuthenticationAlgorithmFastBssTransition = 3;
+    Dot11AuthenticationAlgorithmSae = 4;
+    Dot11AuthenticationAlgorithmFils = 5;
+    Dot11AuthenticationAlgorithmFilsPfs = 6;
+    Dot11AuthenticationAlgorithmFilsPublicKey = 7;
+    Dot11AuthenticationAlgorithmVendorSpecific = 8;
 }
 
-enum Dot11CipherAlgorithm
+// 802.11 Authentication and Key Management (AKM) suites.
+// Values map to those defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
+enum Dot11AkmSuite
 {
-    option allow_alias = true;
+    Dot11AkmSuiteUnknown = 0;
+    Dot11AkmSuiteReserved0 = 1;
+    Dot11AkmSuite8021x = 2;
+    Dot11AkmSuitePsk = 3;
+    Dot11AkmSuiteFt8021x = 4;
+    Dot11AkmSuiteFtPsk = 5;
+    Dot11AkmSuite8021xSha256 = 6;
+    Dot11AkmSuitePskSha256 = 7;
+    Dot11AkmSuiteTdls = 8;
+    Dot11AkmSuiteSae = 9;
+    Dot11AkmSuiteFtSae = 10;
+    Dot11AkmSuiteApPeerKey = 11;
+    Dot11AkmSuite8021xSuiteB = 12;
+    Dot11AkmSuite8021xSuiteB192 = 13;
+    Dot11AkmSuiteFt8021xSha384 = 14;
+    Dot11AkmSuiteFilsSha256 = 15;
+    Dot11AkmSuiteFilsSha384 = 16;
+    Dot11AkmSuiteFtFilsSha256 = 17;
+    Dot11AkmSuiteFtFilsSha384 = 18;
+    Dot11AkmSuiteOwe = 19;
+    Dot11AkmSuiteFtPskSha384 = 20;
+    Dot11AkmSuitePskSha384 = 21;
+}
 
-    Dot11CipherAlgorithmUnknown = 0;
-    Dot11CipherAlgorithmNone = 1;
-    Dot11CipherAlgorithmWep = 2;
-    Dot11CipherAlgorithmWep40 = 3;
-    Dot11CipherAlgorithmWep104 = 4;
-    Dot11CipherAlgorithmTkip = 5;
-    Dot11CipherAlgorithmBip = 6;
-    Dot11CipherAlgorithmBipCmac128 = 6;
-    Dot11CipherAlgorithmBipGmac128 = 7;
-    Dot11CipherAlgorithmBipGmac256 = 8;
-    Dot11CipherAlgorithmBipCmac256 = 9;
-    Dot11CipherAlgorithmGcmp = 10;
-    Dot11CipherAlgorithmGcmp128 = 10;
-    Dot11CipherAlgorithmGcmp256 = 11;
-    Dot11CipherAlgorithmCcmp256 = 12;
-    Dot11CipherAlgorithmWpaUseGroup = 13;
-    Dot11CipherAlgorithmRsnUseGroup = 13;
+// 802.11 Cipher suites.
+// Values map to those defined in IEEE 802.11-2020, Section 9.4.2.24.2, Table 9-149.
+enum Dot11CipherSuite
+{
+    Dot11CipherSuiteUnknown = 0;
+    Dot11CipherSuiteBipCmac128 = 1;
+    Dot11CipherSuiteBipCmac256 = 2;
+    Dot11CipherSuiteBipGmac128 = 3;
+    Dot11CipherSuiteBipGmac256 = 4;
+    Dot11CipherSuiteCcmp128 = 5;
+    Dot11CipherSuiteCcmp256 = 6;
+    Dot11CipherSuiteGcmp128 = 7;
+    Dot11CipherSuiteGcmp256 = 8;
+    Dot11CipherSuiteGroupAddressesTrafficNotAllowed = 9;
+    Dot11CipherSuiteTkip = 10;
+    Dot11CipherSuiteUseGroup = 11;
+    Dot11CipherSuiteWep104 = 12;
+    Dot11CipherSuiteWep40 = 13;
 }
 
 message Dot11Ssid
@@ -100,7 +126,7 @@ message Dot11MacAddress
     bytes Value = 1;
 }
 
-message SharedKey
+message Dot11SharedKey
 {
     oneof Value
     {
@@ -109,25 +135,25 @@ message SharedKey
     }
 }
 
-message AccessPointConfiguration
+message Dot11AccessPointConfiguration
 {
     Dot11Ssid Ssid = 1;
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
     Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 4;
-    Dot11CipherAlgorithm EncryptionAlgorithm = 5;
-    repeated RadioBand Bands = 6;
+    Dot11CipherSuite CipherSuite = 5;
+    repeated Dot11FrequencyBand Bands = 6;
 }
 
-message AccessPointCapabilities
+message Dot11AccessPointCapabilities
 {
-    repeated Microsoft.Net.Wifi.RadioBand Bands = 1;
+    repeated Microsoft.Net.Wifi.Dot11FrequencyBand Bands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
     repeated Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 3;
-    repeated Microsoft.Net.Wifi.Dot11CipherAlgorithm EncryptionAlgorithms = 4;
+    repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;
 }
 
-enum AccessPointState
+enum Dot11AccessPointState
 {
     AccessPointStateUnknown = 0;
 }

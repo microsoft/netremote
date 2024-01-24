@@ -13,10 +13,10 @@ namespace Microsoft::Net::Wifi
  */
 struct Ieee80211AccessPointCapabilities
 {
-    std::vector<IeeeProtocol> Protocols;
-    std::vector<IeeeFrequencyBand> FrequencyBands;
-    std::vector<IeeeAuthenticationAlgorithm> AuthenticationAlgorithms;
-    std::vector<IeeeCipherSuite> EncryptionAlgorithms;
+    std::vector<Ieee80211Protocol> Protocols;
+    std::vector<Ieee80211FrequencyBand> Dot11FrequencyBands;
+    std::vector<Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
+    std::vector<Ieee80211CipherSuite> CipherSuites;
 };
 } // namespace Microsoft::Net::Wifi
 

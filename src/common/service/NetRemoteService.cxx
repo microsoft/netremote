@@ -28,162 +28,187 @@ NetRemoteService::GetAccessPointManager() noexcept
 
 namespace detail
 {
-Microsoft::Net::Wifi::Dot11PhyType
-IeeeProtocolToNetRemotePhyType(Microsoft::Net::Wifi::IeeeProtocol ieeeProtocol)
+using Microsoft::Net::Wifi::Dot11PhyType;
+using Microsoft::Net::Wifi::Ieee80211Protocol;
+
+Dot11PhyType
+IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
 {
-    using Microsoft::Net::Wifi::Dot11PhyType;
-    using Microsoft::Net::Wifi::IeeeProtocol;
-
-    Dot11PhyType phyType{ Dot11PhyType::Dot11PhyTypeUnknown };
-
     switch (ieeeProtocol) {
-    case IeeeProtocol::B:
-        phyType = Dot11PhyType::Dot11PhyTypeB;
-        break;
-    case IeeeProtocol::G:
-        phyType = Dot11PhyType::Dot11PhyTypeG;
-        break;
-    case IeeeProtocol::N:
-        phyType = Dot11PhyType::Dot11PhyTypeN;
-        break;
-    case IeeeProtocol::A:
-        phyType = Dot11PhyType::Dot11PhyTypeA;
-        break;
-    case IeeeProtocol::AC:
-        phyType = Dot11PhyType::Dot11PhyTypeAC;
-        break;
-    case IeeeProtocol::AD:
-        phyType = Dot11PhyType::Dot11PhyTypeAD;
-        break;
-    case IeeeProtocol::AX:
-        phyType = Dot11PhyType::Dot11PhyTypeAX;
-        break;
-    case IeeeProtocol::BE:
-        phyType = Dot11PhyType::Dot11PhyTypeBE;
-        break;
-    default:
-        break;
+    case Ieee80211Protocol::Unknown:
+        return Dot11PhyType::Dot11PhyTypeUnknown;
+    case Ieee80211Protocol::B:
+        return Dot11PhyType::Dot11PhyTypeB;
+    case Ieee80211Protocol::G:
+        return Dot11PhyType::Dot11PhyTypeG;
+    case Ieee80211Protocol::N:
+        return Dot11PhyType::Dot11PhyTypeN;
+    case Ieee80211Protocol::A:
+        return Dot11PhyType::Dot11PhyTypeA;
+    case Ieee80211Protocol::AC:
+        return Dot11PhyType::Dot11PhyTypeAC;
+    case Ieee80211Protocol::AD:
+        return Dot11PhyType::Dot11PhyTypeAD;
+    case Ieee80211Protocol::AX:
+        return Dot11PhyType::Dot11PhyTypeAX;
+    case Ieee80211Protocol::BE:
+        return Dot11PhyType::Dot11PhyTypeBE;
     }
 
-    return phyType;
+    return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
-Microsoft::Net::Wifi::RadioBand
-IeeeFrequencyBandToNetRemoteRadioBand(Microsoft::Net::Wifi::IeeeFrequencyBand ieeeFrequencyBand)
+using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
+using Microsoft::Net::Wifi::Dot11FrequencyBand;
+
+Dot11FrequencyBand
+IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
 {
-    using Microsoft::Net::Wifi::IeeeFrequencyBand;
-    using Microsoft::Net::Wifi::RadioBand;
-
-    RadioBand band{ RadioBand::RadioBandUnknown };
-
-    switch (ieeeFrequencyBand) {
-    case IeeeFrequencyBand::TwoPointFourGHz:
-        band = RadioBand::RadioBandTwoPoint4GHz;
-        break;
-    case IeeeFrequencyBand::FiveGHz:
-        band = RadioBand::RadioBandFiveGHz;
-        break;
-    case IeeeFrequencyBand::SixGHz:
-        band = RadioBand::RadioBandSixGHz;
-        break;
-    default:
-        break;
+    switch (ieeeDot11FrequencyBand) {
+    case Ieee80211FrequencyBand::Unknown:
+        return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
+    case Ieee80211FrequencyBand::TwoPointFourGHz:
+        return Dot11FrequencyBand::Dot11FrequencyBandTwoPoint4GHz;
+    case Ieee80211FrequencyBand::FiveGHz:
+        return Dot11FrequencyBand::Dot11FrequencyBandFiveGHz;
+    case Ieee80211FrequencyBand::SixGHz:
+        return Dot11FrequencyBand::Dot11FrequencyBandSixGHz;
     }
 
-    return band;
+    return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
 }
 
-Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm
-IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Microsoft::Net::Wifi::IeeeAuthenticationAlgorithm ieeeAuthenticationAlgorithm)
+using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
+using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
+
+Dot11AuthenticationAlgorithm
+IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieeeAuthenticationAlgorithm)
 {
-    using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-    using Microsoft::Net::Wifi::IeeeAuthenticationAlgorithm;
-
-    Dot11AuthenticationAlgorithm authenticationAlgorithm{ Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown };
-
     switch (ieeeAuthenticationAlgorithm) {
-    case IeeeAuthenticationAlgorithm::OpenSystem:
-        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpen;
-        break;
-    case IeeeAuthenticationAlgorithm::SharedKey:
-        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey;
-        break;
-    case IeeeAuthenticationAlgorithm::Sae:
-        authenticationAlgorithm = Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae;
-        break;
-    // The following cases do not map to Dot11AuthenticationAlgorithm types. This appears to be because the Microsoft
-    // authentication algorithm definitions do not map 1-1 with the 802.11 definitions. Instead, they more resemble an
-    // 802.11 AKM. Fixing this requires a breaking API change, so will be deferred.
-    //
-    // case IeeeAuthenticationAlgorithm::FastBssTransition:
-    // case IeeeAuthenticationAlgorithm::Fils:
-    // case IeeeAuthenticationAlgorithm::FilsPfs:
-    // case IeeeAuthenticationAlgorithm::FilsPublicKey:
-    //
-    default:
-        break;
+    case Ieee80211AuthenticationAlgorithm::Unknown:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
+    case Ieee80211AuthenticationAlgorithm::OpenSystem:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem;
+    case Ieee80211AuthenticationAlgorithm::SharedKey:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey;
+    case Ieee80211AuthenticationAlgorithm::FastBssTransition:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFastBssTransition;
+    case Ieee80211AuthenticationAlgorithm::Sae:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae;
+    case Ieee80211AuthenticationAlgorithm::Fils:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFils;
+    case Ieee80211AuthenticationAlgorithm::FilsPfs:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPfs;
+    case Ieee80211AuthenticationAlgorithm::FilsPublicKey:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPublicKey;
+    case Ieee80211AuthenticationAlgorithm::VendorSpecific:
+        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmVendorSpecific;
     }
 
-    return authenticationAlgorithm;
+    return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
 }
 
-Microsoft::Net::Wifi::Dot11CipherAlgorithm
-IeeeCipherAlgorithmToNetRemoteCipherAlgorithm(Microsoft::Net::Wifi::IeeeCipherSuite ieeeCipherSuite)
+using Microsoft::Net::Wifi::Dot11AkmSuite;
+using Microsoft::Net::Wifi::Ieee80211AkmSuite;
+
+Dot11AkmSuite
+Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
 {
-    using Microsoft::Net::Wifi::Dot11CipherAlgorithm;
-    using Microsoft::Net::Wifi::IeeeCipherSuite;
-
-    Dot11CipherAlgorithm cipherAlgorithm{ Dot11CipherAlgorithm::Dot11CipherAlgorithmUnknown };
-
-    switch (ieeeCipherSuite) {
-    case IeeeCipherSuite::Unknown:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmNone;
-        break;
-    case IeeeCipherSuite::Wep40:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmWep40;
-        break;
-    case IeeeCipherSuite::Tkip:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmTkip;
-        break;
-    // case IeeeCipherSuite::Ccmp128: // FIXME
-    case IeeeCipherSuite::Wep104:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmWep104;
-        break;
-    case IeeeCipherSuite::BipCmac128:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipCmac128;
-        break;
-    case IeeeCipherSuite::Gcmp128:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmGcmp128;
-        break;
-    case IeeeCipherSuite::Gcmp256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmGcmp256;
-        break;
-    case IeeeCipherSuite::Ccmp256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmCcmp256;
-        break;
-    case IeeeCipherSuite::BipGmac128:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipGmac128;
-        break;
-    case IeeeCipherSuite::BipGmac256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipGmac256;
-        break;
-    case IeeeCipherSuite::BipCmac256:
-        cipherAlgorithm = Dot11CipherAlgorithm::Dot11CipherAlgorithmBipCmac256;
-        break;
-    default:
-        break;
+    switch (akmSuite) {
+    case Ieee80211AkmSuite::Reserved0:
+        return Dot11AkmSuite::Dot11AkmSuiteReserved0;
+    case Ieee80211AkmSuite::Ieee8021x:
+        return Dot11AkmSuite::Dot11AkmSuite8021x;
+    case Ieee80211AkmSuite::Psk:
+        return Dot11AkmSuite::Dot11AkmSuitePsk;
+    case Ieee80211AkmSuite::Ft8021x:
+        return Dot11AkmSuite::Dot11AkmSuiteFt8021x;
+    case Ieee80211AkmSuite::FtPsk:
+        return Dot11AkmSuite::Dot11AkmSuiteFtPsk;
+    case Ieee80211AkmSuite::Ieee8021xSha256:
+        return Dot11AkmSuite::Dot11AkmSuite8021xSha256;
+    case Ieee80211AkmSuite::PskSha256:
+        return Dot11AkmSuite::Dot11AkmSuitePskSha256;
+    case Ieee80211AkmSuite::Tdls:
+        return Dot11AkmSuite::Dot11AkmSuiteTdls;
+    case Ieee80211AkmSuite::Sae:
+        return Dot11AkmSuite::Dot11AkmSuiteSae;
+    case Ieee80211AkmSuite::FtSae:
+        return Dot11AkmSuite::Dot11AkmSuiteFtSae;
+    case Ieee80211AkmSuite::ApPeerKey:
+        return Dot11AkmSuite::Dot11AkmSuiteApPeerKey;
+    case Ieee80211AkmSuite::Ieee8021xSuiteB:
+        return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB;
+    case Ieee80211AkmSuite::Ieee8011xSuiteB192:
+        return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192;
+    case Ieee80211AkmSuite::Ft8021xSha384:
+        return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
+    case Ieee80211AkmSuite::FilsSha256:
+        return Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
+    case Ieee80211AkmSuite::FilsSha284:
+        return Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
+    case Ieee80211AkmSuite::FtFilsSha256:
+        return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;
+    case Ieee80211AkmSuite::FtFilsSha384:
+        return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha384;
+    case Ieee80211AkmSuite::Owe:
+        return Dot11AkmSuite::Dot11AkmSuiteOwe;
+    case Ieee80211AkmSuite::FtPskSha384:
+        return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
+    case Ieee80211AkmSuite::PskSha384:
+        return Dot11AkmSuite::Dot11AkmSuitePskSha384;
     }
 
-    return cipherAlgorithm;
+    return Dot11AkmSuite::Dot11AkmSuiteUnknown;
 }
 
-Microsoft::Net::Wifi::AccessPointCapabilities
+using Microsoft::Net::Wifi::Dot11CipherSuite;
+using Microsoft::Net::Wifi::Ieee80211CipherSuite;
+
+Dot11CipherSuite
+IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
+{
+    switch (ieeeCipherSuite) {
+    case Ieee80211CipherSuite::Unknown:
+        return Dot11CipherSuite::Dot11CipherSuiteUnknown;
+    case Ieee80211CipherSuite::BipCmac128:
+        return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
+    case Ieee80211CipherSuite::BipCmac256:
+        return Dot11CipherSuite::Dot11CipherSuiteBipCmac256;
+    case Ieee80211CipherSuite::BipGmac128:
+        return Dot11CipherSuite::Dot11CipherSuiteBipGmac128;
+    case Ieee80211CipherSuite::BipGmac256:
+        return Dot11CipherSuite::Dot11CipherSuiteBipGmac256;
+    case Ieee80211CipherSuite::Ccmp128:
+        return Dot11CipherSuite::Dot11CipherSuiteCcmp128;
+    case Ieee80211CipherSuite::Ccmp256:
+        return Dot11CipherSuite::Dot11CipherSuiteCcmp256;
+    case Ieee80211CipherSuite::Gcmp128:
+        return Dot11CipherSuite::Dot11CipherSuiteGcmp128;
+    case Ieee80211CipherSuite::Gcmp256:
+        return Dot11CipherSuite::Dot11CipherSuiteGcmp256;
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
+        return Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed;
+    case Ieee80211CipherSuite::Tkip:
+        return Dot11CipherSuite::Dot11CipherSuiteTkip;
+    case Ieee80211CipherSuite::UseGroup:
+        return Dot11CipherSuite::Dot11CipherSuiteUseGroup;
+    case Ieee80211CipherSuite::Wep104:
+        return Dot11CipherSuite::Dot11CipherSuiteWep104;
+    case Ieee80211CipherSuite::Wep40:
+        return Dot11CipherSuite::Dot11CipherSuiteWep40;
+    }
+
+    return Dot11CipherSuite::Dot11CipherSuiteUnknown;
+}
+
+Microsoft::Net::Wifi::Dot11AccessPointCapabilities
 IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
 {
-    using Microsoft::Net::Wifi::AccessPointCapabilities;
+    using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
     using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
-    AccessPointCapabilities capabilities{};
+    Dot11AccessPointCapabilities capabilities{};
 
     std::vector<Microsoft::Net::Wifi::Dot11PhyType> phyTypes(std::size(ieeeCapabilities.Protocols));
     std::ranges::transform(ieeeCapabilities.Protocols, std::begin(phyTypes), IeeeProtocolToNetRemotePhyType);
@@ -193,8 +218,8 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
         std::make_move_iterator(std::end(phyTypes))
     };
 
-    std::vector<Microsoft::Net::Wifi::RadioBand> bands(std::size(ieeeCapabilities.FrequencyBands));
-    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), IeeeFrequencyBandToNetRemoteRadioBand);
+    std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.Dot11FrequencyBands));
+    std::ranges::transform(ieeeCapabilities.Dot11FrequencyBands, std::begin(bands), IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand);
 
     *capabilities.mutable_bands() = {
         std::make_move_iterator(std::begin(bands)),
@@ -209,19 +234,19 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
         std::make_move_iterator(std::end(authenticationAlgorithms))
     };
 
-    std::vector<Microsoft::Net::Wifi::Dot11CipherAlgorithm> encryptionAlgorithms(std::size(ieeeCapabilities.EncryptionAlgorithms));
-    std::ranges::transform(ieeeCapabilities.EncryptionAlgorithms, std::begin(encryptionAlgorithms), IeeeCipherAlgorithmToNetRemoteCipherAlgorithm);
+    std::vector<Microsoft::Net::Wifi::Dot11CipherSuite> cipherSuites(std::size(ieeeCapabilities.CipherSuites));
+    std::ranges::transform(ieeeCapabilities.CipherSuites, std::begin(cipherSuites), IeeeCipherAlgorithmToNetRemoteCipherSuite);
 
-    *capabilities.mutable_encryptionalgorithms() = {
-        std::make_move_iterator(std::begin(encryptionAlgorithms)),
-        std::make_move_iterator(std::end(encryptionAlgorithms))
+    *capabilities.mutable_ciphersuites() = {
+        std::make_move_iterator(std::begin(cipherSuites)),
+        std::make_move_iterator(std::end(cipherSuites))
     };
 
     return capabilities;
 }
 
 using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-using Microsoft::Net::Wifi::AccessPointCapabilities;
+using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
 
 static constexpr auto AccessPointIdInvalid{ "invalid" };
 
@@ -240,7 +265,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 
     bool isEnabled{ false };
     std::string id{};
-    Microsoft::Net::Wifi::AccessPointCapabilities capabilities{};
+    Microsoft::Net::Wifi::Dot11AccessPointCapabilities capabilities{};
 
     auto interfaceName = accessPoint.GetInterfaceName();
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
@@ -327,7 +352,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherAlgorithm;
+using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Dot11PhyType;
 
 ::grpc::Status
@@ -391,9 +416,9 @@ NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::R
         status.set_message("No authentication algorithm provided");
         return false;
     }
-    if (configuration.encryptionalgorithm() == Dot11CipherAlgorithm::Dot11CipherAlgorithmUnknown) {
+    if (configuration.ciphersuite() == Dot11CipherSuite::Dot11CipherSuiteUnknown) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No encryption algorithm provided");
+        status.set_message("No cipher suite provided");
         return false;
     }
     if (std::empty(configuration.bands())) {

@@ -22,7 +22,7 @@ NetRemoteCliHandlerOperations::NetRemoteCliHandlerOperations(std::shared_ptr<Net
 namespace detail
 {
 /**
- * @brief Generate a string representation of a AccessPointCapabilities object.
+ * @brief Generate a string representation of a Dot11AccessPointCapabilities object.
  * 
  * @param accessPointCapabilities The object to generate a string representation of.
  * @param indentationLevel The indentation level to use.
@@ -30,7 +30,7 @@ namespace detail
  * @return std::string 
  */
 std::string
-NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::AccessPointCapabilities& accessPointCapabilities, std::size_t indentationLevel = 1, std::size_t indentation = 2)
+NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities& accessPointCapabilities, std::size_t indentationLevel = 1, std::size_t indentation = 2)
 {
     const auto indent0 = std::string((indentationLevel + 0) * indentation, ' ');
     const auto indent1 = std::string((indentationLevel + 1) * indentation, ' ');
@@ -51,7 +51,7 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::AccessPoint
     for (const auto& band : accessPointCapabilities.bands()) {
         ss << '\n'
            << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::RadioBand>(band));
+           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11FrequencyBand>(band));
     }
 
     ss << '\n'
@@ -66,10 +66,10 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::AccessPoint
     ss << '\n'
        << indent0
        << "Cipher Algorithms:";
-    for (const auto& ciperAlgorithm : accessPointCapabilities.encryptionalgorithms()) {
+    for (const auto& ciperSuite : accessPointCapabilities.ciphersuites()) {
         ss << '\n'
            << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherAlgorithm>(ciperAlgorithm));
+           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherSuite>(ciperSuite));
     }
 
     return ss.str();
