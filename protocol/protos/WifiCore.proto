@@ -9,13 +9,15 @@ enum Dot11FrequencyBand
     
     Dot11FrequencyBandUnknown = 0;
     Dot11FrequencyBand2400MHz = 1;
-    Dot11FrequencyBand2_4GHz = 1;
-    Dot11FrequencyBandTwoPoint4GHz = 1;
     Dot11FrequencyBand5000MHz = 2;
-    Dot11FrequencyBand5_0GHz = 2;
-    Dot11FrequencyBandFiveGHz = 2;
     Dot11FrequencyBand6000MHz = 3;
+
+    Dot11FrequencyBand2_4GHz = 1;
     Dot11FrequencyBand6_0GHz = 3;
+    Dot11FrequencyBand5_0GHz = 2;
+    
+    Dot11FrequencyBandTwoPoint4GHz = 1;
+    Dot11FrequencyBandFiveGHz = 2;
     Dot11FrequencyBandSixGHz = 3;
 }
 
