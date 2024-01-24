@@ -23,11 +23,11 @@ namespace detail
 {
 /**
  * @brief Generate a string representation of a Dot11AccessPointCapabilities object.
- * 
+ *
  * @param accessPointCapabilities The object to generate a string representation of.
  * @param indentationLevel The indentation level to use.
  * @param indentation The number of spaces in each indentation level.
- * @return std::string 
+ * @return std::string
  */
 std::string
 NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities& accessPointCapabilities, std::size_t indentationLevel = 1, std::size_t indentation = 2)
@@ -38,7 +38,7 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
     std::stringstream ss;
 
     ss << indent0
-       <<  "Phy Types:";
+       << "Phy Types:";
     for (const auto& phyType : accessPointCapabilities.phytypes()) {
         ss << '\n'
            << indent1
@@ -63,13 +63,15 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
            << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>(authenticationAlgorithm));
     }
 
+    constexpr auto CipherAlgorithmPrefixLength = std::size(std::string_view("Dot11CipherSuite"));
     ss << '\n'
        << indent0
        << "Cipher Algorithms:";
     for (const auto& ciperSuite : accessPointCapabilities.ciphersuites()) {
+        std::string_view cipherSuiteName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherSuite>(ciperSuite)));
+        cipherSuiteName.remove_prefix(CipherAlgorithmPrefixLength);
         ss << '\n'
-           << indent1
-           << magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherSuite>(ciperSuite));
+           << indent1 << cipherSuiteName;
     }
 
     return ss.str();
