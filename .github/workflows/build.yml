@@ -39,14 +39,7 @@ on:
         default: "[ 'Debug' ]"
         type: string
         description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
-      preset-name:
-        required: true
-        default: 'dev-windows'
-        type: choice
-        options:
-          - 'dev-windows'
-          - 'release-windows'
-        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+
   workflow_call:
     inputs:
       build-types:
@@ -79,10 +72,6 @@ on:
         required: false
         default: false
         type: boolean
-      preset-name:
-        required: false
-        default: 'dev-windows'
-        type: string
 
 jobs:
   build:
@@ -93,16 +82,16 @@ jobs:
         config:
           - { os: windows-2022 }
           - { os: windows-2022, arch: 'ARM64' }
-          - { os: ubuntu-22.04 }
+          - { os: [ self-hosted, ubuntu-23.10 ] }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Initialize CodeQL
-      if: inputs.analyze-codeql == true && contains(matrix.config.os, 'windows')
+      if: inputs.analyze-codeql == true
       uses: github/codeql-action/init@v2
       with:
         languages: 'cpp'
@@ -116,12 +105,17 @@ jobs:
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
-        preset-name: ${{ inputs.preset-name }}
 
     - name: Build Linux
-      if: ${{ contains(matrix.config.os, 'ubuntu') }}
-      uses: ./.github/actions/build-with-docker
+      if: ${{ contains(matrix.config.os, 'ubuntu-23.10') }}
+      uses: ./.github/actions/build-with-selfhost
+      with:
+        build-type: ${{ matrix.build-type }}
+        install: ${{ inputs.install }}
+        test: ${{ inputs.test }}
+        package: ${{ inputs.package }}
+        publish-artifacts: ${{ inputs.publish-artifacts }}
 
     - name: Perform CodeQL Analysis
-      if: inputs.analyze-codeql == true && contains(matrix.config.os, 'windows')
+      if: inputs.analyze-codeql == true
       uses: github/codeql-action/analyze@v2
