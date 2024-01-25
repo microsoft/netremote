@@ -82,7 +82,7 @@ jobs:
         config:
           - { os: windows-2022 }
           - { os: windows-2022, arch: 'ARM64' }
-          - { os: ubuntu-22.04 }
+          - { os: [ self-hosted, ubuntu-23.10 ] }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
@@ -105,11 +105,16 @@ jobs:
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
-        preset-name: ${{ inputs.preset-name }}
 
     - name: Build Linux
       if: ${{ contains(matrix.config.os, 'ubuntu') }}
-      uses: ./.github/actions/build-with-docker
+      uses: ./github/actions/build/with-selfhost
+      with:
+        build-type: ${{ matrix.build-type }}
+        install: ${{ inputs.install }}
+        test: ${{ inputs.test }}
+        package: ${{ inputs.package }}
+        publish-artifacts: ${{ inputs.publish-artifacts }}
 
     - name: Perform CodeQL Analysis
       if: inputs.analyze-codeql == true && contains(matrix.config.os, 'windows')
