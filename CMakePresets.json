@@ -203,7 +203,8 @@
             "name": "test-common",
             "hidden": true,
             "output": {
-                "outputOnFailure": true
+                "outputOnFailure": true,
+                "shortProgress": true
             }
         },
         {
@@ -214,24 +215,16 @@
             ]
         },
         {
-            "name": "local-base",
-            "hidden": true,
-            "description": "Run tests that don't require a remote connection",
+            "name": "non-root",
+            "configurePreset": "dev-linux",
             "inherits": [
                 "test-common"
             ],
             "filter": {
-                "include": {
-                    "label": "[local]"
+                "exclude": {
+                    "name": "(root)"
                 }
             }
-        },
-        {
-            "name": "local",
-            "configurePreset": "dev-linux",
-            "inherits": [
-                "local-base"
-            ]
         }
     ]
 }
