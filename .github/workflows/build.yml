@@ -108,7 +108,7 @@ jobs:
 
     - name: Build Linux
       if: ${{ contains(matrix.config.os, 'ubuntu-23.10') }}
-      uses: ./github/actions/build-with-selfhost
+      uses: ./.github/actions/build-with-selfhost
       with:
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}

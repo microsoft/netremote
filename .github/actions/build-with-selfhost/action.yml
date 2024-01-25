@@ -46,7 +46,7 @@ runs:
 
   - name: CMake Test (ctest)
     if: ${{ inputs.test == 'true' && ! inputs.arch }}
-    run: ctest --preset ${{ inputs.preset-name }} -C ${{ inputs.build-type }}
+    run: ctest --preset non-root -C ${{ inputs.build-type }}
     shell: bash
 
   - name: CMake Install
