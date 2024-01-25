@@ -41,10 +41,11 @@ main(int argc, char *argv[])
 
     // Configure logging, appending all loggers to the default instance.
     plog::init<notstd::to_underlying(LogInstanceId::Console)>(logSeverity, &colorConsoleAppender);
-    plog::init<notstd::to_underlying(LogInstanceId::File)>(logSeverity, &rollingFileAppender);
-    plog::init(logSeverity)
-        .addAppender(plog::get<notstd::to_underlying(LogInstanceId::Console)>())
-        .addAppender(plog::get<notstd::to_underlying(LogInstanceId::File)>());
+    plog::init(logSeverity).addAppender(plog::get<notstd::to_underlying(LogInstanceId::Console)>());
+    if (configuration.EnableFileLogging) {
+        plog::init<notstd::to_underlying(LogInstanceId::File)>(logSeverity, &rollingFileAppender);
+        plog::init(logSeverity).addAppender(plog::get<notstd::to_underlying(LogInstanceId::File)>());
+    }
 
     // Create an access point manager and discovery agent.
     {
