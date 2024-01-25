@@ -8,6 +8,7 @@ obj/
 # CMake
 build/
 out/
+Testing/
 
 # vcpkg
 vcpkg_installed*/
