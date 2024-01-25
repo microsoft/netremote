@@ -39,14 +39,7 @@ on:
         default: "[ 'Debug' ]"
         type: string
         description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
-      preset-name:
-        required: true
-        default: 'dev-windows'
-        type: choice
-        options:
-          - 'dev-windows'
-          - 'release-windows'
-        description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+
   workflow_call:
     inputs:
       build-types:
