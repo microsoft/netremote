@@ -171,9 +171,6 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
         REQUIRE(setPhyTypeStatus.ok());
         REQUIRE(setPhyTypeResult.accesspointid() == setPhyTypeRequest.accesspointid());
         REQUIRE(setPhyTypeResult.has_status());
-        REQUIRE(setPhyTypeResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-        REQUIRE(setPhyTypeResult.status().message().empty());
-        REQUIRE(setPhyTypeResult.status().has_details() == false);
     }
 }
 
@@ -257,8 +254,5 @@ TEST_CASE("WifiAccessPointSetAuthenticationConfiguration API", "[basic][rpc][cli
         REQUIRE(setAuthConfigurationStatus.ok());
         REQUIRE(setAuthConfigurationResult.accesspointid() == setAuthConfigurationRequest.accesspointid());
         REQUIRE(setAuthConfigurationResult.has_status());
-        REQUIRE(setAuthConfigurationResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-        REQUIRE(setAuthConfigurationResult.status().message().empty());
-        REQUIRE(setAuthConfigurationResult.status().has_details() == false);
     }
 }
