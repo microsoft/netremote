@@ -1,0 +1,69 @@
+ 
+name: 'build-on-selfhost'
+description: 'Build the repository on a self-hosted Linux runner'
+inputs:
+  build-type:
+    required: false
+    default: 'Debug'
+    description: 'The CMake build type (CMAKE_BUILD_TYPE) to run.'
+  install:
+    required: false
+    default: 'false'
+    description: 'Invoke CMake install for the project'
+  test:
+    required: false
+    default: 'true'
+    description: 'Invoke CMake CTest for the project'
+  package:
+    required: false
+    default: 'false'
+    description: 'Invoke CMake CPack for the project'
+  publish-artifacts:
+    required: false
+    default: 'false'
+    description: 'Publish build artifacts'
+  preset-name:
+    required: false
+    default: 'dev-linux'
+    description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
+
+runs:
+  using: 'composite'
+  steps:
+  - name: CMake Configure
+    if: ${{ ! inputs.arch }}
+    run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
+    shell: bash
+
+  - name: CMake Configure Cross-Compile ${{ inputs.arch }}
+    if: ${{ inputs.arch }}
+    run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DNETREMOTE_EXCLUDE_TESTS=TRUE -A ${{ inputs.arch }}
+    shell: bash
+
+  - name: CMake Build
+    run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ inputs.build-type }}
+    shell: bash
+
+  - name: CMake Test (ctest)
+    if: ${{ inputs.test == 'true' && ! inputs.arch }}
+    run: ctest --preset ${{ inputs.preset-name }} -C ${{ inputs.build-type }}
+    shell: bash
+
+  - name: CMake Install
+    if: inputs.install == 'true'
+    run: cmake --build --preset ${{ inputs.preset-name }} --target install --config ${{ inputs.build-type }}
+    shell: bash
+
+  - name: CMake Package (cpack)
+    if: inputs.package == 'true'
+    run: cpack --preset ${{ inputs.preset-name }} -C ${{ inputs.build-type }}
+    shell: bash
+
+  - name: Publish Artifacts
+    if: inputs.publish-artifacts == 'true'
+    uses: actions/upload-artifact@v3
+    with:
+      name: release-package-${{ runner.os }}-${{ inputs.build-type }}-${{ inputs.arch != '' && inputs.arch || runner.arch }}
+      path: |
+        ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.tar.*
+        ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.zip
