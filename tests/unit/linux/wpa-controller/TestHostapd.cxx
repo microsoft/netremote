@@ -8,7 +8,7 @@
 
 #include "detail/WpaDaemonManager.hxx"
 
-TEST_CASE("Create a Hostapd instance", "[wpa][hostapd][client][remote]")
+TEST_CASE("Create a Hostapd instance (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -40,7 +40,7 @@ TEST_CASE("Create a Hostapd instance", "[wpa][hostapd][client][remote]")
     }
 }
 
-TEST_CASE("Send Ping() command", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send Ping() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -58,7 +58,7 @@ TEST_CASE("Send Ping() command", "[wpa][hostapd][client][remote]")
     }
 }
 
-TEST_CASE("Send command: GetStatus()", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -96,7 +96,7 @@ TEST_CASE("Send command: GetStatus()", "[wpa][hostapd][client][remote]")
     }
 }
 
-TEST_CASE("Send GetProperty() command", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send GetProperty() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -135,7 +135,7 @@ TEST_CASE("Send GetProperty() command", "[wpa][hostapd][client][remote]")
     }
 }
 
-TEST_CASE("Send SetProperty() command", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send SetProperty() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -159,7 +159,7 @@ TEST_CASE("Send SetProperty() command", "[wpa][hostapd][client][remote]")
     // TODO: validate that the property was actually set. Need to find a property whose value is retrievable.
 }
 
-TEST_CASE("Send control commands: Enable(), Disable()", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -211,7 +211,7 @@ TEST_CASE("Send control commands: Enable(), Disable()", "[wpa][hostapd][client][
 // Also, keep Terminate() test cases at end-of-file since Catch2 will run
 // tests in declaration order by default, which minimizes the possibility
 // of a test case being run after the daemon has been terminated.
-TEST_CASE("Send command: Terminate() doesn't throw", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send command: Terminate() doesn't throw (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -219,7 +219,7 @@ TEST_CASE("Send command: Terminate() doesn't throw", "[wpa][hostapd][client][rem
     REQUIRE_NOTHROW(hostapd.Terminate());
 }
 
-TEST_CASE("Send command: Terminate() ping failure", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send command: Terminate() ping failure (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
     using namespace std::chrono_literals;
