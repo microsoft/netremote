@@ -79,10 +79,6 @@ on:
         required: false
         default: false
         type: boolean
-      preset-name:
-        required: false
-        default: 'dev-windows'
-        type: string
 
 jobs:
   build:
