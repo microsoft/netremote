@@ -26,6 +26,11 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         config.LogVerbosity,
         "The log verbosity level. Supply multiple times to increase verbosity (0=warnings, errors, and fatal messages, 1=info messages, 2=debug messages, 3=verbose messages)");
 
+    app.add_flag(
+        "--enable-file-logging",
+        config.EnableFileLogging,
+        "Enable logging to file (disabled by default)");
+
     return app;
 }
 

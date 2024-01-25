@@ -64,6 +64,11 @@ struct NetRemoteServerConfiguration
      * and a level of 3 or above will show all verbose messages.
      */
     uint32_t LogVerbosity{ 0 };
+   
+    /**
+     * @brief Whether to enable logging to file or not.
+     */
+    bool EnableFileLogging{ false };
 
     /**
      * @brief Access point manager instance.
