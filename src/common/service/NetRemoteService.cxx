@@ -431,8 +431,8 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 }
 
 using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
-using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
 using Microsoft::Net::Wifi::Dot11AkmSuite;
+using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 
