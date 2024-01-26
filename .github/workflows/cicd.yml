@@ -7,6 +7,10 @@ name: CI/CD
 # on pushes and PRs to the main branches to enforce code quality and test
 # coverage.
 on:
+  push:
+    branches:
+      - develop
+      - main
   pull_request:
     branches:
       - develop
