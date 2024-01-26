@@ -481,6 +481,8 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 }
 
 using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
+using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
+using Microsoft::Net::Wifi::Dot11AkmSuite;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 
@@ -491,13 +493,22 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
 
     WifiAccessPointOperationStatus status{};
 
-    auto authenticationConfiguration = request->authenticationconfiguration();
-    auto akmSuites = authenticationConfiguration.akmsuites();
-    auto cipherSuites = authenticationConfiguration.ciphersuites();
+    const auto& authenticationConfiguration = request->authenticationconfiguration();
+    const auto& akmSuites = authenticationConfiguration.akmsuites();
+    const auto& cipherSuites = authenticationConfiguration.ciphersuites();
 
-    if (akmSuites[0].authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
+    if (std::empty(akmSuites) && std::empty(cipherSuites)) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No authentication algorithm provided");
+        status.set_message("No AKM suite or cipher suite provided");
+    } else if (!std::empty(akmSuites) && std::ranges::find(akmSuites, Dot11AkmSuite::Dot11AkmSuiteUnknown, &Dot11AkmSuiteConfiguration::akmsuite) != std::cend(akmSuites)) {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("Invalid AKM suite provided");
+    } else if (!std::empty(akmSuites) && std::ranges::find(akmSuites, Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown, &Dot11AkmSuiteConfiguration::authenticationalgorithm) != std::cend(akmSuites)) {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("Invalid authentication algorithm provided");
+    } else if (!std::empty(cipherSuites) && std::ranges::find(cipherSuites, Dot11CipherSuite::Dot11CipherSuiteUnknown) != std::cend(cipherSuites)) {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("Invalid cipher suite provided");
     } else {
         auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
         auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
@@ -506,9 +517,9 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
             status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
             status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
         }
-    } catch (const AccessPointControllerException& apce) {
-        LOGE << std::format("Failed to set Ieee80211 protocol for access point {} ({})", request->accesspointid(), apce.what());
-        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+
+        // TODO: Use accessPointController to set authentication configuration.
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
