@@ -11,6 +11,7 @@
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/test/AccessPointManagerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 #include "TestNetRemoteCommon.hxx"
@@ -121,12 +122,19 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     constexpr auto SsidName{ "TestWifiAccessPointSetPhyType" };
+    constexpr auto InterfaceName{ "TestWifiAccessPointSetPhyType" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    auto apFactoryTest = std::make_unique<AccessPointFactoryTest>();
+    auto apTest = apFactoryTest->Create(InterfaceName);
+    apManagerTest->AddAccessPoint(apTest);
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .AccessPointManager = apManagerTest,
     };
 
     NetRemoteServer server{ Configuration };
@@ -144,7 +152,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
 
     WifiAccessPointEnableRequest request{};
-    request.set_accesspointid("TestWifiAccessPointSetPhyType");
+    request.set_accesspointid(InterfaceName);
     *request.mutable_configuration() = std::move(apConfiguration);
 
     WifiAccessPointEnableResult result{};
@@ -161,7 +169,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     SECTION("Can be called")
     {
         WifiAccessPointSetPhyTypeRequest setPhyTypeRequest{};
-        setPhyTypeRequest.set_accesspointid("TestWifiAccessPointSetPhyType");
+        setPhyTypeRequest.set_accesspointid(InterfaceName);
         setPhyTypeRequest.set_phytype(Dot11PhyType::Dot11PhyTypeB);
 
         WifiAccessPointSetPhyTypeResult setPhyTypeResult{};
@@ -171,6 +179,9 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
         REQUIRE(setPhyTypeStatus.ok());
         REQUIRE(setPhyTypeResult.accesspointid() == setPhyTypeRequest.accesspointid());
         REQUIRE(setPhyTypeResult.has_status());
+        REQUIRE(setPhyTypeResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(setPhyTypeResult.status().message().empty());
+        REQUIRE(setPhyTypeResult.status().has_details() == false);
     }
 }
 
@@ -180,12 +191,19 @@ TEST_CASE("WifiAccessPointSetAuthenticationConfiguration API", "[basic][rpc][cli
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     constexpr auto SsidName{ "TestWifiAccessPointSetAuthenticationConfiguration" };
+    constexpr auto InterfaceName{ "TestWifiAccessPointSetAuthenticationConfiguration" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    auto apFactoryTest = std::make_unique<AccessPointFactoryTest>();
+    auto apTest = apFactoryTest->Create(InterfaceName);
+    apManagerTest->AddAccessPoint(apTest);
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .AccessPointManager = apManagerTest,
     };
 
     NetRemoteServer server{ Configuration };
@@ -203,7 +221,7 @@ TEST_CASE("WifiAccessPointSetAuthenticationConfiguration API", "[basic][rpc][cli
     apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
 
     WifiAccessPointEnableRequest request{};
-    request.set_accesspointid("TestWifiAccessPointSetAuthenticationConfiguration");
+    request.set_accesspointid(InterfaceName);
     *request.mutable_configuration() = std::move(apConfiguration);
 
     WifiAccessPointEnableResult result{};
@@ -244,7 +262,7 @@ TEST_CASE("WifiAccessPointSetAuthenticationConfiguration API", "[basic][rpc][cli
         *akmSuiteConfiguration2->mutable_configurationsharedkey() = std::move(akmSuiteConfigurationSharedKey2);
 
         WifiAccessPointSetAuthenticationConfigurationRequest setAuthConfigurationRequest{};
-        setAuthConfigurationRequest.set_accesspointid("TestWifiAccessPointSetAuthenticationConfiguration");
+        setAuthConfigurationRequest.set_accesspointid(InterfaceName);
         *setAuthConfigurationRequest.mutable_authenticationconfiguration() = std::move(apAuthConfiguration);
 
         WifiAccessPointSetAuthenticationConfigurationResult setAuthConfigurationResult{};
@@ -254,6 +272,9 @@ TEST_CASE("WifiAccessPointSetAuthenticationConfiguration API", "[basic][rpc][cli
         REQUIRE(setAuthConfigurationStatus.ok());
         REQUIRE(setAuthConfigurationResult.accesspointid() == setAuthConfigurationRequest.accesspointid());
         REQUIRE(setAuthConfigurationResult.has_status());
+        REQUIRE(setAuthConfigurationResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(setAuthConfigurationResult.status().message().empty());
+        REQUIRE(setAuthConfigurationResult.status().has_details() == false);
     }
 }
 
@@ -263,12 +284,19 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     constexpr auto SsidName{ "TestWifiAccessPointSetFrequencyBands" };
+    constexpr auto InterfaceName{ "TestWifiAccessPointSetFrequencyBands" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    auto apFactoryTest = std::make_unique<AccessPointFactoryTest>();
+    auto apTest = apFactoryTest->Create(InterfaceName);
+    apManagerTest->AddAccessPoint(apTest);
 
     NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .AccessPointManager = apManagerTest,
     };
 
     NetRemoteServer server{ Configuration };
@@ -286,7 +314,7 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
     apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
 
     WifiAccessPointEnableRequest request{};
-    request.set_accesspointid("TestWifiAccessPointSetFrequencyBands");
+    request.set_accesspointid(InterfaceName);
     *request.mutable_configuration() = std::move(apConfiguration);
 
     WifiAccessPointEnableResult result{};
@@ -303,7 +331,7 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
     SECTION("Can be called")
     {
         WifiAccessPointSetFrequencyBandsRequest setFrequencyBandsRequest{};
-        setFrequencyBandsRequest.set_accesspointid("TestWifiAccessPointSetFrequencyBands");
+        setFrequencyBandsRequest.set_accesspointid(InterfaceName);
         setFrequencyBandsRequest.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand6_0GHz);
 
         WifiAccessPointSetFrequencyBandsResult setFrequencyBandsResult{};
@@ -313,5 +341,8 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
         REQUIRE(setFrequencyBandsStatus.ok());
         REQUIRE(setFrequencyBandsResult.accesspointid() == setFrequencyBandsRequest.accesspointid());
         REQUIRE(setFrequencyBandsResult.has_status());
+        REQUIRE(setFrequencyBandsResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(setFrequencyBandsResult.status().message().empty());
+        REQUIRE(setFrequencyBandsResult.status().has_details() == false);
     }
 }
