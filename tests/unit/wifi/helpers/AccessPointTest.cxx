@@ -15,7 +15,7 @@ AccessPointTest::AccessPointTest(std::string_view interfaceName, Microsoft::Net:
 {}
 
 std::string_view
-AccessPointTest::GetInterfaceName() const noexcept
+AccessPointTest::GetInterfaceName() const
 {
     return InterfaceName;
 }

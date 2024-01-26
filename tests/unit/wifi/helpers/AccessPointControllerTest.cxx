@@ -12,7 +12,7 @@ AccessPointControllerTest::AccessPointControllerTest(AccessPointTest *accessPoin
 {}
 
 std::string_view
-AccessPointControllerTest::GetInterfaceName() const noexcept
+AccessPointControllerTest::GetInterfaceName() const
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::GetInterfaceName called with null AccessPoint");

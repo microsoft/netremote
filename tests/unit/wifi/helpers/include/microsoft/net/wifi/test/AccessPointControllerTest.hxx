@@ -36,7 +36,7 @@ struct AccessPointControllerTest final :
      * @return std::string_view
      */
     virtual std::string_view
-    GetInterfaceName() const noexcept override;
+    GetInterfaceName() const override;
 
     /**
      * @brief Get whether the access point is enabled.

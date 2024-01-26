@@ -9,7 +9,7 @@ AccessPointController::AccessPointController(std::string_view interface) :
 }
 
 std::string_view
-AccessPointController::GetInterfaceName() const noexcept
+AccessPointController::GetInterfaceName() const
 {
     return m_interfaceName;
 }

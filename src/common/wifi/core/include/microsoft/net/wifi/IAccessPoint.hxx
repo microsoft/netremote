@@ -25,7 +25,7 @@ struct IAccessPoint
      * @return std::string_view
      */
     virtual std::string_view
-    GetInterfaceName() const noexcept = 0;
+    GetInterfaceName() const = 0;
 
     /**
      * @brief Create a new instance that can control the access point.
