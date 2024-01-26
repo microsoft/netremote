@@ -6,6 +6,8 @@
 #include <string_view>
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {
@@ -13,6 +15,8 @@ struct AccessPointTest final :
     public IAccessPoint
 {
     AccessPointTest(std::string_view interfaceName);
+
+    AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities);
 
     virtual std::string_view
     GetInterfaceName() const noexcept override;
@@ -26,6 +30,7 @@ struct AccessPointTest final :
     CreateController() override;
 
     std::string InterfaceName;
+    Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
 };
 
 /**

@@ -6,7 +6,12 @@ using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
 
 AccessPointTest::AccessPointTest(std::string_view interfaceName) :
-    InterfaceName(interfaceName)
+    AccessPointTest(interfaceName, Ieee80211AccessPointCapabilities{})
+{}
+
+AccessPointTest::AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities) :
+    InterfaceName(interfaceName),
+    Capabilities(capabilities)
 {}
 
 std::string_view
