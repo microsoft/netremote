@@ -225,6 +225,13 @@
                     "name": "(root)"
                 }
             }
+        },
+        {
+            "name": "dev-windows",
+            "configurePreset": "dev-windows",
+            "inherits": [
+                "test-common"
+            ]
         }
     ]
 }
