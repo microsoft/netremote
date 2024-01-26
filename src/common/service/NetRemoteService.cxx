@@ -527,11 +527,14 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
 
     WifiAccessPointOperationStatus status{};
 
-    auto frequencyBands = request->frequencybands();
+    const auto& frequencyBands = request->frequencybands();
 
-    if (frequencyBands.size() <= 1 && frequencyBands[0] == Dot11FrequencyBand::Dot11FrequencyBandUnknown) {
+    if (std::empty(frequencyBands)) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         status.set_message("No frequency band provided");
+    } else if (std::ranges::find(frequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(frequencyBands)) {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("Invalid frequency band provided");
     } else {
         auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
         auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
