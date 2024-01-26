@@ -24,7 +24,7 @@ set_target_properties(${PROJECT_NAME}-server-linux
 install(
     TARGETS ${PROJECT_NAME}-server-linux
     EXPORT ${PROJECT_NAME}
-    COMPONENT ${PROJECT_NAME}-server
+    COMPONENT server
 )
 
 add_subdirectory(systemd)
