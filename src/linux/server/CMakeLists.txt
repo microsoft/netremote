@@ -23,6 +23,7 @@ set_target_properties(${PROJECT_NAME}-server-linux
 
 install(
     TARGETS ${PROJECT_NAME}-server-linux
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
     EXPORT ${PROJECT_NAME}
     COMPONENT server
 )
