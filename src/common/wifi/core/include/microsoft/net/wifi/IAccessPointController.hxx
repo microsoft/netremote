@@ -42,7 +42,7 @@ struct IAccessPointController
      * @return std::string_view
      */
     virtual std::string_view
-    GetInterfaceName() const noexcept = 0;
+    GetInterfaceName() const = 0;
 
     /**
      * @brief Get whether the access point is enabled.

@@ -11,7 +11,7 @@ AccessPoint::AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccess
 {}
 
 std::string_view
-AccessPoint::GetInterfaceName() const noexcept
+AccessPoint::GetInterfaceName() const
 {
     return m_interfaceName;
 }
