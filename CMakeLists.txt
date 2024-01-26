@@ -24,9 +24,12 @@ set(VCPKG_TARGET ${VCPKG_TARGET_DEVELOPMENT} CACHE STRING "vcpkg target: either 
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg CACHE PATH "Location of vcpkg submodule root")
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
 
+find_package(Git REQUIRED)
+include(version)
+
 project(netremote
   LANGUAGES CXX
-  VERSION 0.0.1
+  VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
 )
 
 # Conditional inclusion of OS-dependent source trees.
@@ -71,7 +74,6 @@ find_package(Threads REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(plog CONFIG REQUIRED)
-find_package(Git REQUIRED)
 
 # Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
 if (POLICY CMP0083)
