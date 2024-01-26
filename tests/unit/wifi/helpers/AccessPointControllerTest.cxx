@@ -14,18 +14,30 @@ AccessPointControllerTest::AccessPointControllerTest(AccessPointTest *accessPoin
 std::string_view
 AccessPointControllerTest::GetInterfaceName() const noexcept
 {
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::GetInterfaceName called with null AccessPoint");
+    }
+
     return AccessPoint->InterfaceName;
 }
 
 bool
 AccessPointControllerTest::GetIsEnabled()
 {
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::GetIsEnabled called with null AccessPoint");
+    }
+
     return AccessPoint->IsEnabled;
 }
 
 Ieee80211AccessPointCapabilities
 AccessPointControllerTest::GetCapabilities()
 {
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::GetCapabilities called with null AccessPoint");
+    }
+
     return AccessPoint->Capabilities;
 }
 
