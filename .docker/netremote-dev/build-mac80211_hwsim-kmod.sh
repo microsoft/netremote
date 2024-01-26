@@ -68,9 +68,6 @@ cd ${WSL_SRC_DIRECTORY}
 echo "Preparing kernel source with configuration for running kernel..."
 cat /proc/config.gz | gzip -d > .config
 
-echo "Preparing kernel source tree for building external modules..."
-make prepare modules_prepare ${KERNEL_COMPILE_ARG_PARALLEL}
-
 # Ensure kernel helper scripts are available.
 if [[ ! -f ${KERNEL_CONFIG_UTIL} ]]; then
     make scripts
@@ -79,6 +76,7 @@ fi
 # Update the configuration to build the mac80211_hwsim module and its dependencies.
 echo "Updating kernel configuration to build mac80211_hwsim module and its dependencies..."
 ${KERNEL_CONFIG_UTIL} \
+    --enable CONFIG_WLAN \
     --module CONFIG_RFKILL \
     --module CONFIG_CFG80211 \
     --module CONFIG_MAC80211 \
@@ -86,6 +84,9 @@ ${KERNEL_CONFIG_UTIL} \
 
 # Supply defaults for any new/unspecified options in the configuration.
 make olddefconfig
+
+echo "Preparing kernel source tree for building external modules..."
+make prepare modules_prepare ${KERNEL_COMPILE_ARG_PARALLEL}
 
 echo "Building kernel modules..."
 make modules ${KERNEL_COMPILE_ARG_PARALLEL}
