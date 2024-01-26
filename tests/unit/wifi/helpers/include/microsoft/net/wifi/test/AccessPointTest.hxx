@@ -11,13 +11,39 @@
 
 namespace Microsoft::Net::Wifi::Test
 {
+/**
+ * @brief IAccessPoint implementation for testing purposes.
+ *
+ * This implementation has public members for each configurable setting, allowing consumers to read and change them at
+ * will. This is intended to be used by test code only.
+ */
 struct AccessPointTest final :
     public IAccessPoint
 {
+    std::string InterfaceName;
+    Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
+    bool IsEnabled{ false };
+
+    /**
+     * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.
+     *
+     * @param interfaceName The interface name to use for the access point.
+     */
     AccessPointTest(std::string_view interfaceName);
 
+    /**
+     * @brief Construct a new AccessPointTest object with the given interface name and capabilities.
+     *
+     * @param interfaceName The interface name to use for the access point.
+     * @param capabilities The capabilities to use for the access point.
+     */
     AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities);
 
+    /**
+     * @brief Get the interface name of the access point.
+     *
+     * @return std::string_view
+     */
     virtual std::string_view
     GetInterfaceName() const noexcept override;
 
@@ -28,9 +54,6 @@ struct AccessPointTest final :
      */
     virtual std::unique_ptr<IAccessPointController>
     CreateController() override;
-
-    std::string InterfaceName;
-    Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
 };
 
 /**
@@ -59,7 +82,7 @@ struct AccessPointFactoryTest :
      *
      * @param interface The interface to create the AccessPoint for. This can be
      * any string and does not have to correspond to a real device interface.
-     * @param createArgs 
+     * @param createArgs Arguments to be passed to the access point during creation.
      *
      * @return std::shared_ptr<IAccessPoint>
      */
