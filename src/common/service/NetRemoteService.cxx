@@ -364,11 +364,6 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
-using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Dot11PhyType;
 
 ::grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response)
@@ -404,6 +399,8 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
     return grpc::Status::OK;
 }
 
+using Microsoft::Net::Wifi::Dot11PhyType;
+
 ::grpc::Status
 NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response)
 {
@@ -433,6 +430,10 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     return grpc::Status::OK;
 }
 
+using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
+using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
+using Microsoft::Net::Wifi::Dot11CipherSuite;
+
 ::grpc::Status
 NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationResult* response)
 {
@@ -457,6 +458,42 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
         }
 
         // TODO: Use accessPointController to set authentication algorithm.
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
+using Microsoft::Net::Wifi::Dot11FrequencyBand;
+
+::grpc::Status
+NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* response)
+{
+    LOGD << std::format("Received WifiAccessPointSetFrequencyBands request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    const auto& frequencyBands = request->frequencybands();
+
+    if (std::empty(frequencyBands)) {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("No frequency band provided");
+    } else if (std::ranges::find(frequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(frequencyBands)) {
+        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        status.set_message("Invalid frequency band provided");
+    } else {
+        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+        if (!accessPointController) {
+            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
+            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
+        }
+
+        // TODO: Use accessPointController to set frequency bands.
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 
