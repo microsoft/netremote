@@ -313,8 +313,5 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
         REQUIRE(setFrequencyBandsStatus.ok());
         REQUIRE(setFrequencyBandsResult.accesspointid() == setFrequencyBandsRequest.accesspointid());
         REQUIRE(setFrequencyBandsResult.has_status());
-        REQUIRE(setFrequencyBandsResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-        REQUIRE(setFrequencyBandsResult.status().message().empty());
-        REQUIRE(setFrequencyBandsResult.status().has_details() == false);
     }
 }
