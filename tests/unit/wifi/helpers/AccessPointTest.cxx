@@ -1,16 +1,21 @@
 
-#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
 
 AccessPointTest::AccessPointTest(std::string_view interfaceName) :
-    InterfaceName(interfaceName)
+    AccessPointTest(interfaceName, Ieee80211AccessPointCapabilities{})
+{}
+
+AccessPointTest::AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities) :
+    InterfaceName(interfaceName),
+    Capabilities(capabilities)
 {}
 
 std::string_view
-AccessPointTest::GetInterfaceName() const noexcept
+AccessPointTest::GetInterfaceName() const
 {
     return InterfaceName;
 }
@@ -18,7 +23,7 @@ AccessPointTest::GetInterfaceName() const noexcept
 std::unique_ptr<IAccessPointController>
 AccessPointTest::CreateController()
 {
-    return std::make_unique<AccessPointControllerTest>(InterfaceName);
+    return std::make_unique<AccessPointControllerTest>(this);
 }
 
 std::shared_ptr<IAccessPoint>
