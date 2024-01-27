@@ -77,7 +77,7 @@ runs:
 
   - name: Publish Artifacts
     if: inputs.publish-artifacts == 'true'
-    uses: actions/upload-artifact@v3
+    uses: actions/upload-artifact@v4
     with:
       name: release-package-${{ runner.os }}-${{ inputs.build-type }}-${{ inputs.arch != '' && inputs.arch || runner.arch }}
       path: |
