@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include <Wpa/Hostapd.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -28,9 +29,9 @@ struct AccessPointControllerLinux :
 
     /**
      * @brief Get whether the access point is enabled.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     virtual bool
     GetIsEnabled() override;
@@ -42,6 +43,16 @@ struct AccessPointControllerLinux :
      */
     virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
+
+    /**
+     * @brief Set the PHY type
+     *
+     * @param phyType The PHY type to be set
+     * @return true
+     * @return false
+     */
+    virtual bool
+    SetPhyType(Dot11PhyType phyType) override;
 
 private:
     Wpa::Hostapd m_hostapd;

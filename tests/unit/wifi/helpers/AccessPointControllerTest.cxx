@@ -41,6 +41,17 @@ AccessPointControllerTest::GetCapabilities()
     return AccessPoint->Capabilities;
 }
 
+bool
+AccessPointControllerTest::SetPhyType([[maybe_unused]] Dot11PhyType phyType)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetPhyType called with null AccessPoint");
+    }
+
+    // TODO: Set PHY type
+    return true;
+}
+
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
     AccessPoint(accessPoint)
 {}

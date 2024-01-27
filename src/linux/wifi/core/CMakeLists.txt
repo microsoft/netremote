@@ -24,4 +24,5 @@ target_link_libraries(wifi-core-linux
         libnl-helpers
         wifi-core
         wpa-controller
+        ${PROJECT_NAME}-protocol
 )
