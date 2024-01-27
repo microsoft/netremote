@@ -178,8 +178,6 @@ AccessPointControllerLinux::SetPhyType(Dot11PhyType phyType)
     } catch (const Wpa::HostapdException& ex) {
         throw AccessPointControllerException(std::format("Failed to set PHY type for interface {} ({})", GetInterfaceName(), ex.what()));
     }
-
-    return false;
 }
 
 std::unique_ptr<IAccessPointController>
