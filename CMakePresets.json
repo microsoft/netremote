@@ -28,16 +28,16 @@
             "hidden": true,
             "displayName": "Out of source build",
             "description": "Configure to build outside of the source tree",
-            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}",
-            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}"
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/build/${presetName}",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/install/${presetName}"
         },
         {
             "name": "in-source-build",
             "hidden": true,
             "displayName": "In source build",
             "description": "Configure to build inside the source tree",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}"
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "installDir": "${sourceDir}/install/${presetName}"
         },
         {
             "name": "linux-base",
