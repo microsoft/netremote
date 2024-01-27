@@ -31,7 +31,7 @@ struct AccessPointController :
      * @return std::string_view
      */
     std::string_view
-    GetInterfaceName() const noexcept override;
+    GetInterfaceName() const override;
 
 private:
     std::string m_interfaceName;

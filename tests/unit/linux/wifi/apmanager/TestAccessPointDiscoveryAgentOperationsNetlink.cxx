@@ -5,7 +5,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
-#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointFactoryLinuxTest.hxx>
 
 TEST_CASE("Create AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][apmanager]")

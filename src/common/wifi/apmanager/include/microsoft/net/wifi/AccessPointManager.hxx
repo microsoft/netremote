@@ -74,7 +74,7 @@ public:
     std::vector<std::weak_ptr<IAccessPoint>>
     GetAllAccessPoints() const;
 
-    ~AccessPointManager() = default;
+    virtual ~AccessPointManager() = default;
     AccessPointManager(const AccessPointManager&) = delete;
     AccessPointManager(AccessPointManager&&) = delete;
     AccessPointManager&
@@ -85,12 +85,9 @@ public:
 protected:
     /**
      * @brief Construct a new AccessPointManager object.
-     *
-     * @param accessPointFactory
      */
     AccessPointManager() = default;
 
-private:
     /**
      * @brief Callback function for all access point agent presence change events.
      *
@@ -106,7 +103,7 @@ private:
      *
      * @param accessPoint The access point to add.
      */
-    void
+    virtual void
     AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
 
     /**
@@ -114,7 +111,7 @@ private:
      *
      * @param accessPoint The access point to remove.
      */
-    void
+    virtual void
     RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint);
 
 private:

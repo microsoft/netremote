@@ -8,12 +8,14 @@ set(WIFI_TEST_HELPERS_PUBLIC_INCLUDE_PREFIX ${WIFI_TEST_HELPERS_PUBLIC_INCLUDE}/
 target_sources(wifi-test-helpers
     PRIVATE
         AccessPointControllerTest.cxx
+        AccessPointManagerTest.cxx
         AccessPointTest.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_TEST_HELPERS_PUBLIC_INCLUDE}
     FILES
         ${WIFI_TEST_HELPERS_PUBLIC_INCLUDE_PREFIX}/AccessPointControllerTest.hxx
+        ${WIFI_TEST_HELPERS_PUBLIC_INCLUDE_PREFIX}/AccessPointManagerTest.hxx
         ${WIFI_TEST_HELPERS_PUBLIC_INCLUDE_PREFIX}/AccessPointTest.hxx
 )
 
@@ -26,5 +28,6 @@ target_include_directories(wifi-test-helpers
 
 target_link_libraries(wifi-test-helpers
     PUBLIC
+        wifi-apmanager
         wifi-core
 )
