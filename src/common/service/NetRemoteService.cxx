@@ -407,6 +407,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
+    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
         status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -420,8 +421,11 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
             status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
         }
 
-        // TODO: Use accessPointController to set PHY type.
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        if (!accessPointController->SetPhyType(request->phytype())) {
+            LOGE << std::format("Failed to set PHY type for access point {}", request->accesspointid());
+            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+            status.set_message(std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+        }
     }
 
     response->set_accesspointid(request->accesspointid());

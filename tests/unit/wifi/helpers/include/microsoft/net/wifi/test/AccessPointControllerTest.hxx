@@ -54,6 +54,16 @@ struct AccessPointControllerTest final :
      */
     virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
+
+    /**
+     * @brief Set the PHY type of the access point.
+     * 
+     * @param phyType The PHY type to be set
+     * @return true
+     * @return false
+    */
+    virtual bool
+    SetPhyType(Dot11PhyType phyType) override;
 };
 
 /**

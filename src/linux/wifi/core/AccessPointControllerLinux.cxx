@@ -119,6 +119,12 @@ AccessPointControllerLinux::GetIsEnabled()
     return isEnabled;
 }
 
+bool
+AccessPointControllerLinux::SetPhyType([[maybe_unused]] Dot11PhyType phyType)
+{
+    return true;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {
