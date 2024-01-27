@@ -108,15 +108,15 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
 {
     switch (hwMode) {
     case Wpa::HostapdHwMode::Ieee80211b:
-        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueB;
+        return Wpa::ProtocolHostapd::PropertySetHwModeValueB;
     case Wpa::HostapdHwMode::Ieee80211g:
-        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueG;
+        return Wpa::ProtocolHostapd::PropertySetHwModeValueG;
     case Wpa::HostapdHwMode::Ieee80211a:
-        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueA;
+        return Wpa::ProtocolHostapd::PropertySetHwModeValueA;
     case Wpa::HostapdHwMode::Ieee80211ad:
-        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueAD;
+        return Wpa::ProtocolHostapd::PropertySetHwModeValueAD;
     case Wpa::HostapdHwMode::Ieee80211any:
-        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueAny;
+        return Wpa::ProtocolHostapd::PropertySetHwModeValueAny;
     default: // case Wpa::HostapdHwMode::Unknown
         throw AccessPointControllerException(std::format("Invalid hw_mode value {}", magic_enum::enum_name(hwMode)));
     }
@@ -170,7 +170,7 @@ bool
 AccessPointControllerLinux::SetPhyType(Dot11PhyType phyType)
 {
     Wpa::HostapdHwMode hwMode = detail::Dot11PhyTypeToHostapdHwMode(phyType);
-    const auto& propertyName = Wpa::ProtocolHostapd::PropertyNameSetPhyType;
+    const auto& propertyName = Wpa::ProtocolHostapd::PropertyNameSetHwMode;
     const auto& propertyValue = detail::HostapdHwModeToPropertyValue(hwMode);
 
     try {

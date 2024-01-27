@@ -190,12 +190,12 @@ struct ProtocolHostapd :
     static constexpr auto PropertySetBandValue5G = "5G";
     static constexpr auto PropertySetBandValue6G = "6G";
 
-    static constexpr auto PropertyNameSetPhyType = "setphytype";
-    static constexpr auto PropertySetPhyTypeValueB = "b";
-    static constexpr auto PropertySetPhyTypeValueG = "g";
-    static constexpr auto PropertySetPhyTypeValueA = "a";
-    static constexpr auto PropertySetPhyTypeValueAD = "ad";
-    static constexpr auto PropertySetPhyTypeValueAny = "any";
+    static constexpr auto PropertyNameSetHwMode = "sethwmode"; // TODO: This doesn't exist - find correct way to set hw_mode
+    static constexpr auto PropertySetHwModeValueB = "b";
+    static constexpr auto PropertySetHwModeValueG = "g";
+    static constexpr auto PropertySetHwModeValueA = "a";
+    static constexpr auto PropertySetHwModeValueAD = "ad";
+    static constexpr auto PropertySetHwModeValueAny = "any";
 
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
