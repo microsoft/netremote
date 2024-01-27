@@ -101,8 +101,6 @@ Dot11PhyTypeToHostapdHwMode(Dot11PhyType phyType)
     default:
         return Wpa::HostapdHwMode::Unknown;
     }
-
-    return Wpa::HostapdHwMode::Unknown;
 }
 
 std::string
