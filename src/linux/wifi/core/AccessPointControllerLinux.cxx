@@ -7,6 +7,7 @@
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 
@@ -74,6 +75,54 @@ Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
 
     return protocols;
 }
+
+Wpa::HostapdHwMode
+Dot11PhyTypeToHostapdHwMode(Dot11PhyType phyType)
+{
+    switch (phyType) {
+    case Dot11PhyType::Dot11PhyTypeUnknown:
+        return Wpa::HostapdHwMode::Unknown;
+    case Dot11PhyType::Dot11PhyTypeB:
+        return Wpa::HostapdHwMode::Ieee80211b;
+    case Dot11PhyType::Dot11PhyTypeG:
+        return Wpa::HostapdHwMode::Ieee80211g;
+    case Dot11PhyType::Dot11PhyTypeN:
+        return Wpa::HostapdHwMode::Ieee80211a; // TODO: Could be a or g depending on band
+    case Dot11PhyType::Dot11PhyTypeA:
+        return Wpa::HostapdHwMode::Ieee80211a;
+    case Dot11PhyType::Dot11PhyTypeAC:
+        return Wpa::HostapdHwMode::Ieee80211a;
+    case Dot11PhyType::Dot11PhyTypeAD:
+        return Wpa::HostapdHwMode::Ieee80211ad;
+    case Dot11PhyType::Dot11PhyTypeAX:
+        return Wpa::HostapdHwMode::Ieee80211a;
+    case Dot11PhyType::Dot11PhyTypeBE:
+        return Wpa::HostapdHwMode::Ieee80211a; // TODO: Assuming a, although hostapd docs don't mention it
+    default:
+        return Wpa::HostapdHwMode::Unknown;
+    }
+
+    return Wpa::HostapdHwMode::Unknown;
+}
+
+std::string
+HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
+{
+    switch (hwMode) {
+    case Wpa::HostapdHwMode::Ieee80211b:
+        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueB;
+    case Wpa::HostapdHwMode::Ieee80211g:
+        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueG;
+    case Wpa::HostapdHwMode::Ieee80211a:
+        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueA;
+    case Wpa::HostapdHwMode::Ieee80211ad:
+        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueAD;
+    case Wpa::HostapdHwMode::Ieee80211any:
+        return Wpa::ProtocolHostapd::PropertySetPhyTypeValueAny;
+    default: // case Wpa::HostapdHwMode::Unknown
+        throw AccessPointControllerException(std::format("Invalid hw_mode value {}", magic_enum::enum_name(hwMode)));
+    }
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
@@ -120,9 +169,19 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 bool
-AccessPointControllerLinux::SetPhyType([[maybe_unused]] Dot11PhyType phyType)
+AccessPointControllerLinux::SetPhyType(Dot11PhyType phyType)
 {
-    return true;
+    Wpa::HostapdHwMode hwMode = detail::Dot11PhyTypeToHostapdHwMode(phyType);
+    const auto& propertyName = Wpa::ProtocolHostapd::PropertyNameSetPhyType;
+    const auto& propertyValue = detail::HostapdHwModeToPropertyValue(hwMode);
+
+    try {
+        return m_hostapd.SetProperty(propertyName, propertyValue);
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set PHY type for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    return false;
 }
 
 std::unique_ptr<IAccessPointController>
