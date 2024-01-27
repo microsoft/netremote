@@ -190,6 +190,13 @@ struct ProtocolHostapd :
     static constexpr auto PropertySetBandValue5G = "5G";
     static constexpr auto PropertySetBandValue6G = "6G";
 
+    static constexpr auto PropertyNameSetPhyType = "setphytype";
+    static constexpr auto PropertySetPhyTypeValueB = "b";
+    static constexpr auto PropertySetPhyTypeValueG = "g";
+    static constexpr auto PropertySetPhyTypeValueA = "a";
+    static constexpr auto PropertySetPhyTypeValueAD = "ad";
+    static constexpr auto PropertySetPhyTypeValueAny = "any";
+
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
     static constexpr auto ResponseStatusPropertyKeyState = "state=";
