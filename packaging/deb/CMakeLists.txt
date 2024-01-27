@@ -1,6 +1,6 @@
 
 # Common CPack configuration for all packages.
-set(CPACK_PACKAGE_DESCRIPTION "A framework for remotely controlling network componments such as wi-fi access points.")
+set(CPACK_PACKAGE_DESCRIPTION "A framework for remotely controlling network components such as wi-fi access points.")
 set(CPACK_COMPONENTS_GROUPING ONE_PER_GROUP)
 set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 
