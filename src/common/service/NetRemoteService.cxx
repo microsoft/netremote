@@ -464,9 +464,10 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
         handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Failed to create controller for access point {}", request->accesspointid()));
     }
 
+    // Convert PHY type to Ieee80211 protocol.
     auto ieeeProtocol = detail::NetRemotePhyTypeToIeeeProtocol(request->phytype());
 
-    // Check if PHY type is supported by AP.
+    // Check if Ieee80211 protocol is supported by AP.
     try {
         const auto& supportedIeeeProtocols = accessPointController->GetCapabilities().Protocols;
         if (std::ranges::find(supportedIeeeProtocols, ieeeProtocol) == std::cend(supportedIeeeProtocols)) {
@@ -477,13 +478,13 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
         handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
     }
 
-    // Set the PHY type.
+    // Set the Ieee80211 protocol.
     try {
-        if (!accessPointController->SetPhyType(detail::NetRemotePhyTypeToIeeeProtocol(request->phytype()))) {
+        if (!accessPointController->SetIeeeProtocol(ieeeProtocol)) {
             handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
-        LOGE << std::format("Failed to set PHY type for access point {} ({})", request->accesspointid(), apce.what());
+        LOGE << std::format("Failed to set Ieee80211 protocol for access point {} ({})", request->accesspointid(), apce.what());
         handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
     }
 

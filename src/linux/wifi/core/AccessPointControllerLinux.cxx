@@ -165,7 +165,7 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 bool
-AccessPointControllerLinux::SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerLinux::SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
     Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
     const auto& propertyName = Wpa::ProtocolHostapd::PropertyNameSetHwMode;
@@ -174,7 +174,7 @@ AccessPointControllerLinux::SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol i
     try {
         return m_hostapd.SetProperty(propertyName, propertyValue);
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to set PHY type for interface {} ({})", GetInterfaceName(), ex.what()));
+        throw AccessPointControllerException(std::format("Failed to set Ieee80211 protocol for interface {} ({})", GetInterfaceName(), ex.what()));
     }
 }
 

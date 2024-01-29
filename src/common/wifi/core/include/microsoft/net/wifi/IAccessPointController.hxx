@@ -63,15 +63,15 @@ struct IAccessPointController
     GetCapabilities() = 0;
 
     /**
-     * @brief Set the PHY type of the access point.
+     * @brief Set the Ieee80211 protocol of the access point.
      *
-     * @param ieeeProtocol The PHY type to be set
+     * @param ieeeProtocol The Ieee80211 protocol to be set
      * @return true
      * @return false
      *
      */
     virtual bool
-    SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
+    SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
 };
 
 /**

@@ -45,14 +45,14 @@ struct AccessPointControllerLinux :
     GetCapabilities() override;
 
     /**
-     * @brief Set the PHY type
+     * @brief Set the Ieee80211 protocol
      *
-     * @param ieeeProtocol The PHY type to be set
+     * @param ieeeProtocol The Ieee80211 protocol to be set
      * @return true
      * @return false
      */
     virtual bool
-    SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+    SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 
 private:
     Wpa::Hostapd m_hostapd;
