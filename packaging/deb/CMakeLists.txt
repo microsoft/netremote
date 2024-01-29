@@ -11,6 +11,9 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "netremoteowners@microsoft.com")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/microsoft/netremote")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
-set(CPACK_COMPONENTS_ALL server)
+set(CPACK_COMPONENTS_ALL
+    server 
+    hostapd
+)
 
 include(CPack)
