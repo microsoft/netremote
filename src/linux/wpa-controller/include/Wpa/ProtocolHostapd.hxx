@@ -190,7 +190,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertySetBandValue5G = "5G";
     static constexpr auto PropertySetBandValue6G = "6G";
 
-    static constexpr auto PropertyNameSetHwMode = "sethwmode"; // TODO: This doesn't exist - find correct way to set hw_mode
+    static constexpr auto PropertyNameSetHwMode = "hw_mode";
     static constexpr auto PropertySetHwModeValueB = "b";
     static constexpr auto PropertySetHwModeValueG = "g";
     static constexpr auto PropertySetHwModeValueA = "a";

@@ -25,7 +25,6 @@ target_sources(wifi-core
 target_link_libraries(wifi-core
     PUBLIC
         notstd
-        ${PROJECT_NAME}-protocol
 )
 
 install(

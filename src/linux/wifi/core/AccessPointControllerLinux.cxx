@@ -77,26 +77,24 @@ Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
 }
 
 Wpa::HostapdHwMode
-Dot11PhyTypeToHostapdHwMode(Dot11PhyType phyType)
+IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol)
 {
-    switch (phyType) {
-    case Dot11PhyType::Dot11PhyTypeUnknown:
-        return Wpa::HostapdHwMode::Unknown;
-    case Dot11PhyType::Dot11PhyTypeB:
+    switch (ieeeProtocol) {
+    case Ieee80211Protocol::B:
         return Wpa::HostapdHwMode::Ieee80211b;
-    case Dot11PhyType::Dot11PhyTypeG:
+    case Ieee80211Protocol::G:
         return Wpa::HostapdHwMode::Ieee80211g;
-    case Dot11PhyType::Dot11PhyTypeN:
+    case Ieee80211Protocol::N:
         return Wpa::HostapdHwMode::Ieee80211a; // TODO: Could be a or g depending on band
-    case Dot11PhyType::Dot11PhyTypeA:
+    case Ieee80211Protocol::A:
         return Wpa::HostapdHwMode::Ieee80211a;
-    case Dot11PhyType::Dot11PhyTypeAC:
+    case Ieee80211Protocol::AC:
         return Wpa::HostapdHwMode::Ieee80211a;
-    case Dot11PhyType::Dot11PhyTypeAD:
+    case Ieee80211Protocol::AD:
         return Wpa::HostapdHwMode::Ieee80211ad;
-    case Dot11PhyType::Dot11PhyTypeAX:
+    case Ieee80211Protocol::AX:
         return Wpa::HostapdHwMode::Ieee80211a;
-    case Dot11PhyType::Dot11PhyTypeBE:
+    case Ieee80211Protocol::BE:
         return Wpa::HostapdHwMode::Ieee80211a; // TODO: Assuming a, although hostapd docs don't mention it
     default:
         return Wpa::HostapdHwMode::Unknown;
@@ -167,9 +165,9 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 bool
-AccessPointControllerLinux::SetPhyType(Dot11PhyType phyType)
+AccessPointControllerLinux::SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
-    Wpa::HostapdHwMode hwMode = detail::Dot11PhyTypeToHostapdHwMode(phyType);
+    Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
     const auto& propertyName = Wpa::ProtocolHostapd::PropertyNameSetHwMode;
     const auto& propertyValue = detail::HostapdHwModeToPropertyValue(hwMode);
 

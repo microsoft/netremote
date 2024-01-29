@@ -58,6 +58,32 @@ IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
     return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
+Ieee80211Protocol
+NetRemotePhyTypeToIeeeProtocol(Dot11PhyType phyType)
+{
+    switch (phyType) {
+    case Dot11PhyType::Dot11PhyTypeB:
+        return Ieee80211Protocol::B;
+    case Dot11PhyType::Dot11PhyTypeG:
+        return Ieee80211Protocol::G;
+    case Dot11PhyType::Dot11PhyTypeN:
+        return Ieee80211Protocol::N;
+    case Dot11PhyType::Dot11PhyTypeA:
+        return Ieee80211Protocol::A;
+    case Dot11PhyType::Dot11PhyTypeAC:
+        return Ieee80211Protocol::AC;
+    case Dot11PhyType::Dot11PhyTypeAD:
+        return Ieee80211Protocol::AD;
+    case Dot11PhyType::Dot11PhyTypeAX:
+        return Ieee80211Protocol::AX;
+    case Dot11PhyType::Dot11PhyTypeBE:
+        return Ieee80211Protocol::BE;
+    default:
+        return Ieee80211Protocol::Unknown;
+    }
+}
+
+using Microsoft::Net::Wifi::Dot11FrequencyBand;
 using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 using Microsoft::Net::Wifi::Dot11FrequencyBand;
 
@@ -411,7 +437,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
             status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
         }
 
-        if (!accessPointController->SetPhyType(request->phytype())) {
+        if (!accessPointController->SetPhyType(detail::NetRemotePhyTypeToIeeeProtocol(request->phytype()))) {
             LOGE << std::format("Failed to set PHY type for access point {}", request->accesspointid());
             status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
             status.set_message(std::format("Failed to set PHY type for access point {}", request->accesspointid()));

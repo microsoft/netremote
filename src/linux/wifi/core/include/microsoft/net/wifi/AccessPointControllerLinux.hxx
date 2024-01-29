@@ -5,7 +5,7 @@
 #include <string_view>
 
 #include <Wpa/Hostapd.hxx>
-#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -47,12 +47,12 @@ struct AccessPointControllerLinux :
     /**
      * @brief Set the PHY type
      *
-     * @param phyType The PHY type to be set
+     * @param ieeeProtocol The PHY type to be set
      * @return true
      * @return false
      */
     virtual bool
-    SetPhyType(Dot11PhyType phyType) override;
+    SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 
 private:
     Wpa::Hostapd m_hostapd;

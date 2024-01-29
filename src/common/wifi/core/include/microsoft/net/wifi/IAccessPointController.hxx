@@ -7,7 +7,7 @@
 #include <string>
 #include <string_view>
 
-#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -65,13 +65,13 @@ struct IAccessPointController
     /**
      * @brief Set the PHY type of the access point.
      *
-     * @param phyType The PHY type to be set
+     * @param ieeeProtocol The PHY type to be set
      * @return true
      * @return false
      *
      */
     virtual bool
-    SetPhyType(Dot11PhyType phyType) = 0;
+    SetPhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
 };
 
 /**

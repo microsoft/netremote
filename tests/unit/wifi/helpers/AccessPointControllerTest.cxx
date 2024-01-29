@@ -42,7 +42,7 @@ AccessPointControllerTest::GetCapabilities()
 }
 
 bool
-AccessPointControllerTest::SetPhyType([[maybe_unused]] Dot11PhyType phyType)
+AccessPointControllerTest::SetPhyType([[maybe_unused]] Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::SetPhyType called with null AccessPoint");
