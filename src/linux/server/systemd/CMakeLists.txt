@@ -8,6 +8,6 @@ configure_file(
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/netremote-server.service
-    DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/systemd/system
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
     COMPONENT server
 )

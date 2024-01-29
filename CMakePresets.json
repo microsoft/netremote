@@ -28,16 +28,28 @@
             "hidden": true,
             "displayName": "Out of source build",
             "description": "Configure to build outside of the source tree",
-            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/out/build/${presetName}",
-            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/out/install/${presetName}"
+            "binaryDir": "${sourceParentDir}/${sourceDirName}-cmake/build/${presetName}"
+        },
+        {
+            "name": "out-of-source-install",
+            "hidden": true,
+            "description": "Configure to install outside of the source tree",
+            "displayName": "Out of source install",
+            "installDir": "${sourceParentDir}/${sourceDirName}-cmake/install/${presetName}"
         },
         {
             "name": "in-source-build",
             "hidden": true,
             "displayName": "In source build",
             "description": "Configure to build inside the source tree",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}"
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "in-source-install",
+            "hidden": true,
+            "displayName": "In source install",
+            "description": "Configure to install inside the source tree",
+            "installDir": "${sourceDir}/install/${presetName}"
         },
         {
             "name": "linux-base",
@@ -61,7 +73,8 @@
             "displayName": "Development (base)",
             "description": "Base options for all development presets",
             "inherits": [
-                "out-of-source-build"
+                "out-of-source-build",
+                "out-of-source-install"
             ]
         },
         {
@@ -109,8 +122,11 @@
             "name": "release-base",
             "hidden": true,
             "inherits": [
-                "in-source-build"
-            ]
+                "out-of-source-build"
+            ],
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "/usr/local"
+            }
         },
         {
             "name": "release-linux",
@@ -144,7 +160,6 @@
             "hidden": true,
             "configuration": "Debug"
         },
-
         {
             "name": "cfg-release",
             "hidden": true,
