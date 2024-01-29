@@ -92,6 +92,7 @@ set(HOSTAPD_CLI_BIN
 install(
     FILES ${LIBWPA_CLIENT}
     TYPE LIB
+    COMPONENT hostapd
 )
 
 install(
@@ -100,10 +101,12 @@ install(
         ${HOSTAPD_CLI_BIN}
     DESTINATION
         ${CMAKE_INSTALL_SBINDIR}
+    COMPONENT hostapd
 )
 
 install(
     DIRECTORY DESTINATION ${CMAKE_INSTALL_FULL_RUNSTATEDIR}
+    COMPONENT hostapd
 )
 
 add_subdirectory(systemd)
