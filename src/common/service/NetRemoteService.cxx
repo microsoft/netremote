@@ -85,7 +85,6 @@ NetRemotePhyTypeToIeeeProtocol(Dot11PhyType phyType)
 
 using Microsoft::Net::Wifi::Dot11FrequencyBand;
 using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
 
 Dot11FrequencyBand
 IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
