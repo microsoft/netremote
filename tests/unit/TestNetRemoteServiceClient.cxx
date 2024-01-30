@@ -128,8 +128,10 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     constexpr auto InterfaceName{ "TestWifiAccessPointSetPhyType" };
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
-    auto apFactoryTest = std::make_unique<AccessPointFactoryTest>();
-    auto apTest = apFactoryTest->Create(InterfaceName);
+    Ieee80211AccessPointCapabilities apCapabilities{
+        .Protocols{ Ieee80211Protocol::B, Ieee80211Protocol::G, Ieee80211Protocol::N, Ieee80211Protocol::A, Ieee80211Protocol::AC, Ieee80211Protocol::AD, Ieee80211Protocol::AX, Ieee80211Protocol::AX }
+    };
+    auto apTest = std::make_shared<AccessPointTest>(InterfaceName, std::move(apCapabilities));
     apManagerTest->AddAccessPoint(apTest);
 
     NetRemoteServerConfiguration Configuration{
