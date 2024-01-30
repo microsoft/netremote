@@ -116,7 +116,7 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
     case Wpa::HostapdHwMode::Ieee80211any:
         return Wpa::ProtocolHostapd::PropertySetHwModeValueAny;
     default: // case Wpa::HostapdHwMode::Unknown
-        throw AccessPointControllerException(std::format("Invalid hw_mode value {}", magic_enum::enum_name(hwMode)));
+        throw AccessPointControllerException(std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode)));
     }
 }
 } // namespace detail
@@ -165,7 +165,7 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 bool
-AccessPointControllerLinux::SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
     Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
     const auto& propertyName = Wpa::ProtocolHostapd::PropertyNameSetHwMode;

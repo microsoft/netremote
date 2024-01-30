@@ -52,7 +52,7 @@ struct AccessPointControllerLinux :
      * @return false
      */
     virtual bool
-    SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 
 private:
     Wpa::Hostapd m_hostapd;

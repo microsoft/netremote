@@ -71,7 +71,7 @@ struct IAccessPointController
      *
      */
     virtual bool
-    SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
 };
 
 /**

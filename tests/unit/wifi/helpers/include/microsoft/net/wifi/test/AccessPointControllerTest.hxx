@@ -63,7 +63,7 @@ struct AccessPointControllerTest final :
      * @return false
     */
     virtual bool
-    SetIeeeProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 };
 
 /**

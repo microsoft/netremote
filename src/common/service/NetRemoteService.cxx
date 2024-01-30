@@ -440,7 +440,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     WifiAccessPointOperationStatus status{};
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
-    auto handleFailure = [&](WifiAccessPointOperationStatusCode statusCode, const std::string& statusMessage) {
+    auto handleFailure = [&](WifiAccessPointOperationStatusCode statusCode, std::string statusMessage) {
         LOGE << statusMessage;
 
         status.set_code(statusCode);
@@ -454,14 +454,14 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 
     // Check if PHY type is provided.
     if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
-        handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No PHY type provided");
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No PHY type provided");
     }
 
     // Create an AP controller for the requested AP.
     auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
     auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
     if (!accessPointController) {
-        handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Failed to create controller for access point {}", request->accesspointid()));
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Failed to create controller for access point {}", request->accesspointid()));
     }
 
     // Convert PHY type to Ieee80211 protocol.
@@ -471,21 +471,21 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     try {
         const auto& supportedIeeeProtocols = accessPointController->GetCapabilities().Protocols;
         if (std::ranges::find(supportedIeeeProtocols, ieeeProtocol) == std::cend(supportedIeeeProtocols)) {
-            handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
+            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what());
-        handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
     }
 
     // Set the Ieee80211 protocol.
     try {
-        if (!accessPointController->SetIeeeProtocol(ieeeProtocol)) {
-            handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+        if (!accessPointController->SetProtocol(ieeeProtocol)) {
+            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to set Ieee80211 protocol for access point {} ({})", request->accesspointid(), apce.what());
-        handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
     }
 
     response->set_accesspointid(request->accesspointid());
