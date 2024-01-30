@@ -45,9 +45,9 @@ struct AccessPointControllerLinux :
     GetCapabilities() override;
 
     /**
-     * @brief Set the Ieee80211 protocol
+     * @brief Set the Ieee80211 protocol.
      *
-     * @param ieeeProtocol The Ieee80211 protocol to be set
+     * @param ieeeProtocol The Ieee80211 protocol to be set.
      * @return true
      * @return false
      */

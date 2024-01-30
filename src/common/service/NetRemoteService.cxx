@@ -437,7 +437,6 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
 
     WifiAccessPointOperationStatus status{};
-    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     auto handleFailure = [&](WifiAccessPointOperationStatusCode statusCode, std::string statusMessage) {
         LOGE << statusMessage;
@@ -468,7 +467,8 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 
     // Check if Ieee80211 protocol is supported by AP.
     try {
-        const auto& supportedIeeeProtocols = accessPointController->GetCapabilities().Protocols;
+        auto accessPointCapabilities = accessPointController->GetCapabilities();
+        const auto& supportedIeeeProtocols = accessPointCapabilities.Protocols;
         if (std::ranges::find(supportedIeeeProtocols, ieeeProtocol) == std::cend(supportedIeeeProtocols)) {
             return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
         }
@@ -487,15 +487,12 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
         return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
     }
 
+    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     response->set_accesspointid(request->accesspointid());
     *response->mutable_status() = std::move(status);
 
     return grpc::Status::OK;
 }
-
-using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherSuite;
 
 bool
 NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status)

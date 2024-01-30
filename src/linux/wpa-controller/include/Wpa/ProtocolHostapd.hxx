@@ -201,8 +201,11 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAny = "any";
 
     static constexpr auto PropertyNameIeee80211N = "ieee80211n";
+    static constexpr auto PropertyNameDisable11N = "disable_11n";
     static constexpr auto PropertyNameIeee80211AC = "ieee80211ac";
+    static constexpr auto PropertyNameDisable11AC = "disable_11ac";
     static constexpr auto PropertyNameIeee80211AX = "ieee80211ax";
+    static constexpr auto PropertyNameDisable11AX = "disable_11ax";
     static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
 
     // Response properties for the "STATUS" command.

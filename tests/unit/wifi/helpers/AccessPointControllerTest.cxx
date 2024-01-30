@@ -42,13 +42,13 @@ AccessPointControllerTest::GetCapabilities()
 }
 
 bool
-AccessPointControllerTest::SetProtocol([[maybe_unused]] Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerTest::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
     }
 
-    // TODO: Set Ieee80211 protocol
+    AccessPoint->Protocol = ieeeProtocol;
     return true;
 }
 

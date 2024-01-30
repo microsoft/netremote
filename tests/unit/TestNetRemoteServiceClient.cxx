@@ -16,6 +16,11 @@
 
 #include "TestNetRemoteCommon.hxx"
 
+namespace Microsoft::Net::Remote::Test
+{
+constexpr auto AllProtocols = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211Protocol>();
+} // namespace Microsoft::Net::Remote::Test
+
 using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 using Microsoft::Net::Wifi::Test::AccessPointFactoryTest;
 
@@ -120,6 +125,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
@@ -129,7 +135,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ Ieee80211Protocol::B, Ieee80211Protocol::G, Ieee80211Protocol::N, Ieee80211Protocol::A, Ieee80211Protocol::AC, Ieee80211Protocol::AD, Ieee80211Protocol::AX, Ieee80211Protocol::AX }
+        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
     };
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, std::move(apCapabilities));
     apManagerTest->AddAccessPoint(apTest);
