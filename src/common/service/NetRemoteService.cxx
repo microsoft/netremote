@@ -494,89 +494,9 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     return grpc::Status::OK;
 }
 
-using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
 using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Dot11CipherSuite;
-
-::grpc::Status
-NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationResult* response)
-{
-    LOGD << std::format("Received WifiAccessPointSetAuthenticationConfiguration request for access point id {}", request->accesspointid());
-
-    WifiAccessPointOperationStatus status{};
-
-    const auto& authenticationConfiguration = request->authenticationconfiguration();
-    const auto& akmSuites = authenticationConfiguration.akmsuites();
-    const auto& cipherSuites = authenticationConfiguration.ciphersuites();
-
-    if (std::empty(akmSuites) && std::empty(cipherSuites)) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No AKM suite or cipher suite provided");
-    } else if (!std::empty(akmSuites) && std::ranges::find(akmSuites, Dot11AkmSuite::Dot11AkmSuiteUnknown, &Dot11AkmSuiteConfiguration::akmsuite) != std::cend(akmSuites)) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("Invalid AKM suite provided");
-    } else if (!std::empty(akmSuites) && std::ranges::find(akmSuites, Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown, &Dot11AkmSuiteConfiguration::authenticationalgorithm) != std::cend(akmSuites)) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("Invalid authentication algorithm provided");
-    } else if (!std::empty(cipherSuites) && std::ranges::find(cipherSuites, Dot11CipherSuite::Dot11CipherSuiteUnknown) != std::cend(cipherSuites)) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("Invalid cipher suite provided");
-    } else {
-        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
-        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
-        if (!accessPointController) {
-            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
-            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
-            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
-        }
-
-        // TODO: Use accessPointController to set authentication configuration.
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-    }
-
-    response->set_accesspointid(request->accesspointid());
-    *response->mutable_status() = std::move(status);
-
-    return grpc::Status::OK;
-}
-
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-
-::grpc::Status
-NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* response)
-{
-    LOGD << std::format("Received WifiAccessPointSetFrequencyBands request for access point id {}", request->accesspointid());
-
-    WifiAccessPointOperationStatus status{};
-
-    const auto& frequencyBands = request->frequencybands();
-
-    if (std::empty(frequencyBands)) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No frequency band provided");
-    } else if (std::ranges::find(frequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(frequencyBands)) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("Invalid frequency band provided");
-    } else {
-        auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
-        auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
-        if (!accessPointController) {
-            LOGE << std::format("Failed to create controller for access point {}", request->accesspointid());
-            status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
-            status.set_message(std::format("Failed to create controller for access point {}", request->accesspointid()));
-        }
-
-        // TODO: Use accessPointController to set frequency bands.
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-    }
-
-    response->set_accesspointid(request->accesspointid());
-    *response->mutable_status() = std::move(status);
-
-    return grpc::Status::OK;
-}
 
 bool
 NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status)
