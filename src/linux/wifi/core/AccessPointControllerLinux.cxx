@@ -175,25 +175,29 @@ AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol 
         isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameHwMode, detail::HostapdHwModeToPropertyValue(hwMode));
 
         // Additively set other hostapd properties based on the protocol.
-        if (ieeeProtocol == Ieee80211Protocol::N || ieeeProtocol == Ieee80211Protocol::AC || ieeeProtocol == Ieee80211Protocol::AX) {
+        switch (ieeeProtocol) {
+        case Ieee80211Protocol::AX:
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
+            [[fallthrough]];
+        case Ieee80211Protocol::AC:
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
+            [[fallthrough]];
+        case Ieee80211Protocol::N:
             isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
             isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
             isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);
+            break;
+        default:
+            break;
         }
-        if (ieeeProtocol == Ieee80211Protocol::AC || ieeeProtocol == Ieee80211Protocol::AX) {
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
-        }
-        if (ieeeProtocol == Ieee80211Protocol::AX) {
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
-        }
-
     } catch (const Wpa::HostapdException& ex) {
         throw AccessPointControllerException(std::format("Failed to set Ieee80211 protocol for interface {} ({})", GetInterfaceName(), ex.what()));
     }
 
-    return isOk;
+    // Reload hostapd conf file.
+    return isOk && m_hostapd.Reload();
 }
 
 std::unique_ptr<IAccessPointController>

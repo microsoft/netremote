@@ -93,13 +93,22 @@ struct IHostapd
      */
     virtual bool
     SetProperty(std::string_view propertyName, std::string_view propertyValue) = 0;
+
+    /**
+     * @brief Reloads the interface.
+     *
+     * @return true
+     * @return false
+     */
+    virtual bool
+    Reload() = 0;
 };
 
 /**
  * @brief Generic exception that may be thrown by any of the functions in
  * IHostapd.
  */
-struct HostapdException : 
+struct HostapdException :
     public std::exception
 {
     HostapdException(std::string_view message);

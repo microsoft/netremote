@@ -94,6 +94,15 @@ struct Hostapd :
     bool
     SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
 
+    /**
+     * @brief Reloads the interface.
+     *
+     * @return true
+     * @return false
+     */
+    bool
+    Reload() override;
+
 private:
     const std::string m_interface;
     WpaController m_controller;
