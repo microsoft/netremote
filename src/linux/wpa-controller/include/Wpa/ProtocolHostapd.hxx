@@ -184,18 +184,26 @@ struct ProtocolHostapd :
     static constexpr auto PropertyVersionValue = "2.10-hostap_2_10";
 
     // Property names for "SET" commands.
+    static constexpr auto PropertyEnabled = "1";
+    static constexpr auto PropertyDisabled = "0";
+
     static constexpr auto PropertyNameSetBand = "setband";
     static constexpr auto PropertySetBandValueAuto = "AUTO";
     static constexpr auto PropertySetBandValue2G = "2G";
     static constexpr auto PropertySetBandValue5G = "5G";
     static constexpr auto PropertySetBandValue6G = "6G";
 
-    static constexpr auto PropertyNameSetHwMode = "hw_mode";
-    static constexpr auto PropertySetHwModeValueB = "b";
-    static constexpr auto PropertySetHwModeValueG = "g";
-    static constexpr auto PropertySetHwModeValueA = "a";
-    static constexpr auto PropertySetHwModeValueAD = "ad";
-    static constexpr auto PropertySetHwModeValueAny = "any";
+    static constexpr auto PropertyNameHwMode = "hw_mode";
+    static constexpr auto PropertyHwModeValueB = "b";
+    static constexpr auto PropertyHwModeValueG = "g";
+    static constexpr auto PropertyHwModeValueA = "a";
+    static constexpr auto PropertyHwModeValueAD = "ad";
+    static constexpr auto PropertyHwModeValueAny = "any";
+
+    static constexpr auto PropertyNameIeee80211N = "ieee80211n";
+    static constexpr auto PropertyNameIeee80211AC = "ieee80211ac";
+    static constexpr auto PropertyNameIeee80211AX = "ieee80211ax";
+    static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
 
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
