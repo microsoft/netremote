@@ -295,7 +295,7 @@
         },
         {
             "name": "build-dev-linux",
-            "displayName": "Development Build",
+            "displayName": "Development",
             "description": "Build the project for development on Linux",
             "configurePreset": "dev-linux",
             "inherits": [
@@ -304,7 +304,7 @@
         },
         {
             "name": "build-dev-windows",
-            "displayName": "Development Build",
+            "displayName": "Development",
             "description": "Build the project for development on Windows",
             "configurePreset": "dev-windows",
             "inherits": [
@@ -312,8 +312,17 @@
             ]
         },
         {
+            "name": "build-dev-windows-arm64",
+            "displayName": "Development",
+            "description": "Build the project for development on Windows (ARM64)",
+            "configurePreset": "dev-windows-arm64",
+            "inherits": [
+                "build-dev"
+            ]
+        },
+        {
             "name": "build-release-linux",
-            "displayName": "Release Build",
+            "displayName": "Release",
             "description": "Build the project for release on Linux",
             "configurePreset": "release-linux",
             "inherits": [
@@ -322,9 +331,18 @@
         },
         {
             "name": "build-release-windows",
-            "displayName": "Release Build",
+            "displayName": "Release",
             "description": "Build the project for release on Windows",
             "configurePreset": "release-windows",
+            "inherits": [
+                "build-release"
+            ]
+        },
+        {
+            "name": "build-release-windows-arm64",
+            "displayName": "Release (ARM64)",
+            "description": "Build the project for release on Windows (ARM64)",
+            "configurePreset": "release-windows-arm64",
             "inherits": [
                 "build-release"
             ]
