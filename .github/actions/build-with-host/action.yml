@@ -57,7 +57,7 @@ runs:
     shell: pwsh
 
   - name: CMake Build
-    run: cmake --build --preset ${{ inputs.preset-name }} --config ${{ inputs.build-type }}
+    run: cmake --build --preset build-${{ inputs.preset-name }} --config ${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Test (ctest)
@@ -67,12 +67,12 @@ runs:
 
   - name: CMake Install
     if: inputs.install == 'true'
-    run: cmake --build --preset ${{ inputs.preset-name }} --target install --config ${{ inputs.build-type }}
+    run: cmake --build --preset build-${{ inputs.preset-name }} --target install --config ${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Package (cpack)
     if: inputs.package == 'true'
-    run: cpack --preset ${{ inputs.preset-name }} -C ${{ inputs.build-type }}
+    run: cpack --preset package-${{ inputs.preset-name }} -C ${{ inputs.build-type }}
     shell: pwsh
 
   - name: Publish Artifacts
