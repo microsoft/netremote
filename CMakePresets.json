@@ -364,5 +364,31 @@
                 "test-common"
             ]
         }
+    ],
+    "packagePresets": [
+        {
+            "name": "packaging-dev",
+            "configurePreset": "packaging-dev"
+        },
+        {
+            "name": "packaging-release",
+            "configurePreset": "packaging-release"
+        },
+        {
+            "name": "packaging-dev-linux",
+            "configurePreset": "dev-linux"
+        },
+        {
+            "name": "packaging-release-linux",
+            "configurePreset": "release-linux"
+        },
+        {
+            "name": "packaging-dev-windows",
+            "configurePreset": "dev-windows"
+        },
+        {
+            "name": "packaging-release-windows",
+            "configurePreset": "release-windows"
+        }
     ]
 }
