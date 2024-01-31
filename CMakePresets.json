@@ -43,7 +43,6 @@
                 "CMAKE_GENERATOR": "Ninja Multi-Config"
             }
         },
-
         {
             "name": "out-of-source-build",
             "hidden": true,
@@ -58,7 +57,6 @@
             "displayName": "Out of source install",
             "installDir": "${sourceParentDir}/${sourceDirName}-cmake/install/${presetName}"
         },
-
         {
             "name": "in-source-build",
             "hidden": true,
@@ -73,7 +71,6 @@
             "description": "Configure to install inside the source tree",
             "installDir": "${sourceDir}/install/${presetName}"
         },
-
         {
             "name": "packaging",
             "hidden": true,
@@ -98,7 +95,6 @@
                 "packaging"
             ]
         },
-
         {
             "name": "packaging-linux",
             "hidden": true,
@@ -123,7 +119,6 @@
                 "CPACK_GENERATOR": "ZIP"
             }
         },
-
         {
             "name": "packaging-linux-dev",
             "hidden": true,
@@ -145,7 +140,6 @@
                 "packaging-windows"
             ]
         },
-
         {
             "name": "packaging-linux-release",
             "hidden": true,
@@ -167,7 +161,6 @@
                 "packaging-windows"
             ]
         },
-
         {
             "name": "dev",
             "hidden": true,
@@ -190,7 +183,6 @@
                 "packaging-release"
             ]
         },
-
         {
             "name": "dev-linux",
             "displayName": "Development",
@@ -220,7 +212,6 @@
                 "windows-arm64"
             ]
         },
-
         {
             "name": "release-linux",
             "displayName": "Release",
@@ -283,7 +274,6 @@
             "description": "Build the project with MinSizeRel configuration",
             "configuration": "MinSizeRel"
         },
-
         {
             "name": "build-dev",
             "hidden": true,
@@ -302,7 +292,6 @@
                 "cfg-release-with-debuginfo"
             ]
         },
-
         {
             "name": "build-dev-linux",
             "displayName": "Development Build",
@@ -321,7 +310,6 @@
                 "build-dev"
             ]
         },
-
         {
             "name": "build-release-linux",
             "displayName": "Release Build",
