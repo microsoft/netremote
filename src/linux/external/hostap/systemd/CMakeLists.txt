@@ -14,10 +14,12 @@ install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/hostapd.example.conf
     DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/hostapd
+    COMPONENT hostapd
 )
 
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/hostapd@.service
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
+    COMPONENT hostapd
 )
