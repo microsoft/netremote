@@ -68,13 +68,32 @@
             }
         },
         {
+            "name": "dev-packaging-base",
+            "hidden": true,
+            "displayName": "Development (packaging base)",
+            "cacheVariables": {
+                "CPACK_PACKAGING_INSTALL_PREFIX": "/usr/local",
+                "CPACK_SET_DESTDIR": "OFF"
+            }
+        },
+        {
+            "name": "release-packaging-base",
+            "hidden": true,
+            "displayName": "Release (packaging base)",
+            "cacheVariables": {
+                "CPACK_PACKAGING_INSTALL_PREFIX": "/usr/local",
+                "CPACK_SET_DESTDIR": "ON"
+            }
+        },
+        {
             "name": "dev-base",
             "hidden": true,
             "displayName": "Development (base)",
             "description": "Base options for all development presets",
             "inherits": [
                 "out-of-source-build",
-                "out-of-source-install"
+                "out-of-source-install",
+                "dev-packaging-base"
             ]
         },
         {
@@ -122,7 +141,8 @@
             "name": "release-base",
             "hidden": true,
             "inherits": [
-                "out-of-source-build"
+                "out-of-source-build",
+                "release-packaging-base"
             ],
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "/usr/local"
