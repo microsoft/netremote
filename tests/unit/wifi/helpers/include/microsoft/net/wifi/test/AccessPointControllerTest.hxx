@@ -54,6 +54,16 @@ struct AccessPointControllerTest final :
      */
     virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
+
+    /**
+     * @brief Set the Ieee80211 protocol of the access point.
+     * 
+     * @param ieeeProtocol The Ieee80211 protocol to be set
+     * @return true
+     * @return false
+    */
+    virtual bool
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 };
 
 /**

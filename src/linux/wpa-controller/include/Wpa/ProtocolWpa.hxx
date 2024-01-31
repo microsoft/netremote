@@ -45,6 +45,7 @@ struct ProtocolWpa
     static constexpr auto CommandPayloadAclShow = "SHOW";
     static constexpr auto CommandPayloadAclClear = "CLEAR";
     static constexpr auto CommandPayloadLogLevel = "LOG_LEVEL";
+    static constexpr auto CommandPayloadReload = "RELOAD";
 
     // Response payloads.
     static constexpr auto ResponsePayloadOk = "OK";

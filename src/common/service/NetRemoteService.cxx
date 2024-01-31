@@ -58,8 +58,33 @@ IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
     return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
-using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
+Ieee80211Protocol
+NetRemotePhyTypeToIeeeProtocol(Dot11PhyType phyType)
+{
+    switch (phyType) {
+    case Dot11PhyType::Dot11PhyTypeB:
+        return Ieee80211Protocol::B;
+    case Dot11PhyType::Dot11PhyTypeG:
+        return Ieee80211Protocol::G;
+    case Dot11PhyType::Dot11PhyTypeN:
+        return Ieee80211Protocol::N;
+    case Dot11PhyType::Dot11PhyTypeA:
+        return Ieee80211Protocol::A;
+    case Dot11PhyType::Dot11PhyTypeAC:
+        return Ieee80211Protocol::AC;
+    case Dot11PhyType::Dot11PhyTypeAD:
+        return Ieee80211Protocol::AD;
+    case Dot11PhyType::Dot11PhyTypeAX:
+        return Ieee80211Protocol::AX;
+    case Dot11PhyType::Dot11PhyTypeBE:
+        return Ieee80211Protocol::BE;
+    default:
+        return Ieee80211Protocol::Unknown;
+    }
+}
+
 using Microsoft::Net::Wifi::Dot11FrequencyBand;
+using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 
 Dot11FrequencyBand
 IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
@@ -316,6 +341,19 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<Microsoft::Net::W
     return item;
 }
 
+std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
+IAccessPointWeakToAccessPointController(std::weak_ptr<Microsoft::Net::Wifi::IAccessPoint>& accessPointWeak)
+{
+    auto accessPoint = accessPointWeak.lock();
+    if (accessPoint != nullptr) {
+        return accessPoint->CreateController();
+    } else {
+        LOGE << "Failed to retrieve access point as it is no longer valid";
+    }
+
+    return nullptr;
+}
+
 bool
 NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
 {
@@ -383,6 +421,73 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
     // TODO: Disable the access point.
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
+using Microsoft::Net::Wifi::Dot11PhyType;
+
+::grpc::Status
+NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response)
+{
+    using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
+
+    LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    auto handleFailure = [&](WifiAccessPointOperationStatusCode statusCode, std::string statusMessage) {
+        LOGE << statusMessage;
+
+        status.set_code(statusCode);
+        status.set_message(statusMessage);
+
+        response->set_accesspointid(request->accesspointid());
+        *response->mutable_status() = std::move(status);
+
+        return grpc::Status::OK;
+    };
+
+    // Check if PHY type is provided.
+    if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No PHY type provided");
+    }
+
+    // Create an AP controller for the requested AP.
+    auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+    auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+    if (!accessPointController) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Failed to create controller for access point {}", request->accesspointid()));
+    }
+
+    // Convert PHY type to Ieee80211 protocol.
+    auto ieeeProtocol = detail::NetRemotePhyTypeToIeeeProtocol(request->phytype());
+
+    // Check if Ieee80211 protocol is supported by AP.
+    try {
+        auto accessPointCapabilities = accessPointController->GetCapabilities();
+        const auto& supportedIeeeProtocols = accessPointCapabilities.Protocols;
+        if (std::ranges::find(supportedIeeeProtocols, ieeeProtocol) == std::cend(supportedIeeeProtocols)) {
+            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
+        }
+    } catch (const AccessPointControllerException& apce) {
+        LOGE << std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what());
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
+    }
+
+    // Set the Ieee80211 protocol.
+    try {
+        if (!accessPointController->SetProtocol(ieeeProtocol)) {
+            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+        }
+    } catch (const AccessPointControllerException& apce) {
+        LOGE << std::format("Failed to set Ieee80211 protocol for access point {} ({})", request->accesspointid(), apce.what());
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+    }
+
+    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     response->set_accesspointid(request->accesspointid());
     *response->mutable_status() = std::move(status);
 

@@ -4,9 +4,10 @@
 
 #include <exception>
 #include <memory>
-#include <string_view>
 #include <string>
+#include <string_view>
 
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -46,9 +47,9 @@ struct IAccessPointController
 
     /**
      * @brief Get whether the access point is enabled.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     virtual bool
     GetIsEnabled() = 0;
@@ -60,6 +61,17 @@ struct IAccessPointController
      */
     virtual Ieee80211AccessPointCapabilities
     GetCapabilities() = 0;
+
+    /**
+     * @brief Set the Ieee80211 protocol of the access point.
+     *
+     * @param ieeeProtocol The Ieee80211 protocol to be set.
+     * @return true
+     * @return false
+     *
+     */
+    virtual bool
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
 };
 
 /**

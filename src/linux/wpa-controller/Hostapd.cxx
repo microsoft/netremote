@@ -133,3 +133,16 @@ Hostapd::Terminate()
 
     return response->IsOk();
 }
+
+bool
+Hostapd::Reload()
+{
+    static constexpr WpaCommand ReloadCommand(ProtocolHostapd::CommandPayloadReload);
+
+    const auto response = m_controller.SendCommand(ReloadCommand);
+    if (!response) {
+        throw HostapdException("Failed to send hostapd 'reload' command");
+    }
+
+    return response->IsOk();
+}
