@@ -64,6 +64,26 @@ struct AccessPointControllerTest final :
     */
     virtual bool
     SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+
+    /**
+     * @brief Set the AKM suites used by the access point.
+     *
+     * @param akmSuites The AKM suites to be set.
+     * @return true
+     * @return false
+     */
+    virtual bool
+    SetAkmSuites(std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> akmSuites) override;
+
+    /**
+     * @brief Set the cipher suites used by the access point.
+     *
+     * @param cipherSuites The cipher suites to be set.
+     * @return true
+     * @return false
+     */
+    virtual bool
+    SetCipherSuites(std::vector<Microsoft::Net::Wifi::Ieee80211CipherSuite> cipherSuites) override;
 };
 
 /**

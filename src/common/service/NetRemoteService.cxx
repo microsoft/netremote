@@ -133,6 +133,33 @@ IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Ieee80211Authentic
     return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
 }
 
+Ieee80211AuthenticationAlgorithm
+NetRemoteAuthenticationAlgorithmToIeeeAuthenticationAlgorithm(Dot11AuthenticationAlgorithm authenticationAlgorithm)
+{
+    switch (authenticationAlgorithm) {
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown:
+        return Ieee80211AuthenticationAlgorithm::Unknown;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem:
+        return Ieee80211AuthenticationAlgorithm::OpenSystem;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey:
+        return Ieee80211AuthenticationAlgorithm::SharedKey;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFastBssTransition:
+        return Ieee80211AuthenticationAlgorithm::FastBssTransition;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae:
+        return Ieee80211AuthenticationAlgorithm::Sae;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFils:
+        return Ieee80211AuthenticationAlgorithm::Fils;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPfs:
+        return Ieee80211AuthenticationAlgorithm::FilsPfs;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPublicKey:
+        return Ieee80211AuthenticationAlgorithm::FilsPublicKey;
+    case Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmVendorSpecific:
+        return Ieee80211AuthenticationAlgorithm::VendorSpecific;
+    default:
+        return Ieee80211AuthenticationAlgorithm::Unknown;
+    }
+}
+
 using Microsoft::Net::Wifi::Dot11AkmSuite;
 using Microsoft::Net::Wifi::Ieee80211AkmSuite;
 
@@ -164,7 +191,7 @@ Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
         return Dot11AkmSuite::Dot11AkmSuiteApPeerKey;
     case Ieee80211AkmSuite::Ieee8021xSuiteB:
         return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB;
-    case Ieee80211AkmSuite::Ieee8011xSuiteB192:
+    case Ieee80211AkmSuite::Ieee8021xSuiteB192:
         return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192;
     case Ieee80211AkmSuite::Ft8021xSha384:
         return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
@@ -185,6 +212,55 @@ Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
     }
 
     return Dot11AkmSuite::Dot11AkmSuiteUnknown;
+}
+
+Ieee80211AkmSuite
+NetRemoteAkmToIeee80211AkmSuite(Dot11AkmSuite akmSuite)
+{
+    switch (akmSuite) {
+    case Dot11AkmSuite::Dot11AkmSuite8021x:
+        return Ieee80211AkmSuite::Ieee8021x;
+    case Dot11AkmSuite::Dot11AkmSuitePsk:
+        return Ieee80211AkmSuite::Psk;
+    case Dot11AkmSuite::Dot11AkmSuiteFt8021x:
+        return Ieee80211AkmSuite::Ft8021x;
+    case Dot11AkmSuite::Dot11AkmSuiteFtPsk:
+        return Ieee80211AkmSuite::FtPsk;
+    case Dot11AkmSuite::Dot11AkmSuite8021xSha256:
+        return Ieee80211AkmSuite::Ieee8021xSha256;
+    case Dot11AkmSuite::Dot11AkmSuitePskSha256:
+        return Ieee80211AkmSuite::PskSha256;
+    case Dot11AkmSuite::Dot11AkmSuiteTdls:
+        return Ieee80211AkmSuite::Tdls;
+    case Dot11AkmSuite::Dot11AkmSuiteSae:
+        return Ieee80211AkmSuite::Sae;
+    case Dot11AkmSuite::Dot11AkmSuiteFtSae:
+        return Ieee80211AkmSuite::FtSae;
+    case Dot11AkmSuite::Dot11AkmSuiteApPeerKey:
+        return Ieee80211AkmSuite::ApPeerKey;
+    case Dot11AkmSuite::Dot11AkmSuite8021xSuiteB:
+        return Ieee80211AkmSuite::Ieee8021xSuiteB;
+    case Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192:
+        return Ieee80211AkmSuite::Ieee8021xSuiteB192;
+    case Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384:
+        return Ieee80211AkmSuite::Ft8021xSha384;
+    case Dot11AkmSuite::Dot11AkmSuiteFilsSha256:
+        return Ieee80211AkmSuite::FilsSha256;
+    case Dot11AkmSuite::Dot11AkmSuiteFilsSha384:
+        return Ieee80211AkmSuite::FilsSha384;
+    case Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256:
+        return Ieee80211AkmSuite::FtFilsSha256;
+    case Dot11AkmSuite::Dot11AkmSuiteFtFilsSha384:
+        return Ieee80211AkmSuite::FtFilsSha384;
+    case Dot11AkmSuite::Dot11AkmSuiteOwe:
+        return Ieee80211AkmSuite::Owe;
+    case Dot11AkmSuite::Dot11AkmSuiteFtPskSha384:
+        return Ieee80211AkmSuite::FtPskSha384;
+    case Dot11AkmSuite::Dot11AkmSuitePskSha384:
+        return Ieee80211AkmSuite::PskSha384;
+    default:
+        return Ieee80211AkmSuite::Reserved0;
+    }
 }
 
 using Microsoft::Net::Wifi::Dot11CipherSuite;
@@ -225,6 +301,41 @@ IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
     }
 
     return Dot11CipherSuite::Dot11CipherSuiteUnknown;
+}
+
+Ieee80211CipherSuite
+NetRemoteCipherSuiteToIeeeCipherAlgorithm(Dot11CipherSuite cipherSuite)
+{
+    switch (cipherSuite) {
+    case Dot11CipherSuite::Dot11CipherSuiteBipCmac128:
+        return Ieee80211CipherSuite::BipCmac128;
+    case Dot11CipherSuite::Dot11CipherSuiteBipCmac256:
+        return Ieee80211CipherSuite::BipCmac256;
+    case Dot11CipherSuite::Dot11CipherSuiteBipGmac128:
+        return Ieee80211CipherSuite::BipGmac128;
+    case Dot11CipherSuite::Dot11CipherSuiteBipGmac256:
+        return Ieee80211CipherSuite::BipGmac256;
+    case Dot11CipherSuite::Dot11CipherSuiteCcmp128:
+        return Ieee80211CipherSuite::Ccmp128;
+    case Dot11CipherSuite::Dot11CipherSuiteCcmp256:
+        return Ieee80211CipherSuite::Ccmp256;
+    case Dot11CipherSuite::Dot11CipherSuiteGcmp128:
+        return Ieee80211CipherSuite::Gcmp128;
+    case Dot11CipherSuite::Dot11CipherSuiteGcmp256:
+        return Ieee80211CipherSuite::Gcmp256;
+    case Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed:
+        return Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed;
+    case Dot11CipherSuite::Dot11CipherSuiteTkip:
+        return Ieee80211CipherSuite::Tkip;
+    case Dot11CipherSuite::Dot11CipherSuiteUseGroup:
+        return Ieee80211CipherSuite::UseGroup;
+    case Dot11CipherSuite::Dot11CipherSuiteWep104:
+        return Ieee80211CipherSuite::Wep104;
+    case Dot11CipherSuite::Dot11CipherSuiteWep40:
+        return Ieee80211CipherSuite::Wep40;
+    default:
+        return Ieee80211CipherSuite::Unknown;
+    }
 }
 
 Microsoft::Net::Wifi::Dot11AccessPointCapabilities
@@ -389,9 +500,6 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Dot11PhyType;
 
 ::grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response)
@@ -485,6 +593,113 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to set Ieee80211 protocol for access point {} ({})", request->accesspointid(), apce.what());
         return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+    }
+
+    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    response->set_accesspointid(request->accesspointid());
+    *response->mutable_status() = std::move(status);
+
+    return grpc::Status::OK;
+}
+
+using Microsoft::Net::Wifi::Dot11AccessPointAuthenticationConfiguration;
+using Microsoft::Net::Wifi::Dot11AkmSuite;
+using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
+using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
+using Microsoft::Net::Wifi::Dot11CipherSuite;
+
+::grpc::Status
+NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationConfigurationResult* response)
+{
+    LOGD << std::format("Received WifiAccessPointSetAuthenticationConfiguration request for access point id {}", request->accesspointid());
+
+    WifiAccessPointOperationStatus status{};
+
+    const auto& authenticationConfiguration = request->authenticationconfiguration();
+    const auto& akmSuiteConfigurations = authenticationConfiguration.akmsuites();
+    const auto& cipherSuites = authenticationConfiguration.ciphersuites();
+
+    auto handleFailure = [&](WifiAccessPointOperationStatusCode statusCode, std::string statusMessage) {
+        LOGE << statusMessage;
+
+        status.set_code(statusCode);
+        status.set_message(statusMessage);
+
+        response->set_accesspointid(request->accesspointid());
+        *response->mutable_status() = std::move(status);
+
+        return grpc::Status::OK;
+    };
+
+    // Check for invalid provided AKM suites or cipher suites.
+    if (std::empty(akmSuiteConfigurations) && std::empty(cipherSuites)) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No AKM suite or cipher suite provided");
+    } else if (!std::empty(akmSuiteConfigurations) && std::ranges::find(akmSuiteConfigurations, Dot11AkmSuite::Dot11AkmSuiteUnknown, &Dot11AkmSuiteConfiguration::akmsuite) != std::cend(akmSuiteConfigurations)) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "Invalid AKM suite provided");
+    } else if (!std::empty(akmSuiteConfigurations) && std::ranges::find(akmSuiteConfigurations, Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown, &Dot11AkmSuiteConfiguration::authenticationalgorithm) != std::cend(akmSuiteConfigurations)) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "Invalid authentication algorithm provided");
+    } else if (!std::empty(cipherSuites) && std::ranges::find(cipherSuites, Dot11CipherSuite::Dot11CipherSuiteUnknown) != std::cend(cipherSuites)) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "Invalid cipher suite provided");
+    }
+
+    // Create an AP controller for the requested AP.
+    auto accessPointWeak = m_accessPointManager->GetAccessPoint(request->accesspointid());
+    auto accessPointController = detail::IAccessPointWeakToAccessPointController(accessPointWeak);
+    if (!accessPointController) {
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Failed to create controller for access point {}", request->accesspointid()));
+    }
+
+    // Convert Dot11AkmSuiteConfigurations to Ieee equivalent values.
+    std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> ieeeAkmSuites;
+    std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> ieeeAuthenticationAlgorithms;
+    std::ranges::transform(akmSuiteConfigurations, std::back_inserter(ieeeAkmSuites), [&](const Dot11AkmSuiteConfiguration& akmSuiteConfiguration) {
+        return detail::NetRemoteAkmToIeee80211AkmSuite(akmSuiteConfiguration.akmsuite());
+    });
+    std::ranges::transform(akmSuiteConfigurations, std::back_inserter(ieeeAuthenticationAlgorithms), [&](const Dot11AkmSuiteConfiguration& akmSuiteConfiguration) {
+        return detail::NetRemoteAuthenticationAlgorithmToIeeeAuthenticationAlgorithm(akmSuiteConfiguration.authenticationalgorithm());
+    });
+    // TODO: Store configuration values somehow.
+
+    // TODO: Convert Dot11CipherSuites to Ieee80211CipherSuites.
+
+    // Check if provided authentication configuration is supported by AP.
+    try {
+        auto accessPointCapabilities = accessPointController->GetCapabilities();
+        const auto& supportedAkmSuites = accessPointCapabilities.AkmSuites;
+        const auto& supportedCipherSuites = accessPointCapabilities.CipherSuites;
+
+        if (!std::empty(akmSuiteConfigurations)) {
+            // Remove unsupported AKM suites.
+            for (const auto& ieeeAkmSuite : ieeeAkmSuites) {
+                if (std::ranges::find(supportedAkmSuites, ieeeAkmSuite) == std::cend(supportedAkmSuites)) {
+                    std::erase(ieeeAkmSuites, ieeeAkmSuite);
+                }
+            }
+            // TODO: Do the same for other parts of Dot11AkmSuiteConfiguration.
+        }
+
+        if (!std::empty(cipherSuites)) {
+            // TODO: Remove unsupported cipher suites.
+        }
+    } catch (const AccessPointControllerException& apce) {
+        LOGE << std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what());
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
+    }
+
+    // Set the authentication configuration for the AP.
+    try {
+        if (!std::empty(akmSuiteConfigurations)) {
+            if (!accessPointController->SetAkmSuites(ieeeAkmSuites)) {
+                return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set AKM suites for access point {}", request->accesspointid()));
+            }
+        }
+
+        if (!std::empty(cipherSuites)) {
+            // TODO: Set cipher suites via accessPointController->SetCipherSuites.
+        }
+    } catch (const AccessPointControllerException& apce) {
+        LOGE << std::format("Failed to set authentication configuration for access point {} ({})", request->accesspointid(), apce.what());
+        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set authentication configuration for access point {}", request->accesspointid()));
     }
 
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);

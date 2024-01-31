@@ -52,6 +52,28 @@ AccessPointControllerTest::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol i
     return true;
 }
 
+bool
+AccessPointControllerTest::SetAkmSuites(std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> akmSuites)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetAkmSuites called with null AccessPoint");
+    }
+
+    // TODO: Set AKM suites.
+    return true;
+}
+
+bool
+AccessPointControllerTest::SetCipherSuites(std::vector<Microsoft::Net::Wifi::Ieee80211CipherSuite> cipherSuites)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetCipherSuites called with null AccessPoint");
+    }
+
+    // TODO: Set cipher suites.
+    return true;
+}
+
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
     AccessPoint(accessPoint)
 {}

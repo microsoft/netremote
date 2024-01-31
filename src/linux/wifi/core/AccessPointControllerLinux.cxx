@@ -165,7 +165,7 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 bool
-AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
     bool isOk = false;
     Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
@@ -198,6 +198,20 @@ AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol 
 
     // Reload hostapd conf file.
     return isOk && m_hostapd.Reload();
+}
+
+bool
+AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites)
+{
+    // TODO: Set AKM suites.
+    return true;
+}
+
+bool
+AccessPointControllerLinux::SetCipherSuites(std::vector<Ieee80211CipherSuite> cipherSuites)
+{
+    // TODO: Set cipher suites.
+    return true;
 }
 
 std::unique_ptr<IAccessPointController>

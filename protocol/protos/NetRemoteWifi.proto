@@ -73,3 +73,15 @@ message WifiAccessPointSetPhyTypeResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointSetAuthenticationConfigurationRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11AccessPointAuthenticationConfiguration AuthenticationConfiguration = 2;
+}
+
+message WifiAccessPointSetAuthenticationConfigurationResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
