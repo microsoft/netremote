@@ -209,7 +209,6 @@
             "description": "Base options for release on all platforms",
             "inherits": [
                 "out-of-source-build",
-                "out-of-source-install",
                 "packaging-release"
             ]
         },
