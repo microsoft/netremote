@@ -200,6 +200,39 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
+    static constexpr auto PropertyNameWpa = "wpa";
+    static constexpr auto PropertyWpaValue0 = "0"; // None
+    static constexpr auto PropertyWpaValue1 = "1"; // WPA
+    static constexpr auto PropertyWpaValue2 = "2"; // IEEE 802.11i/RSN (WPA2)
+    static constexpr auto PropertyWpaValue3 = "3"; // WPA and WPA2
+
+    static constexpr auto PropertyNameWpaKeyMgmt = "wpa_key_mgmt";
+    static constexpr auto PropertyWpaKeyMgmtValueWpaPsk = "WPA-PSK";
+    static constexpr auto PropertyWpaKeyMgmtValueWpaPskSha256 = "WPA-PSK-SHA256";
+    static constexpr auto PropertyWpaKeyMgmtValueWpaEap = "WPA-EAP";
+    static constexpr auto PropertyWpaKeyMgmtValueWpaEapSha256 = "WPA-EAP-SHA256";
+    static constexpr auto PropertyWpaKeyMgmtValueSae = "SAE";
+    static constexpr auto PropertyWpaKeyMgmtValueWpaEapSuiteB192 = "WPA-EAP-SUITE-B-192";
+    static constexpr auto PropertyWpaKeyMgmtValueFtPsk = "FT-PSK";
+    static constexpr auto PropertyWpaKeyMgmtValueFtEap = "FT-EAP";
+    static constexpr auto PropertyWpaKeyMgmtValueFtEapSha384 = "FT-EAP-SHA384";
+    static constexpr auto PropertyWpaKeyMgmtValueFtSae = "FT-SAE";
+    static constexpr auto PropertyWpaKeyMgmtValueFilsSha256 = "FILS-SHA256";
+    static constexpr auto PropertyWpaKeyMgmtValueFilsSha384 = "FILS-SHA384";
+    static constexpr auto PropertyWpaKeyMgmtValueFtFilsSha256 = "FT-FILS-SHA256";
+    static constexpr auto PropertyWpaKeyMgmtValueFtFilsSha384 = "FT-FILS-SHA384";
+    static constexpr auto PropertyWpaKeyMgmtValueOwe = "OWE";
+    static constexpr auto PropertyWpaKeyMgmtValueDpp = "DPP";
+    static constexpr auto PropertyWpaKeyMgmtValueOsen = "OSEN";
+
+    static constexpr auto PropertyNameWpaPairwise = "wpa_pairwise";
+    static constexpr auto PropertynameRsnPairwise = "rsn_pairwise";
+    static constexpr auto PropertyPairwiseValueCcmp = "CCMP";
+    static constexpr auto PropertyPairwiseValueTkip = "TKIP";
+    static constexpr auto PropertyPairwiseValueCcmp256 = "CCMP-256";
+    static constexpr auto PropertyPairwiseValueGcmp = "GCMP";
+    static constexpr auto PropertyPairwiseValueGcmp256 = "GCMP-256";
+
     static constexpr auto PropertyNameIeee80211N = "ieee80211n";
     static constexpr auto PropertyNameDisable11N = "disable_11n";
     static constexpr auto PropertyNameIeee80211AC = "ieee80211ac";
