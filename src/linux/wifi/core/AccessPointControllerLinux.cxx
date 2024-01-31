@@ -7,6 +7,7 @@
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 
@@ -74,6 +75,50 @@ Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
 
     return protocols;
 }
+
+Wpa::HostapdHwMode
+IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol)
+{
+    switch (ieeeProtocol) {
+    case Ieee80211Protocol::B:
+        return Wpa::HostapdHwMode::Ieee80211b;
+    case Ieee80211Protocol::G:
+        return Wpa::HostapdHwMode::Ieee80211g;
+    case Ieee80211Protocol::N:
+        return Wpa::HostapdHwMode::Ieee80211a; // TODO: Could be a or g depending on band
+    case Ieee80211Protocol::A:
+        return Wpa::HostapdHwMode::Ieee80211a;
+    case Ieee80211Protocol::AC:
+        return Wpa::HostapdHwMode::Ieee80211a;
+    case Ieee80211Protocol::AD:
+        return Wpa::HostapdHwMode::Ieee80211ad;
+    case Ieee80211Protocol::AX:
+        return Wpa::HostapdHwMode::Ieee80211a;
+    case Ieee80211Protocol::BE:
+        return Wpa::HostapdHwMode::Ieee80211a; // TODO: Assuming a, although hostapd docs don't mention it
+    default:
+        return Wpa::HostapdHwMode::Unknown;
+    }
+}
+
+std::string
+HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
+{
+    switch (hwMode) {
+    case Wpa::HostapdHwMode::Ieee80211b:
+        return Wpa::ProtocolHostapd::PropertyHwModeValueB;
+    case Wpa::HostapdHwMode::Ieee80211g:
+        return Wpa::ProtocolHostapd::PropertyHwModeValueG;
+    case Wpa::HostapdHwMode::Ieee80211a:
+        return Wpa::ProtocolHostapd::PropertyHwModeValueA;
+    case Wpa::HostapdHwMode::Ieee80211ad:
+        return Wpa::ProtocolHostapd::PropertyHwModeValueAD;
+    case Wpa::HostapdHwMode::Ieee80211any:
+        return Wpa::ProtocolHostapd::PropertyHwModeValueAny;
+    default: // case Wpa::HostapdHwMode::Unknown
+        throw AccessPointControllerException(std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode)));
+    }
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
@@ -117,6 +162,42 @@ AccessPointControllerLinux::GetIsEnabled()
     }
 
     return isEnabled;
+}
+
+bool
+AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+{
+    bool isOk = false;
+    Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+
+    try {
+        // Set the hostapd hw_mode property.
+        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameHwMode, detail::HostapdHwModeToPropertyValue(hwMode));
+
+        // Additively set other hostapd properties based on the protocol.
+        switch (ieeeProtocol) {
+        case Ieee80211Protocol::AX:
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
+            [[fallthrough]];
+        case Ieee80211Protocol::AC:
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
+            [[fallthrough]];
+        case Ieee80211Protocol::N:
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
+            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);
+            break;
+        default:
+            break;
+        }
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set Ieee80211 protocol for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    // Reload hostapd conf file.
+    return isOk && m_hostapd.Reload();
 }
 
 std::unique_ptr<IAccessPointController>

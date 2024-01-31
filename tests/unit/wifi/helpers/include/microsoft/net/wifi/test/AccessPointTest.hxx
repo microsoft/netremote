@@ -23,6 +23,7 @@ struct AccessPointTest final :
     std::string InterfaceName;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     bool IsEnabled{ false };
+    Microsoft::Net::Wifi::Ieee80211Protocol Protocol;
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.

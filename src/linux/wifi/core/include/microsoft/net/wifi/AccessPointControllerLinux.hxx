@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include <Wpa/Hostapd.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -28,9 +29,9 @@ struct AccessPointControllerLinux :
 
     /**
      * @brief Get whether the access point is enabled.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     virtual bool
     GetIsEnabled() override;
@@ -42,6 +43,16 @@ struct AccessPointControllerLinux :
      */
     virtual Ieee80211AccessPointCapabilities
     GetCapabilities() override;
+
+    /**
+     * @brief Set the Ieee80211 protocol.
+     *
+     * @param ieeeProtocol The Ieee80211 protocol to be set.
+     * @return true
+     * @return false
+     */
+    virtual bool
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 
 private:
     Wpa::Hostapd m_hostapd;
