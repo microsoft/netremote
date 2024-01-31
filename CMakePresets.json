@@ -19,6 +19,7 @@
         },
         {
             "name": "windows-arm64",
+            "hidden": true,
             "displayName": "Windows ARM64",
             "description": "Base options for all Windows ARM64 builds",
             "inherits": [
