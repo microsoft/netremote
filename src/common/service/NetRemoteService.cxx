@@ -218,6 +218,8 @@ Ieee80211AkmSuite
 NetRemoteAkmToIeee80211AkmSuite(Dot11AkmSuite akmSuite)
 {
     switch (akmSuite) {
+    case Dot11AkmSuite::Dot11AkmSuiteReserved0:
+        return Ieee80211AkmSuite::Reserved0;
     case Dot11AkmSuite::Dot11AkmSuite8021x:
         return Ieee80211AkmSuite::Ieee8021x;
     case Dot11AkmSuite::Dot11AkmSuitePsk:
@@ -259,7 +261,7 @@ NetRemoteAkmToIeee80211AkmSuite(Dot11AkmSuite akmSuite)
     case Dot11AkmSuite::Dot11AkmSuitePskSha384:
         return Ieee80211AkmSuite::PskSha384;
     default:
-        return Ieee80211AkmSuite::Reserved0;
+        return Ieee80211AkmSuite::Unknown;
     }
 }
 

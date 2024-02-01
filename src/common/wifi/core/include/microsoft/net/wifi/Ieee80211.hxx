@@ -175,6 +175,7 @@ static constexpr uint8_t Ieee80211AkmSuiteIdPskSha384 = 20;
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
  */
 enum class Ieee80211AkmSuite : uint32_t {
+    Unknown = MakeIeeeSuite(OuiInvalid, 0),
     Reserved0 = MakeIeee80211Suite(Ieee80211AkmSuiteIdReserved0),
     Ieee8021x = MakeIeee80211Suite(Ieee80211AkmSuiteId8021x),
     Psk = MakeIeee80211Suite(Ieee80211AkmSuiteIdPsk),
