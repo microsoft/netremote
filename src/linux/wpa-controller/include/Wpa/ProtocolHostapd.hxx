@@ -200,11 +200,15 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
+    static constexpr auto PropertyNameAuthAlgs = "auth_algs";
+    static constexpr auto PropertyAuthAlgsValueOpen = "1"; // Open System Authentication
+    static constexpr auto PropertyAuthAlgsValueSharedKey = "2"; // Shared Key Authentication
+    static constexpr auto PropertyAuthAlgsValueOpenAndSharedKey = "3"; // Open System and Shared Key
+
     static constexpr auto PropertyNameWpa = "wpa";
-    static constexpr auto PropertyWpaValue0 = "0"; // None
-    static constexpr auto PropertyWpaValue1 = "1"; // WPA
-    static constexpr auto PropertyWpaValue2 = "2"; // IEEE 802.11i/RSN (WPA2)
-    static constexpr auto PropertyWpaValue3 = "3"; // WPA and WPA2
+    static constexpr auto PropertyWpaValueWpa = "1"; // WPA
+    static constexpr auto PropertyWpaValueWpa2 = "2"; // IEEE 802.11i/RSN (WPA2)
+    static constexpr auto PropertyWpaValueWpaAndWpa2 = "3"; // WPA and WPA2
 
     static constexpr auto PropertyNameWpaKeyMgmt = "wpa_key_mgmt";
     static constexpr auto PropertyWpaKeyMgmtValueWpaPsk = "WPA-PSK";

@@ -304,8 +304,11 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
         // Set the hostapd wpa_key_mgmt property.
         isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpaKeyMgmt, concatenatedWpaKeyMgmtPropertyValue);
 
-        // Set the hostapd wpa property.
-        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpa, Wpa::ProtocolHostapd::PropertyWpaValue2); // TODO: Set this correctly
+        // For simplicity, set the hostapd wpa property to allow WPA and WPA2 (and WPA3).
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpa, Wpa::ProtocolHostapd::PropertyWpaValueWpaAndWpa2);
+
+        // For simplicity, set the hostapd auth_algs property to allow both Open System Authentication and Shared Key Authentication.
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameAuthAlgs, Wpa::ProtocolHostapd::PropertyAuthAlgsValueOpenAndSharedKey);
     } catch (const Wpa::HostapdException& ex) {
         throw AccessPointControllerException(std::format("Failed to set AKM suites for interface {} ({})", GetInterfaceName(), ex.what()));
     }
