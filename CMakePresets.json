@@ -6,21 +6,42 @@
     },
     "configurePresets": [
         {
-            "name": "os-windows",
+            "name": "windows",
             "hidden": true,
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_GENERATOR": "Visual Studio 17 2022"
             }
         },
         {
-            "name": "os-linux",
+            "name": "windows-arm64",
+            "hidden": true,
+            "displayName": "Windows ARM64",
+            "description": "Base options for all Windows ARM64 builds",
+            "inherits": [
+                "windows"
+            ],
+            "architecture": {
+                "value": "ARM64",
+                "strategy": "set"
+            }
+        },
+        {
+            "name": "linux",
             "hidden": true,
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-17",
+                "CMAKE_GENERATOR": "Ninja Multi-Config"
             }
         },
         {
@@ -52,184 +73,278 @@
             "installDir": "${sourceDir}/install/${presetName}"
         },
         {
-            "name": "linux-base",
+            "name": "packaging",
             "hidden": true,
+            "displayName": "Packaging (base)",
+            "description": "Base options for all packaging presets"
+        },
+        {
+            "name": "packaging-dev",
+            "hidden": true,
+            "displayName": "Packaging (development)",
+            "description": "Development packaging for inner-loop",
+            "inherits": [
+                "packaging"
+            ]
+        },
+        {
+            "name": "packaging-release",
+            "hidden": true,
+            "displayName": "Packaging (release)",
+            "description": "Release packaging for inner-loop",
+            "inherits": [
+                "packaging"
+            ]
+        },
+        {
+            "name": "packaging-linux",
+            "hidden": true,
+            "displayName": "Packaging Linux (base)",
+            "inherits": [
+                "linux",
+                "packaging"
+            ],
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
-                "CMAKE_C_COMPILER": "/usr/bin/clang-17",
-                "CMAKE_GENERATOR": "Ninja Multi-Config"
+                "CPACK_PACKAGING_INSTALL_PREFIX": "/usr/local"
             }
         },
         {
-            "name": "windows-base",
+            "name": "packaging-linux-dev",
             "hidden": true,
+            "displayName": "Packaging Linux (development)",
+            "description": "Packaging for development inner-loop on Linux",
+            "inherits": [
+                "packaging-linux"
+            ],
             "cacheVariables": {
-                "CMAKE_GENERATOR": "Visual Studio 17 2022"
-            }
-        },
-        {
-            "name": "dev-packaging-base",
-            "hidden": true,
-            "displayName": "Development (packaging base)",
-            "cacheVariables": {
-                "CPACK_PACKAGING_INSTALL_PREFIX": "/usr/local",
                 "CPACK_SET_DESTDIR": "OFF"
             }
         },
         {
-            "name": "release-packaging-base",
+            "name": "packaging-linux-release",
             "hidden": true,
-            "displayName": "Release (packaging base)",
+            "displayName": "Packaging Linux (release)",
+            "description": "Packaging for release on Linux",
+            "inherits": [
+                "packaging-linux"
+            ],
             "cacheVariables": {
-                "CPACK_PACKAGING_INSTALL_PREFIX": "/usr/local",
                 "CPACK_SET_DESTDIR": "ON"
             }
         },
         {
-            "name": "dev-base",
+            "name": "packaging-windows",
             "hidden": true,
-            "displayName": "Development (base)",
-            "description": "Base options for all development presets",
+            "displayName": "Packaging Windows (base)",
             "inherits": [
-                "out-of-source-build",
-                "out-of-source-install",
-                "dev-packaging-base"
+                "windows",
+                "packaging"
+            ],
+            "cacheVariables": {
+                "CPACK_GENERATOR": "ZIP"
+            }
+        },
+        {
+            "name": "packaging-windows-dev",
+            "hidden": true,
+            "displayName": "Packaging Windows (development)",
+            "description": "Packaging for development inner-loop on Windows",
+            "inherits": [
+                "packaging-windows"
+            ]
+        },
+        {
+            "name": "packaging-windows-release",
+            "hidden": true,
+            "displayName": "Packaging Windows (release)",
+            "description": "Packaging for release on Windows",
+            "inherits": [
+                "packaging-windows"
             ]
         },
         {
             "name": "dev",
             "hidden": true,
-            "displayName": "Development",
-            "description": "Development build for inner-loop",
+            "displayName": "Development (base)",
+            "description": "Base options for development inner-loop on all platforms",
             "inherits": [
-                "dev-base"
+                "out-of-source-build",
+                "out-of-source-install",
+                "packaging-dev"
             ]
         },
         {
             "name": "dev-linux",
             "displayName": "Development",
-            "description": "Development build for inner-loop on Linux",
+            "description": "Development inner-loop on Linux",
             "inherits": [
-                "os-linux",
-                "linux-base",
-                "dev"
+                "dev",
+                "linux",
+                "packaging-linux-dev"
             ]
         },
+
         {
             "name": "dev-windows",
             "displayName": "Development",
-            "description": "Development build for inner-loop on Windows",
+            "description": "Development inner-loop on Windows",
             "inherits": [
-                "os-windows",
-                "windows-base",
-                "dev"
+                "dev",
+                "windows",
+                "packaging-windows-dev"
             ]
         },
         {
             "name": "dev-windows-arm64",
             "displayName": "Development (ARM64)",
-            "description": "Development build for inner-loop on Windows ARM64",
-            "inherits":[
-                "dev-windows"
-            ],
-            "architecture": {
-                "value": "ARM64",
-                "strategy": "set"
-            }
+            "description": "Development inner-loop on Windows ARM64",
+            "inherits": [
+                "dev-windows",
+                "windows-arm64"
+            ]
         },
         {
-            "name": "release-base",
+            "name": "release",
             "hidden": true,
+            "displayName": "Release (base)",
+            "description": "Base options for release on all platforms",
             "inherits": [
                 "out-of-source-build",
-                "release-packaging-base"
+                "packaging-release"
+            ]
+        },
+        {
+            "name": "release-linux",
+            "displayName": "Release",
+            "description": "Release for Linux",
+            "inherits": [
+                "release",
+                "linux",
+                "packaging-linux-release"
             ],
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "/usr/local"
             }
         },
         {
-            "name": "release-linux",
-            "inherits":[
-                "os-linux",
-                "linux-base",
-                "release-base"
+            "name": "release-windows",
+            "displayName": "Release",
+            "description": "Release for Windows",
+            "inherits": [
+                "release",
+                "windows",
+                "packaging-windows-release"
             ]
         },
         {
-            "name": "release-windows",
-            "inherits":[
-                "os-windows",
-                "windows-base",
-                "release-base"
+            "name": "release-windows-arm64",
+            "displayName": "Release (ARM64)",
+            "description": "Release for Windows ARM64",
+            "inherits": [
+                "release-windows",
+                "windows-arm64"
             ]
         }
     ],
     "buildPresets": [
         {
-            "name": "dev-linux",
-            "configurePreset": "dev-linux",
-            "configuration": "Debug"
-        },
-        {
-            "name": "dev-windows",
-            "configurePreset": "dev-windows"
-        },
-        {
             "name": "cfg-debug",
             "hidden": true,
+            "displayName": "Build (Debug)",
+            "description": "Build the project with Debug configuration",
             "configuration": "Debug"
         },
         {
             "name": "cfg-release",
             "hidden": true,
+            "displayName": "Build (Release)",
+            "description": "Build the project with Release configuration",
             "configuration": "Release"
         },
         {
-            "name": "cfg-release-with-debug",
+            "name": "cfg-release-with-debuginfo",
             "hidden": true,
+            "displayName": "Build (RelWithDebInfo)",
+            "description": "Build the project with RelWithDebInfo configuration",
             "configuration": "RelWithDebInfo"
         },
         {
-            "name": "release-linux-debug",
-            "configurePreset": "release-linux",
+            "name": "cfg-release-with-minsizerel",
+            "hidden": true,
+            "displayName": "Build (MinSizeRel)",
+            "description": "Build the project with MinSizeRel configuration",
+            "configuration": "MinSizeRel"
+        },
+        {
+            "name": "build-dev",
+            "hidden": true,
+            "displayName": "Development Build (base)",
+            "description": "Base options for development builds on all platforms",
             "inherits": [
                 "cfg-debug"
             ]
         },
         {
-            "name": "release-linux-release",
+            "name": "build-release",
+            "hidden": true,
+            "displayName": "Release Build (base)",
+            "description": "Base options for release builds on all platforms",
+            "inherits": [
+                "cfg-release-with-debuginfo"
+            ]
+        },
+        {
+            "name": "build-dev-linux",
+            "displayName": "Development",
+            "description": "Build the project for development on Linux",
+            "configurePreset": "dev-linux",
+            "inherits": [
+                "build-dev"
+            ]
+        },
+        {
+            "name": "build-dev-windows",
+            "displayName": "Development",
+            "description": "Build the project for development on Windows",
+            "configurePreset": "dev-windows",
+            "inherits": [
+                "build-dev"
+            ]
+        },
+        {
+            "name": "build-dev-windows-arm64",
+            "displayName": "Development",
+            "description": "Build the project for development on Windows (ARM64)",
+            "configurePreset": "dev-windows-arm64",
+            "inherits": [
+                "build-dev"
+            ]
+        },
+        {
+            "name": "build-release-linux",
+            "displayName": "Release",
+            "description": "Build the project for release on Linux",
             "configurePreset": "release-linux",
             "inherits": [
-                "cfg-release"
+                "build-release"
             ]
         },
         {
-            "name": "release-linux-release-with-debug",
-            "configurePreset": "release-linux",
-            "inherits": [
-                "cfg-release-with-debug"
-            ]
-        },
-        {
-            "name": "release-windows-debug",
+            "name": "build-release-windows",
+            "displayName": "Release",
+            "description": "Build the project for release on Windows",
             "configurePreset": "release-windows",
             "inherits": [
-                "cfg-debug"
+                "build-release"
             ]
         },
         {
-            "name": "release-windows-release",
-            "configurePreset": "release-windows",
+            "name": "build-release-windows-arm64",
+            "displayName": "Release (ARM64)",
+            "description": "Build the project for release on Windows (ARM64)",
+            "configurePreset": "release-windows-arm64",
             "inherits": [
-                "cfg-release"
-            ]
-        },
-        {
-            "name": "release-windows-release-with-debug",
-            "configurePreset": "release-windows",
-            "inherits": [
-                "cfg-release-with-debug"
+                "build-release"
             ]
         }
     ],
@@ -267,6 +382,32 @@
             "inherits": [
                 "test-common"
             ]
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "packaging-dev",
+            "configurePreset": "packaging-dev"
+        },
+        {
+            "name": "packaging-release",
+            "configurePreset": "packaging-release"
+        },
+        {
+            "name": "packaging-dev-linux",
+            "configurePreset": "dev-linux"
+        },
+        {
+            "name": "packaging-release-linux",
+            "configurePreset": "release-linux"
+        },
+        {
+            "name": "packaging-dev-windows",
+            "configurePreset": "dev-windows"
+        },
+        {
+            "name": "packaging-release-windows",
+            "configurePreset": "release-windows"
         }
     ]
 }
