@@ -147,7 +147,7 @@ IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
     case Ieee80211AkmSuite::ApPeerKey:
         return "";
     case Ieee80211AkmSuite::Ieee8021xSuiteB:
-        return "";
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSuiteB;
     case Ieee80211AkmSuite::Ieee8021xSuiteB192:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSuiteB192;
     case Ieee80211AkmSuite::Ft8021xSha384:

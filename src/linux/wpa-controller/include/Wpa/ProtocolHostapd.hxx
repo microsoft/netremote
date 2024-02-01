@@ -216,6 +216,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyWpaKeyMgmtValueWpaEap = "WPA-EAP";
     static constexpr auto PropertyWpaKeyMgmtValueWpaEapSha256 = "WPA-EAP-SHA256";
     static constexpr auto PropertyWpaKeyMgmtValueSae = "SAE";
+    static constexpr auto PropertyWpaKeyMgmtValueWpaEapSuiteB = "WPA-EAP-SUITE-B";
     static constexpr auto PropertyWpaKeyMgmtValueWpaEapSuiteB192 = "WPA-EAP-SUITE-B-192";
     static constexpr auto PropertyWpaKeyMgmtValueFtPsk = "FT-PSK";
     static constexpr auto PropertyWpaKeyMgmtValueFtEap = "FT-EAP";
