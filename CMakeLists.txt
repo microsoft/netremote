@@ -30,6 +30,8 @@ include(version)
 project(netremote
   LANGUAGES CXX
   VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}
+  DESCRIPTION "A framework for remotely controlling network components such as wi-fi access points."
+  HOMEPAGE_URL https://github.com/microsoft/netremote
 )
 
 # Conditional inclusion of OS-dependent source trees.
