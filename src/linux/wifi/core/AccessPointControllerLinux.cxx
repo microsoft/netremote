@@ -101,7 +101,7 @@ IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol)
     }
 }
 
-std::string
+std::string_view
 HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
 {
     switch (hwMode) {
@@ -120,7 +120,7 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
     }
 }
 
-std::string
+std::string_view
 IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
 {
     switch (akmSuite) {
@@ -171,7 +171,7 @@ IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
     }
 }
 
-std::string
+std::string_view
 IeeeCipherSuiteToPairwisePropertyValue(Ieee80211CipherSuite cipherSuite)
 {
     switch (cipherSuite) {
@@ -297,7 +297,8 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
     std::string concatenatedWpaKeyMgmtPropertyValue{};
     for (const auto& akmSuite : akmSuites) {
         const auto& wpaKeyMgmtPropertyValue = detail::IeeeAkmSuiteToWpaKeyMgmtPropertyValue(akmSuite);
-        concatenatedWpaKeyMgmtPropertyValue += wpaKeyMgmtPropertyValue + " ";    
+        concatenatedWpaKeyMgmtPropertyValue += wpaKeyMgmtPropertyValue;
+        concatenatedWpaKeyMgmtPropertyValue += " ";
     }
 
     try {
@@ -326,7 +327,8 @@ AccessPointControllerLinux::SetCipherSuites(std::vector<Ieee80211CipherSuite> ci
     std::string concatenatedPairwisePropertyValue{};
     for (const auto& cipherSuite : cipherSuites) {
         const auto& pairwisePropertyValue = detail::IeeeCipherSuiteToPairwisePropertyValue(cipherSuite);
-        concatenatedPairwisePropertyValue += pairwisePropertyValue + " ";    
+        concatenatedPairwisePropertyValue += pairwisePropertyValue;
+        concatenatedPairwisePropertyValue += " ";
     }
 
     try {
