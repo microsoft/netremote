@@ -285,7 +285,9 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
     }
 
     // Reload hostapd conf file.
-    return isOk && m_hostapd.Reload();
+    isOk = isOk && m_hostapd.Reload();
+
+    return isOk;
 }
 
 bool
@@ -315,7 +317,9 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
     }
 
     // Reload hostapd conf file.
-    return isOk && m_hostapd.Reload();
+    isOk = isOk && m_hostapd.Reload();
+
+    return isOk;
 }
 
 bool
@@ -342,7 +346,9 @@ AccessPointControllerLinux::SetCipherSuites(std::vector<Ieee80211CipherSuite> ci
     }
 
     // Reload hostapd conf file.
-    return isOk && m_hostapd.Reload();
+    isOk = isOk && m_hostapd.Reload();
+
+    return isOk;
 }
 
 std::unique_ptr<IAccessPointController>
