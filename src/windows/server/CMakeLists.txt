@@ -20,5 +20,6 @@ set_target_properties(${PROJECT_NAME}-server-windows
 install(
     TARGETS ${PROJECT_NAME}-server-windows
     EXPORT ${PROJECT_NAME}
+    COMPONENT server
 )
 

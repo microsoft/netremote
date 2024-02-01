@@ -22,4 +22,5 @@ set_target_properties(${PROJECT_NAME}-cli-linux
 install(
     TARGETS ${PROJECT_NAME}-cli-linux
     EXPORT ${PROJECT_NAME}
+    COMPONENT server
 )
