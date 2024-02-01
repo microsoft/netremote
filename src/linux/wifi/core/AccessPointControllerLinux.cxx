@@ -124,8 +124,6 @@ std::string_view
 IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
 {
     switch (akmSuite) {
-    case Ieee80211AkmSuite::Reserved0:
-        return "";
     case Ieee80211AkmSuite::Ieee8021x:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEap;
     case Ieee80211AkmSuite::Psk:
@@ -138,14 +136,10 @@ IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSha256;
     case Ieee80211AkmSuite::PskSha256:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaPskSha256;
-    case Ieee80211AkmSuite::Tdls:
-        return "";
     case Ieee80211AkmSuite::Sae:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueSae;
     case Ieee80211AkmSuite::FtSae:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtSae;
-    case Ieee80211AkmSuite::ApPeerKey:
-        return "";
     case Ieee80211AkmSuite::Ieee8021xSuiteB:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSuiteB;
     case Ieee80211AkmSuite::Ieee8021xSuiteB192:
@@ -162,12 +156,18 @@ IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtFilsSha384;
     case Ieee80211AkmSuite::Owe:
         return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueOwe;
+    case Ieee80211AkmSuite::Reserved0:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::Tdls:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::ApPeerKey:
+        [[fallthrough]];
     case Ieee80211AkmSuite::FtPskSha384:
-        return "";
+        [[fallthrough]];
     case Ieee80211AkmSuite::PskSha384:
-        return "";
+        [[fallthrough]];
     default:
-        throw AccessPointControllerException(std::format("Invalid Ieee80211AkmSuite value {}", magic_enum::enum_name(akmSuite)));
+        throw AccessPointControllerException(std::format("Invalid Ieee80211AkmSuite value {} for hostapd wpa_key_mgmt", magic_enum::enum_name(akmSuite)));
     }
 }
 
