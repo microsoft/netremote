@@ -175,16 +175,6 @@ std::string_view
 IeeeCipherSuiteToPairwisePropertyValue(Ieee80211CipherSuite cipherSuite)
 {
     switch (cipherSuite) {
-    case Ieee80211CipherSuite::Unknown:
-        return "";
-    case Ieee80211CipherSuite::BipCmac128:
-        return "";
-    case Ieee80211CipherSuite::BipCmac256:
-        return "";
-    case Ieee80211CipherSuite::BipGmac128:
-        return "";
-    case Ieee80211CipherSuite::BipGmac256:
-        return "";
     case Ieee80211CipherSuite::Ccmp128:
         return Wpa::ProtocolHostapd::PropertyPairwiseValueCcmp;
     case Ieee80211CipherSuite::Ccmp256:
@@ -193,18 +183,28 @@ IeeeCipherSuiteToPairwisePropertyValue(Ieee80211CipherSuite cipherSuite)
         return Wpa::ProtocolHostapd::PropertyPairwiseValueGcmp;
     case Ieee80211CipherSuite::Gcmp256:
         return Wpa::ProtocolHostapd::PropertyPairwiseValueGcmp256;
-    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
-        return "";
     case Ieee80211CipherSuite::Tkip:
         return Wpa::ProtocolHostapd::PropertyPairwiseValueTkip;
+    case Ieee80211CipherSuite::Unknown:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipCmac128:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipCmac256:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipGmac128:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipGmac256:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
+        [[fallthrough]];
     case Ieee80211CipherSuite::UseGroup:
-        return "";
+        [[fallthrough]];
     case Ieee80211CipherSuite::Wep104:
-        return "";
+        [[fallthrough]];
     case Ieee80211CipherSuite::Wep40:
-        return "";
+        [[fallthrough]];
     default:
-        return "";
+        throw AccessPointControllerException(std::format("Invalid Ieee80211CipherSuite value {} for hostapd wpa_pairwise/rsn_pairwise", magic_enum::enum_name(cipherSuite)));
     }
 }
 } // namespace detail
@@ -326,6 +326,8 @@ bool
 AccessPointControllerLinux::SetCipherSuites(std::vector<Ieee80211CipherSuite> cipherSuites)
 {
     bool isOk = false;
+
+    // TODO: Handle WEP separately.
 
     // For simplicity, construct both wpa_pairwise and rsn_pairwise hostapd property values.
     std::string concatenatedPairwisePropertyValue{};
