@@ -684,11 +684,9 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
 
         if (!std::empty(akmSuiteConfigurations)) {
             // Remove unsupported AKM suites.
-            for (const auto& ieeeAkmSuite : ieeeAkmSuites) {
-                if (std::ranges::find(supportedAkmSuites, ieeeAkmSuite) == std::cend(supportedAkmSuites)) {
-                    std::erase(ieeeAkmSuites, ieeeAkmSuite);
-                }
-            }
+            std::erase_if(ieeeAkmSuites, [&](const auto& ieeeAkmSuite) {
+                return std::ranges::find(supportedAkmSuites, ieeeAkmSuite) == std::cend(supportedAkmSuites);
+            });
             // TODO: Do the same for other parts of Dot11AkmSuiteConfiguration.
         }
 
