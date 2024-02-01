@@ -119,6 +119,57 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
         throw AccessPointControllerException(std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode)));
     }
 }
+
+std::string
+IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
+{
+    switch (akmSuite) {
+    case Ieee80211AkmSuite::Reserved0:
+        return "";
+    case Ieee80211AkmSuite::Ieee8021x:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEap;
+    case Ieee80211AkmSuite::Psk:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaPsk;
+    case Ieee80211AkmSuite::Ft8021x:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtEap;
+    case Ieee80211AkmSuite::FtPsk:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtPsk;
+    case Ieee80211AkmSuite::Ieee8021xSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSha256;
+    case Ieee80211AkmSuite::PskSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaPskSha256;
+    case Ieee80211AkmSuite::Tdls:
+        return "";
+    case Ieee80211AkmSuite::Sae:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueSae;
+    case Ieee80211AkmSuite::FtSae:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtSae;
+    case Ieee80211AkmSuite::ApPeerKey:
+        return "";
+    case Ieee80211AkmSuite::Ieee8021xSuiteB:
+        return "";
+    case Ieee80211AkmSuite::Ieee8021xSuiteB192:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSuiteB192;
+    case Ieee80211AkmSuite::Ft8021xSha384:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtEapSha384;
+    case Ieee80211AkmSuite::FilsSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFilsSha256;
+    case Ieee80211AkmSuite::FilsSha384:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFilsSha384;
+    case Ieee80211AkmSuite::FtFilsSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtFilsSha256;
+    case Ieee80211AkmSuite::FtFilsSha384:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtFilsSha384;
+    case Ieee80211AkmSuite::Owe:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueOwe;
+    case Ieee80211AkmSuite::FtPskSha384:
+        return "";
+    case Ieee80211AkmSuite::PskSha384:
+        return "";
+    default:
+        throw AccessPointControllerException(std::format("Invalid Ieee80211AkmSuite value {}", magic_enum::enum_name(akmSuite)));
+    }
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
