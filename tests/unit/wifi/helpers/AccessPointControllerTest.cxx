@@ -59,7 +59,7 @@ AccessPointControllerTest::SetAkmSuites(std::vector<Microsoft::Net::Wifi::Ieee80
         throw std::runtime_error("AccessPointControllerTest::SetAkmSuites called with null AccessPoint");
     }
 
-    // TODO: Set AKM suites.
+    AccessPoint->AkmSuites = akmSuites;
     return true;
 }
 
@@ -70,7 +70,7 @@ AccessPointControllerTest::SetCipherSuites(std::vector<Microsoft::Net::Wifi::Iee
         throw std::runtime_error("AccessPointControllerTest::SetCipherSuites called with null AccessPoint");
     }
 
-    // TODO: Set cipher suites.
+    AccessPoint->CipherSuites = cipherSuites;
     return true;
 }
 
