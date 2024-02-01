@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <format>
 #include <iterator>
+#include <ranges>
 #include <string>
 #include <vector>
 
@@ -209,9 +210,9 @@ Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
         return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
     case Ieee80211AkmSuite::PskSha384:
         return Dot11AkmSuite::Dot11AkmSuitePskSha384;
+    default:
+        return Dot11AkmSuite::Dot11AkmSuiteUnknown;
     }
-
-    return Dot11AkmSuite::Dot11AkmSuiteUnknown;
 }
 
 Ieee80211AkmSuite
@@ -272,8 +273,6 @@ Dot11CipherSuite
 IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
 {
     switch (ieeeCipherSuite) {
-    case Ieee80211CipherSuite::Unknown:
-        return Dot11CipherSuite::Dot11CipherSuiteUnknown;
     case Ieee80211CipherSuite::BipCmac128:
         return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
     case Ieee80211CipherSuite::BipCmac256:
@@ -300,9 +299,9 @@ IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
         return Dot11CipherSuite::Dot11CipherSuiteWep104;
     case Ieee80211CipherSuite::Wep40:
         return Dot11CipherSuite::Dot11CipherSuiteWep40;
+    default:
+        return Dot11CipherSuite::Dot11CipherSuiteUnknown;
     }
-
-    return Dot11CipherSuite::Dot11CipherSuiteUnknown;
 }
 
 Ieee80211CipherSuite
@@ -471,6 +470,23 @@ bool
 NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
 {
     return (item.accesspointid() == AccessPointIdInvalid);
+}
+
+using Microsoft::Net::Wifi::Dot11AkmSuite;
+using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
+
+Dot11AkmSuite
+AkmSuiteFromDot11AkmSuiteConfiguration(const Dot11AkmSuiteConfiguration& akmSuiteConfiguration)
+{
+    return akmSuiteConfiguration.akmsuite();
+}
+
+using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
+
+Dot11AuthenticationAlgorithm
+AuthenticationAlgorithmFromAkmSuiteConfiguration(const Dot11AkmSuiteConfiguration& akmSuiteConfiguration)
+{
+    return akmSuiteConfiguration.authenticationalgorithm();
 }
 } // namespace detail
 
@@ -652,14 +668,10 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
     }
 
     // Convert Dot11AkmSuiteConfigurations to Ieee equivalent values.
-    std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> ieeeAkmSuites;
-    std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> ieeeAuthenticationAlgorithms;
-    std::ranges::transform(akmSuiteConfigurations, std::back_inserter(ieeeAkmSuites), [&](const Dot11AkmSuiteConfiguration& akmSuiteConfiguration) {
-        return detail::NetRemoteAkmToIeee80211AkmSuite(akmSuiteConfiguration.akmsuite());
-    });
-    std::ranges::transform(akmSuiteConfigurations, std::back_inserter(ieeeAuthenticationAlgorithms), [&](const Dot11AkmSuiteConfiguration& akmSuiteConfiguration) {
-        return detail::NetRemoteAuthenticationAlgorithmToIeeeAuthenticationAlgorithm(akmSuiteConfiguration.authenticationalgorithm());
-    });
+    std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> ieeeAkmSuites(static_cast<std::size_t>(std::size(akmSuiteConfigurations)));
+    std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> ieeeAuthenticationAlgorithms(static_cast<std::size_t>(std::size(akmSuiteConfigurations)));
+    std::ranges::transform(akmSuiteConfigurations | std::views::transform(detail::AkmSuiteFromDot11AkmSuiteConfiguration), std::begin(ieeeAkmSuites), detail::NetRemoteAkmToIeee80211AkmSuite);
+    std::ranges::transform(akmSuiteConfigurations | std::views::transform(detail::AuthenticationAlgorithmFromAkmSuiteConfiguration), std::begin(ieeeAuthenticationAlgorithms), detail::NetRemoteAuthenticationAlgorithmToIeeeAuthenticationAlgorithm);
     // TODO: Store configuration values somehow.
 
     // TODO: Convert Dot11CipherSuites to Ieee80211CipherSuites.
