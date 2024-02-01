@@ -254,8 +254,27 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 bool
 AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites)
 {
-    // TODO: Set AKM suites.
-    return true;
+    bool isOk = false;
+
+    // Construct the wpa_key_mgmt hostapd property value.
+    std::string concatenatedWpaKeyMgmtPropertyValue{};
+    for (const auto& akmSuite : akmSuites) {
+        const auto& wpaKeyMgmtPropertyValue = detail::IeeeAkmSuiteToWpaKeyMgmtPropertyValue(akmSuite);
+        concatenatedWpaKeyMgmtPropertyValue += wpaKeyMgmtPropertyValue + " ";    
+    }
+
+    try {
+        // Set the hostapd wpa_key_mgmt property.
+        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpaKeyMgmt, concatenatedWpaKeyMgmtPropertyValue);
+
+        // Set the hostapd wpa property.
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpa, Wpa::ProtocolHostapd::PropertyWpaValue2); // TODO: Set this correctly
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set AKM suites for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    // Reload hostapd conf file.
+    return isOk && m_hostapd.Reload();
 }
 
 bool
