@@ -170,6 +170,43 @@ IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
         throw AccessPointControllerException(std::format("Invalid Ieee80211AkmSuite value {}", magic_enum::enum_name(akmSuite)));
     }
 }
+
+std::string
+IeeeCipherSuiteToPairwisePropertyValue(Ieee80211CipherSuite cipherSuite)
+{
+    switch (cipherSuite) {
+    case Ieee80211CipherSuite::Unknown:
+        return "";
+    case Ieee80211CipherSuite::BipCmac128:
+        return "";
+    case Ieee80211CipherSuite::BipCmac256:
+        return "";
+    case Ieee80211CipherSuite::BipGmac128:
+        return "";
+    case Ieee80211CipherSuite::BipGmac256:
+        return "";
+    case Ieee80211CipherSuite::Ccmp128:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueCcmp;
+    case Ieee80211CipherSuite::Ccmp256:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueCcmp256;
+    case Ieee80211CipherSuite::Gcmp128:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueGcmp;
+    case Ieee80211CipherSuite::Gcmp256:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueGcmp256;
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
+        return "";
+    case Ieee80211CipherSuite::Tkip:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueTkip;
+    case Ieee80211CipherSuite::UseGroup:
+        return "";
+    case Ieee80211CipherSuite::Wep104:
+        return "";
+    case Ieee80211CipherSuite::Wep40:
+        return "";
+    default:
+        return "";
+    }
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
@@ -280,8 +317,27 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
 bool
 AccessPointControllerLinux::SetCipherSuites(std::vector<Ieee80211CipherSuite> cipherSuites)
 {
-    // TODO: Set cipher suites.
-    return true;
+    bool isOk = false;
+
+    // For simplicity, construct both wpa_pairwise and rsn_pairwise hostapd property values.
+    std::string concatenatedPairwisePropertyValue{};
+    for (const auto& cipherSuite : cipherSuites) {
+        const auto& pairwisePropertyValue = detail::IeeeCipherSuiteToPairwisePropertyValue(cipherSuite);
+        concatenatedPairwisePropertyValue += pairwisePropertyValue + " ";    
+    }
+
+    try {
+        // Set the hostapd wpa_pairwise property.
+        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpaPairwise, concatenatedPairwisePropertyValue);
+
+        // Set the hostapd rsn_pairwise property.
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertynameRsnPairwise, concatenatedPairwisePropertyValue);
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set cipher suites for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    // Reload hostapd conf file.
+    return isOk && m_hostapd.Reload();
 }
 
 std::unique_ptr<IAccessPointController>
