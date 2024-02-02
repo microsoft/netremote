@@ -233,6 +233,11 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameWpaPassphrase = "wpa_passphrase";
     static constexpr auto PropertyNameWpaPsk = "wpa_psk";
     static constexpr auto PropertyNameSaePassword = "sae_password";
+    static constexpr auto PropertyNameWepDefaultKey = "wep_default_key";
+    static constexpr auto PropertyNameWepKey0 = "wep_key0";
+    static constexpr auto PropertyNameWepKey1 = "wep_key1";
+    static constexpr auto PropertyNameWepKey2 = "wep_key2";
+    static constexpr auto PropertyNameWepKey3 = "wep_key3";
 
     static constexpr auto PropertyNameEapServer = "eap_server"; // Enable to use integrated EAP server, disable to use external RADIUS server
     static constexpr auto PropertyNameOwnIpAddr = "own_ip_addr"; // IP address of access point
