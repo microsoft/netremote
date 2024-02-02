@@ -2,6 +2,7 @@
 #include <format>
 #include <iostream>
 
+#include <plog/Log.h>
 #include <Wpa/WpaResponseParser.hxx>
 
 using namespace Wpa;
@@ -47,7 +48,7 @@ WpaResponseParser::TryParseProperties()
             propertyToParseIterator = m_propertiesToParse.erase(propertyToParseIterator);
             continue;
         } else if (propertyToParse.IsRequired) {
-            std::cerr << std::format("Failed to parse required property: {}", propertyToParse.Key) << std::endl;
+            LOGE << std::format("Failed to parse required property: {}\nPayload {}\n", propertyToParse.Key, ResponsePayload);
             return false;
         } else {
             ++propertyToParseIterator;
