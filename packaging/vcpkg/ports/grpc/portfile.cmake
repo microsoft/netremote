@@ -48,7 +48,7 @@ vcpkg_cmake_configure(
         -DgRPC_STATIC_LINKING=${gRPC_STATIC_LINKING}
         -DgRPC_MSVC_STATIC_RUNTIME=${gRPC_MSVC_STATIC_RUNTIME}
         -DgRPC_ZLIB_PROVIDER=package
-        -DgRPC_SSL_PROVIDER=package
+        -DgRPC_SSL_PROVIDER=
         -DgRPC_PROTOBUF_PROVIDER=package
         -DgRPC_ABSL_PROVIDER=package
         -DgRPC_UPB_PROVIDER=package
