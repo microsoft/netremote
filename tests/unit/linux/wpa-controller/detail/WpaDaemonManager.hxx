@@ -13,7 +13,7 @@
 #include <Wpa/WpaCore.hxx>
 
 /**
- * @brief Handle referencing an running wpa daemon instance.
+ * @brief Handle referencing a running wpa daemon instance.
  */
 struct WpaDaemonInstanceHandle
 {
@@ -36,6 +36,15 @@ struct WpaDaemonManager
      * @brief The default path to the daemon control socket, if not specified.
      */
     static constexpr auto ControlSocketPathBase{ "/run/" };
+
+    /**
+     * @brief Attempts to find the binary for the specified wpa daemon type.
+     *
+     * @param wpaType The type of wpa daemon to find the binary for.
+     * @return std::filesystem::path The path to the daemon binary, if found. Otherwise, an empty path.
+     */
+    static std::filesystem::path
+    FindDaemonBinary(Wpa::WpaType wpaType, std::filesystem::path searchPath = std::filesystem::current_path());
 
     /**
      * @brief Create and write a default configuration file to disk for the
@@ -65,12 +74,13 @@ struct WpaDaemonManager
      *
      * @param wpaType The type of wpa daemon to start.
      * @param interfaceName The wlan interface for the daemon to use.
+     * @param daemonFilePath The path to the daemon binary, including the daemon name.
      * @param configurationFilePath The path to the daemon configuration file.
      * @param extraCommandLineArguments The command line arguments to be passed to the daemon binary.
      * @return std::optional<WpaDaemonInstanceHandle>
      */
     static std::optional<WpaDaemonInstanceHandle>
-    Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments = "");
+    Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& daemonFilePath, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments = "");
 
     /**
      * @brief Stop a running instance of the specified wpa daemon.

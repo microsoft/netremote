@@ -63,6 +63,28 @@ WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, std::string_view int
 
 /* static */
 std::filesystem::path
+WpaDaemonManager::FindDaemonBinary(Wpa::WpaType wpaType, std::filesystem::path searchPath)
+{
+    using std::filesystem::perms;
+
+    const auto daemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
+
+    std::cout << std::format("Searching for hostapd daemon binary '{}' in '{}'\n", daemon, searchPath.c_str());
+
+    for (const auto& directoryEntry : std::filesystem::recursive_directory_iterator(searchPath)) {
+        if (directoryEntry.is_regular_file() && directoryEntry.path().filename() == daemon) {
+            const auto permissions = directoryEntry.status().permissions();
+            if ((permissions & (perms::owner_exec | perms::group_exec | perms::others_exec)) != perms::none) {
+                return directoryEntry.path();
+            }
+        }
+    }
+
+    return {};
+}
+
+/* static */
+std::filesystem::path
 WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(Wpa::WpaType wpaType, std::string_view interfaceName)
 {
     // Determine which daemon to create the configuration file for.
@@ -87,7 +109,7 @@ WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(Wpa::WpaType wpaType, s
 
 /* static */
 std::optional<WpaDaemonInstanceHandle>
-WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments)
+WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, const std::filesystem::path& daemonFilePath, const std::filesystem::path& configurationFilePath, std::string_view extraCommandLineArguments)
 {
     // Use the default interface name if none provided.
     if (std::empty(interfaceName)) {
@@ -103,7 +125,7 @@ WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, co
     // -B -> run in background
     // -P -> write pid to file
     // -i -> interface name
-    const auto daemonStartCommand = std::format("{} -B -P {} -i {} {} {} {}", daemon, pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
+    const auto daemonStartCommand = std::format("{} -B -P {} -i {} {} {} {}", daemonFilePath.c_str(), pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
     std::cout << std::format("Starting wpa daemon with command '{}'\n", daemonStartCommand);
 
     int ret = std::system(daemonStartCommand.c_str());
@@ -149,7 +171,13 @@ WpaDaemonManager::StartDefault(Wpa::WpaType wpaType, std::string_view interfaceN
         return std::nullopt;
     }
 
-    return Start(wpaType, interfaceName, configurationFilePath);
+    auto daemonFilePath = FindDaemonBinary(wpaType);
+    if (daemonFilePath.empty()) {
+        std::cerr << std::format("Failed to find wpa '{}' daemon binary\n", magic_enum::enum_name(wpaType));
+        return std::nullopt;
+    }
+
+    return Start(wpaType, interfaceName, daemonFilePath, configurationFilePath);
 }
 
 /* static */
