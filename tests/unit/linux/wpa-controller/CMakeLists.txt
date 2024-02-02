@@ -6,6 +6,7 @@ target_sources(wpa-controller-test-unit
         detail/WifiVirtualDeviceManager.cxx
         detail/WpaDaemonCatch2EventListener.cxx
         detail/WpaDaemonManager.cxx
+        Main.cxx
         TestHostapd.cxx
         TestWpaController.cxx
 )
@@ -17,8 +18,9 @@ target_include_directories(wpa-controller-test-unit
 
 target_link_libraries(wpa-controller-test-unit
     PRIVATE
-        Catch2::Catch2WithMain
+        Catch2::Catch2
         magic_enum::magic_enum
+        plog::plog
         strings
         wpa-controller
 )
