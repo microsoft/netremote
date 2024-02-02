@@ -1,4 +1,5 @@
 
+#include <plog/Log.h>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
@@ -19,11 +20,8 @@ WpaStatusResponseParser::WpaStatusResponseParser(const WpaCommand* command, std:
     WpaResponseParser(command, responsePayload, {
         { ProtocolHostapd::ResponseStatusPropertyKeyState, WpaValuePresence::Required },
         { ProtocolHostapd::ResponseStatusPropertyKeyIeee80211N, WpaValuePresence::Required },
-        { ProtocolHostapd::ResponseStatusPropertyKeyDisable11N, WpaValuePresence::Required },
         { ProtocolHostapd::ResponseStatusPropertyKeyIeee80211AC, WpaValuePresence::Required },
-        { ProtocolHostapd::ResponseStatusPropertyKeyDisableAC, WpaValuePresence::Required },
         { ProtocolHostapd::ResponseStatusPropertyKeyIeee80211AX, WpaValuePresence::Required },
-        { ProtocolHostapd::ResponseStatusPropertyKeyDisableAX, WpaValuePresence::Required }
     })
 // clang-format on
 {
