@@ -674,7 +674,11 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
     std::ranges::transform(akmSuiteConfigurations | std::views::transform(detail::AuthenticationAlgorithmFromAkmSuiteConfiguration), std::begin(ieeeAuthenticationAlgorithms), detail::NetRemoteAuthenticationAlgorithmToIeeeAuthenticationAlgorithm);
     // TODO: Store configuration values somehow.
 
-    // TODO: Convert Dot11CipherSuites to Ieee80211CipherSuites.
+    // Convert Dot11CipherSuites to Ieee80211CipherSuites.
+    std::vector<Microsoft::Net::Wifi::Ieee80211CipherSuite> ieeeCipherSuites(static_cast<std::size_t>(std::size(cipherSuites)));
+    std::ranges::transform(cipherSuites, std::begin(ieeeCipherSuites), [&](const auto& cipherSuite) {
+        return detail::NetRemoteCipherSuiteToIeeeCipherAlgorithm(static_cast<Dot11CipherSuite>(cipherSuite));
+    });
 
     // Check if provided authentication configuration is supported by AP.
     try {
@@ -691,7 +695,10 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
         }
 
         if (!std::empty(cipherSuites)) {
-            // TODO: Remove unsupported cipher suites.
+            // Remove unsupported cipher suites.
+            std::erase_if(ieeeCipherSuites, [&](const auto& ieeeCipherSuite) {
+                return std::ranges::find(supportedCipherSuites, ieeeCipherSuite) == std::cend(supportedCipherSuites);
+            });
         }
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what());
@@ -707,7 +714,9 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
         }
 
         if (!std::empty(cipherSuites)) {
-            // TODO: Set cipher suites via accessPointController->SetCipherSuites.
+            if (!accessPointController->SetCipherSuites(ieeeCipherSuites)) {
+                return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set cipher suites for access point {}", request->accesspointid()));
+            }
         }
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to set authentication configuration for access point {} ({})", request->accesspointid(), apce.what());
