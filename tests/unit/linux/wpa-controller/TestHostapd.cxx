@@ -120,6 +120,40 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
         ieee80211nValueUpdated = hostapd.GetStatus().Ieee80211n;
         REQUIRE(ieee80211nValueUpdated == ieee80211nValueExpected);
     }
+
+    SECTION("GetStatus() reflects changes in IEEE 802.11ac state")
+    {
+        using namespace Wpa::Test;
+
+        const auto ieee80211acInitial = hostapd.GetStatus().Ieee80211ac;
+
+        auto ieee80211acValueExpected = !!ieee80211acInitial;
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
+        auto ieee80211acValueUpdated = hostapd.GetStatus().Ieee80211ac;
+        REQUIRE(ieee80211acValueUpdated == ieee80211acValueExpected);
+
+        ieee80211acValueExpected = !!ieee80211acValueUpdated;
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
+        ieee80211acValueUpdated = hostapd.GetStatus().Ieee80211ac;
+        REQUIRE(ieee80211acValueUpdated == ieee80211acValueExpected);
+    }
+
+    SECTION("GetStatus() reflects changes in IEEE 802.11ax state")
+    {
+        using namespace Wpa::Test;
+
+        const auto ieee80211axInitial = hostapd.GetStatus().Ieee80211ax;
+
+        auto ieee80211axValueExpected = !!ieee80211axInitial;
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AX, GetPropertyEnablementValue(ieee80211axValueExpected)));
+        auto ieee80211axValueUpdated = hostapd.GetStatus().Ieee80211ax;
+        REQUIRE(ieee80211axValueUpdated == ieee80211axValueExpected);
+
+        ieee80211axValueExpected = !!ieee80211axValueUpdated;
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AX, GetPropertyEnablementValue(ieee80211axValueExpected)));
+        ieee80211axValueUpdated = hostapd.GetStatus().Ieee80211ax;
+        REQUIRE(ieee80211axValueUpdated == ieee80211axValueExpected);
+    }
 }
 
 TEST_CASE("Send GetProperty() command (root)", "[wpa][hostapd][client][remote]")
