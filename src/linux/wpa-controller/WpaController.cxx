@@ -2,10 +2,10 @@
 #include <array>
 #include <cstddef>
 #include <format>
-#include <iostream>
 #include <mutex>
 
 #include <magic_enum.hpp>
+#include <plog/Log.h>
 #include <wpa_ctrl.h>
 
 #include <Wpa/WpaController.hxx>
@@ -63,7 +63,7 @@ WpaController::GetCommandControlSocket()
     const auto controlSocketPath = m_controlSocketPath / m_interfaceName;
     struct wpa_ctrl* controlSocket = wpa_ctrl_open(controlSocketPath.c_str());
     if (controlSocket == nullptr) {
-        std::cerr << std::format("Failed to open control socket for {} interface at {}.", m_interfaceName, controlSocketPath.c_str()) << std::endl;
+        LOGE << std::format("Failed to open control socket for {} interface at {}.\n", m_interfaceName, controlSocketPath.c_str());
         return nullptr;
     }
 
@@ -78,7 +78,7 @@ WpaController::SendCommand(const WpaCommand& command)
     // Obtain a control socket connection to send the command over.
     struct wpa_ctrl* controlSocket = GetCommandControlSocket();
     if (controlSocket == nullptr) {
-        std::cerr << std::format("Failed to get control socket for {}.", m_interfaceName) << std::endl;
+        LOGE << std::format("Failed to get control socket for {}.\n", m_interfaceName);
         return nullptr;
     }
 
@@ -93,13 +93,13 @@ WpaController::SendCommand(const WpaCommand& command)
         return command.ParseResponse(responsePayload);
     }
     case -1:
-        std::cerr << std::format("Failed to send or receive command to {} interface.", m_interfaceName) << std::endl;
+        LOGE << std::format("Failed to send or receive command to {} interface.\n", m_interfaceName);
         return nullptr;
     case -2:
-        std::cerr << std::format("Sending command to {} interface timed out.", m_interfaceName) << std::endl;
+        LOGE << std::format("Sending command to {} interface timed out.\n", m_interfaceName);
         return nullptr;
     default:
-        std::cerr << std::format("Unknown error sending command to {} interface (ret={}).", m_interfaceName, ret) << std::endl;
+        LOGE << std::format("Unknown error sending command to {} interface (ret={}).\n", m_interfaceName, ret);
         return nullptr;
     }
 }

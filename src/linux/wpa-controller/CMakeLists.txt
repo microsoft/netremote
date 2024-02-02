@@ -20,6 +20,8 @@ target_sources(wpa-controller
         WpaKeyValuePair.cxx
         WpaResponse.cxx
         WpaResponseParser.cxx
+        WpaParsingUtilities.hxx
+        WpaParsingUtilities.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WPA_CONTROLLER_PUBLIC_INCLUDE}
@@ -45,4 +47,5 @@ target_link_libraries(wpa-controller
         notstd
     PRIVATE
         magic_enum::magic_enum
+        plog::plog
 )

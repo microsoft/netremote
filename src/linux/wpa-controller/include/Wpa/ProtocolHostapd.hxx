@@ -96,9 +96,12 @@ struct HostapdStatus
     // int EdmgEnable{ 0 };
     // uint8_t EdmgChannel{ 0 };
     // int SecondaryChannel{ 0 };
-    // int Ieee80211n{ 0 };
-    // int Ieee80211ac{ 0 };
-    // int Ieee80211ax{ 0 };
+    int Ieee80211n{ 0 };
+    int Ieee80211ac{ 0 };
+    int Ieee80211ax{ 0 };
+    int Disable11n{ 0 };
+    int Disable11ac{ 0 };
+    int Disable11ax{ 0 };
     // int Ieee80211be{ 0 };
     // uint16_t BeaconInterval{ 0 };
     // int DtimPeriod{ 0 };
@@ -200,17 +203,37 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
-    static constexpr auto PropertyNameIeee80211N = "ieee80211n";
-    static constexpr auto PropertyNameDisable11N = "disable_11n";
-    static constexpr auto PropertyNameIeee80211AC = "ieee80211ac";
-    static constexpr auto PropertyNameDisable11AC = "disable_11ac";
-    static constexpr auto PropertyNameIeee80211AX = "ieee80211ax";
-    static constexpr auto PropertyNameDisable11AX = "disable_11ax";
+#define HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER "="
+#define HOSTAPD_PROPERTY_NAME_IEEE80211N     "ieee80211n"
+#define HOSTAPD_PROPERTY_NAME_DISABLE11N     "disable_11n"
+#define HOSTAPD_PROPERTY_NAME_IEEE80211AC    "ieee80211ac"
+#define HOSTAPD_PROPERTY_NAME_DISABLE11AC    "disable_11ac"
+#define HOSTAPD_PROPERTY_NAME_IEEE80211AX    "ieee80211ax"
+#define HOSTAPD_PROPERTY_NAME_DISABLE11AX    "disable_11ax"
+#define HOSTAPD_PROPERTY_NAME_STATE          "state"
+
+// Helper macro to create a hostapd configuration file key with value delimiter.
+#define HOSTAPD_DELIMITED_KEY(name) name HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER
+
+    static constexpr auto ProperyKeyValueNameDelimeter = HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER;
+    static constexpr auto PropertyNameIeee80211N = HOSTAPD_PROPERTY_NAME_IEEE80211N;
+    static constexpr auto PropertyNameDisable11N = HOSTAPD_PROPERTY_NAME_DISABLE11N;
+    static constexpr auto PropertyNameIeee80211AC = HOSTAPD_PROPERTY_NAME_IEEE80211AC;
+    static constexpr auto PropertyNameDisable11AC = HOSTAPD_PROPERTY_NAME_DISABLE11AC;
+    static constexpr auto PropertyNameIeee80211AX = HOSTAPD_PROPERTY_NAME_IEEE80211AX;
+    static constexpr auto PropertyNameDisable11AX = HOSTAPD_PROPERTY_NAME_DISABLE11AX;
     static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
 
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
-    static constexpr auto ResponseStatusPropertyKeyState = "state=";
+    static constexpr auto PropertyNameState = HOSTAPD_PROPERTY_NAME_STATE;
+    static constexpr auto ResponseStatusPropertyKeyState = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_STATE);
+    static constexpr auto ResponseStatusPropertyKeyIeee80211N = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_IEEE80211N);
+    static constexpr auto ResponseStatusPropertyKeyDisable11N = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_DISABLE11N);
+    static constexpr auto ResponseStatusPropertyKeyIeee80211AC = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_IEEE80211AC);
+    static constexpr auto ResponseStatusPropertyKeyDisableAC = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_DISABLE11AC);
+    static constexpr auto ResponseStatusPropertyKeyIeee80211AX = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_IEEE80211AX);
+    static constexpr auto ResponseStatusPropertyKeyDisableAX = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_DISABLE11AX);
 };
 
 /**
