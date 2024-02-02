@@ -2,6 +2,7 @@
 #include <format>
 #include <stdexcept>
 
+#include <plog/Log.h>
 #include <Wpa/WpaKeyValuePair.hxx>
 
 using namespace Wpa;
@@ -15,7 +16,15 @@ WpaKeyValuePair::TryParseValue(std::string_view input)
         const auto keyPosition = input.find(Key);
         if (keyPosition != input.npos) {
             // Assign the starting position of the value, advancing past the key.
-            Value = std::data(input) + keyPosition + std::size(Key);
+            input = input.substr(keyPosition + std::size(Key));
+
+            // Find the end of the line, marking the end of the value string.
+            const auto eolPosition = input.find('\n');
+            if (eolPosition != input.npos) {
+                Value = input.substr(0, eolPosition);
+            } else {
+                LOGW << std::format("Failed to parse value for key: {} (missing eol)", Key);
+            }
         }
     }
 
