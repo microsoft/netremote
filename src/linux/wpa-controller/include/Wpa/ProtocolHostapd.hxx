@@ -230,6 +230,16 @@ struct ProtocolHostapd :
     static constexpr auto PropertyWpaKeyMgmtValueDpp = "DPP";
     static constexpr auto PropertyWpaKeyMgmtValueOsen = "OSEN";
 
+    static constexpr auto PropertyNameWpaPassphrase = "wpa_passphrase";
+    static constexpr auto PropertyNameWpaPsk = "wpa_psk";
+    static constexpr auto PropertyNameSaePassword = "sae_password";
+
+    static constexpr auto PropertyNameEapServer = "eap_server"; // Enable to use integrated EAP server, disable to use external RADIUS server
+    static constexpr auto PropertyNameOwnIpAddr = "own_ip_addr"; // IP address of access point
+    static constexpr auto PropertyNameAuthServerAddr = "auth_server_addr"; // IP address of RADIUS authentication server
+    static constexpr auto PropertyNameAuthServerPort = "auth_server_port"; // Port used by RADIUS authentication server
+    static constexpr auto PropertyNameAuthServerSharedSecret = "auth_server_shared_secret"; // Shared secret between RADIUS authentication server and client
+
     static constexpr auto PropertyNameWpaPairwise = "wpa_pairwise";
     static constexpr auto PropertynameRsnPairwise = "rsn_pairwise";
     static constexpr auto PropertyPairwiseValueCcmp = "CCMP";
