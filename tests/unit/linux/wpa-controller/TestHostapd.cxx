@@ -8,6 +8,15 @@
 
 #include "detail/WpaDaemonManager.hxx"
 
+namespace Wpa::Test
+{
+std::string_view
+GetPropertyEnablementValue(int valueToSet)
+{
+    return !!valueToSet ? ProtocolHostapd::PropertyEnabled : ProtocolHostapd::PropertyDisabled;
+}
+} // namespace Wpa::Test
+
 TEST_CASE("Create a Hostapd instance (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
@@ -93,6 +102,23 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
         REQUIRE(hostapd.Disable());
         const auto statusDisabled = hostapd.GetStatus();
         REQUIRE(!IsHostapdStateOperational(statusDisabled.State));
+    }
+
+    SECTION("GetStatus() reflects changes in IEEE 802.11n state")
+    {
+        using namespace Wpa::Test;
+
+        const auto ieee80211nInitial = hostapd.GetStatus().Ieee80211n;
+
+        auto ieee80211nValueExpected = !!ieee80211nInitial;
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211N, GetPropertyEnablementValue(ieee80211nValueExpected)));
+        auto ieee80211nValueUpdated = hostapd.GetStatus().Ieee80211n;
+        REQUIRE(ieee80211nValueUpdated == ieee80211nValueExpected);
+
+        ieee80211nValueExpected = !!ieee80211nValueUpdated;
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211N, GetPropertyEnablementValue(ieee80211nValueExpected)));
+        ieee80211nValueUpdated = hostapd.GetStatus().Ieee80211n;
+        REQUIRE(ieee80211nValueUpdated == ieee80211nValueExpected);
     }
 }
 
