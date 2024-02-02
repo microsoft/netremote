@@ -157,3 +157,43 @@ enum Dot11AccessPointState
 {
     AccessPointStateUnknown = 0;
 }
+
+message Dot11RadiusServerConfiguration
+{
+    string Address = 1;
+    uint32 Port = 2;
+    Microsoft.Net.Wifi.Dot11SharedKey SharedSecret = 3;
+}
+
+message Dot11AkmSuiteConfigurationNone
+{
+
+}
+
+message Dot11AkmSuiteConfigurationSharedKey
+{
+    Microsoft.Net.Wifi.Dot11SharedKey SharedKey = 1;
+}
+
+message Dot11AkmSuiteConfigurationEnterprise
+{
+    Microsoft.Net.Wifi.Dot11RadiusServerConfiguration RadiusServerConfiguration = 1;
+}
+
+message Dot11AkmSuiteConfiguration
+{
+    Microsoft.Net.Wifi.Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 1;
+    Microsoft.Net.Wifi.Dot11AkmSuite AkmSuite = 2;
+    oneof Configuration
+    {
+        Dot11AkmSuiteConfigurationNone ConfigurationNone = 3;
+        Dot11AkmSuiteConfigurationSharedKey ConfigurationSharedKey = 4;
+        Dot11AkmSuiteConfigurationEnterprise ConfigurationEnterprise = 5;
+    }
+}
+
+message Dot11AccessPointAuthenticationConfiguration
+{
+    repeated Microsoft.Net.Wifi.Dot11AkmSuiteConfiguration AkmSuites = 1;
+    repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 2;
+}

@@ -101,7 +101,7 @@ IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol)
     }
 }
 
-std::string
+std::string_view
 HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
 {
     switch (hwMode) {
@@ -117,6 +117,94 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
         return Wpa::ProtocolHostapd::PropertyHwModeValueAny;
     default: // case Wpa::HostapdHwMode::Unknown
         throw AccessPointControllerException(std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode)));
+    }
+}
+
+std::string_view
+IeeeAkmSuiteToWpaKeyMgmtPropertyValue(Ieee80211AkmSuite akmSuite)
+{
+    switch (akmSuite) {
+    case Ieee80211AkmSuite::Ieee8021x:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEap;
+    case Ieee80211AkmSuite::Psk:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaPsk;
+    case Ieee80211AkmSuite::Ft8021x:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtEap;
+    case Ieee80211AkmSuite::FtPsk:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtPsk;
+    case Ieee80211AkmSuite::Ieee8021xSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSha256;
+    case Ieee80211AkmSuite::PskSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaPskSha256;
+    case Ieee80211AkmSuite::Sae:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueSae;
+    case Ieee80211AkmSuite::FtSae:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtSae;
+    case Ieee80211AkmSuite::Ieee8021xSuiteB:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSuiteB;
+    case Ieee80211AkmSuite::Ieee8021xSuiteB192:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueWpaEapSuiteB192;
+    case Ieee80211AkmSuite::Ft8021xSha384:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtEapSha384;
+    case Ieee80211AkmSuite::FilsSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFilsSha256;
+    case Ieee80211AkmSuite::FilsSha384:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFilsSha384;
+    case Ieee80211AkmSuite::FtFilsSha256:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtFilsSha256;
+    case Ieee80211AkmSuite::FtFilsSha384:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueFtFilsSha384;
+    case Ieee80211AkmSuite::Owe:
+        return Wpa::ProtocolHostapd::PropertyWpaKeyMgmtValueOwe;
+    case Ieee80211AkmSuite::Reserved0:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::Tdls:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::ApPeerKey:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::FtPskSha384:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::PskSha384:
+        [[fallthrough]];
+    default:
+        throw AccessPointControllerException(std::format("Invalid Ieee80211AkmSuite value {} for hostapd wpa_key_mgmt", magic_enum::enum_name(akmSuite)));
+    }
+}
+
+std::string_view
+IeeeCipherSuiteToPairwisePropertyValue(Ieee80211CipherSuite cipherSuite)
+{
+    switch (cipherSuite) {
+    case Ieee80211CipherSuite::Ccmp128:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueCcmp;
+    case Ieee80211CipherSuite::Ccmp256:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueCcmp256;
+    case Ieee80211CipherSuite::Gcmp128:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueGcmp;
+    case Ieee80211CipherSuite::Gcmp256:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueGcmp256;
+    case Ieee80211CipherSuite::Tkip:
+        return Wpa::ProtocolHostapd::PropertyPairwiseValueTkip;
+    case Ieee80211CipherSuite::Unknown:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipCmac128:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipCmac256:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipGmac128:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::BipGmac256:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::UseGroup:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::Wep104:
+        [[fallthrough]];
+    case Ieee80211CipherSuite::Wep40:
+        [[fallthrough]];
+    default:
+        throw AccessPointControllerException(std::format("Invalid Ieee80211CipherSuite value {} for hostapd wpa_pairwise/rsn_pairwise", magic_enum::enum_name(cipherSuite)));
     }
 }
 } // namespace detail
@@ -165,7 +253,7 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 bool
-AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
     bool isOk = false;
     Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
@@ -197,7 +285,72 @@ AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol 
     }
 
     // Reload hostapd conf file.
-    return isOk && m_hostapd.Reload();
+    isOk = isOk && m_hostapd.Reload();
+
+    return isOk;
+}
+
+bool
+AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites)
+{
+    bool isOk = false;
+
+    // Construct the wpa_key_mgmt hostapd property value.
+    std::string concatenatedWpaKeyMgmtPropertyValue{};
+    for (const auto& akmSuite : akmSuites) {
+        const auto& wpaKeyMgmtPropertyValue = detail::IeeeAkmSuiteToWpaKeyMgmtPropertyValue(akmSuite);
+        concatenatedWpaKeyMgmtPropertyValue += wpaKeyMgmtPropertyValue;
+        concatenatedWpaKeyMgmtPropertyValue += " ";
+    }
+
+    try {
+        // Set the hostapd wpa_key_mgmt property.
+        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpaKeyMgmt, concatenatedWpaKeyMgmtPropertyValue);
+
+        // For simplicity, set the hostapd wpa property to allow WPA and WPA2 (and WPA3).
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpa, Wpa::ProtocolHostapd::PropertyWpaValueWpaAndWpa2);
+
+        // For simplicity, set the hostapd auth_algs property to allow both Open System Authentication and Shared Key Authentication.
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameAuthAlgs, Wpa::ProtocolHostapd::PropertyAuthAlgsValueOpenAndSharedKey);
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set AKM suites for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    // Reload hostapd conf file.
+    isOk = isOk && m_hostapd.Reload();
+
+    return isOk;
+}
+
+bool
+AccessPointControllerLinux::SetCipherSuites(std::vector<Ieee80211CipherSuite> cipherSuites)
+{
+    bool isOk = false;
+
+    // TODO: Handle WEP separately.
+
+    // For simplicity, construct both wpa_pairwise and rsn_pairwise hostapd property values.
+    std::string concatenatedPairwisePropertyValue{};
+    for (const auto& cipherSuite : cipherSuites) {
+        const auto& pairwisePropertyValue = detail::IeeeCipherSuiteToPairwisePropertyValue(cipherSuite);
+        concatenatedPairwisePropertyValue += pairwisePropertyValue;
+        concatenatedPairwisePropertyValue += " ";
+    }
+
+    try {
+        // Set the hostapd wpa_pairwise property.
+        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWpaPairwise, concatenatedPairwisePropertyValue);
+
+        // Set the hostapd rsn_pairwise property.
+        isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertynameRsnPairwise, concatenatedPairwisePropertyValue);
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set cipher suites for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    // Reload hostapd conf file.
+    isOk = isOk && m_hostapd.Reload();
+
+    return isOk;
 }
 
 std::unique_ptr<IAccessPointController>

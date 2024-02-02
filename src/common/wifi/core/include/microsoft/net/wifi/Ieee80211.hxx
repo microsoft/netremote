@@ -175,6 +175,7 @@ static constexpr uint8_t Ieee80211AkmSuiteIdPskSha384 = 20;
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
  */
 enum class Ieee80211AkmSuite : uint32_t {
+    Unknown = MakeIeeeSuite(OuiInvalid, 0),
     Reserved0 = MakeIeee80211Suite(Ieee80211AkmSuiteIdReserved0),
     Ieee8021x = MakeIeee80211Suite(Ieee80211AkmSuiteId8021x),
     Psk = MakeIeee80211Suite(Ieee80211AkmSuiteIdPsk),
@@ -187,7 +188,7 @@ enum class Ieee80211AkmSuite : uint32_t {
     FtSae = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtSae),
     ApPeerKey = MakeIeee80211Suite(Ieee80211AkmSuiteIdApPeerKey),
     Ieee8021xSuiteB = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSuiteB),
-    Ieee8011xSuiteB192 = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSuiteB192),
+    Ieee8021xSuiteB192 = MakeIeee80211Suite(Ieee80211AkmSuiteId8021xSuiteB192),
     Ft8021xSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFt8021xSha384),
     FilsSha256 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha256),
     FilsSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFilsSha384),
@@ -215,7 +216,7 @@ constexpr std::initializer_list<uint32_t> AllIeee80211Akms{
     notstd::to_underlying(Ieee80211AkmSuite::FtSae),
     notstd::to_underlying(Ieee80211AkmSuite::ApPeerKey),
     notstd::to_underlying(Ieee80211AkmSuite::Ieee8021xSuiteB),
-    notstd::to_underlying(Ieee80211AkmSuite::Ieee8011xSuiteB192),
+    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021xSuiteB192),
     notstd::to_underlying(Ieee80211AkmSuite::Ft8021xSha384),
     notstd::to_underlying(Ieee80211AkmSuite::FilsSha256),
     notstd::to_underlying(Ieee80211AkmSuite::FilsSha384),
