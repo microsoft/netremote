@@ -239,6 +239,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameWepKey2 = "wep_key2";
     static constexpr auto PropertyNameWepKey3 = "wep_key3";
 
+    static constexpr auto PropertyNameIeee8021x = "ieee8021x"; // Enable to require IEEE 802.1x authentication
     static constexpr auto PropertyNameEapServer = "eap_server"; // Enable to use integrated EAP server, disable to use external RADIUS server
     static constexpr auto PropertyNameOwnIpAddr = "own_ip_addr"; // IP address of access point
     static constexpr auto PropertyNameAuthServerAddr = "auth_server_addr"; // IP address of RADIUS authentication server

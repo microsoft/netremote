@@ -266,6 +266,49 @@ NetRemoteAkmToIeee80211AkmSuite(Dot11AkmSuite akmSuite)
     }
 }
 
+using Microsoft::Net::Wifi::Dot11AkmSuiteConfiguration;
+using Microsoft::Net::Wifi::Dot11SharedKey;
+using Microsoft::Net::Wifi::Ieee80211AuthenticationServerConfiguration;
+using Microsoft::Net::Wifi::Ieee80211SharedKey;
+
+using IeeeAuthenticationConfiguration = std::variant<
+    std::monostate,
+    Ieee80211SharedKey,
+    Ieee80211AuthenticationServerConfiguration>;
+
+std::tuple<Ieee80211AkmSuite, IeeeAuthenticationConfiguration>
+NetRemoteAkmSuiteConfigurationToIeeeAkmSuiteAndConfigurationTuple(Dot11AkmSuiteConfiguration akmSuiteConfiguration)
+{
+    const auto& akmSuite = akmSuiteConfiguration.akmsuite();
+    const auto& configuration = akmSuiteConfiguration.Configuration_case();
+
+    switch (configuration) {
+    case Dot11AkmSuiteConfiguration::kConfigurationNone: {
+        return { detail::NetRemoteAkmToIeee80211AkmSuite(akmSuite), std::monostate{} };
+    }
+    case Dot11AkmSuiteConfiguration::kConfigurationSharedKey: {
+        const auto& configurationSharedKey = akmSuiteConfiguration.configurationsharedkey().sharedkey();
+        std::string sharedKey = (configurationSharedKey.Value_case() == Dot11SharedKey::kPassphrase) ? configurationSharedKey.passphrase() : configurationSharedKey.data();
+
+        return { detail::NetRemoteAkmToIeee80211AkmSuite(akmSuite), sharedKey };
+    }
+    case Dot11AkmSuiteConfiguration::kConfigurationEnterprise: {
+        const auto& configurationEnterprise = akmSuiteConfiguration.configurationenterprise();
+        const auto& radiusSharedSecret = configurationEnterprise.radiusserverconfiguration().sharedsecret();
+        std::string sharedSecret = (radiusSharedSecret.Value_case() == Dot11SharedKey::kPassphrase) ? radiusSharedSecret.passphrase() : radiusSharedSecret.data();
+        Ieee80211AuthenticationServerConfiguration radiusServerConfiguration{
+            .Address{ configurationEnterprise.radiusserverconfiguration().address() },
+            .Port{ configurationEnterprise.radiusserverconfiguration().port() },
+            .SharedSecret{ sharedSecret }
+        };
+
+        return { detail::NetRemoteAkmToIeee80211AkmSuite(akmSuite), std::move(radiusServerConfiguration) };
+    }
+    }
+
+    return {};
+}
+
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
@@ -488,6 +531,12 @@ AuthenticationAlgorithmFromAkmSuiteConfiguration(const Dot11AkmSuiteConfiguratio
 {
     return akmSuiteConfiguration.authenticationalgorithm();
 }
+
+Dot11AkmSuiteConfiguration::ConfigurationCase
+ConfigurationFromAkmSuiteConfiguration(const Dot11AkmSuiteConfiguration& akmSuiteConfiguration)
+{
+    return akmSuiteConfiguration.Configuration_case();
+}
 } // namespace detail
 
 ::grpc::Status
@@ -668,11 +717,10 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
     }
 
     // Convert Dot11AkmSuiteConfigurations to Ieee equivalent values.
-    std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> ieeeAkmSuites(static_cast<std::size_t>(std::size(akmSuiteConfigurations)));
-    std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> ieeeAuthenticationAlgorithms(static_cast<std::size_t>(std::size(akmSuiteConfigurations)));
-    std::ranges::transform(akmSuiteConfigurations | std::views::transform(detail::AkmSuiteFromDot11AkmSuiteConfiguration), std::begin(ieeeAkmSuites), detail::NetRemoteAkmToIeee80211AkmSuite);
-    std::ranges::transform(akmSuiteConfigurations | std::views::transform(detail::AuthenticationAlgorithmFromAkmSuiteConfiguration), std::begin(ieeeAuthenticationAlgorithms), detail::NetRemoteAuthenticationAlgorithmToIeeeAuthenticationAlgorithm);
-    // TODO: Store configuration values somehow.
+    std::vector<std::tuple<Microsoft::Net::Wifi::Ieee80211AkmSuite, detail::IeeeAuthenticationConfiguration>> ieeeAkmSuitesAndConfigurations(static_cast<std::size_t>(std::size(akmSuiteConfigurations)));
+    std::ranges::transform(akmSuiteConfigurations, std::begin(ieeeAkmSuitesAndConfigurations), [&](const auto& akmSuiteConfiguration) {
+        return detail::NetRemoteAkmSuiteConfigurationToIeeeAkmSuiteAndConfigurationTuple(akmSuiteConfiguration);
+    });
 
     // Convert Dot11CipherSuites to Ieee80211CipherSuites.
     std::vector<Microsoft::Net::Wifi::Ieee80211CipherSuite> ieeeCipherSuites(static_cast<std::size_t>(std::size(cipherSuites)));
@@ -688,10 +736,11 @@ NetRemoteService::WifiAccessPointSetAuthenticationConfiguration([[maybe_unused]]
 
         if (!std::empty(akmSuiteConfigurations)) {
             // Remove unsupported AKM suites.
-            std::erase_if(ieeeAkmSuites, [&](const auto& ieeeAkmSuite) {
-                return std::ranges::find(supportedAkmSuites, ieeeAkmSuite) == std::cend(supportedAkmSuites);
-            });
-            // TODO: Do the same for other parts of Dot11AkmSuiteConfiguration.
+            ieeeAkmSuitesAndConfigurations.erase(std::remove_if(std::begin(ieeeAkmSuitesAndConfigurations), std::end(ieeeAkmSuitesAndConfigurations), [&](const auto& ieeeAkmSuiteAndConfiguration) {
+                const auto& akmSuite = std::get<0>(ieeeAkmSuiteAndConfiguration);
+                return std::ranges::find(supportedAkmSuites, akmSuite) == std::cend(supportedAkmSuites);
+            }),
+                std::end(ieeeAkmSuitesAndConfigurations));
         }
 
         if (!std::empty(cipherSuites)) {

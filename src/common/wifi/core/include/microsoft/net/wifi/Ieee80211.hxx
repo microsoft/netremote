@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdint>
 #include <initializer_list>
+#include <string>
 
 #include <notstd/Utility.hxx>
 
@@ -267,6 +268,24 @@ enum class Ieee80211CipherSuite : uint32_t {
     UseGroup = MakeIeee80211Suite(Ieee80211CipherSuiteIdUseGroup),
     Wep104 = MakeIeee80211Suite(Ieee80211CipherSuiteIdWep104),
     Wep40 = MakeIeee80211Suite(Ieee80211CipherSuiteIdWep40),
+};
+
+/**
+ * @brief IEEE 802.11 shared key types.
+ *
+ * Defined in ???.
+ */
+using Ieee80211SharedKey = std::string;
+
+/**
+ * @brief IEEE 802.11 Authentication Server (AS) configuration.
+ *
+ * Defined in <TODO: AS is out of scope of IEEE 802.11-2020 document. Perhaps move this elsewhere>.
+ */
+struct Ieee80211AuthenticationServerConfiguration {
+    std::string Address;
+    uint32_t Port;
+    Ieee80211SharedKey SharedSecret;
 };
 
 } // namespace Microsoft::Net::Wifi
