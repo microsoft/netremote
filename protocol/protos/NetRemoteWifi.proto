@@ -44,8 +44,9 @@ enum WifiDataStreamOperationStatusCode
 {
     WifiDataStreamOperationStatusCodeUnknown = 0;
     WifiDataStreamOperationStatusCodeSucceeded = 1;
-    WifiDataStreamOperationStatusCodeInvalidParameter = 2;
-    WifiDataStreamOperationStatusCodeOperationNotSupported = 3;
+    WifiDataStreamOperationStatusCodeFailed = 2;
+    WifiDataStreamOperationStatusCodeInvalidParameter = 3;
+    WifiDataStreamOperationStatusCodeOperationNotSupported = 4;
 }
 
 message WifiDataStreamOperationStatus
@@ -111,4 +112,9 @@ message WifiDataStreamUploadResult
 {
     uint32 DataReceivedCount = 1;
     WifiDataStreamOperationStatus Status = 2;
+}
+
+message WifiDataStreamDownloadRequest
+{
+    uint32 DataRequestedCount = 1;
 }

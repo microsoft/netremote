@@ -61,3 +61,53 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
 
     return new StreamReader(result);
 }
+
+::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::CallbackServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request)
+{
+    LOGD << "Received WifiDataStreamDownload request";
+
+    class StreamWriter : public ::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>
+    {
+    public:
+        StreamWriter(const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request)
+        {
+            m_dataRequestedCount = request->datarequestedcount();
+            NextWrite();
+        }
+
+        void OnWriteDone(bool ok) override
+        {
+            if (ok) {
+                m_dataRequestedCount--;
+                NextWrite();
+            } else {
+                LOGE << "Data write failed";
+                Finish(::grpc::Status::OK);
+            }
+        }
+
+        void OnDone() override
+        {
+            delete this;
+        }
+
+    private:
+        void NextWrite()
+        {
+            if (m_dataRequestedCount > 0) {
+                m_data.set_data("Data");
+                StartWrite(&m_data);
+            } else {
+                // No more data to write
+                Finish(::grpc::Status::OK);
+            }
+        }
+
+    private:
+        uint32_t m_dataRequestedCount{};
+        ::Microsoft::Net::Remote::Wifi::WifiDataStreamData m_data{};
+    };
+
+    return new StreamWriter(request);
+}

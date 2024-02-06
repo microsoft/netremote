@@ -22,6 +22,9 @@ public:
 private:
     virtual ::grpc::ServerReadReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
     WifiDataStreamUpload(::grpc::CallbackServerContext* context, ::Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* result) override;
+
+    virtual ::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+    WifiDataStreamDownload(::grpc::CallbackServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 
