@@ -8,6 +8,7 @@ set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE
 target_sources(${PROJECT_NAME}-service
     PRIVATE
         NetRemoteService.cxx
+        NetRemoteCallbackService.cxx
         NetRemoteApiTrace.hxx
         NetRemoteApiTrace.cxx 
         NetRemoteWifiApiTrace.hxx
@@ -17,6 +18,7 @@ target_sources(${PROJECT_NAME}-service
     BASE_DIRS ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}
     FILES
         ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteService.hxx
+        ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteCallbackService.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-service

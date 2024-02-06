@@ -13,5 +13,4 @@ service NetRemote
     rpc WifiAccessPointDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableResult);
     rpc WifiAccessPointSetPhyType (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeResult);
     rpc WifiAccessPointSetFrequencyBands (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsResult);
-    rpc WifiDataStreamUpload (stream Microsoft.Net.Remote.Wifi.WifiDataStreamUploadRequest) returns (Microsoft.Net.Remote.Wifi.WifiDataStreamUploadResult);
 }
