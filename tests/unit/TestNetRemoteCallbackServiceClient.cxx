@@ -107,3 +107,85 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
         REQUIRE(result.status().code() == WifiDataStreamOperationStatusCodeSucceeded);
     }
 }
+
+TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemoteCallback::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        class StreamReader : public grpc::ClientReadReactor<WifiDataStreamData>
+        {
+        public:
+            StreamReader(NetRemoteCallback::Stub* client, WifiDataStreamDownloadRequest* request)
+            {
+                client->async()->WifiDataStreamDownload(&m_clientContext, request, this);
+                StartCall();
+                StartRead(&m_data);
+            }
+
+            void OnReadDone(bool ok) override
+            {
+                if (ok) {
+                    m_dataReceivedCount++;
+                    StartRead(&m_data);
+                }
+                // If read fails, then there is likely no more data to be read, so do nothing.
+            }
+
+            void OnDone(const grpc::Status& status) override
+            {
+                std::unique_lock lock(m_mutex);
+
+                m_status = status;
+                m_done = true;
+                m_cv.notify_one();
+            }
+
+            grpc::Status Await(uint32_t* dataReceivedCount)
+            {
+                std::unique_lock lock(m_mutex);
+
+                m_cv.wait(lock, [this] {
+                    return m_done;
+                });
+                *dataReceivedCount = m_dataReceivedCount;
+
+                return m_status;
+            }
+
+        private:
+            grpc::ClientContext m_clientContext{};
+            uint32_t m_dataReceivedCount{};
+            WifiDataStreamData m_data{};
+            grpc::Status m_status{};
+            std::mutex m_mutex{};
+            std::condition_variable m_cv{};
+            bool m_done{false};
+        };
+
+        static constexpr auto dataRequestedCount = 10;
+        WifiDataStreamDownloadRequest request{};
+        request.set_datarequestedcount(dataRequestedCount);
+        auto streamReader = std::make_unique<StreamReader>(client.get(), &request);
+
+        uint32_t dataReceivedCount{};
+        grpc::Status status = streamReader->Await(&dataReceivedCount);
+        REQUIRE(status.ok());
+        REQUIRE(dataReceivedCount == dataRequestedCount);
+    }
+}
