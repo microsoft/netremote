@@ -60,6 +60,7 @@ AccessPointControllerTest::SetFrquencyBands(std::vector<Ieee80211FrequencyBand> 
     }
 
     AccessPoint->FrequencyBands = std::move(frequencyBands);
+    return true;
 }
 
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
