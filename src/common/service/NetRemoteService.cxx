@@ -352,7 +352,7 @@ NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::Wifi
 
 /**
  * @brief Handle a failure for a request that referecnes an access point.
- * 
+ *
  * @tparam RequestT The request type. This must contain an access point id (trait).
  * @tparam ResultT The result type. This must contain an access point id and a status (traits).
  * @param request A reference to the request.
@@ -360,7 +360,7 @@ NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::Wifi
  * @param code The error code to set in the result message.
  * @param message The error message to set in the result message.
  * @param grpcStatus The status to be returned to the client.
- * @return ::grpc::Status 
+ * @return ::grpc::Status
  */
 template <
     typename RequestT,
@@ -384,13 +384,13 @@ HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatus
 
 /**
  * @brief Attempt to obtain an IAccessPintController instance for the access point in the specified request message.
- * 
+ *
  * @tparam RequestT The request type. This must contain an access point id (trait).
  * @tparam ResultT The result type. This must contain an access point id and a status (traits).
  * @param request A reference to the request.
  * @param result A reference to the result.
- * @param accessPointManager 
- * @return std::shared_ptr<IAccessPointController> 
+ * @param accessPointManager
+ * @return std::shared_ptr<IAccessPointController>
  */
 template <
     typename RequestT,

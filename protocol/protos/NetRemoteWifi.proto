@@ -30,6 +30,7 @@ enum WifiAccessPointOperationStatusCode
     WifiAccessPointOperationStatusCodeAccessPointInvalid = 3;
     WifiAccessPointOperationStatusCodeAccessPointNotEnabled = 4;
     WifiAccessPointOperationStatusCodeOperationNotSupported = 5;
+    WifiAccessPointOperationStatusCodeInternalError = 6;
 }
 
 message WifiAccessPointOperationStatus
