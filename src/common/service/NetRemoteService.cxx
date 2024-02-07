@@ -31,6 +31,108 @@ NetRemoteService::GetAccessPointManager() noexcept
 
 namespace detail
 {
+/**
+ * @brief Handle a failure for a request that referecnes an access point.
+ *
+ * @tparam RequestT The request type. This must contain an access point id (trait).
+ * @tparam ResultT The result type. This must contain an access point id and a status (traits).
+ * @param request A reference to the request.
+ * @param result A reference to the result.
+ * @param code The error code to set in the result message.
+ * @param message The error message to set in the result message.
+ * @param grpcStatus The status to be returned to the client.
+ * @return ::grpc::Status
+ */
+template <
+    typename RequestT,
+    typename ResultT>
+::grpc::Status
+HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatusCode code, std::string_view message, ::grpc::Status grpcStatus = ::grpc::Status::OK)
+{
+    LOGE << message;
+
+    // Populate status.
+    WifiAccessPointOperationStatus status{};
+    status.set_code(code);
+    status.set_message(std::string(message));
+
+    // Populate result fields expected on error conditions.
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(status);
+
+    return grpcStatus;
+}
+
+/**
+ * @brief Attempt to obtain an IAccessPoint instance for the access point in the specified request message.
+ *
+ * @tparam RequestT The request type. This must contain an access point id (trait).
+ * @tparam ResultT The result type. This must contain an access point id and a status (traits).
+ * @param request A reference to the request.
+ * @param result A reference to the result.
+ * @param accessPointManager
+ * @return std::shared_ptr<IAccessPoint>
+ */
+template <
+    typename RequestT,
+    typename ResultT>
+std::shared_ptr<IAccessPoint>
+TryGetAccessPoint(RequestT& request, ResultT& result, std::shared_ptr<AccessPointManager>& accessPointManager)
+{
+    const auto& accessPointId = request->accesspointid();
+
+    // Find the requested AP.
+    auto accessPointOpt = accessPointManager->GetAccessPoint(accessPointId);
+    if (!accessPointOpt.has_value()) {
+        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} not found", accessPointId));
+        return nullptr;
+    }
+
+    // Attempt to promote the weak reference to a strong reference.
+    auto accessPointWeak{ accessPointOpt.value() };
+    auto accessPoint = accessPointWeak.lock();
+    if (accessPoint == nullptr) {
+        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} is no longer valid", accessPointId));
+        return nullptr;
+    }
+
+    return accessPoint;
+}
+
+/**
+ * @brief Attempt to obtain an IAccessPointController instance for the access point in the specified request message.
+ *
+ * @tparam RequestT The request type. This must contain an access point id (trait).
+ * @tparam ResultT The result type. This must contain an access point id and a status (traits).
+ * @param request A reference to the request.
+ * @param result A reference to the result.
+ * @param accessPointManager
+ * @return std::shared_ptr<IAccessPointController>
+ */
+template <
+    typename RequestT,
+    typename ResultT>
+std::shared_ptr<IAccessPointController>
+TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<AccessPointManager>& accessPointManager)
+{
+    const auto& accessPointId = request->accesspointid();
+
+    // Find the requested AP.
+    auto accessPoint = TryGetAccessPoint(request, result, accessPointManager);
+    if (accessPoint == nullptr) {
+        return nullptr;
+    }
+
+    // Create a controller for this access point.
+    auto accessPointController = accessPoint->CreateController();
+    if (accessPointController == nullptr) {
+        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to create controller for access point {}", accessPointId));
+        return nullptr;
+    }
+
+    return accessPointController;
+}
+
 using Microsoft::Net::Wifi::Dot11PhyType;
 using Microsoft::Net::Wifi::Ieee80211Protocol;
 
@@ -348,82 +450,6 @@ bool
 NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
 {
     return (item.accesspointid() == AccessPointIdInvalid);
-}
-
-/**
- * @brief Handle a failure for a request that referecnes an access point.
- *
- * @tparam RequestT The request type. This must contain an access point id (trait).
- * @tparam ResultT The result type. This must contain an access point id and a status (traits).
- * @param request A reference to the request.
- * @param result A reference to the result.
- * @param code The error code to set in the result message.
- * @param message The error message to set in the result message.
- * @param grpcStatus The status to be returned to the client.
- * @return ::grpc::Status
- */
-template <
-    typename RequestT,
-    typename ResultT>
-::grpc::Status
-HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatusCode code, std::string_view message, ::grpc::Status grpcStatus = ::grpc::Status::OK)
-{
-    LOGE << message;
-
-    // Populate status.
-    WifiAccessPointOperationStatus status{};
-    status.set_code(code);
-    status.set_message(std::string(message));
-
-    // Populate result fields expected on error conditions.
-    result->set_accesspointid(request->accesspointid());
-    *result->mutable_status() = std::move(status);
-
-    return grpcStatus;
-}
-
-/**
- * @brief Attempt to obtain an IAccessPintController instance for the access point in the specified request message.
- *
- * @tparam RequestT The request type. This must contain an access point id (trait).
- * @tparam ResultT The result type. This must contain an access point id and a status (traits).
- * @param request A reference to the request.
- * @param result A reference to the result.
- * @param accessPointManager
- * @return std::shared_ptr<IAccessPointController>
- */
-template <
-    typename RequestT,
-    typename ResultT>
-std::shared_ptr<IAccessPointController>
-TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<AccessPointManager>& accessPointManager)
-{
-    const auto& accessPointId = request->accesspointid();
-
-    // Find the requested AP.
-    auto accessPointOpt = accessPointManager->GetAccessPoint(accessPointId);
-    if (!accessPointOpt.has_value()) {
-        LOGW << std::format("Access point {} not found", accessPointId);
-        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} not found", accessPointId));
-        return nullptr;
-    }
-
-    // Attempt to promote the weak reference to a strong reference.
-    auto accessPointWeak{ accessPointOpt.value() };
-    auto accessPoint = accessPointWeak.lock();
-    if (accessPoint == nullptr) {
-        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} is no longer valid", accessPointId));
-        return nullptr;
-    }
-
-    // Create a controller for this access point.
-    auto accessPointController = accessPoint->CreateController();
-    if (accessPointController == nullptr) {
-        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to create controller for access point {}", accessPointId));
-        return nullptr;
-    }
-
-    return accessPointController;
 }
 } // namespace detail
 
