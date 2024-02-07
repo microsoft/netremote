@@ -200,6 +200,13 @@ AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol 
     return isOk && m_hostapd.Reload();
 }
 
+bool
+AccessPointControllerLinux::SetFrquencyBands([[maybe_unused]] std::vector<Ieee80211FrequencyBand> frequencyBands)
+{
+    // TODO:
+    return false;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {

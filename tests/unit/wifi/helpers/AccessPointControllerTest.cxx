@@ -42,7 +42,7 @@ AccessPointControllerTest::GetCapabilities()
 }
 
 bool
-AccessPointControllerTest::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
@@ -50,6 +50,16 @@ AccessPointControllerTest::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol i
 
     AccessPoint->Protocol = ieeeProtocol;
     return true;
+}
+
+bool
+AccessPointControllerTest::SetFrquencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
+    }
+
+    AccessPoint->FrequencyBands = std::move(frequencyBands);
 }
 
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
