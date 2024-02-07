@@ -63,7 +63,7 @@ struct AccessPointControllerLinux :
      * @return false
      */
     virtual bool
-    SetFrquencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
+    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
 
 private:
     Wpa::Hostapd m_hostapd;

@@ -81,7 +81,7 @@ struct IAccessPointController
      * @return false
      */
     virtual bool
-    SetFrquencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) = 0;
+    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) = 0;
 };
 
 /**

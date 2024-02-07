@@ -226,7 +226,7 @@ AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol 
 }
 
 bool
-AccessPointControllerLinux::SetFrquencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
+AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
     // Ensure at least one band is requested.
     if (std::empty(frequencyBands)) {

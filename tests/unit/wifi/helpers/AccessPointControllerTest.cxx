@@ -53,7 +53,7 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
 }
 
 bool
-AccessPointControllerTest::SetFrquencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
+AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
