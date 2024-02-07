@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -24,6 +25,7 @@ struct AccessPointTest final :
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     bool IsEnabled{ false };
     Microsoft::Net::Wifi::Ieee80211Protocol Protocol;
+    std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.

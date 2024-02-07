@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 
@@ -57,13 +58,23 @@ struct AccessPointControllerTest final :
 
     /**
      * @brief Set the Ieee80211 protocol of the access point.
-     * 
+     *
      * @param ieeeProtocol The Ieee80211 protocol to be set
      * @return true
      * @return false
-    */
+     */
     virtual bool
     SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+
+    /**
+     * @brief Set the frquency bands the access point should enable.
+     *
+     * @param frequencyBands The frequency bands to be set.
+     * @return true
+     * @return false
+     */
+    virtual bool
+    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
 };
 
 /**

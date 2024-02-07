@@ -1,8 +1,12 @@
 
+#include <algorithm>
+#include <format>
 #include <stdexcept>
 
+#include <magic_enum.hpp>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
@@ -42,13 +46,31 @@ AccessPointControllerTest::GetCapabilities()
 }
 
 bool
-AccessPointControllerTest::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
     }
 
     AccessPoint->Protocol = ieeeProtocol;
+    return true;
+}
+
+bool
+AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
+    }
+
+    for (const auto &frequencyBandToSet : frequencyBands) {
+        if (std::ranges::find(AccessPoint->Capabilities.FrequencyBands, frequencyBandToSet) == std::cend(AccessPoint->Capabilities.FrequencyBands)) {
+            LOGE << std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet));
+            return false;
+        }
+    }
+
+    AccessPoint->FrequencyBands = std::move(frequencyBands);
     return true;
 }
 
