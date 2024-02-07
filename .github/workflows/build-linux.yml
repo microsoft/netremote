@@ -5,6 +5,10 @@ on: workflow_dispatch
 
 jobs:
   build:
+    name: build linux
+    permissions:
+      actions: read
+      security-events: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

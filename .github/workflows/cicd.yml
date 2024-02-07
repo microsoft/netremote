@@ -21,6 +21,9 @@ on:
 jobs:
   build-validation:
     name: Build Validation
+    permissions:
+      actions: read
+      security-events: write
     uses: ./.github/workflows/build.yml
     with:
       build-types: "[ 'Debug' ]"
