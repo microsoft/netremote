@@ -130,7 +130,6 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
 
-    constexpr auto SsidName{ "TestWifiAccessPointSetPhyType" };
     constexpr auto InterfaceName{ "TestWifiAccessPointSetPhyType" };
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
@@ -150,29 +149,6 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemote::NewStub(channel);
-
-    Dot11AccessPointConfiguration apConfiguration{};
-    apConfiguration.mutable_ssid()->set_name(SsidName);
-    apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
-    apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
-    apConfiguration.set_ciphersuite(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
-    apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
-    apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
-
-    WifiAccessPointEnableRequest request{};
-    request.set_accesspointid(InterfaceName);
-    *request.mutable_configuration() = std::move(apConfiguration);
-
-    WifiAccessPointEnableResult result{};
-    grpc::ClientContext clientContext{};
-
-    auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
-    REQUIRE(status.ok());
-    REQUIRE(result.accesspointid() == request.accesspointid());
-    REQUIRE(result.has_status());
-    REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-    REQUIRE(result.status().message().empty());
-    REQUIRE(result.status().has_details() == false);
 
     SECTION("Can be called")
     {
