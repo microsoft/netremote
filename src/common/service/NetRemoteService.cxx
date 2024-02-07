@@ -619,6 +619,7 @@ NetRemoteFrequencyBandToIeee80211FrequencyBand(Dot11FrequencyBand dot11Frequency
 }
 } // namespace detail
 
+/* static */
 bool
 NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetFrequencyBandsRequest* request, WifiAccessPointSetFrequencyBandsResult* result)
 {
@@ -693,6 +694,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
     return grpc::Status::OK;
 }
 
+/* static */
 bool
 NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
 {
