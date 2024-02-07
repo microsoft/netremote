@@ -10,4 +10,5 @@ service NetRemoteCallback
 {
     rpc WifiDataStreamUpload (stream Microsoft.Net.Remote.Wifi.WifiDataStreamData) returns (Microsoft.Net.Remote.Wifi.WifiDataStreamUploadResult);
     rpc WifiDataStreamDownload (Microsoft.Net.Remote.Wifi.WifiDataStreamDownloadRequest) returns (stream Microsoft.Net.Remote.Wifi.WifiDataStreamData);
+    rpc WifiDataStreamBidirectional (stream Microsoft.Net.Remote.Wifi.WifiDataStreamData) returns (stream Microsoft.Net.Remote.Wifi.WifiDataStreamData);
 }

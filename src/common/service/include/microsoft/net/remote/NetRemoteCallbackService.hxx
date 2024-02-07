@@ -25,6 +25,9 @@ private:
 
     virtual ::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
     WifiDataStreamDownload(::grpc::CallbackServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request) override;
+
+    virtual ::grpc::ServerBidiReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData, ::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+    WifiDataStreamBidirectional(::grpc::CallbackServerContext* context) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 

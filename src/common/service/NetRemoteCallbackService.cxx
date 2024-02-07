@@ -111,3 +111,66 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
 
     return new StreamWriter(request);
 }
+
+::grpc::ServerBidiReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData, ::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::CallbackServerContext* context)
+{
+    LOGD << "Received WifiDataStreamBidirectional request";
+
+    class StreamReaderWriter : public ::grpc::ServerBidiReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData, ::Microsoft::Net::Remote::Wifi::WifiDataStreamData>
+    {
+    public:
+        StreamReaderWriter()
+        {
+            StartRead(&m_readData);
+            NextWrite();
+        }
+
+        void OnReadDone(bool ok) override
+        {
+            if (ok) {
+                LOGD << "Data read successful";
+                StartRead(&m_readData);
+            } else {
+                // A false "ok" value could either mean a failed RPC or that no more data is available.
+                // Unfortunately, there is no clear way to tell which situation occurred.
+                LOGD << "Data read failed (RPC failed OR no more data)";
+                Finish(::grpc::Status::OK);
+            }
+        }
+
+        void OnWriteDone(bool ok) override
+        {
+            if (ok) {
+                NextWrite();
+            } else {
+                LOGE << "Data write failed";
+                Finish(::grpc::Status::OK);
+            }
+        }
+
+        void OnCancel() override
+        {
+            LOGE << "RPC cancelled";
+            Finish(::grpc::Status::CANCELLED);
+        }
+
+        void OnDone() override
+        {
+            delete this;
+        }
+
+    private:
+        void NextWrite()
+        {
+            m_writeData.set_data("Data");
+            StartWrite(&m_writeData);
+        }
+
+    private:
+        ::Microsoft::Net::Remote::Wifi::WifiDataStreamData m_readData{};
+        ::Microsoft::Net::Remote::Wifi::WifiDataStreamData m_writeData{};
+    };
+
+    return new StreamReaderWriter();
+}
