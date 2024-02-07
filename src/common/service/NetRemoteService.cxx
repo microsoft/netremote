@@ -196,17 +196,31 @@ Dot11FrequencyBand
 IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
 {
     switch (ieeeDot11FrequencyBand) {
-    case Ieee80211FrequencyBand::Unknown:
-        return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
     case Ieee80211FrequencyBand::TwoPointFourGHz:
         return Dot11FrequencyBand::Dot11FrequencyBandTwoPoint4GHz;
     case Ieee80211FrequencyBand::FiveGHz:
         return Dot11FrequencyBand::Dot11FrequencyBandFiveGHz;
     case Ieee80211FrequencyBand::SixGHz:
         return Dot11FrequencyBand::Dot11FrequencyBandSixGHz;
+    default:
+        return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
     }
+}
 
-    return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
+Ieee80211FrequencyBand
+NetRemoteDot11FrequencyBandToIeee80211FrequencyBand(Dot11FrequencyBand dot11FrequencyBand)
+{
+    switch (dot11FrequencyBand) {
+    case Dot11FrequencyBand::Dot11FrequencyBand2_4GHz:
+        return Ieee80211FrequencyBand::TwoPointFourGHz;
+    case Dot11FrequencyBand::Dot11FrequencyBand5_0GHz:
+        return Ieee80211FrequencyBand::FiveGHz;
+    case Dot11FrequencyBand::Dot11FrequencyBand6_0GHz:
+        return Ieee80211FrequencyBand::SixGHz;
+    case Dot11FrequencyBand::Dot11FrequencyBandUnknown:
+    default:
+        return Ieee80211FrequencyBand::Unknown;
+    }
 }
 
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
@@ -602,21 +616,7 @@ GetFrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request)
     return bands;
 }
 
-Ieee80211FrequencyBand
-NetRemoteFrequencyBandToIeee80211FrequencyBand(Dot11FrequencyBand dot11FrequencyBand)
-{
-    switch (dot11FrequencyBand) {
-    case Dot11FrequencyBand::Dot11FrequencyBand2_4GHz:
-        return Ieee80211FrequencyBand::TwoPointFourGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBand5_0GHz:
-        return Ieee80211FrequencyBand::FiveGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBand6_0GHz:
-        return Ieee80211FrequencyBand::SixGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBandUnknown:
-    default:
-        return Ieee80211FrequencyBand::Unknown;
-    }
-}
+
 } // namespace detail
 
 /* static */
@@ -657,7 +657,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
     // Convert dot11 bands to ieee80211 bands.
     const auto& frequencyBands = detail::GetFrequencyBands(*request);
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> ieeeFrequencyBands(static_cast<std::size_t>(std::size(frequencyBands)));
-    std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), detail::NetRemoteFrequencyBandToIeee80211FrequencyBand);
+    std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), detail::NetRemoteDot11FrequencyBandToIeee80211FrequencyBand);
 
     // Obtain capabilities of the access point.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};
