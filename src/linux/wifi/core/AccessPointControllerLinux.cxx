@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <format>
 #include <ranges>
+#include <sstream>
 
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
@@ -10,6 +11,7 @@
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Wifi;
 
@@ -119,6 +121,21 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
         throw AccessPointControllerException(std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode)));
     }
 }
+
+std::string_view
+IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
+{
+    switch (ieeeFrequencyBand) {
+    case Ieee80211FrequencyBand::TwoPointFourGHz:
+        return Wpa::ProtocolHostapd::PropertySetBandValue2G;
+    case Ieee80211FrequencyBand::FiveGHz:
+        return Wpa::ProtocolHostapd::PropertySetBandValue5G;
+    case Ieee80211FrequencyBand::SixGHz:
+        return Wpa::ProtocolHostapd::PropertySetBandValue6G;
+    default:
+        throw AccessPointControllerException(std::format("Invalid ieee80211 frequency band value {}", magic_enum::enum_name(ieeeFrequencyBand)));
+    }
+}
 } // namespace detail
 
 Ieee80211AccessPointCapabilities
@@ -196,15 +213,56 @@ AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol 
         throw AccessPointControllerException(std::format("Failed to set Ieee80211 protocol for interface {} ({})", GetInterfaceName(), ex.what()));
     }
 
-    // Reload hostapd conf file.
-    return isOk && m_hostapd.Reload();
+    if (isOk) {
+        // Reload hostapd configuration.
+        isOk = m_hostapd.Reload();
+        if (!isOk) {
+            LOGE << std::format("Failed to reload hostapd configuration for interface {}", GetInterfaceName());
+            return false;
+        }
+    }
+
+    return isOk;
 }
 
 bool
-AccessPointControllerLinux::SetFrquencyBands([[maybe_unused]] std::vector<Ieee80211FrequencyBand> frequencyBands)
+AccessPointControllerLinux::SetFrquencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
-    // TODO:
-    return false;
+    // Ensure at least one band is requested.
+    if (std::empty(frequencyBands)) {
+        LOGW << std::format("No frequency bands specified for interface {}", GetInterfaceName());
+        return false;
+    }
+
+    // Generate the argument for the hostapd "setband" command, which accepts a comma separated list of bands.
+    std::ostringstream setBandArgumentBuilder;
+    for (const auto& band : frequencyBands) {
+        setBandArgumentBuilder << detail::IeeeFrequencyBandToHostapdBand(band) << ',';
+    }
+
+    std::string setBandArgumentAll = setBandArgumentBuilder.str();
+    std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
+
+    bool isOk = false;
+    try {
+        // Set the hostapd "setband" property.
+        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSetBand, setBandArgument);
+        if (!isOk) {
+            LOGE << std::format("Failed to set frequency bands for interface {}", GetInterfaceName());
+            return false;
+        }
+
+        // Reload hostapd configuration to pick up the changes.
+        isOk = m_hostapd.Reload();
+        if (!isOk) {
+            LOGE << std::format("Failed to reload hostapd configuration for interface {}", GetInterfaceName());
+            return false;
+        }
+    } catch (const Wpa::HostapdException& ex) {
+        throw AccessPointControllerException(std::format("Failed to set frequency bands for interface {} ({})", GetInterfaceName(), ex.what()));
+    }
+
+    return true;
 }
 
 std::unique_ptr<IAccessPointController>
