@@ -2,7 +2,10 @@
 #include <algorithm>
 #include <format>
 #include <iterator>
+#include <source_location>
+#include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <magic_enum.hpp>
@@ -466,6 +469,89 @@ NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::Wifi
 {
     return (item.accesspointid() == AccessPointIdInvalid);
 }
+
+std::string
+BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, std::string_view prefix)
+{
+    if (std::empty(values)) {
+        return {};
+    }
+
+    std::ostringstream valueListBuilder;
+    valueListBuilder << prefix;
+    for (std::size_t i = 0; i < std::size(values); i++) {
+        const auto& [name, value] = values[i];
+        if (i > 0) {
+            valueListBuilder << ", ";
+        }
+        valueListBuilder << name << "='" << value << "'";
+    }
+
+    return valueListBuilder.str();
+}
+
+struct NetRemoteApiTrace
+{
+    NetRemoteApiTrace(std::vector<std::pair<std::string, std::string>> arguments = {}, const std::source_location location = std::source_location::current()) :
+        m_location(std::move(location)),
+        m_functionName(m_location.function_name()),
+        m_arguments(std::move(arguments))
+    {
+        // Attempt to parse the function name, removing the return type, namespace prefixes, and arguments.
+        const auto openingBracketPos = m_functionName.find_first_of('(');
+        if (openingBracketPos != m_functionName.npos) {
+            m_functionName.remove_suffix(m_functionName.size() - openingBracketPos);
+        }
+
+        const auto lastColonPos = m_functionName.find_last_of(':');
+        if (lastColonPos != m_functionName.npos) {
+            m_functionName.remove_prefix(lastColonPos + 1);
+        }
+
+        // Build a list of arguments.
+        std::string argumentList = BuildValueList(m_arguments, " with arguments ");
+
+        LOGI << std::format("[API] +{}{}", m_functionName, argumentList);
+    }
+
+    void
+    AddReturnValue(std::string name, std::string value)
+    {
+        m_returnValues.emplace_back(std::move(name), std::move(value));
+    }
+
+    ~NetRemoteApiTrace()
+    {
+        std::string returnvValueList = BuildValueList(m_returnValues, " returning ");
+        LOGI << std::format("[API] -{}{}", m_functionName, returnvValueList);
+    }
+
+    struct Wifi
+    {
+        static NetRemoteApiTrace
+        WithAccessPoint(const std::string& accessPointId, const std::source_location location = std::source_location::current())
+        {
+            return NetRemoteApiTrace({ { AccessPointIdArgName, accessPointId } }, std::move(location));
+        }
+
+        template <typename RequestT>
+        static NetRemoteApiTrace
+        WithAccessPoint(const RequestT& request, const std::source_location location = std::source_location::current())
+        {
+            return WithAccessPoint(request.accesspointid(), std::move(location));
+        }
+
+    private:
+        static constexpr auto AccessPointIdArgName{ "Access Point" };
+    };
+
+private:
+    std::source_location m_location;
+    std::string_view m_functionName;
+    std::vector<std::pair<std::string, std::string>> m_arguments;
+    std::vector<std::pair<std::string, std::string>> m_returnValues;
+};
+
 } // namespace detail
 
 ::grpc::Status
@@ -473,7 +559,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 {
     using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
 
-    LOGD << std::format("Received WifiEnumerateAccessPoints request");
+    detail::NetRemoteApiTrace traceMe{};
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
@@ -501,7 +587,7 @@ using Microsoft::Net::Wifi::Dot11PhyType;
 ::grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response)
 {
-    LOGD << std::format("Received WifiAccessPointEnable request for access point id {}", request->accesspointid());
+    auto traceMe{ detail::NetRemoteApiTrace::Wifi::WithAccessPoint(*request) };
 
     WifiAccessPointOperationStatus status{};
 
@@ -520,7 +606,7 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* 
 ::grpc::Status
 NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* response)
 {
-    LOGD << std::format("Received WifiAccessPointDisable request for access point id {}", request->accesspointid());
+    auto traceMe{ detail::NetRemoteApiTrace::Wifi::WithAccessPoint(*request) };
 
     WifiAccessPointOperationStatus status{};
     // TODO: Disable the access point.
@@ -539,7 +625,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 {
     using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
-    LOGD << std::format("Received WifiAccessPointSetPhyType request for access point id {}", request->accesspointid());
+    auto traceMe{ detail::NetRemoteApiTrace::Wifi::WithAccessPoint(*request) };
 
     WifiAccessPointOperationStatus status{};
 
@@ -616,7 +702,6 @@ GetFrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request)
     return bands;
 }
 
-
 } // namespace detail
 
 /* static */
@@ -641,7 +726,7 @@ using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 ::grpc::Status
 NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result)
 {
-    LOGD << std::format("Received WifiAccessPointSetFrequencyBands request for access point id {}", request->accesspointid());
+    auto traceMe{ detail::NetRemoteApiTrace::Wifi::WithAccessPoint(*request) };
 
     // Validate basic parameters in the request.
     if (!ValidateWifiSetFrequencyBandsRequest(request, result)) {
