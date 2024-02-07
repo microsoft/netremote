@@ -73,7 +73,8 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
     {
         accessPointDiscoveryAgentOperationsTestPtr->AddAccessPoint(accessPointInterfaceName1);
 
-        auto accessPointRetrievedWeak{ accessPointManager->GetAccessPoint(accessPointInterfaceName1) };
+        auto accessPointRetrievedOpt{ accessPointManager->GetAccessPoint(accessPointInterfaceName1) };
+        auto accessPointRetrievedWeak{ accessPointRetrievedOpt.value() };
         auto accessPointRetrieved{ accessPointRetrievedWeak.lock() };
         REQUIRE(accessPointRetrieved != nullptr);
         REQUIRE(accessPointRetrieved->GetInterfaceName() == accessPointInterfaceName1);
@@ -98,7 +99,8 @@ TEST_CASE("AccessPointManager persists access points reported by discovery agent
         accessPointDiscoveryAgentOperationsTestPtr->AddAccessPoint(accessPointInterfaceName1);
         accessPointDiscoveryAgentOperationsTestPtr->AddAccessPoint(accessPointInterfaceName2);
 
-        auto accessPointRetrievedWeak{ accessPointManager->GetAccessPoint(accessPointInterfaceName1) };
+        auto accessPointRetrievedOpt{ accessPointManager->GetAccessPoint(accessPointInterfaceName1) };
+        auto accessPointRetrievedWeak{ accessPointRetrievedOpt.value() };
         auto accessPointRetrieved{ accessPointRetrievedWeak.lock() };
         REQUIRE(accessPointRetrieved != nullptr);
         REQUIRE(accessPointRetrieved->GetInterfaceName() == accessPointInterfaceName1);
@@ -137,19 +139,21 @@ TEST_CASE("AccessPointManager discards access points reported to have departed b
     SECTION("Access points reported to have departed are not accessible via GetAccessPoint()")
     {
         accessPointDiscoveryAgentOperationsTestPtr->AddAccessPoint(accessPointInterfaceName);
-        auto accessPointWeak{ accessPointManager->GetAccessPoint(accessPointInterfaceName) };
+        auto accessPointOpt{ accessPointManager->GetAccessPoint(accessPointInterfaceName) };
+        auto accessPointWeak{ accessPointOpt.value() };
         auto accessPoint{ accessPointWeak.lock() };
 
         accessPointDiscoveryAgentOperationsTestPtr->RemoveAccessPoint(accessPointInterfaceName);
         auto accessPointRetrieved{ accessPointManager->GetAccessPoint(accessPointInterfaceName) };
-        REQUIRE(accessPointRetrieved.expired());
+        REQUIRE(!accessPointRetrieved.has_value());
     }
 
     SECTION("Access points reported to have departed are not accessible via GetAllAccessPoints()")
     {
         accessPointDiscoveryAgentOperationsTestPtr->AddAccessPoint(accessPointInterfaceName);
 
-        auto accessPointWeak{ accessPointManager->GetAccessPoint(accessPointInterfaceName) };
+        auto accessPointOpt{ accessPointManager->GetAccessPoint(accessPointInterfaceName) };
+        auto accessPointWeak{ accessPointOpt.value() };
         auto accessPoint{ accessPointWeak.lock() };
 
         accessPointDiscoveryAgentOperationsTestPtr->RemoveAccessPoint(accessPointInterfaceName);

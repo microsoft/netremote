@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <shared_mutex>
 #include <vector>
 
@@ -55,9 +56,9 @@ public:
      * @brief Get the IAccessPoint object with the specified interface name.
      *
      * @param interfaceName The interface name of the access point to get.
-     * @return std::weak_ptr<IAccessPoint>
+     * @return std::optional<std::weak_ptr<IAccessPoint>> 
      */
-    std::weak_ptr<IAccessPoint>
+    std::optional<std::weak_ptr<IAccessPoint>>
     GetAccessPoint(std::string_view interfaceName) const;
 
     /**

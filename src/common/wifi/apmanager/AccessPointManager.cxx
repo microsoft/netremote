@@ -56,7 +56,7 @@ AccessPointManager::RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
     m_accessPoints.erase(accessPointToRemove);
 }
 
-std::weak_ptr<IAccessPoint>
+std::optional<std::weak_ptr<IAccessPoint>>
 AccessPointManager::GetAccessPoint(std::string_view interfaceName) const
 {
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
