@@ -4,6 +4,7 @@
 
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -96,6 +97,24 @@ ToDot11CipherSuite(const Microsoft::Net::Wifi::Ieee80211CipherSuite ieeeCipherSu
  */
 Microsoft::Net::Wifi::Ieee80211CipherSuite
 FromDot11CipherSuite(const Microsoft::Net::Wifi::Dot11CipherSuite dot11CipherSuite) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 access point capabilities to the equivalent Dot11AccessPointCapabilities.
+ * 
+ * @param ieeeAccessPointCapabilities The IEEE 802.11 access point capabilities to convert.
+ * @return Microsoft::Net::Wifi::Dot11AccessPointCapabilities 
+ */
+Microsoft::Net::Wifi::Dot11AccessPointCapabilities
+ToDot11AccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities ieeeAccessPointCapabilities) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AccessPointCapabilities to the equivalent IEEE 802.11 access point capabilities.
+ * 
+ * @param dot11AccessPointCapabilities The Dot11AccessPointCapabilities to convert.
+ * @return Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities 
+ */
+Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities
+FromDot11AccessPointCapabilities(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities dot11AccessPointCapabilities) noexcept;
 
 } // namespace Microsoft::Net::Wifi
 

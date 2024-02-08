@@ -163,6 +163,8 @@ MakeInvalidAccessPointResultItem()
 Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
 IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 {
+    using Microsoft::Net::Wifi::ToDot11AccessPointCapabilities;
+
     WifiEnumerateAccessPointsResultItem item{};
 
     bool isEnabled{ false };
@@ -187,7 +189,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 
     try {
         auto capabilitiesIeee80211 = accessPointController->GetCapabilities();
-        capabilities = IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(capabilitiesIeee80211);
+        capabilities = ToDot11AccessPointCapabilities(capabilitiesIeee80211);
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to get capabilities for access point {} ({})", interfaceName, apce.what());
         return MakeInvalidAccessPointResultItem();

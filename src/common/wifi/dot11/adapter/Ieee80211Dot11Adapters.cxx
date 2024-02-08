@@ -1,4 +1,7 @@
 
+#include <ranges>
+#include <vector>
+
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -324,6 +327,60 @@ FromDot11CipherSuite(const Dot11CipherSuite dot11CipherSuite) noexcept
     default:
         return Ieee80211CipherSuite::Unknown;
     }
+}
+
+using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
+using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
+
+Dot11AccessPointCapabilities
+ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities ieeeAccessPointCapabilities) noexcept
+{
+    Dot11AccessPointCapabilities dot11Capabilities{};
+
+    std::vector<Dot11PhyType> phyTypes(std::size(ieeeAccessPointCapabilities.Protocols));
+    std::ranges::transform(ieeeAccessPointCapabilities.Protocols, std::begin(phyTypes), ToDot11PhyType);
+
+    *dot11Capabilities.mutable_phytypes() = {
+        std::make_move_iterator(std::begin(phyTypes)),
+        std::make_move_iterator(std::end(phyTypes))
+    };
+
+    std::vector<Dot11FrequencyBand> bands(std::size(ieeeAccessPointCapabilities.FrequencyBands));
+    std::ranges::transform(ieeeAccessPointCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
+
+    *dot11Capabilities.mutable_bands() = {
+        std::make_move_iterator(std::begin(bands)),
+        std::make_move_iterator(std::end(bands))
+    };
+
+    std::vector<Dot11AkmSuite> akmSuites(std::size(ieeeAccessPointCapabilities.AkmSuites));
+    std::ranges::transform(ieeeAccessPointCapabilities.AkmSuites, std::begin(akmSuites), ToDot11AkmSuite);
+
+    *dot11Capabilities.mutable_akmsuites() = {
+        std::make_move_iterator(std::begin(akmSuites)),
+        std::make_move_iterator(std::end(akmSuites))
+    };
+
+    std::vector<Dot11CipherSuite> cipherSuites(std::size(ieeeAccessPointCapabilities.CipherSuites));
+    std::ranges::transform(ieeeAccessPointCapabilities.CipherSuites, std::begin(cipherSuites), ToDot11CipherSuite);
+
+    *dot11Capabilities.mutable_ciphersuites() = {
+        std::make_move_iterator(std::begin(cipherSuites)),
+        std::make_move_iterator(std::end(cipherSuites))
+    };
+
+    return dot11Capabilities;
+}
+
+Ieee80211AccessPointCapabilities
+FromDot11AccessPointCapabilities([[maybe_unused]] const Dot11AccessPointCapabilities dot11AccessPointCapabilities) noexcept
+{
+    Ieee80211AccessPointCapabilities ieee80211Capabilities{};
+
+    std::vector<Ieee80211Protocol> protocols(std::size(dot11AccessPointCapabilities.phytypes()));
+
+
+    return {};
 }
 
 } // namespace Microsoft::Net::Wifi
