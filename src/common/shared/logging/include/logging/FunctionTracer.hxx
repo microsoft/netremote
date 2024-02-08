@@ -21,24 +21,53 @@ struct FunctionTracer
 
     virtual ~FunctionTracer();
 
+    /**
+     * @brief Print the function entry log message.
+     */
     void
     Enter();
 
+    /**
+     * @brief Print the function exit log message.
+     */
     void
     Exit();
 
+    /**
+     * @brief Add an argument to the function tracer. This value will be printed in the entry log message.
+     *
+     * @param name The name of the argument.
+     * @param value The value of the argument.
+     */
     void
     AddArgument(std::string name, std::string value);
 
+    /**
+     * @brief Add a return value to the function tracer. This value will be printed in the exit log message.
+     *
+     * @param name The name of the return value.
+     * @param value The value of the return value.
+     */
     void
     AddReturnValue(std::string name, std::string value);
 
+    /**
+     * @brief Mark that the function has succeeded. This will set the log verbosity to info.
+     */
     void
     SetSucceeded() noexcept;
 
+    /**
+     * @brief Mark that the function has failed. This will set the log verbosity to error.
+     */
     void
     SetFailed() noexcept;
 
+    /**
+     * @brief Manually set the log severity for the exit log message. This overrides the SetSucceeded and SetFailed methods.
+     *
+     * @param severity The log severity to use when printing the exit log message.
+     */
     void
     SetExitLogSeverity(plog::Severity severity) noexcept;
 
