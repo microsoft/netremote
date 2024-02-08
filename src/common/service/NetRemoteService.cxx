@@ -14,6 +14,7 @@
 #include <microsoft/net/remote/NetRemoteService.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::Service;
@@ -22,8 +23,10 @@ using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
 using Microsoft::Net::Wifi::AccessPointControllerException;
 using Microsoft::Net::Wifi::AccessPointManager;
+using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
 using Microsoft::Net::Wifi::IAccessPoint;
 using Microsoft::Net::Wifi::IAccessPointController;
+using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
 NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
     m_accessPointManager(std::move(accessPointManager))
@@ -139,179 +142,6 @@ TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<
     return accessPointController;
 }
 
-using Microsoft::Net::Wifi::Dot11PhyType;
-using Microsoft::Net::Wifi::Ieee80211Protocol;
-
-Dot11PhyType
-IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
-{
-    switch (ieeeProtocol) {
-    case Ieee80211Protocol::Unknown:
-        return Dot11PhyType::Dot11PhyTypeUnknown;
-    case Ieee80211Protocol::B:
-        return Dot11PhyType::Dot11PhyTypeB;
-    case Ieee80211Protocol::G:
-        return Dot11PhyType::Dot11PhyTypeG;
-    case Ieee80211Protocol::N:
-        return Dot11PhyType::Dot11PhyTypeN;
-    case Ieee80211Protocol::A:
-        return Dot11PhyType::Dot11PhyTypeA;
-    case Ieee80211Protocol::AC:
-        return Dot11PhyType::Dot11PhyTypeAC;
-    case Ieee80211Protocol::AD:
-        return Dot11PhyType::Dot11PhyTypeAD;
-    case Ieee80211Protocol::AX:
-        return Dot11PhyType::Dot11PhyTypeAX;
-    case Ieee80211Protocol::BE:
-        return Dot11PhyType::Dot11PhyTypeBE;
-    }
-
-    return Dot11PhyType::Dot11PhyTypeUnknown;
-}
-
-Ieee80211Protocol
-NetRemotePhyTypeToIeeeProtocol(Dot11PhyType phyType)
-{
-    switch (phyType) {
-    case Dot11PhyType::Dot11PhyTypeB:
-        return Ieee80211Protocol::B;
-    case Dot11PhyType::Dot11PhyTypeG:
-        return Ieee80211Protocol::G;
-    case Dot11PhyType::Dot11PhyTypeN:
-        return Ieee80211Protocol::N;
-    case Dot11PhyType::Dot11PhyTypeA:
-        return Ieee80211Protocol::A;
-    case Dot11PhyType::Dot11PhyTypeAC:
-        return Ieee80211Protocol::AC;
-    case Dot11PhyType::Dot11PhyTypeAD:
-        return Ieee80211Protocol::AD;
-    case Dot11PhyType::Dot11PhyTypeAX:
-        return Ieee80211Protocol::AX;
-    case Dot11PhyType::Dot11PhyTypeBE:
-        return Ieee80211Protocol::BE;
-    default:
-        return Ieee80211Protocol::Unknown;
-    }
-}
-
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
-
-Dot11FrequencyBand
-IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
-{
-    switch (ieeeDot11FrequencyBand) {
-    case Ieee80211FrequencyBand::TwoPointFourGHz:
-        return Dot11FrequencyBand::Dot11FrequencyBandTwoPoint4GHz;
-    case Ieee80211FrequencyBand::FiveGHz:
-        return Dot11FrequencyBand::Dot11FrequencyBandFiveGHz;
-    case Ieee80211FrequencyBand::SixGHz:
-        return Dot11FrequencyBand::Dot11FrequencyBandSixGHz;
-    default:
-        return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
-    }
-}
-
-Ieee80211FrequencyBand
-NetRemoteDot11FrequencyBandToIeee80211FrequencyBand(Dot11FrequencyBand dot11FrequencyBand)
-{
-    switch (dot11FrequencyBand) {
-    case Dot11FrequencyBand::Dot11FrequencyBand2_4GHz:
-        return Ieee80211FrequencyBand::TwoPointFourGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBand5_0GHz:
-        return Ieee80211FrequencyBand::FiveGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBand6_0GHz:
-        return Ieee80211FrequencyBand::SixGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBandUnknown:
-    default:
-        return Ieee80211FrequencyBand::Unknown;
-    }
-}
-
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
-
-Dot11AuthenticationAlgorithm
-IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieeeAuthenticationAlgorithm)
-{
-    switch (ieeeAuthenticationAlgorithm) {
-    case Ieee80211AuthenticationAlgorithm::Unknown:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
-    case Ieee80211AuthenticationAlgorithm::OpenSystem:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem;
-    case Ieee80211AuthenticationAlgorithm::SharedKey:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey;
-    case Ieee80211AuthenticationAlgorithm::FastBssTransition:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFastBssTransition;
-    case Ieee80211AuthenticationAlgorithm::Sae:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae;
-    case Ieee80211AuthenticationAlgorithm::Fils:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFils;
-    case Ieee80211AuthenticationAlgorithm::FilsPfs:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPfs;
-    case Ieee80211AuthenticationAlgorithm::FilsPublicKey:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPublicKey;
-    case Ieee80211AuthenticationAlgorithm::VendorSpecific:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmVendorSpecific;
-    }
-
-    return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
-}
-
-using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::Ieee80211AkmSuite;
-
-Dot11AkmSuite
-Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
-{
-    switch (akmSuite) {
-    case Ieee80211AkmSuite::Reserved0:
-        return Dot11AkmSuite::Dot11AkmSuiteReserved0;
-    case Ieee80211AkmSuite::Ieee8021x:
-        return Dot11AkmSuite::Dot11AkmSuite8021x;
-    case Ieee80211AkmSuite::Psk:
-        return Dot11AkmSuite::Dot11AkmSuitePsk;
-    case Ieee80211AkmSuite::Ft8021x:
-        return Dot11AkmSuite::Dot11AkmSuiteFt8021x;
-    case Ieee80211AkmSuite::FtPsk:
-        return Dot11AkmSuite::Dot11AkmSuiteFtPsk;
-    case Ieee80211AkmSuite::Ieee8021xSha256:
-        return Dot11AkmSuite::Dot11AkmSuite8021xSha256;
-    case Ieee80211AkmSuite::PskSha256:
-        return Dot11AkmSuite::Dot11AkmSuitePskSha256;
-    case Ieee80211AkmSuite::Tdls:
-        return Dot11AkmSuite::Dot11AkmSuiteTdls;
-    case Ieee80211AkmSuite::Sae:
-        return Dot11AkmSuite::Dot11AkmSuiteSae;
-    case Ieee80211AkmSuite::FtSae:
-        return Dot11AkmSuite::Dot11AkmSuiteFtSae;
-    case Ieee80211AkmSuite::ApPeerKey:
-        return Dot11AkmSuite::Dot11AkmSuiteApPeerKey;
-    case Ieee80211AkmSuite::Ieee8021xSuiteB:
-        return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB;
-    case Ieee80211AkmSuite::Ieee8011xSuiteB192:
-        return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192;
-    case Ieee80211AkmSuite::Ft8021xSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
-    case Ieee80211AkmSuite::FilsSha256:
-        return Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
-    case Ieee80211AkmSuite::FilsSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
-    case Ieee80211AkmSuite::FtFilsSha256:
-        return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;
-    case Ieee80211AkmSuite::FtFilsSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha384;
-    case Ieee80211AkmSuite::Owe:
-        return Dot11AkmSuite::Dot11AkmSuiteOwe;
-    case Ieee80211AkmSuite::FtPskSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
-    case Ieee80211AkmSuite::PskSha384:
-        return Dot11AkmSuite::Dot11AkmSuitePskSha384;
-    }
-
-    return Dot11AkmSuite::Dot11AkmSuiteUnknown;
-}
-
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
@@ -355,13 +185,14 @@ IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
 Microsoft::Net::Wifi::Dot11AccessPointCapabilities
 IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
 {
-    using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-    using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
+    using Microsoft::Net::Wifi::ToDot11AkmSuite;
+    using Microsoft::Net::Wifi::ToDot11FrequencyBand;
+    using Microsoft::Net::Wifi::ToDot11PhyType;
 
     Dot11AccessPointCapabilities capabilities{};
 
     std::vector<Microsoft::Net::Wifi::Dot11PhyType> phyTypes(std::size(ieeeCapabilities.Protocols));
-    std::ranges::transform(ieeeCapabilities.Protocols, std::begin(phyTypes), IeeeProtocolToNetRemotePhyType);
+    std::ranges::transform(ieeeCapabilities.Protocols, std::begin(phyTypes), ToDot11PhyType);
 
     *capabilities.mutable_phytypes() = {
         std::make_move_iterator(std::begin(phyTypes)),
@@ -369,7 +200,7 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
     };
 
     std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.FrequencyBands));
-    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand);
+    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
 
     *capabilities.mutable_bands() = {
         std::make_move_iterator(std::begin(bands)),
@@ -377,7 +208,7 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
     };
 
     std::vector<Microsoft::Net::Wifi::Dot11AkmSuite> akmSuites(std::size(ieeeCapabilities.AkmSuites));
-    std::ranges::transform(ieeeCapabilities.AkmSuites, std::begin(akmSuites), Ieee80211AkmSuiteToNetRemoteAkm);
+    std::ranges::transform(ieeeCapabilities.AkmSuites, std::begin(akmSuites), ToDot11AkmSuite);
 
     *capabilities.mutable_akmsuites() = {
         std::make_move_iterator(std::begin(akmSuites)),
@@ -638,7 +469,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     }
 
     // Convert PHY type to Ieee80211 protocol.
-    auto ieeeProtocol = detail::NetRemotePhyTypeToIeeeProtocol(request->phytype());
+    auto ieeeProtocol = FromDot11PhyType(request->phytype());
 
     // Check if Ieee80211 protocol is supported by AP.
     try {
@@ -706,11 +537,11 @@ NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetF
     return true;
 }
 
-using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
-
 ::grpc::Status
 NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result)
 {
+    using Microsoft::Net::Wifi::FromDot11FrequencyBand;
+
     detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     // Validate basic parameters in the request.
@@ -727,7 +558,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
     // Convert dot11 bands to ieee80211 bands.
     const auto& frequencyBands = detail::GetFrequencyBands(*request);
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> ieeeFrequencyBands(static_cast<std::size_t>(std::size(frequencyBands)));
-    std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), detail::NetRemoteDot11FrequencyBandToIeee80211FrequencyBand);
+    std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), FromDot11FrequencyBand);
 
     // Obtain capabilities of the access point.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};

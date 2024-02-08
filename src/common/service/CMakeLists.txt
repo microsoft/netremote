@@ -22,6 +22,7 @@ target_link_libraries(${PROJECT_NAME}-service
     PRIVATE
         logging-utils
         plog::plog
+        wifi-core-adapter-dot11
 )
 
 install(
