@@ -22,7 +22,7 @@ struct WpaCommand :
 
     constexpr WpaCommand() = default;
     constexpr explicit WpaCommand(std::string_view payload) :
-        Payload(payload)
+        m_payload(payload)
     {
     }
 
@@ -43,6 +43,14 @@ struct WpaCommand :
     SetPayload(std::string_view payload);
 
     /**
+     * @brief Get the payload of the command.
+     * 
+     * @return std::string_view 
+     */
+    std::string_view
+    GetPayload() const noexcept;
+
+    /**
      * @brief Parse the response payload into a WpaResponse object.
      *
      * @param responsePayload The response payload to parse.
@@ -50,8 +58,6 @@ struct WpaCommand :
      */
     std::shared_ptr<WpaResponse>
     ParseResponse(std::string_view responsePayload) const;
-
-    std::string Payload;
 
 private:
     /**
@@ -63,6 +69,9 @@ private:
      */
     std::unique_ptr<WpaResponseParser>
     CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
+
+private:
+    std::string m_payload;
 };
 } // namespace Wpa
 

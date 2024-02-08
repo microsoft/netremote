@@ -51,8 +51,21 @@ struct WpaResponseParser
     virtual std::shared_ptr<WpaResponse>
     Parse();
 
-    const WpaCommand* Command;
-    const std::string_view ResponsePayload;
+    /**
+     * @brief Get the command associated with the response payload.
+     * 
+     * @return const WpaCommand* 
+     */
+    const WpaCommand*
+    GetCommand() const noexcept;
+
+    /**
+     * @brief Get the response payload.
+     * 
+     * @return std::string_view 
+     */
+    std::string_view
+    GetResponsePayload() const noexcept;
 
 protected:
     /**
@@ -87,6 +100,8 @@ private:
     TryParseProperties();
 
 private:
+    const WpaCommand* m_command;
+    std::string_view m_responsePayload;
     std::vector<WpaKeyValuePair> m_propertiesToParse;
     std::unordered_map<std::string_view, std::string_view> m_properties{};
 };

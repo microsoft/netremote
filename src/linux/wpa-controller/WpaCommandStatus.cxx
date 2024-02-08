@@ -1,8 +1,12 @@
 
-#include <plog/Log.h>
+#include <memory>
+#include <string_view>
+
 #include <Wpa/ProtocolHostapd.hxx>
-#include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
+#include <Wpa/WpaKeyValuePair.hxx>
+#include <Wpa/WpaResponse.hxx>
+#include <Wpa/WpaResponseParser.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 
 #include "WpaParsingUtilities.hxx"
