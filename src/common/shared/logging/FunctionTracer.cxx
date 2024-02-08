@@ -12,6 +12,8 @@ namespace detail
 std::string
 BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, std::string_view prefix, std::string_view keyValueSeparator = "=", std::string_view delimeter = ", ")
 {
+    static constexpr auto ValueWrapperCharacter = '\'';
+
     if (std::empty(values)) {
         return {};
     }
@@ -23,7 +25,7 @@ BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, s
         if (i > 0) {
             valueListBuilder << delimeter;
         }
-        valueListBuilder << name << keyValueSeparator << value << "'";
+        valueListBuilder << name << keyValueSeparator <<  ValueWrapperCharacter << value << ValueWrapperCharacter;
     }
 
     return valueListBuilder.str();
