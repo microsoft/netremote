@@ -21,7 +21,17 @@ struct WpaCommand;
  */
 struct WpaResponseParser
 {
+    WpaResponseParser() = delete;
+
     virtual ~WpaResponseParser() = default;
+
+    /**
+     * Prevent copy and move operations. 
+     */
+    WpaResponseParser(const WpaResponseParser&) = delete;
+    WpaResponseParser(WpaResponseParser&&) = delete;
+    WpaResponseParser& operator=(const WpaResponseParser&) = delete;
+    WpaResponseParser& operator=(WpaResponseParser&&) = delete;
 
     /**
      * @brief Construct a new WpaResponseParser object.
@@ -86,7 +96,17 @@ private:
  */
 struct WpaResponseParserFactory
 {
+    WpaResponseParserFactory() = default;
+
     virtual ~WpaResponseParserFactory() = default;
+
+    /**
+     * Prevent copy and move operations. 
+     */
+    WpaResponseParserFactory(const WpaResponseParserFactory&) = delete;
+    WpaResponseParserFactory(WpaResponseParserFactory&&) = delete;
+    WpaResponseParserFactory& operator=(const WpaResponseParserFactory&) = delete;
+    WpaResponseParserFactory& operator=(WpaResponseParserFactory&&) = delete;
 
     /**
      * @brief Create a response parser object.

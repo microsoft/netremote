@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 
+#include <Wpa/WpaResponse.hxx>
 #include <Wpa/WpaResponseParser.hxx>
 
 namespace Wpa
@@ -17,13 +18,21 @@ namespace Wpa
 struct WpaCommand :
     private WpaResponseParserFactory
 {
-    virtual ~WpaCommand() = default;
+    ~WpaCommand() override = default;
 
     constexpr WpaCommand() = default;
-    constexpr WpaCommand(std::string_view payload) :
+    constexpr explicit WpaCommand(std::string_view payload) :
         Payload(payload)
     {
     }
+
+    /**
+     * Prevent copying and moving of this object. 
+     */
+    WpaCommand(const WpaCommand&) = delete;
+    WpaCommand& operator=(const WpaCommand&) = delete;
+    WpaCommand(WpaCommand&&) = delete;
+    WpaCommand& operator=(WpaCommand&&) = delete;
 
     /**
      * @brief Set the payload of the command.

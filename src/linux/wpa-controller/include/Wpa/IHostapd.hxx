@@ -3,6 +3,7 @@
 #define I_HOSTAPD_HXX
 
 #include <exception>
+#include <string>
 #include <string_view>
 
 #include <Wpa/ProtocolHostapd.hxx>
@@ -24,7 +25,7 @@ struct IHostapd
      * @brief Default destructor supporting polymorphic destruction.
      */
     virtual ~IHostapd() = default;
-    
+
     /**
      * Prevent copying and moving of IHostapd objects.
      */
@@ -121,13 +122,13 @@ struct IHostapd
 struct HostapdException :
     public std::exception
 {
-    HostapdException(std::string_view message);
+    explicit HostapdException(std::string_view message);
 
     const char*
     what() const noexcept override;
 
 private:
-    const std::string m_message;
+    std::string m_message;
 };
 } // namespace Wpa
 

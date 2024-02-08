@@ -3,7 +3,6 @@
 #define MICROSOFT_NET_NETLINK_NETLINK_SOCKET_HXX
 
 #include <netlink/netlink.h>
-#include <netlink/socket.h>
 
 namespace Microsoft::Net::Netlink
 {
@@ -70,7 +69,7 @@ struct NetlinkSocket
      *
      * @param socket The netlink socket to manage.
      */
-    NetlinkSocket(struct nl_sock* socket);
+    explicit NetlinkSocket(struct nl_sock* socket);
 
     /**
      * @brief Destroy the NetlinkSocket object, freeing the managed netlink
