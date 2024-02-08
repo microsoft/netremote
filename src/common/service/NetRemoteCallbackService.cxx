@@ -129,12 +129,8 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
         void OnReadDone(bool ok) override
         {
             if (ok) {
-                LOGD << "Data read successful";
                 StartRead(&m_readData);
             } else {
-                // A false "ok" value could either mean a failed RPC or that no more data is available.
-                // Unfortunately, there is no clear way to tell which situation occurred.
-                LOGD << "Data read failed (RPC failed OR no more data)";
                 Finish(::grpc::Status::OK);
             }
         }
@@ -143,15 +139,11 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
         {
             if (ok) {
                 NextWrite();
-            } else {
-                LOGE << "Data write failed";
-                Finish(::grpc::Status::OK);
             }
         }
 
         void OnCancel() override
         {
-            LOGE << "RPC cancelled";
             Finish(::grpc::Status::CANCELLED);
         }
 

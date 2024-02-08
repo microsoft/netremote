@@ -78,9 +78,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
             void NextWrite()
             {
                 if (m_dataToWriteCount > 0) {
-                    WifiDataStreamData data{};
-                    data.set_data("Data");
-                    StartWrite(&data);
+                    m_data.set_data("Data");
+                    StartWrite(&m_data);
                     m_dataToWriteCount--;
                 } else {
                     StartWritesDone();
@@ -91,6 +90,7 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
             grpc::ClientContext m_clientContext{};
             WifiDataStreamUploadResult m_result{};
             uint32_t m_dataToWriteCount{};
+            WifiDataStreamData m_data{};
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};
@@ -187,5 +187,104 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
         grpc::Status status = streamReader->Await(&dataReceivedCount);
         REQUIRE(status.ok());
         REQUIRE(dataReceivedCount == dataRequestedCount);
+    }
+}
+
+TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemoteCallback::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        class StreamReaderWriter : public grpc::ClientBidiReactor<WifiDataStreamData, WifiDataStreamData>
+        {
+        public:
+            StreamReaderWriter(NetRemoteCallback::Stub* client, uint32_t dataToWriteCount) :
+                m_dataToWriteCount(dataToWriteCount)
+            {
+                client->async()->WifiDataStreamBidirectional(&m_clientContext, this);
+                StartCall();
+                StartRead(&m_readData);
+                NextWrite();
+            }
+
+            void OnReadDone(bool ok) override
+            {
+                if (ok) {
+                    StartRead(&m_readData);
+                }
+            }
+        
+            void OnWriteDone(bool ok) override
+            {
+                if (ok) {
+                    NextWrite();
+                } else {
+                    StartWritesDone();
+                }
+            }
+
+            void OnDone(const grpc::Status& status) override
+            {
+                std::unique_lock lock(m_mutex);
+
+                m_status = status;
+                m_done = true;
+                m_cv.notify_one();
+            }
+
+            grpc::Status Await()
+            {
+                std::unique_lock lock(m_mutex);
+
+                m_cv.wait(lock, [this] {
+                    return m_done;
+                });
+
+                return m_status;
+            }
+
+        private:
+            void NextWrite()
+            {
+                if (m_dataToWriteCount > 0) {
+                    m_writeData.set_data("Data");
+                    StartWrite(&m_writeData);
+                    m_dataToWriteCount--;
+                } else {
+                    StartWritesDone();
+                }
+            }
+
+        private:
+            grpc::ClientContext m_clientContext{};
+            uint32_t m_dataToWriteCount{};
+            WifiDataStreamData m_readData{};
+            WifiDataStreamData m_writeData{};
+            grpc::Status m_status{};
+            std::mutex m_mutex{};
+            std::condition_variable m_cv{};
+            bool m_done{false};
+        };
+
+        static constexpr auto dataToWriteCount = 10;
+        auto streamReaderWriter = std::make_unique<StreamReaderWriter>(client.get(), dataToWriteCount);
+
+        grpc::Status status = streamReaderWriter->Await();
+        REQUIRE(status.ok());
     }
 }
