@@ -32,27 +32,27 @@ public:
     GetAccessPointManager() noexcept;
 
 private:
-    virtual ::grpc::Status
-    WifiEnumerateAccessPoints(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;
+    virtual grpc::Status
+    WifiEnumerateAccessPoints(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;
 
-    virtual ::grpc::Status
-    WifiAccessPointEnable(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response) override;
+    virtual grpc::Status
+    WifiAccessPointEnable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response) override;
 
-    virtual ::grpc::Status
-    WifiAccessPointDisable(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* response) override;
+    virtual grpc::Status
+    WifiAccessPointDisable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* response) override;
 
-    virtual ::grpc::Status
-    WifiAccessPointSetPhyType(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response) override;
+    virtual grpc::Status
+    WifiAccessPointSetPhyType(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response) override;
 
-    virtual ::grpc::Status
-    WifiAccessPointSetFrequencyBands(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* response) override;
+    virtual grpc::Status
+    WifiAccessPointSetFrequencyBands(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* response) override;
 
 protected:
     static bool
-    ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status);
+    ValidateWifiAccessPointEnableRequest(const Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status);
 
     static bool
-    ValidateWifiSetFrequencyBandsRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result);
+    ValidateWifiSetFrequencyBandsRequest(const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result);
 
 private:
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
