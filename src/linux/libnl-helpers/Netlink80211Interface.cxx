@@ -1,15 +1,30 @@
-
 #include <array>
+#include <cstdint>
+#include <cstring>
 #include <format>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <linux/genetlink.h>
+#include <linux/netlink.h>
+#include <linux/nl80211.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
+#include <netlink/attr.h>
+#include <netlink/errno.h>
 #include <netlink/genl/genl.h>
+#include <netlink/handlers.h>
+#include <netlink/msg.h>
+#include <netlink/netlink.h>
+#include <netlink/socket.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Netlink::Nl80211;

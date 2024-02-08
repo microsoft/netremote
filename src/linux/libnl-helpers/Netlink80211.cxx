@@ -1,7 +1,14 @@
 
+#include <cstdint>
 #include <format>
+#include <optional>
+#include <string_view>
+#include <utility>
 
+#include <linux/nl80211.h>
+#include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
+#include <netlink/errno.h>
 #include <netlink/genl/genl.h>
 #include <plog/Log.h>
 

@@ -16,19 +16,29 @@ namespace Microsoft::Net::Remote
 struct NetRemoteCliHandlerOperations :
     public INetRemoteCliHandlerOperations
 {
-    virtual ~NetRemoteCliHandlerOperations() = default;
+    ~NetRemoteCliHandlerOperations() override = default;
+
+    NetRemoteCliHandlerOperations() = delete;
+
+    /**
+     * Prevent copying and moving of this object. 
+     */
+    NetRemoteCliHandlerOperations(const NetRemoteCliHandlerOperations&) = delete;
+    NetRemoteCliHandlerOperations(NetRemoteCliHandlerOperations&&) = delete;
+    NetRemoteCliHandlerOperations& operator=(const NetRemoteCliHandlerOperations&) = delete;
+    NetRemoteCliHandlerOperations& operator=(NetRemoteCliHandlerOperations&&) = delete;
 
     /**
      * @brief Construct a new NetRemoteCliHandlerOperations object with the specified server connection.
      *
      * @param connection The server connection to use to carry out operations.
      */
-    NetRemoteCliHandlerOperations(std::shared_ptr<NetRemoteServerConnection> connection);
+    explicit NetRemoteCliHandlerOperations(std::shared_ptr<NetRemoteServerConnection> connection);
 
     /**
      * @brief Enumerate available WiFi access points.
      */
-    virtual void
+    void
     WifiEnumerateAccessPoints() override;
 
 private:
@@ -38,7 +48,17 @@ private:
 struct NetRemoteCliHandlerOperationsFactory :
     public INetRemoteCliHandlerOperationsFactory
 {
-    virtual ~NetRemoteCliHandlerOperationsFactory() = default;
+    NetRemoteCliHandlerOperationsFactory() = default;
+
+    ~NetRemoteCliHandlerOperationsFactory() override = default;
+
+    /**
+     * Prevent copying and moving of this object. 
+     */
+    NetRemoteCliHandlerOperationsFactory(const NetRemoteCliHandlerOperationsFactory&) = delete;
+    NetRemoteCliHandlerOperationsFactory(NetRemoteCliHandlerOperationsFactory&&) = delete;
+    NetRemoteCliHandlerOperationsFactory& operator=(const NetRemoteCliHandlerOperationsFactory&) = delete;
+    NetRemoteCliHandlerOperationsFactory& operator=(NetRemoteCliHandlerOperationsFactory&&) = delete;
 
     /**
      * @brief Create a new INetRemoteCliHandlerOperationsFactory instance with the specified server connection.
@@ -46,7 +66,7 @@ struct NetRemoteCliHandlerOperationsFactory :
      * @param connection The server connection the handler will use to carry out operations.
      * @return std::unique_ptr<INetRemoteCliHandlerOperations>
      */
-    virtual std::unique_ptr<INetRemoteCliHandlerOperations>
+    std::unique_ptr<INetRemoteCliHandlerOperations>
     Create(std::shared_ptr<NetRemoteServerConnection> connection) override;
 };
 } // namespace Microsoft::Net::Remote

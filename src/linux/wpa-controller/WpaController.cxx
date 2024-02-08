@@ -1,31 +1,38 @@
 
 #include <array>
 #include <cstddef>
+#include <filesystem>
 #include <format>
+#include <memory>
 #include <mutex>
+#include <shared_mutex>
+#include <string_view>
+#include <utility>
 
-#include <magic_enum.hpp>
-#include <plog/Log.h>
 #include <wpa_ctrl.h>
 
+#include <Wpa/WpaCommand.hxx>
 #include <Wpa/WpaController.hxx>
+#include <Wpa/WpaCore.hxx>
+#include <Wpa/WpaResponse.hxx>
+#include <plog/Log.h>
 
 using namespace Wpa;
 
 WpaController::WpaController(std::string_view interfaceName, WpaType type) :
-    WpaController(std::move(interfaceName), type, std::filesystem::path(WpaControlSocket::DefaultPath(type)))
+    WpaController(interfaceName, type, std::filesystem::path(WpaControlSocket::DefaultPath(type)))
 {
 }
 
 WpaController::WpaController(std::string_view interfaceName, WpaType type, std::string_view controlSocketPath) :
-    WpaController(std::move(interfaceName), type, std::filesystem::path(controlSocketPath))
+    WpaController(interfaceName, type, std::filesystem::path(controlSocketPath))
 {
 }
 
 WpaController::WpaController(std::string_view interfaceName, WpaType type, std::filesystem::path controlSocketPath) :
     m_type(type),
     m_interfaceName(interfaceName),
-    m_controlSocketPath(controlSocketPath)
+    m_controlSocketPath(std::move(controlSocketPath))
 {
 }
 

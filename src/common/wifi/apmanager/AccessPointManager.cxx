@@ -1,13 +1,22 @@
 
 #include <algorithm>
-#include <chrono>
+#include <chrono> // NOLINT(misc-include-cleaner)
+#include <format>
+#include <future>
 #include <iterator>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <shared_mutex>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <magic_enum.hpp>
-#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>
 

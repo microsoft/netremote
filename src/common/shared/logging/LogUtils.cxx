@@ -1,9 +1,14 @@
 
 #include <chrono>
+#include <cstdint>
+#include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <string>
+#include <string_view>
 
 #include <logging/LogUtils.hxx>
+#include <plog/Severity.h>
 
 std::string
 logging::GetLogName(std::string_view componentName)

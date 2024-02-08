@@ -34,7 +34,7 @@ struct NetRemoteCliHandler
      *
      * @param operationsFactory The factory to use to create the operations instance to use for handling commands.
      */
-    NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory);
+    explicit NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory);
 
     /**
      * @brief Assign the parent NetRemoteCli object.

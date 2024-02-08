@@ -1,7 +1,11 @@
 
+#include <memory>
+#include <utility>
+
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteCli.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
+#include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;

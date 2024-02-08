@@ -1,11 +1,21 @@
 
+#include <cstddef>
 #include <format>
+#include <iterator>
+#include <memory>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <utility>
 
 #include <grpcpp/client_context.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandlerOperations.hxx>
+#include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;

@@ -1,9 +1,14 @@
 
+#include <cerrno>
+#include <cstring>
 #include <format>
+#include <iterator>
 
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
+#include <netlink/errno.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
 #include <plog/Log.h>

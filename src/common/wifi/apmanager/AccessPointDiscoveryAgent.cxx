@@ -1,9 +1,16 @@
 
 #include <format>
+#include <future>
+#include <memory>
+#include <mutex>
+#include <shared_mutex>
+#include <utility>
+#include <vector>
 
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>
 

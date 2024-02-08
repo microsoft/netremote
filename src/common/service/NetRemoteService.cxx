@@ -349,7 +349,8 @@ NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetF
     if (std::empty(frequencyBands)) {
         detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No frequency band provided");
         return false;
-    } else if (std::ranges::find(frequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(frequencyBands)) {
+    }
+    if (std::ranges::find(frequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(frequencyBands)) {
         detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "Invalid frequency band provided");
         return false;
     }

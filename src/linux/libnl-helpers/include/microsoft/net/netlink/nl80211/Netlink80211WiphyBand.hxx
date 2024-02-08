@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include <linux/netlink.h>
 #include <linux/nl80211.h>

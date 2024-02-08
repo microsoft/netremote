@@ -1,8 +1,15 @@
 
 #include <format>
+#include <memory>
 #include <string>
+#include <utility>
 
+#include <CLI/App.hpp>
+#include <CLI/Error.hpp>
 #include <microsoft/net/remote/NetRemoteCli.hxx>
+#include <microsoft/net/remote/NetRemoteCliData.hxx>
+#include <microsoft/net/remote/NetRemoteCliHandler.hxx>
+#include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>

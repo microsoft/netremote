@@ -1,6 +1,9 @@
 
+#include <iterator>
+
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 
 TEST_CASE("Netlink80211ProtocolState instance creation", "[linux][libnl-helpers]")

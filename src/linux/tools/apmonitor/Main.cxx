@@ -1,17 +1,19 @@
 
+#include <csignal> // NOLINT(misc-include-cleaner)
 #include <format>
+#include <memory>
+#include <utility>
 
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
-#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/MessageOnlyFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
-#include <signal.h>
+#include <plog/Severity.h>
 
 using namespace Microsoft::Net::Wifi;
 

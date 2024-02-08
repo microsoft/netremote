@@ -1,4 +1,6 @@
 
+#include <string_view>
+
 #include <Wpa/ProtocolHostapd.hxx>
 
 using namespace Wpa;

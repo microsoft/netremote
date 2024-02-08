@@ -1,7 +1,9 @@
 
 #include <format>
+#include <string_view>
 
 #include <Wpa/ProtocolWpa.hxx>
+#include <Wpa/WpaCommand.hxx>
 #include <Wpa/WpaCommandSet.hxx>
 
 using namespace Wpa;

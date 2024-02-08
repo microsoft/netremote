@@ -1,16 +1,24 @@
-
 #include <algorithm>
+#include <cstdint>
 #include <format>
+#include <iterator>
+#include <memory>
 #include <ranges>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
-#include <Wpa/WpaCommandStatus.hxx>
-#include <Wpa/WpaResponseStatus.hxx>
+#include <linux/nl80211.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
+#include <microsoft/net/wifi/AccessPointController.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Wifi;
