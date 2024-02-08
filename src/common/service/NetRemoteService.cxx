@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <format>
 #include <iterator>
-#include <memory>
 #include <optional>
 #include <source_location>
 #include <sstream>
@@ -16,7 +15,6 @@
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <plog/Log.h>
-#include <plog/Severity.h>
 
 using namespace Microsoft::Net::Remote::Service;
 
