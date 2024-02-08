@@ -20,6 +20,7 @@ target_link_libraries(${PROJECT_NAME}-service
         ${PROJECT_NAME}-protocol
         wifi-apmanager
     PRIVATE
+        logging-utils
         plog::plog
 )
 

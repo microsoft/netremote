@@ -7,15 +7,25 @@ set(LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX ${LOGUTILS_DIR_PUBLIC_INCLUDE}/${LOGUTILS
 
 target_sources(logging-utils
     PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/FunctionTracer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/LogUtils.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${LOGUTILS_DIR_PUBLIC_INCLUDE}
     FILES
+        ${LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX}/FunctionTracer.hxx
         ${LOGUTILS_DIR_PUBLIC_INCLUDE_PREFIX}/LogUtils.hxx
 )
 
 target_link_libraries(logging-utils 
     PUBLIC 
         plog::plog
+)
+
+install(
+    TARGETS logging-utils
+    EXPORT ${PROJECT_NAME}
+    COMPONENT dev
+    FILE_SET HEADERS
+    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${LOGUTILS_DIR_PUBLIC_INCLUDE_SUFFIX}"
 )
