@@ -3,37 +3,24 @@
 #include <format>
 #include <iterator>
 #include <optional>
-#include <source_location>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <logging/FunctionTracer.hxx>
+#include "NetRemoteApiTrace.hxx"
+#include "NetRemoteWifiApiTrace.hxx"
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::Service;
-
-using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
-using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::AccessPointControllerException;
-using Microsoft::Net::Wifi::AccessPointManager;
-using Microsoft::Net::Wifi::IAccessPoint;
-using Microsoft::Net::Wifi::IAccessPointController;
-
-NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
-    m_accessPointManager(std::move(accessPointManager))
-{}
-
-std::shared_ptr<AccessPointManager>
-NetRemoteService::GetAccessPointManager() noexcept
-{
-    return m_accessPointManager;
-}
+using namespace Microsoft::Net::Remote::Service::Tracing;
+using namespace Microsoft::Net::Remote::Wifi;
+using namespace Microsoft::Net::Wifi;
 
 namespace detail
 {
@@ -47,13 +34,13 @@ namespace detail
  * @param code The error code to set in the result message.
  * @param message The error message to set in the result message.
  * @param grpcStatus The status to be returned to the client.
- * @return ::grpc::Status
+ * @return grpc::Status
  */
 template <
     typename RequestT,
     typename ResultT>
-::grpc::Status
-HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatusCode code, std::string_view message, ::grpc::Status grpcStatus = ::grpc::Status::OK)
+grpc::Status
+HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatusCode code, std::string_view message, grpc::Status grpcStatus = grpc::Status::OK)
 {
     LOGE << message;
 
@@ -139,268 +126,14 @@ TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<
     return accessPointController;
 }
 
-using Microsoft::Net::Wifi::Dot11PhyType;
-using Microsoft::Net::Wifi::Ieee80211Protocol;
-
-Dot11PhyType
-IeeeProtocolToNetRemotePhyType(Ieee80211Protocol ieeeProtocol)
-{
-    switch (ieeeProtocol) {
-    case Ieee80211Protocol::Unknown:
-        return Dot11PhyType::Dot11PhyTypeUnknown;
-    case Ieee80211Protocol::B:
-        return Dot11PhyType::Dot11PhyTypeB;
-    case Ieee80211Protocol::G:
-        return Dot11PhyType::Dot11PhyTypeG;
-    case Ieee80211Protocol::N:
-        return Dot11PhyType::Dot11PhyTypeN;
-    case Ieee80211Protocol::A:
-        return Dot11PhyType::Dot11PhyTypeA;
-    case Ieee80211Protocol::AC:
-        return Dot11PhyType::Dot11PhyTypeAC;
-    case Ieee80211Protocol::AD:
-        return Dot11PhyType::Dot11PhyTypeAD;
-    case Ieee80211Protocol::AX:
-        return Dot11PhyType::Dot11PhyTypeAX;
-    case Ieee80211Protocol::BE:
-        return Dot11PhyType::Dot11PhyTypeBE;
-    }
-
-    return Dot11PhyType::Dot11PhyTypeUnknown;
-}
-
-Ieee80211Protocol
-NetRemotePhyTypeToIeeeProtocol(Dot11PhyType phyType)
-{
-    switch (phyType) {
-    case Dot11PhyType::Dot11PhyTypeB:
-        return Ieee80211Protocol::B;
-    case Dot11PhyType::Dot11PhyTypeG:
-        return Ieee80211Protocol::G;
-    case Dot11PhyType::Dot11PhyTypeN:
-        return Ieee80211Protocol::N;
-    case Dot11PhyType::Dot11PhyTypeA:
-        return Ieee80211Protocol::A;
-    case Dot11PhyType::Dot11PhyTypeAC:
-        return Ieee80211Protocol::AC;
-    case Dot11PhyType::Dot11PhyTypeAD:
-        return Ieee80211Protocol::AD;
-    case Dot11PhyType::Dot11PhyTypeAX:
-        return Ieee80211Protocol::AX;
-    case Dot11PhyType::Dot11PhyTypeBE:
-        return Ieee80211Protocol::BE;
-    default:
-        return Ieee80211Protocol::Unknown;
-    }
-}
-
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
-
-Dot11FrequencyBand
-IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand(Ieee80211FrequencyBand ieeeDot11FrequencyBand)
-{
-    switch (ieeeDot11FrequencyBand) {
-    case Ieee80211FrequencyBand::TwoPointFourGHz:
-        return Dot11FrequencyBand::Dot11FrequencyBandTwoPoint4GHz;
-    case Ieee80211FrequencyBand::FiveGHz:
-        return Dot11FrequencyBand::Dot11FrequencyBandFiveGHz;
-    case Ieee80211FrequencyBand::SixGHz:
-        return Dot11FrequencyBand::Dot11FrequencyBandSixGHz;
-    default:
-        return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
-    }
-}
-
-Ieee80211FrequencyBand
-NetRemoteDot11FrequencyBandToIeee80211FrequencyBand(Dot11FrequencyBand dot11FrequencyBand)
-{
-    switch (dot11FrequencyBand) {
-    case Dot11FrequencyBand::Dot11FrequencyBand2_4GHz:
-        return Ieee80211FrequencyBand::TwoPointFourGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBand5_0GHz:
-        return Ieee80211FrequencyBand::FiveGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBand6_0GHz:
-        return Ieee80211FrequencyBand::SixGHz;
-    case Dot11FrequencyBand::Dot11FrequencyBandUnknown:
-    default:
-        return Ieee80211FrequencyBand::Unknown;
-    }
-}
-
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
-
-Dot11AuthenticationAlgorithm
-IeeeAuthenticationAlgorithmToNetRemoteAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieeeAuthenticationAlgorithm)
-{
-    switch (ieeeAuthenticationAlgorithm) {
-    case Ieee80211AuthenticationAlgorithm::Unknown:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
-    case Ieee80211AuthenticationAlgorithm::OpenSystem:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem;
-    case Ieee80211AuthenticationAlgorithm::SharedKey:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey;
-    case Ieee80211AuthenticationAlgorithm::FastBssTransition:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFastBssTransition;
-    case Ieee80211AuthenticationAlgorithm::Sae:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSae;
-    case Ieee80211AuthenticationAlgorithm::Fils:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFils;
-    case Ieee80211AuthenticationAlgorithm::FilsPfs:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPfs;
-    case Ieee80211AuthenticationAlgorithm::FilsPublicKey:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmFilsPublicKey;
-    case Ieee80211AuthenticationAlgorithm::VendorSpecific:
-        return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmVendorSpecific;
-    }
-
-    return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
-}
-
-using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::Ieee80211AkmSuite;
-
-Dot11AkmSuite
-Ieee80211AkmSuiteToNetRemoteAkm(Ieee80211AkmSuite akmSuite)
-{
-    switch (akmSuite) {
-    case Ieee80211AkmSuite::Reserved0:
-        return Dot11AkmSuite::Dot11AkmSuiteReserved0;
-    case Ieee80211AkmSuite::Ieee8021x:
-        return Dot11AkmSuite::Dot11AkmSuite8021x;
-    case Ieee80211AkmSuite::Psk:
-        return Dot11AkmSuite::Dot11AkmSuitePsk;
-    case Ieee80211AkmSuite::Ft8021x:
-        return Dot11AkmSuite::Dot11AkmSuiteFt8021x;
-    case Ieee80211AkmSuite::FtPsk:
-        return Dot11AkmSuite::Dot11AkmSuiteFtPsk;
-    case Ieee80211AkmSuite::Ieee8021xSha256:
-        return Dot11AkmSuite::Dot11AkmSuite8021xSha256;
-    case Ieee80211AkmSuite::PskSha256:
-        return Dot11AkmSuite::Dot11AkmSuitePskSha256;
-    case Ieee80211AkmSuite::Tdls:
-        return Dot11AkmSuite::Dot11AkmSuiteTdls;
-    case Ieee80211AkmSuite::Sae:
-        return Dot11AkmSuite::Dot11AkmSuiteSae;
-    case Ieee80211AkmSuite::FtSae:
-        return Dot11AkmSuite::Dot11AkmSuiteFtSae;
-    case Ieee80211AkmSuite::ApPeerKey:
-        return Dot11AkmSuite::Dot11AkmSuiteApPeerKey;
-    case Ieee80211AkmSuite::Ieee8021xSuiteB:
-        return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB;
-    case Ieee80211AkmSuite::Ieee8011xSuiteB192:
-        return Dot11AkmSuite::Dot11AkmSuite8021xSuiteB192;
-    case Ieee80211AkmSuite::Ft8021xSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFt8021xSha384;
-    case Ieee80211AkmSuite::FilsSha256:
-        return Dot11AkmSuite::Dot11AkmSuiteFilsSha256;
-    case Ieee80211AkmSuite::FilsSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFilsSha384;
-    case Ieee80211AkmSuite::FtFilsSha256:
-        return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha256;
-    case Ieee80211AkmSuite::FtFilsSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFtFilsSha384;
-    case Ieee80211AkmSuite::Owe:
-        return Dot11AkmSuite::Dot11AkmSuiteOwe;
-    case Ieee80211AkmSuite::FtPskSha384:
-        return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
-    case Ieee80211AkmSuite::PskSha384:
-        return Dot11AkmSuite::Dot11AkmSuitePskSha384;
-    }
-
-    return Dot11AkmSuite::Dot11AkmSuiteUnknown;
-}
-
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Ieee80211CipherSuite;
-
-Dot11CipherSuite
-IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
-{
-    switch (ieeeCipherSuite) {
-    case Ieee80211CipherSuite::Unknown:
-        return Dot11CipherSuite::Dot11CipherSuiteUnknown;
-    case Ieee80211CipherSuite::BipCmac128:
-        return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
-    case Ieee80211CipherSuite::BipCmac256:
-        return Dot11CipherSuite::Dot11CipherSuiteBipCmac256;
-    case Ieee80211CipherSuite::BipGmac128:
-        return Dot11CipherSuite::Dot11CipherSuiteBipGmac128;
-    case Ieee80211CipherSuite::BipGmac256:
-        return Dot11CipherSuite::Dot11CipherSuiteBipGmac256;
-    case Ieee80211CipherSuite::Ccmp128:
-        return Dot11CipherSuite::Dot11CipherSuiteCcmp128;
-    case Ieee80211CipherSuite::Ccmp256:
-        return Dot11CipherSuite::Dot11CipherSuiteCcmp256;
-    case Ieee80211CipherSuite::Gcmp128:
-        return Dot11CipherSuite::Dot11CipherSuiteGcmp128;
-    case Ieee80211CipherSuite::Gcmp256:
-        return Dot11CipherSuite::Dot11CipherSuiteGcmp256;
-    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
-        return Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed;
-    case Ieee80211CipherSuite::Tkip:
-        return Dot11CipherSuite::Dot11CipherSuiteTkip;
-    case Ieee80211CipherSuite::UseGroup:
-        return Dot11CipherSuite::Dot11CipherSuiteUseGroup;
-    case Ieee80211CipherSuite::Wep104:
-        return Dot11CipherSuite::Dot11CipherSuiteWep104;
-    case Ieee80211CipherSuite::Wep40:
-        return Dot11CipherSuite::Dot11CipherSuiteWep40;
-    }
-
-    return Dot11CipherSuite::Dot11CipherSuiteUnknown;
-}
-
-Microsoft::Net::Wifi::Dot11AccessPointCapabilities
-IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
-{
-    using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-    using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
-
-    Dot11AccessPointCapabilities capabilities{};
-
-    std::vector<Microsoft::Net::Wifi::Dot11PhyType> phyTypes(std::size(ieeeCapabilities.Protocols));
-    std::ranges::transform(ieeeCapabilities.Protocols, std::begin(phyTypes), IeeeProtocolToNetRemotePhyType);
-
-    *capabilities.mutable_phytypes() = {
-        std::make_move_iterator(std::begin(phyTypes)),
-        std::make_move_iterator(std::end(phyTypes))
-    };
-
-    std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.FrequencyBands));
-    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), IeeeDot11FrequencyBandToNetRemoteDot11FrequencyBand);
-
-    *capabilities.mutable_bands() = {
-        std::make_move_iterator(std::begin(bands)),
-        std::make_move_iterator(std::end(bands))
-    };
-
-    std::vector<Microsoft::Net::Wifi::Dot11AkmSuite> akmSuites(std::size(ieeeCapabilities.AkmSuites));
-    std::ranges::transform(ieeeCapabilities.AkmSuites, std::begin(akmSuites), Ieee80211AkmSuiteToNetRemoteAkm);
-
-    *capabilities.mutable_akmsuites() = {
-        std::make_move_iterator(std::begin(akmSuites)),
-        std::make_move_iterator(std::end(akmSuites))
-    };
-
-    std::vector<Microsoft::Net::Wifi::Dot11CipherSuite> cipherSuites(std::size(ieeeCapabilities.CipherSuites));
-    std::ranges::transform(ieeeCapabilities.CipherSuites, std::begin(cipherSuites), IeeeCipherAlgorithmToNetRemoteCipherSuite);
-
-    *capabilities.mutable_ciphersuites() = {
-        std::make_move_iterator(std::begin(cipherSuites)),
-        std::make_move_iterator(std::end(cipherSuites))
-    };
-
-    return capabilities;
-}
-
-using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-
 static constexpr auto AccessPointIdInvalid{ "invalid" };
 
-Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
+/**
+ * @brief Create an invalid access point result item.
+ *
+ * @return WifiEnumerateAccessPointsResultItem
+ */
+WifiEnumerateAccessPointsResultItem
 MakeInvalidAccessPointResultItem()
 {
     WifiEnumerateAccessPointsResultItem item{};
@@ -408,14 +141,14 @@ MakeInvalidAccessPointResultItem()
     return item;
 }
 
-Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
+WifiEnumerateAccessPointsResultItem
 IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 {
     WifiEnumerateAccessPointsResultItem item{};
 
     bool isEnabled{ false };
     std::string id{};
-    Microsoft::Net::Wifi::Dot11AccessPointCapabilities capabilities{};
+    Dot11AccessPointCapabilities dot11AccessPointCapabilities{};
 
     auto interfaceName = accessPoint.GetInterfaceName();
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
@@ -434,8 +167,8 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     }
 
     try {
-        auto capabilitiesIeee80211 = accessPointController->GetCapabilities();
-        capabilities = IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(capabilitiesIeee80211);
+        auto ieee80211AccessPointCapabilities = accessPointController->GetCapabilities();
+        dot11AccessPointCapabilities = ToDot11AccessPointCapabilities(ieee80211AccessPointCapabilities);
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to get capabilities for access point {} ({})", interfaceName, apce.what());
         return MakeInvalidAccessPointResultItem();
@@ -444,16 +177,14 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     // Populate the result item.
     item.set_accesspointid(std::move(id));
     item.set_isenabled(isEnabled);
-    *item.mutable_capabilities() = std::move(capabilities);
+    *item.mutable_capabilities() = std::move(dot11AccessPointCapabilities);
 
     return item;
 }
 
-Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
+WifiEnumerateAccessPointsResultItem
 IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& accessPointWeak)
 {
-    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-
     WifiEnumerateAccessPointsResultItem item{};
 
     auto accessPoint = accessPointWeak.lock();
@@ -467,84 +198,27 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& ac
 }
 
 bool
-NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
+NetRemoteAccessPointResultItemIsInvalid(const WifiEnumerateAccessPointsResultItem& item)
 {
     return (item.accesspointid() == AccessPointIdInvalid);
 }
 
-/**
- * @brief Netremote API function tracer.
- */
-struct NetRemoteApiTrace :
-    public logging::FunctionTracer
-{
-    /**
-     * @brief Construct a new NetRemoteApiTrace object.
-     *
-     * @param deferEnter Whether to defer the entry log message upon construction.
-     * @param location The source code location of the function call.
-     */
-    NetRemoteApiTrace(bool deferEnter = false, std::source_location location = std::source_location::current()) :
-        logging::FunctionTracer(LogTracePrefix, {}, deferEnter, std::move(location))
-    {}
-
-private:
-    static constexpr auto LogTracePrefix = "[API]";
-};
-
-/**
- * @brief Netremote Wi-Fi API function tracer. This should be used for all Wi-Fi API calls. It accepts arguments and
- * return values as optionals and/or pointers to indicate their presence.
- */
-struct NetRemoteWifiApiTrace :
-    public NetRemoteApiTrace
-{
-    /**
-     * @brief Construct a new Net RemoteWifiApiTrace object.
-     *
-     * @param accessPointId The access point id associated with the API request, if present.
-     * @param operationStatus The result status of the operation, if present.
-     * @param location The source code location of the function call.
-     */
-    NetRemoteWifiApiTrace(std::optional<std::string> accessPointId, const WifiAccessPointOperationStatus* operationStatus, std::source_location location = std::source_location::current()) :
-        NetRemoteApiTrace(/* deferEnter= */ true, std::move(location)),
-        m_accessPointId(std::move(accessPointId)),
-        m_operationStatus(operationStatus)
-    {
-        if (m_accessPointId.has_value()) {
-            AddArgument(AccessPointIdArgName, m_accessPointId.value());
-        }
-
-        Enter();
-    }
-
-    virtual ~NetRemoteWifiApiTrace()
-    {
-        if (m_operationStatus != nullptr) {
-            AddReturnValue("Status", std::string(magic_enum::enum_name(m_operationStatus->code())));
-            if (m_operationStatus->code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-                AddReturnValue("Error Message", m_operationStatus->message());
-                SetFailed();
-            } else {
-                SetSucceeded();
-            }
-        }
-    }
-
-private:
-    std::optional<std::string> m_accessPointId;
-    const WifiAccessPointOperationStatus* m_operationStatus{ nullptr };
-
-    static constexpr auto AccessPointIdArgName{ "Access Point" };
-};
 } // namespace detail
 
-::grpc::Status
-NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response)
-{
-    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
+NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
+    m_accessPointManager(std::move(accessPointManager))
+{}
 
-    detail::NetRemoteApiTrace traceMe{};
+std::shared_ptr<AccessPointManager>
+NetRemoteService::GetAccessPointManager() noexcept
+{
+    return m_accessPointManager;
+}
+
+grpc::Status
+NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const WifiEnumerateAccessPointsRequest* request, WifiEnumerateAccessPointsResult* response)
+{
+    NetRemoteApiTrace traceMe{};
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
@@ -565,14 +239,10 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
     return grpc::Status::OK;
 }
 
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Dot11PhyType;
-
-::grpc::Status
-NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* result)
+grpc::Status
+NetRemoteService::WifiAccessPointEnable([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointEnableRequest* request, WifiAccessPointEnableResult* result)
 {
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
 
@@ -588,10 +258,10 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* 
     return grpc::Status::OK;
 }
 
-::grpc::Status
-NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* result)
+grpc::Status
+NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointDisableRequest* request, WifiAccessPointDisableResult* result)
 {
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
     // TODO: Disable the access point.
@@ -603,14 +273,10 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
     return grpc::Status::OK;
 }
 
-using Microsoft::Net::Wifi::Dot11PhyType;
-
-::grpc::Status
-NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* result)
+grpc::Status
+NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetPhyTypeRequest* request, WifiAccessPointSetPhyTypeResult* result)
 {
-    using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
-
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
 
@@ -638,13 +304,13 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     }
 
     // Convert PHY type to Ieee80211 protocol.
-    auto ieeeProtocol = detail::NetRemotePhyTypeToIeeeProtocol(request->phytype());
+    auto ieee80211Protocol = FromDot11PhyType(request->phytype());
 
     // Check if Ieee80211 protocol is supported by AP.
     try {
         auto accessPointCapabilities = accessPointController->GetCapabilities();
-        const auto& supportedIeeeProtocols = accessPointCapabilities.Protocols;
-        if (std::ranges::find(supportedIeeeProtocols, ieeeProtocol) == std::cend(supportedIeeeProtocols)) {
+        const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
+        if (std::ranges::find(supportedIeee80211Protocols, ieee80211Protocol) == std::cend(supportedIeee80211Protocols)) {
             return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
@@ -654,7 +320,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 
     // Set the Ieee80211 protocol.
     try {
-        if (!accessPointController->SetProtocol(ieeeProtocol)) {
+        if (!accessPointController->SetProtocol(ieee80211Protocol)) {
             return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
@@ -667,27 +333,6 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 
     return grpc::Status::OK;
 }
-
-using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest;
-using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult;
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-
-namespace detail
-{
-std::vector<Dot11FrequencyBand>
-GetFrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request)
-{
-    const auto& frequencyBands = request.frequencybands();
-
-    std::vector<Dot11FrequencyBand> bands(static_cast<std::size_t>(std::size(frequencyBands)));
-    std::ranges::transform(frequencyBands, std::begin(bands), [](const auto& frequencyBand) {
-        return static_cast<Dot11FrequencyBand>(frequencyBand);
-    });
-
-    return bands;
-}
-
-} // namespace detail
 
 /* static */
 bool
@@ -706,12 +351,10 @@ NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetF
     return true;
 }
 
-using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
-
-::grpc::Status
-NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result)
+grpc::Status
+NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetFrequencyBandsRequest* request, WifiAccessPointSetFrequencyBandsResult* result)
 {
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     // Validate basic parameters in the request.
     if (!ValidateWifiSetFrequencyBandsRequest(request, result)) {
@@ -725,9 +368,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
     }
 
     // Convert dot11 bands to ieee80211 bands.
-    const auto& frequencyBands = detail::GetFrequencyBands(*request);
-    std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> ieeeFrequencyBands(static_cast<std::size_t>(std::size(frequencyBands)));
-    std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), detail::NetRemoteDot11FrequencyBandToIeee80211FrequencyBand);
+    auto ieee80211FrequencyBands = FromDot11SetFrequencyBandsRequest(*request);
 
     // Obtain capabilities of the access point.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};
@@ -738,7 +379,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
     }
 
     // Check if requested bands are supported by the AP.
-    for (const auto& requestedFrequencyBand : ieeeFrequencyBands) {
+    for (const auto& requestedFrequencyBand : ieee80211FrequencyBands) {
         if (std::ranges::find(accessPointCapabilities.FrequencyBands, requestedFrequencyBand) == std::cend(accessPointCapabilities.FrequencyBands)) {
             return detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Frequency band {} not supported by access point {}", magic_enum::enum_name(requestedFrequencyBand), request->accesspointid()));
         }
@@ -746,7 +387,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
 
     // Attempt to set the frequency bands.
     try {
-        const auto setBandsSucceeded = accessPointController->SetFrequencyBands(std::move(ieeeFrequencyBands));
+        const auto setBandsSucceeded = accessPointController->SetFrequencyBands(std::move(ieee80211FrequencyBands));
         if (!setBandsSucceeded) {
             return detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set frequency bands for access point {}", request->accesspointid()));
         }
@@ -766,7 +407,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
 
 /* static */
 bool
-NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
+NetRemoteService::ValidateWifiAccessPointEnableRequest(const WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
 {
     // Validate required arguments are present. Detailed argument validation is left to the implementation.
 

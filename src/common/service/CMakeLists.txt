@@ -8,6 +8,10 @@ set(NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE
 target_sources(${PROJECT_NAME}-service
     PRIVATE
         NetRemoteService.cxx
+        NetRemoteApiTrace.hxx
+        NetRemoteApiTrace.cxx 
+        NetRemoteWifiApiTrace.hxx
+        NetRemoteWifiApiTrace.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE}
@@ -22,6 +26,7 @@ target_link_libraries(${PROJECT_NAME}-service
     PRIVATE
         logging-utils
         plog::plog
+        wifi-core-adapter-dot11
 )
 
 install(
