@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include <logging/FunctionTracer.hxx>
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -473,123 +474,42 @@ NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::Wifi
     return (item.accesspointid() == AccessPointIdInvalid);
 }
 
-std::string
-BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, std::string_view prefix)
+/**
+ * @brief Netremote API function tracer.
+ */
+struct NetRemoteApiTrace :
+    public logging::FunctionTracer
 {
-    if (std::empty(values)) {
-        return {};
-    }
-
-    std::ostringstream valueListBuilder;
-    valueListBuilder << prefix;
-    for (std::size_t i = 0; i < std::size(values); i++) {
-        const auto& [name, value] = values[i];
-        if (i > 0) {
-            valueListBuilder << ", ";
-        }
-        valueListBuilder << name << "='" << value << "'";
-    }
-
-    return valueListBuilder.str();
-}
-
-struct NetRemoteApiTrace
-{
-    NetRemoteApiTrace(std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current()) :
-        m_location(std::move(location)),
-        m_functionName(m_location.function_name()),
-        m_arguments(std::move(arguments))
-    {
-        // Attempt to parse the function name, removing the return type, namespace prefixes, and arguments.
-        const auto openingBracketPos = m_functionName.find_first_of('(');
-        if (openingBracketPos != m_functionName.npos) {
-            m_functionName.remove_suffix(m_functionName.size() - openingBracketPos);
-        }
-
-        const auto lastColonPos = m_functionName.find_last_of(':');
-        if (lastColonPos != m_functionName.npos) {
-            m_functionName.remove_prefix(lastColonPos + 1);
-        }
-
-        if (!deferEnter) {
-            Enter();
-        }
-    }
-
-    virtual ~NetRemoteApiTrace()
-    {
-        Exit();
-    }
-
-    void
-    Enter()
-    {
-        if (m_entered) {
-            return;
-        }
-
-        m_entered = true;
-        auto arguments = BuildValueList(m_arguments, " with arguments ");
-        LOGI << std::format("[API] +{}{}", m_functionName, arguments);
-    }
-
-    void
-    Exit()
-    {
-        if (m_exited) {
-            return;
-        }
-
-        auto returnValues = BuildValueList(m_returnValues, " returning ");
-        PLOG(m_exitLogSeverity) << std::format("[API] -{}{}", m_functionName, returnValues);
-        m_exited = true;
-    }
-
-    void
-    AddArgument(std::string name, std::string value)
-    {
-        m_arguments.emplace_back(std::move(name), std::move(value));
-    }
-
-    void
-    AddReturnValue(std::string name, std::string value)
-    {
-        m_returnValues.emplace_back(std::move(name), std::move(value));
-    }
-
-    void
-    SetSucceeded() noexcept
-    {
-        m_exitLogSeverity = plog::Severity::info;
-    }
-
-    void
-    SetFailed() noexcept
-    {
-        m_exitLogSeverity = plog::Severity::error;
-    }
-
-    void
-    SetExitLogSeverity(plog::Severity severity) noexcept
-    {
-        m_exitLogSeverity = severity;
-    }
+    /**
+     * @brief Construct a new NetRemoteApiTrace object.
+     *
+     * @param deferEnter Whether to defer the entry log message upon construction.
+     * @param location The source code location of the function call.
+     */
+    NetRemoteApiTrace(bool deferEnter = false, std::source_location location = std::source_location::current()) :
+        logging::FunctionTracer(LogTracePrefix, {}, deferEnter, std::move(location))
+    {}
 
 private:
-    std::source_location m_location;
-    std::string_view m_functionName;
-    std::vector<std::pair<std::string, std::string>> m_arguments;
-    std::vector<std::pair<std::string, std::string>> m_returnValues;
-    bool m_entered{ false };
-    bool m_exited{ false };
-    plog::Severity m_exitLogSeverity{ plog::Severity::info };
+    static constexpr auto LogTracePrefix = "[API]";
 };
 
+/**
+ * @brief Netremote Wi-Fi API function tracer. This should be used for all Wi-Fi API calls. It accepts arguments and
+ * return values as optionals and/or pointers to indicate their presence.
+ */
 struct NetRemoteWifiApiTrace :
     public NetRemoteApiTrace
 {
+    /**
+     * @brief Construct a new Net RemoteWifiApiTrace object.
+     *
+     * @param accessPointId The access point id associated with the API request, if present.
+     * @param operationStatus The result status of the operation, if present.
+     * @param location The source code location of the function call.
+     */
     NetRemoteWifiApiTrace(std::optional<std::string> accessPointId, const WifiAccessPointOperationStatus* operationStatus, std::source_location location = std::source_location::current()) :
-        NetRemoteApiTrace({}, /* deferEnter= */ true, std::move(location)),
+        NetRemoteApiTrace(/* deferEnter= */ true, std::move(location)),
         m_accessPointId(std::move(accessPointId)),
         m_operationStatus(operationStatus)
     {
