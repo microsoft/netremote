@@ -79,6 +79,24 @@ ToDot11AkmSuite(const Microsoft::Net::Wifi::Ieee80211AkmSuite ieeeAkmSuite) noex
 Microsoft::Net::Wifi::Ieee80211AkmSuite
 FromDot11AkmSuite(const Microsoft::Net::Wifi::Dot11AkmSuite dot11AkmSuite) noexcept;
 
+/**
+ * @brief Convert the specified IEEE 802.11 cipher suite algorithm to the equivalent Dot11CipherSuite.
+ * 
+ * @param ieeeCipherSuite The IEEE 802.11 cipher suite algorithm to convert.
+ * @return Microsoft::Net::Wifi::Dot11CipherSuite 
+ */
+Microsoft::Net::Wifi::Dot11CipherSuite
+ToDot11CipherSuite(const Microsoft::Net::Wifi::Ieee80211CipherSuite ieeeCipherSuite) noexcept;
+
+/**
+ * @brief Convert the specified Dot11CipherSuite to the equivalent IEEE 802.11 cipher suite algorithm.
+ * 
+ * @param dot11CipherSuite The Dot11CipherSuite to convert.
+ * @return Microsoft::Net::Wifi::Ieee80211CipherSuite 
+ */
+Microsoft::Net::Wifi::Ieee80211CipherSuite
+FromDot11CipherSuite(const Microsoft::Net::Wifi::Dot11CipherSuite dot11CipherSuite) noexcept;
+
 } // namespace Microsoft::Net::Wifi
 
 #endif // IEEE_80211_DOT11_ADAPTERS_HXX

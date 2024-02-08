@@ -145,47 +145,11 @@ TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
-Dot11CipherSuite
-IeeeCipherAlgorithmToNetRemoteCipherSuite(Ieee80211CipherSuite ieeeCipherSuite)
-{
-    switch (ieeeCipherSuite) {
-    case Ieee80211CipherSuite::Unknown:
-        return Dot11CipherSuite::Dot11CipherSuiteUnknown;
-    case Ieee80211CipherSuite::BipCmac128:
-        return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
-    case Ieee80211CipherSuite::BipCmac256:
-        return Dot11CipherSuite::Dot11CipherSuiteBipCmac256;
-    case Ieee80211CipherSuite::BipGmac128:
-        return Dot11CipherSuite::Dot11CipherSuiteBipGmac128;
-    case Ieee80211CipherSuite::BipGmac256:
-        return Dot11CipherSuite::Dot11CipherSuiteBipGmac256;
-    case Ieee80211CipherSuite::Ccmp128:
-        return Dot11CipherSuite::Dot11CipherSuiteCcmp128;
-    case Ieee80211CipherSuite::Ccmp256:
-        return Dot11CipherSuite::Dot11CipherSuiteCcmp256;
-    case Ieee80211CipherSuite::Gcmp128:
-        return Dot11CipherSuite::Dot11CipherSuiteGcmp128;
-    case Ieee80211CipherSuite::Gcmp256:
-        return Dot11CipherSuite::Dot11CipherSuiteGcmp256;
-    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
-        return Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed;
-    case Ieee80211CipherSuite::Tkip:
-        return Dot11CipherSuite::Dot11CipherSuiteTkip;
-    case Ieee80211CipherSuite::UseGroup:
-        return Dot11CipherSuite::Dot11CipherSuiteUseGroup;
-    case Ieee80211CipherSuite::Wep104:
-        return Dot11CipherSuite::Dot11CipherSuiteWep104;
-    case Ieee80211CipherSuite::Wep40:
-        return Dot11CipherSuite::Dot11CipherSuiteWep40;
-    }
-
-    return Dot11CipherSuite::Dot11CipherSuiteUnknown;
-}
-
 Microsoft::Net::Wifi::Dot11AccessPointCapabilities
 IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
 {
     using Microsoft::Net::Wifi::ToDot11AkmSuite;
+    using Microsoft::Net::Wifi::ToDot11CipherSuite;
     using Microsoft::Net::Wifi::ToDot11FrequencyBand;
     using Microsoft::Net::Wifi::ToDot11PhyType;
 
@@ -216,7 +180,7 @@ IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::N
     };
 
     std::vector<Microsoft::Net::Wifi::Dot11CipherSuite> cipherSuites(std::size(ieeeCapabilities.CipherSuites));
-    std::ranges::transform(ieeeCapabilities.CipherSuites, std::begin(cipherSuites), IeeeCipherAlgorithmToNetRemoteCipherSuite);
+    std::ranges::transform(ieeeCapabilities.CipherSuites, std::begin(cipherSuites), ToDot11CipherSuite);
 
     *capabilities.mutable_ciphersuites() = {
         std::make_move_iterator(std::begin(cipherSuites)),

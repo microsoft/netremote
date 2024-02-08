@@ -252,4 +252,78 @@ FromDot11AkmSuite(const Dot11AkmSuite dot11AkmSuite) noexcept
     }
 }
 
+using Microsoft::Net::Wifi::Dot11CipherSuite;
+using Microsoft::Net::Wifi::Ieee80211CipherSuite;
+
+Dot11CipherSuite
+ToDot11CipherSuite(const Ieee80211CipherSuite ieeeCipherSuite) noexcept
+{
+    switch (ieeeCipherSuite) {
+    case Ieee80211CipherSuite::BipCmac128:
+        return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
+    case Ieee80211CipherSuite::BipCmac256:
+        return Dot11CipherSuite::Dot11CipherSuiteBipCmac256;
+    case Ieee80211CipherSuite::BipGmac128:
+        return Dot11CipherSuite::Dot11CipherSuiteBipGmac128;
+    case Ieee80211CipherSuite::BipGmac256:
+        return Dot11CipherSuite::Dot11CipherSuiteBipGmac256;
+    case Ieee80211CipherSuite::Ccmp128:
+        return Dot11CipherSuite::Dot11CipherSuiteCcmp128;
+    case Ieee80211CipherSuite::Ccmp256:
+        return Dot11CipherSuite::Dot11CipherSuiteCcmp256;
+    case Ieee80211CipherSuite::Gcmp128:
+        return Dot11CipherSuite::Dot11CipherSuiteGcmp128;
+    case Ieee80211CipherSuite::Gcmp256:
+        return Dot11CipherSuite::Dot11CipherSuiteGcmp256;
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
+        return Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed;
+    case Ieee80211CipherSuite::Tkip:
+        return Dot11CipherSuite::Dot11CipherSuiteTkip;
+    case Ieee80211CipherSuite::UseGroup:
+        return Dot11CipherSuite::Dot11CipherSuiteUseGroup;
+    case Ieee80211CipherSuite::Wep104:
+        return Dot11CipherSuite::Dot11CipherSuiteWep104;
+    case Ieee80211CipherSuite::Wep40:
+        return Dot11CipherSuite::Dot11CipherSuiteWep40;
+    case Ieee80211CipherSuite::Unknown:
+    default:
+        return Dot11CipherSuite::Dot11CipherSuiteUnknown;
+    }
+}
+
+Ieee80211CipherSuite
+FromDot11CipherSuite(const Dot11CipherSuite dot11CipherSuite) noexcept
+{
+    switch (dot11CipherSuite) {
+    case Dot11CipherSuite::Dot11CipherSuiteBipCmac128:
+        return Ieee80211CipherSuite::BipCmac128;
+    case Dot11CipherSuite::Dot11CipherSuiteBipCmac256:
+        return Ieee80211CipherSuite::BipCmac256;
+    case Dot11CipherSuite::Dot11CipherSuiteBipGmac128:
+        return Ieee80211CipherSuite::BipGmac128;
+    case Dot11CipherSuite::Dot11CipherSuiteBipGmac256:
+        return Ieee80211CipherSuite::BipGmac256;
+    case Dot11CipherSuite::Dot11CipherSuiteCcmp128:
+        return Ieee80211CipherSuite::Ccmp128;
+    case Dot11CipherSuite::Dot11CipherSuiteCcmp256:
+        return Ieee80211CipherSuite::Ccmp256;
+    case Dot11CipherSuite::Dot11CipherSuiteGcmp128:
+        return Ieee80211CipherSuite::Gcmp128;
+    case Dot11CipherSuite::Dot11CipherSuiteGcmp256:
+        return Ieee80211CipherSuite::Gcmp256;
+    case Dot11CipherSuite::Dot11CipherSuiteGroupAddressesTrafficNotAllowed:
+        return Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed;
+    case Dot11CipherSuite::Dot11CipherSuiteTkip:
+        return Ieee80211CipherSuite::Tkip;
+    case Dot11CipherSuite::Dot11CipherSuiteUseGroup:
+        return Ieee80211CipherSuite::UseGroup;
+    case Dot11CipherSuite::Dot11CipherSuiteWep104:
+        return Ieee80211CipherSuite::Wep104;
+    case Dot11CipherSuite::Dot11CipherSuiteWep40:
+        return Ieee80211CipherSuite::Wep40;
+    default:
+        return Ieee80211CipherSuite::Unknown;
+    }
+}
+
 } // namespace Microsoft::Net::Wifi
