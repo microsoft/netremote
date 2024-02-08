@@ -1,11 +1,18 @@
 
 #include <algorithm>
+#include <future>
+#include <iterator>
+#include <memory>
+#include <string_view>
+#include <vector>
 
-#include "AccessPointDiscoveryAgentOperationsTest.hxx"
+#include <AccessPointDiscoveryAgentOperationsTest.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
+#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
-using Microsoft::Net::Wifi::AccessPointPresenceEvent;
 
 AccessPointDiscoveryAgentOperationsTest::AccessPointDiscoveryAgentOperationsTest() :
     m_accessPointFactory(std::make_unique<AccessPointFactoryTest>())

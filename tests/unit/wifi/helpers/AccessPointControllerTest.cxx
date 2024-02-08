@@ -1,9 +1,18 @@
 
+
 #include <algorithm>
 #include <format>
+#include <iterator>
+#include <memory>
 #include <stdexcept>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <magic_enum.hpp>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
 #include <plog/Log.h>

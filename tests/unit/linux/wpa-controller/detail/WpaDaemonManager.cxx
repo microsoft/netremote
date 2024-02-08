@@ -1,15 +1,19 @@
 
+#include <csignal>
 #include <cstdlib>
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <iterator>
+#include <optional>
 #include <sstream>
+#include <stdexcept>
+#include <string_view>
 
 #include "WpaDaemonManager.hxx"
-
+#include <Wpa/WpaCore.hxx>
 #include <magic_enum.hpp>
 #include <plog/Log.h>
-#include <signal.h>
 
 namespace detail
 {
@@ -64,7 +68,7 @@ WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, std::string_view int
 
 /* static */
 std::filesystem::path
-WpaDaemonManager::FindDaemonBinary(Wpa::WpaType wpaType, std::filesystem::path searchPath)
+WpaDaemonManager::FindDaemonBinary(Wpa::WpaType wpaType, const std::filesystem::path& searchPath)
 {
     using std::filesystem::perms;
 
@@ -119,7 +123,7 @@ WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, co
 
     // Determine which daemon to start and formulate daemon binary arguments.
     const auto daemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
-    const auto configurationFileArgumentPrefix = (wpaType == Wpa::WpaType::WpaSupplicant) ? "-c" : "";
+    const auto* configurationFileArgumentPrefix = (wpaType == Wpa::WpaType::WpaSupplicant) ? "-c" : "";
     const auto pidFilePath{ std::filesystem::temp_directory_path() / std::format("{}.pid", daemon) };
 
     // Start the daemon. Arguments are:
@@ -129,7 +133,7 @@ WpaDaemonManager::Start(Wpa::WpaType wpaType, std::string_view interfaceName, co
     const auto daemonStartCommand = std::format("{} -B -P {} -i {} {} {} {}", daemonFilePath.c_str(), pidFilePath.c_str(), interfaceName, extraCommandLineArguments, configurationFileArgumentPrefix, configurationFilePath.c_str());
     LOGI << std::format("Starting wpa daemon with command '{}'\n", daemonStartCommand);
 
-    int ret = std::system(daemonStartCommand.c_str());
+    int ret = std::system(daemonStartCommand.c_str()); // NOLINT(cert-env33-c)
     if (ret == -1) {
         ret = WEXITSTATUS(ret);
         LOGE << std::format("Failed to start wpa '{}' daemon, ret={}\n", daemon, ret);

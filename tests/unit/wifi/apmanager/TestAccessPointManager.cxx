@@ -1,11 +1,11 @@
 
+#include <memory>
 #include <string_view>
+#include <utility>
 
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
-#include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
-#include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
 #include "AccessPointDiscoveryAgentOperationsTest.hxx"
 

@@ -1,6 +1,7 @@
 
-#include <chrono>
+#include <chrono> // NOLINT(misc-include-cleaner)
 #include <future>
+#include <memory>
 #include <string_view>
 #include <utility>
 
@@ -28,8 +29,8 @@ TEST_CASE("Destroy an AccessPointDiscoveryAgent instance", "[wifi][core][apdisco
 {
     using namespace Microsoft::Net::Wifi;
 
-    std::string_view accessPointInterfaceName1{ "TestAccessPoint1" };
-    std::string_view accessPointInterfaceName2{ "TestAccessPoint2" };
+    constexpr std::string_view accessPointInterfaceName1{ "TestAccessPoint1" };
+    constexpr std::string_view accessPointInterfaceName2{ "TestAccessPoint2" };
 
     SECTION("Destroy doesn't cause a crash")
     {
@@ -119,7 +120,7 @@ TEST_CASE("Presence events are raised", "[wifi][core][apdiscoveryagent]")
 {
     using namespace Microsoft::Net::Wifi;
 
-    static constexpr auto PresenceEventCallbackWaitTime{ 100ms };
+    static constexpr auto PresenceEventCallbackWaitTime{ 100ms }; // NOLINT(misc-include-cleaner)
 
     std::string_view accessPointInterfaceName{ "TestAccessPoint" };
 

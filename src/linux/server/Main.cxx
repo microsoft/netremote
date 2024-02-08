@@ -64,17 +64,15 @@ main(int argc, char *argv[])
         accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
     }
 
-    const bool runInBackground{ configuration.RunInBackground };
-
     // Create the server.
-    NetRemoteServer server{ std::move(configuration) };
+    NetRemoteServer server{ configuration };
 
     // Start the server.
     LOGI << "Netremote server starting";
     server.Run();
 
     // If running in the background, daemonize the process.
-    if (runInBackground) {
+    if (configuration.RunInBackground) {
         constexpr int nochdir = 0; // Change current working directory to /
         constexpr int noclose = 0; // Don't redirect stdin, stdout to /dev/null
 

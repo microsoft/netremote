@@ -1,15 +1,17 @@
 
 #include <format>
-#include <iostream>
-#include <stdexcept>
+#include <memory>
 
+#include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
+#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/NetRemoteService.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
 
-NetRemoteServer::NetRemoteServer(NetRemoteServerConfiguration configuration) :
+NetRemoteServer::NetRemoteServer(const NetRemoteServerConfiguration& configuration) :
     m_serverAddress(configuration.ServerAddress),
     m_service(configuration.AccessPointManager)
 {}

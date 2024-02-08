@@ -1,4 +1,9 @@
 
+#include <memory>
+#include <utility>
+
+#include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/test/AccessPointManagerTest.hxx>
 
 using namespace Microsoft::Net::Wifi::Test;

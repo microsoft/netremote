@@ -1,7 +1,9 @@
-
 #include <memory>
 #include <string_view>
 
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
 

@@ -1,10 +1,14 @@
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdlib>
 #include <format>
 #include <iostream>
 #include <iterator>
-#include <ranges>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "WifiVirtualDeviceManager.hxx"
@@ -26,12 +30,6 @@ WifiVirtualDeviceManager::EnumerateInterfaces() const
 }
 
 bool
-WifiVirtualDeviceManager::RemoveInterfaces(std::string_view driverName)
-{
-    return RemoveInterfacesForDriver(driverName);
-}
-
-bool
 WifiVirtualDeviceManager::RemoveAllInterfaces()
 {
     for (auto it = std::begin(m_interfaces); it != std::end(m_interfaces);) {
@@ -43,6 +41,13 @@ WifiVirtualDeviceManager::RemoveAllInterfaces()
     }
 
     return true;
+}
+
+/* static */
+bool
+WifiVirtualDeviceManager::RemoveInterfaces(std::string_view driverName)
+{
+    return RemoveInterfacesForDriver(driverName);
 }
 
 /* static */
@@ -59,7 +64,7 @@ WifiVirtualDeviceManager::CreateInterfacesForDriver(uint32_t numberOfInterfaces,
 
     // Load the specified kernel module, which should create the simulated wireless interface(s).
     const auto driverLoadCommand = std::format("sudo modprobe {} {}", driverName, driverArguments);
-    int ret = std::system(driverLoadCommand.c_str());
+    int ret = std::system(driverLoadCommand.c_str()); // NOLINT(cert-env33-c, cert-err34-c)
     if (ret == -1) {
         ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to load {} driver, load command '{}' failed (ret={})\n", driverName, driverLoadCommand, ret);
@@ -84,8 +89,8 @@ bool
 WifiVirtualDeviceManager::RemoveInterfacesForDriver(std::string_view driverName)
 {
     // Forcefully remove any existing loaded kernel module for this driver.
-    const auto driverUnloadCommand = std::format("sudo modprobe -rf {}", driverName);
-    int ret = std::system(driverUnloadCommand.c_str());
+    const auto driverUnloadCommand = std::format("sudo modprobe -rf {}", driverName);   // NOLINT(concurrency-mt-unsafe))
+    int ret = std::system(driverUnloadCommand.c_str()); // NOLINT(cert-env33-c)
     if (ret == -1) {
         ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to unload {} driver, unload command '{}' failed (ret={})\n", driverName, driverUnloadCommand, ret);

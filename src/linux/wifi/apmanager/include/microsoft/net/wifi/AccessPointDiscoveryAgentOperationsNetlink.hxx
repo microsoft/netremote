@@ -3,21 +3,20 @@
 #define ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_NETLINK_HXX
 
 #include <cstdint>
+#include <future>
 #include <memory>
 #include <stop_token>
-#include <string>
 #include <thread>
 #include <unordered_set>
+#include <vector>
 
-#include <linux/nl80211.h>
-#include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
-#include <netlink/netlink.h>
+#include <netlink/attr.h>
 
 namespace Microsoft::Net::Wifi
 {
@@ -37,12 +36,14 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
      */
     explicit AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory);
 
-    ~AccessPointDiscoveryAgentOperationsNetlink();
+    ~AccessPointDiscoveryAgentOperationsNetlink() override;
 
-    AccessPointDiscoveryAgentOperationsNetlink(const AccessPointDiscoveryAgentOperationsNetlink&) = delete;
-    AccessPointDiscoveryAgentOperationsNetlink& operator=(const AccessPointDiscoveryAgentOperationsNetlink&) = delete;
-    AccessPointDiscoveryAgentOperationsNetlink(AccessPointDiscoveryAgentOperationsNetlink&&) = delete;
-    AccessPointDiscoveryAgentOperationsNetlink& operator=(AccessPointDiscoveryAgentOperationsNetlink&&) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink(const AccessPointDiscoveryAgentOperationsNetlink &) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink &
+    operator=(const AccessPointDiscoveryAgentOperationsNetlink &) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink(AccessPointDiscoveryAgentOperationsNetlink &&) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink &
+    operator=(AccessPointDiscoveryAgentOperationsNetlink &&) = delete;
 
     /**
      * @brief Start the discovery process.

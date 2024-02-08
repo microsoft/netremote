@@ -58,15 +58,15 @@ WpaStatusResponseParser::ParsePayload()
         }
     }
 
-    if (!!status.Ieee80211n) {
+    if (!(status.Ieee80211n == 0)) {
         // TODO: parse attributes that are preset when this value is set.
     }
 
-    if (!!status.Ieee80211ac) {
+    if (!(status.Ieee80211ac == 0)) {
         // TODO: parse attributes that are preset when this value is set.
     }
 
-    if (!!status.Ieee80211ax) {
+    if (!(status.Ieee80211ax == 0)) {
         // TODO: parse attributes that are preset when this value is set.
     }
 

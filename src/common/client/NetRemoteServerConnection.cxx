@@ -1,8 +1,14 @@
 
+#include <memory>
+#include <string_view>
+#include <utility>
+
+#include <grpc/impl/codegen/connectivity_state.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
@@ -12,7 +18,7 @@ using namespace Microsoft::Net::Remote::Wifi;
 
 NetRemoteServerConnection::NetRemoteServerConnection(std::string_view address, std::shared_ptr<grpc::Channel> channel, std::unique_ptr<NetRemote::Stub> client) :
     Address(address),
-    Channel(channel),
+    Channel(std::move(channel)),
     Client(std::move(client))
 {
 }

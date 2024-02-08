@@ -25,8 +25,11 @@ struct NetRemoteServer
      *
      * @param configuration
      */
-    explicit NetRemoteServer(NetRemoteServerConfiguration configuration);
+    explicit NetRemoteServer(const NetRemoteServerConfiguration& configuration);
 
+    /**
+     * Prevent copying and moving of this object. 
+     */
     NetRemoteServer(const NetRemoteServer&) = delete;
     NetRemoteServer& operator=(const NetRemoteServer&) = delete;
     NetRemoteServer(NetRemoteServer&&) = delete;

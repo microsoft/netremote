@@ -55,7 +55,7 @@ struct WpaDaemonInstance :
             return false;
         }
 
-        m_instanceToken = std::move(instanceToken);
+        m_instanceToken = instanceToken;
         return true;
     }
 
@@ -78,7 +78,8 @@ struct WpaDaemonInstance :
 
 private:
     std::optional<WpaDaemonInstanceHandle> m_instanceToken;
-    const std::string_view m_wpaDaemonName;
+    std::string_view m_wpaDaemonName;
+
     static constexpr Wpa::WpaType m_wpaType{ wpaType };
 };
 

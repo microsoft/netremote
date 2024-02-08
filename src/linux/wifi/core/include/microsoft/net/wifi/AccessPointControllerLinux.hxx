@@ -17,7 +17,7 @@ namespace Microsoft::Net::Wifi
 struct AccessPointControllerLinux :
     public AccessPointController
 {
-    virtual ~AccessPointControllerLinux() = default;
+    ~AccessPointControllerLinux() override = default;
 
     AccessPointControllerLinux() = delete;
 
@@ -42,7 +42,7 @@ struct AccessPointControllerLinux :
      * @return true
      * @return false
      */
-    virtual bool
+    bool
     GetIsEnabled() override;
 
     /**
@@ -50,7 +50,7 @@ struct AccessPointControllerLinux :
      *
      * @return Ieee80211AccessPointCapabilities
      */
-    virtual Ieee80211AccessPointCapabilities
+    Ieee80211AccessPointCapabilities
     GetCapabilities() override;
 
     /**
@@ -60,7 +60,7 @@ struct AccessPointControllerLinux :
      * @return true
      * @return false
      */
-    virtual bool
+    bool
     SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 
     /**
@@ -70,7 +70,7 @@ struct AccessPointControllerLinux :
      * @return true
      * @return false
      */
-    virtual bool
+    bool
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
 
 private:
@@ -83,14 +83,24 @@ private:
 struct AccessPointControllerLinuxFactory :
     public IAccessPointControllerFactory
 {
-    virtual ~AccessPointControllerLinuxFactory() = default;
+    AccessPointControllerLinuxFactory() = default;
+
+    ~AccessPointControllerLinuxFactory() override = default;
+
+    /**
+     * Prevent copying and moving of this object. 
+     */
+    AccessPointControllerLinuxFactory(const AccessPointControllerLinuxFactory&) = delete;
+    AccessPointControllerLinuxFactory& operator=(const AccessPointControllerLinuxFactory&) = delete;
+    AccessPointControllerLinuxFactory(AccessPointControllerLinuxFactory&&) = delete;
+    AccessPointControllerLinuxFactory& operator=(AccessPointControllerLinuxFactory&&) = delete;
 
     /**
      * @brief Create a new IAccessPointController object.
      *
      * @return std::unique_ptr<IAccessPointController>
      */
-    virtual std::unique_ptr<IAccessPointController>
+    std::unique_ptr<IAccessPointController>
     Create(std::string_view interfaceName) override;
 };
 } // namespace Microsoft::Net::Wifi
