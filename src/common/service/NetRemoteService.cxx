@@ -9,7 +9,8 @@
 #include <utility>
 #include <vector>
 
-#include <logging/FunctionTracer.hxx>
+#include "NetRemoteApiTrace.hxx"
+#include "NetRemoteWifiApiTrace.hxx"
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -18,6 +19,7 @@
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::Service;
+using namespace Microsoft::Net::Remote::Service::Tracing;
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
@@ -145,51 +147,6 @@ TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<
 using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
-Microsoft::Net::Wifi::Dot11AccessPointCapabilities
-IeeeAccessPointCapabilitiesToNetRemoteAccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieeeCapabilities)
-{
-    using Microsoft::Net::Wifi::ToDot11AkmSuite;
-    using Microsoft::Net::Wifi::ToDot11CipherSuite;
-    using Microsoft::Net::Wifi::ToDot11FrequencyBand;
-    using Microsoft::Net::Wifi::ToDot11PhyType;
-
-    Dot11AccessPointCapabilities capabilities{};
-
-    std::vector<Microsoft::Net::Wifi::Dot11PhyType> phyTypes(std::size(ieeeCapabilities.Protocols));
-    std::ranges::transform(ieeeCapabilities.Protocols, std::begin(phyTypes), ToDot11PhyType);
-
-    *capabilities.mutable_phytypes() = {
-        std::make_move_iterator(std::begin(phyTypes)),
-        std::make_move_iterator(std::end(phyTypes))
-    };
-
-    std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> bands(std::size(ieeeCapabilities.FrequencyBands));
-    std::ranges::transform(ieeeCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
-
-    *capabilities.mutable_bands() = {
-        std::make_move_iterator(std::begin(bands)),
-        std::make_move_iterator(std::end(bands))
-    };
-
-    std::vector<Microsoft::Net::Wifi::Dot11AkmSuite> akmSuites(std::size(ieeeCapabilities.AkmSuites));
-    std::ranges::transform(ieeeCapabilities.AkmSuites, std::begin(akmSuites), ToDot11AkmSuite);
-
-    *capabilities.mutable_akmsuites() = {
-        std::make_move_iterator(std::begin(akmSuites)),
-        std::make_move_iterator(std::end(akmSuites))
-    };
-
-    std::vector<Microsoft::Net::Wifi::Dot11CipherSuite> cipherSuites(std::size(ieeeCapabilities.CipherSuites));
-    std::ranges::transform(ieeeCapabilities.CipherSuites, std::begin(cipherSuites), ToDot11CipherSuite);
-
-    *capabilities.mutable_ciphersuites() = {
-        std::make_move_iterator(std::begin(cipherSuites)),
-        std::make_move_iterator(std::end(cipherSuites))
-    };
-
-    return capabilities;
-}
-
 using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
 using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
 
@@ -267,71 +224,6 @@ NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::Wifi
     return (item.accesspointid() == AccessPointIdInvalid);
 }
 
-/**
- * @brief Netremote API function tracer.
- */
-struct NetRemoteApiTrace :
-    public logging::FunctionTracer
-{
-    /**
-     * @brief Construct a new NetRemoteApiTrace object.
-     *
-     * @param deferEnter Whether to defer the entry log message upon construction.
-     * @param location The source code location of the function call.
-     */
-    NetRemoteApiTrace(bool deferEnter = false, std::source_location location = std::source_location::current()) :
-        logging::FunctionTracer(LogTracePrefix, {}, deferEnter, std::move(location))
-    {}
-
-private:
-    static constexpr auto LogTracePrefix = "[API]";
-};
-
-/**
- * @brief Netremote Wi-Fi API function tracer. This should be used for all Wi-Fi API calls. It accepts arguments and
- * return values as optionals and/or pointers to indicate their presence.
- */
-struct NetRemoteWifiApiTrace :
-    public NetRemoteApiTrace
-{
-    /**
-     * @brief Construct a new Net RemoteWifiApiTrace object.
-     *
-     * @param accessPointId The access point id associated with the API request, if present.
-     * @param operationStatus The result status of the operation, if present.
-     * @param location The source code location of the function call.
-     */
-    NetRemoteWifiApiTrace(std::optional<std::string> accessPointId, const WifiAccessPointOperationStatus* operationStatus, std::source_location location = std::source_location::current()) :
-        NetRemoteApiTrace(/* deferEnter= */ true, std::move(location)),
-        m_accessPointId(std::move(accessPointId)),
-        m_operationStatus(operationStatus)
-    {
-        if (m_accessPointId.has_value()) {
-            AddArgument(AccessPointIdArgName, m_accessPointId.value());
-        }
-
-        Enter();
-    }
-
-    virtual ~NetRemoteWifiApiTrace()
-    {
-        if (m_operationStatus != nullptr) {
-            AddReturnValue("Status", std::string(magic_enum::enum_name(m_operationStatus->code())));
-            if (m_operationStatus->code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-                AddReturnValue("Error Message", m_operationStatus->message());
-                SetFailed();
-            } else {
-                SetSucceeded();
-            }
-        }
-    }
-
-private:
-    std::optional<std::string> m_accessPointId;
-    const WifiAccessPointOperationStatus* m_operationStatus{ nullptr };
-
-    static constexpr auto AccessPointIdArgName{ "Access Point" };
-};
 } // namespace detail
 
 ::grpc::Status
@@ -339,7 +231,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
 {
     using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
 
-    detail::NetRemoteApiTrace traceMe{};
+    NetRemoteApiTrace traceMe{};
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
@@ -367,7 +259,7 @@ using Microsoft::Net::Wifi::Dot11PhyType;
 ::grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* result)
 {
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
 
@@ -386,7 +278,7 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* 
 ::grpc::Status
 NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* result)
 {
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
     // TODO: Disable the access point.
@@ -405,7 +297,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
 {
     using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
 
@@ -506,7 +398,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
 {
     using Microsoft::Net::Wifi::FromDot11FrequencyBand;
 
-    detail::NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     // Validate basic parameters in the request.
     if (!ValidateWifiSetFrequencyBandsRequest(request, result)) {
