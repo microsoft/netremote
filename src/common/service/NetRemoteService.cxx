@@ -3,7 +3,6 @@
 #include <format>
 #include <iterator>
 #include <optional>
-#include <source_location>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -20,25 +19,8 @@
 
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Service::Tracing;
-
-using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
-using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::AccessPointControllerException;
-using Microsoft::Net::Wifi::AccessPointManager;
-using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-using Microsoft::Net::Wifi::IAccessPoint;
-using Microsoft::Net::Wifi::IAccessPointController;
-using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
-
-NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
-    m_accessPointManager(std::move(accessPointManager))
-{}
-
-std::shared_ptr<AccessPointManager>
-NetRemoteService::GetAccessPointManager() noexcept
-{
-    return m_accessPointManager;
-}
+using namespace Microsoft::Net::Remote::Wifi;
+using namespace Microsoft::Net::Wifi;
 
 namespace detail
 {
@@ -144,15 +126,14 @@ TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<
     return accessPointController;
 }
 
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Ieee80211CipherSuite;
-
-using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-
 static constexpr auto AccessPointIdInvalid{ "invalid" };
 
-Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
+/**
+ * @brief Create an invalid access point result item.
+ * 
+ * @return WifiEnumerateAccessPointsResultItem 
+ */
+WifiEnumerateAccessPointsResultItem
 MakeInvalidAccessPointResultItem()
 {
     WifiEnumerateAccessPointsResultItem item{};
@@ -160,16 +141,14 @@ MakeInvalidAccessPointResultItem()
     return item;
 }
 
-Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
+WifiEnumerateAccessPointsResultItem
 IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 {
-    using Microsoft::Net::Wifi::ToDot11AccessPointCapabilities;
-
     WifiEnumerateAccessPointsResultItem item{};
 
     bool isEnabled{ false };
     std::string id{};
-    Microsoft::Net::Wifi::Dot11AccessPointCapabilities capabilities{};
+    Dot11AccessPointCapabilities capabilities{};
 
     auto interfaceName = accessPoint.GetInterfaceName();
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
@@ -203,11 +182,9 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     return item;
 }
 
-Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem
+WifiEnumerateAccessPointsResultItem
 IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& accessPointWeak)
 {
-    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
-
     WifiEnumerateAccessPointsResultItem item{};
 
     auto accessPoint = accessPointWeak.lock();
@@ -221,18 +198,26 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& ac
 }
 
 bool
-NetRemoteAccessPointResultItemIsInvalid(const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem& item)
+NetRemoteAccessPointResultItemIsInvalid(const WifiEnumerateAccessPointsResultItem& item)
 {
     return (item.accesspointid() == AccessPointIdInvalid);
 }
 
 } // namespace detail
 
-::grpc::Status
-NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response)
-{
-    using Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResultItem;
+NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
+    m_accessPointManager(std::move(accessPointManager))
+{}
 
+std::shared_ptr<AccessPointManager>
+NetRemoteService::GetAccessPointManager() noexcept
+{
+    return m_accessPointManager;
+}
+
+::grpc::Status
+NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const WifiEnumerateAccessPointsRequest* request, WifiEnumerateAccessPointsResult* response)
+{
     NetRemoteApiTrace traceMe{};
 
     // List all known access points.
@@ -254,12 +239,8 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] ::grpc::ServerConte
     return grpc::Status::OK;
 }
 
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Dot11PhyType;
-
 ::grpc::Status
-NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* result)
+NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* context, const WifiAccessPointEnableRequest* request, WifiAccessPointEnableResult* result)
 {
     NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
@@ -278,7 +259,7 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] ::grpc::ServerContext* 
 }
 
 ::grpc::Status
-NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* result)
+NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext* context, const WifiAccessPointDisableRequest* request, WifiAccessPointDisableResult* result)
 {
     NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
@@ -292,13 +273,9 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] ::grpc::ServerContext*
     return grpc::Status::OK;
 }
 
-using Microsoft::Net::Wifi::Dot11PhyType;
-
 ::grpc::Status
-NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* result)
+NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerContext* context, const WifiAccessPointSetPhyTypeRequest* request, WifiAccessPointSetPhyTypeResult* result)
 {
-    using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
-
     NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
@@ -357,10 +334,6 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     return grpc::Status::OK;
 }
 
-using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest;
-using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult;
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-
 namespace detail
 {
 std::vector<Dot11FrequencyBand>
@@ -396,10 +369,8 @@ NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetF
 }
 
 ::grpc::Status
-NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, ::Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result)
+NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::ServerContext* context, const WifiAccessPointSetFrequencyBandsRequest* request, WifiAccessPointSetFrequencyBandsResult* result)
 {
-    using Microsoft::Net::Wifi::FromDot11FrequencyBand;
-
     NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     // Validate basic parameters in the request.
@@ -415,7 +386,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
 
     // Convert dot11 bands to ieee80211 bands.
     const auto& frequencyBands = detail::GetFrequencyBands(*request);
-    std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> ieeeFrequencyBands(static_cast<std::size_t>(std::size(frequencyBands)));
+    std::vector<Ieee80211FrequencyBand> ieeeFrequencyBands(static_cast<std::size_t>(std::size(frequencyBands)));
     std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), FromDot11FrequencyBand);
 
     // Obtain capabilities of the access point.
@@ -455,7 +426,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
 
 /* static */
 bool
-NetRemoteService::ValidateWifiAccessPointEnableRequest(const ::Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
+NetRemoteService::ValidateWifiAccessPointEnableRequest(const WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
 {
     // Validate required arguments are present. Detailed argument validation is left to the implementation.
 
