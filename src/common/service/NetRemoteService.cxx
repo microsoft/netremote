@@ -334,23 +334,6 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] ::grpc::ServerConte
     return grpc::Status::OK;
 }
 
-namespace detail
-{
-std::vector<Dot11FrequencyBand>
-GetFrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request)
-{
-    const auto& frequencyBands = request.frequencybands();
-
-    std::vector<Dot11FrequencyBand> bands(static_cast<std::size_t>(std::size(frequencyBands)));
-    std::ranges::transform(frequencyBands, std::begin(bands), [](const auto& frequencyBand) {
-        return static_cast<Dot11FrequencyBand>(frequencyBand);
-    });
-
-    return bands;
-}
-
-} // namespace detail
-
 /* static */
 bool
 NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetFrequencyBandsRequest* request, WifiAccessPointSetFrequencyBandsResult* result)
@@ -385,9 +368,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] ::grpc::Serv
     }
 
     // Convert dot11 bands to ieee80211 bands.
-    const auto& frequencyBands = detail::GetFrequencyBands(*request);
-    std::vector<Ieee80211FrequencyBand> ieeeFrequencyBands(static_cast<std::size_t>(std::size(frequencyBands)));
-    std::ranges::transform(frequencyBands, std::begin(ieeeFrequencyBands), FromDot11FrequencyBand);
+    auto ieee80211FrequencyBands = FromDot11SetFrequencyBandsRequest(*request);
 
     // Obtain capabilities of the access point.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};

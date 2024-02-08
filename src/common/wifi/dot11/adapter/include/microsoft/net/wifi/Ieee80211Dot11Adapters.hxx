@@ -2,6 +2,8 @@
 #ifndef IEEE_80211_DOT11_ADAPTERS_HXX
 #define IEEE_80211_DOT11_ADAPTERS_HXX
 
+#include <vector>
+
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -45,6 +47,16 @@ Microsoft::Net::Wifi::Ieee80211FrequencyBand
 FromDot11FrequencyBand(const Microsoft::Net::Wifi::Dot11FrequencyBand dot11FrequencyBand) noexcept;
 
 /**
+ * @brief Obtain the equivalent IEEE 802.11 frequency band from the Dot11FrequencyBands in the
+ * WifiAccessPointSetFrequencyBandsRequest.
+ *
+ * @param request
+ * @return std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand>
+ */
+std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand>
+FromDot11SetFrequencyBandsRequest(const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest& request);
+
+/**
  * @brief Convert the specified IEEE 802.11 authentication algorithm to the equivalent Dot11AuthenticationAlgorithm.
  *
  * @param ieeeAuthenticationAlgorithm The IEEE 802.11 authentication algorithm to convert.
@@ -82,36 +94,36 @@ FromDot11AkmSuite(const Microsoft::Net::Wifi::Dot11AkmSuite dot11AkmSuite) noexc
 
 /**
  * @brief Convert the specified IEEE 802.11 cipher suite algorithm to the equivalent Dot11CipherSuite.
- * 
+ *
  * @param ieeeCipherSuite The IEEE 802.11 cipher suite algorithm to convert.
- * @return Microsoft::Net::Wifi::Dot11CipherSuite 
+ * @return Microsoft::Net::Wifi::Dot11CipherSuite
  */
 Microsoft::Net::Wifi::Dot11CipherSuite
 ToDot11CipherSuite(const Microsoft::Net::Wifi::Ieee80211CipherSuite ieeeCipherSuite) noexcept;
 
 /**
  * @brief Convert the specified Dot11CipherSuite to the equivalent IEEE 802.11 cipher suite algorithm.
- * 
+ *
  * @param dot11CipherSuite The Dot11CipherSuite to convert.
- * @return Microsoft::Net::Wifi::Ieee80211CipherSuite 
+ * @return Microsoft::Net::Wifi::Ieee80211CipherSuite
  */
 Microsoft::Net::Wifi::Ieee80211CipherSuite
 FromDot11CipherSuite(const Microsoft::Net::Wifi::Dot11CipherSuite dot11CipherSuite) noexcept;
 
 /**
  * @brief Convert the specified IEEE 802.11 access point capabilities to the equivalent Dot11AccessPointCapabilities.
- * 
+ *
  * @param ieeeAccessPointCapabilities The IEEE 802.11 access point capabilities to convert.
- * @return Microsoft::Net::Wifi::Dot11AccessPointCapabilities 
+ * @return Microsoft::Net::Wifi::Dot11AccessPointCapabilities
  */
 Microsoft::Net::Wifi::Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities ieeeAccessPointCapabilities) noexcept;
 
 /**
  * @brief Convert the specified Dot11AccessPointCapabilities to the equivalent IEEE 802.11 access point capabilities.
- * 
+ *
  * @param dot11AccessPointCapabilities The Dot11AccessPointCapabilities to convert.
- * @return Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities 
+ * @return Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities
  */
 Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities
 FromDot11AccessPointCapabilities(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities dot11AccessPointCapabilities) noexcept;

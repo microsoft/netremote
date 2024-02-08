@@ -95,6 +95,23 @@ FromDot11FrequencyBand(const Dot11FrequencyBand dot11FrequencyBand) noexcept
     }
 }
 
+using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest;
+
+std::vector<Ieee80211FrequencyBand>
+FromDot11SetFrequencyBandsRequest(const WifiAccessPointSetFrequencyBandsRequest& request)
+{
+    // protobuf encodes enums in repeated fields as 'int' instead of the enum type itself. So, the below is a simple
+    // function to convert the repeated field of int to the enum type.
+    constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
+        return static_cast<Dot11FrequencyBand>(frequencyBand);
+    };
+
+    std::vector<Ieee80211FrequencyBand> ieee80211FrequencyBands(static_cast<std::size_t>(std::size(request.frequencybands())));
+    std::ranges::transform(request.frequencybands() | std::views::transform(toDot11FrequencyBand), std::begin(ieee80211FrequencyBands), FromDot11FrequencyBand);
+
+    return ieee80211FrequencyBands;
+}
+
 using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
 
@@ -377,8 +394,8 @@ FromDot11AccessPointCapabilities([[maybe_unused]] const Dot11AccessPointCapabili
 {
     Ieee80211AccessPointCapabilities ieee80211Capabilities{};
 
-    std::vector<Ieee80211Protocol> protocols(std::size(dot11AccessPointCapabilities.phytypes()));
-
+    std::vector<Ieee80211Protocol> protocols(static_cast<std::size_t>(std::size(dot11AccessPointCapabilities.phytypes())));
+    // TODO
 
     return {};
 }
