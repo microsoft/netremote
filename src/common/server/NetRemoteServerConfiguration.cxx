@@ -1,7 +1,10 @@
 
+#include <string>
 #include <utility>
+#include <vector>
 
-#include <CLI/CLI.hpp>
+#include <CLI/App.hpp>
+#include <CLI/Error.hpp>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 
 using namespace Microsoft::Net::Remote;

@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -18,9 +19,9 @@ namespace Microsoft::Net::Wifi
 struct AccessPointControllerException :
     public std::exception
 {
-    AccessPointControllerException(std::string_view what);
+    explicit AccessPointControllerException(std::string_view what);
 
-    virtual const char*
+    const char*
     what() const noexcept override;
 
 private:

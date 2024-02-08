@@ -4,7 +4,10 @@
 
 #include <memory>
 
+#include <grpcpp/server_context.h>
+#include <grpcpp/support/status.h>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 
 namespace Microsoft::Net::Remote::Service
@@ -21,7 +24,7 @@ public:
      *
      * @param accessPointManager The access point manager to use.
      */
-    NetRemoteService(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager);
+    explicit NetRemoteService(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager);
 
     /**
      * @brief Get the AccessPointManager object for this service.
@@ -40,7 +43,7 @@ private:
      * @param response
      * @return grpc::Status
      */
-    virtual grpc::Status
+    grpc::Status
     WifiEnumerateAccessPoints(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;
 
     /**
@@ -51,19 +54,19 @@ private:
      * @param response
      * @return grpc::Status
      */
-    virtual grpc::Status
-    WifiAccessPointEnable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* response) override;
+    grpc::Status
+    WifiAccessPointEnable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointEnableResult* result) override;
 
     /**
      * @brief Disable an access point. This will take the access point offline, making it unavailable for use by clients.
      *
      * @param context
      * @param request
-     * @param response
+     * @param result
      * @return grpc::Status
      */
-    virtual grpc::Status
-    WifiAccessPointDisable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* response) override;
+    grpc::Status
+    WifiAccessPointDisable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* result) override;
 
     /**
      * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause
@@ -71,11 +74,11 @@ private:
      *
      * @param context
      * @param request
-     * @param response
+     * @param result
      * @return grpc::Status
      */
-    virtual grpc::Status
-    WifiAccessPointSetPhyType(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* response) override;
+    grpc::Status
+    WifiAccessPointSetPhyType(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetPhyTypeResult* result) override;
 
     /**
      * @brief Set the active frequency bands of the access point. The access point must be enabled. This will cause
@@ -83,11 +86,11 @@ private:
      *
      * @param context
      * @param request
-     * @param response
+     * @param result
      * @return grpc::Status
      */
-    virtual grpc::Status
-    WifiAccessPointSetFrequencyBands(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* response) override;
+    grpc::Status
+    WifiAccessPointSetFrequencyBands(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result) override;
 
 protected:
     /**

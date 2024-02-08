@@ -5,6 +5,8 @@
 #include <format>
 #include <source_location>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 
 namespace notstd
 {
@@ -14,7 +16,7 @@ namespace notstd
 struct NotImplementedException :
     public std::logic_error
 {
-    NotImplementedException(std::source_location location = std::source_location::current(), std::string_view message = "") :
+    explicit NotImplementedException(std::source_location location = std::source_location::current(), std::string_view message = "") :
         std::logic_error(std::format("{}({}:{}) `{}` not implemented {}", location.file_name(), location.line(), location.column(), location.function_name(), (!std::empty(message) ? std::string(": ").append(message) : "")))
     {
     }

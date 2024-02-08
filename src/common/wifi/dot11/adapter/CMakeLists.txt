@@ -19,6 +19,8 @@ target_link_libraries(wifi-core-adapter-dot11
     PUBLIC
         ${PROJECT_NAME}-protocol
         wifi-core
+    PRIVATE
+        notstd
 )
 
 install(

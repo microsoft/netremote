@@ -1,6 +1,13 @@
 
+#include <optional>
+#include <string>
+#include <source_location>
+#include <utility>
+
+#include "NetRemoteApiTrace.hxx"
 #include "NetRemoteWifiApiTrace.hxx"
 #include <magic_enum.hpp>
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 
 using namespace Microsoft::Net::Remote::Service::Tracing;
 
@@ -8,7 +15,7 @@ using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
 
 NetRemoteWifiApiTrace::NetRemoteWifiApiTrace(std::optional<std::string> accessPointId, const WifiAccessPointOperationStatus* operationStatus, std::source_location location) :
-    NetRemoteApiTrace(/* deferEnter= */ true, std::move(location)),
+    NetRemoteApiTrace(/* deferEnter= */ true, location),
     m_accessPointId(std::move(accessPointId)),
     m_operationStatus(operationStatus)
 {

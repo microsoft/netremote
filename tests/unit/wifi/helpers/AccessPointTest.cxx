@@ -1,4 +1,7 @@
 
+#include <memory>
+#include <string_view>
+
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
 

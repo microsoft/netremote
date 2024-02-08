@@ -2,18 +2,24 @@
 #include <algorithm>
 #include <format>
 #include <iterator>
-#include <optional>
-#include <sstream>
+#include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 #include "NetRemoteApiTrace.hxx"
 #include "NetRemoteWifiApiTrace.hxx"
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/server_context.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteService.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 #include <plog/Log.h>
 
@@ -218,7 +224,7 @@ NetRemoteService::GetAccessPointManager() noexcept
 grpc::Status
 NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const WifiEnumerateAccessPointsRequest* request, WifiEnumerateAccessPointsResult* response)
 {
-    NetRemoteApiTrace traceMe{};
+    const NetRemoteApiTrace traceMe{};
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
@@ -242,7 +248,7 @@ NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] grpc::ServerContext
 grpc::Status
 NetRemoteService::WifiAccessPointEnable([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointEnableRequest* request, WifiAccessPointEnableResult* result)
 {
-    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
 
@@ -261,7 +267,7 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] grpc::ServerContext* co
 grpc::Status
 NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointDisableRequest* request, WifiAccessPointDisableResult* result)
 {
-    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
     // TODO: Disable the access point.
@@ -276,7 +282,7 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
 grpc::Status
 NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetPhyTypeRequest* request, WifiAccessPointSetPhyTypeResult* result)
 {
-    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     WifiAccessPointOperationStatus status{};
 
@@ -354,7 +360,7 @@ NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetF
 grpc::Status
 NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetFrequencyBandsRequest* request, WifiAccessPointSetFrequencyBandsResult* result)
 {
-    NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     // Validate basic parameters in the request.
     if (!ValidateWifiSetFrequencyBandsRequest(request, result)) {

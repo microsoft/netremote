@@ -1,7 +1,11 @@
 
-#include <stdexcept>
+#include <memory>
+#include <string_view>
+#include <utility>
 
 #include <microsoft/net/wifi/AccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 
 using namespace Microsoft::Net::Wifi;
 

@@ -1,9 +1,16 @@
 
+#include <cstddef>
 #include <format>
+#include <source_location>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <logging/FunctionTracer.hxx>
 #include <plog/Log.h>
+#include <plog/Severity.h>
 
 using namespace logging;
 
@@ -25,7 +32,7 @@ BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, s
         if (i > 0) {
             valueListBuilder << delimeter;
         }
-        valueListBuilder << name << keyValueSeparator <<  ValueWrapperCharacter << value << ValueWrapperCharacter;
+        valueListBuilder << name << keyValueSeparator << ValueWrapperCharacter << value << ValueWrapperCharacter;
     }
 
     return valueListBuilder.str();
@@ -34,18 +41,18 @@ BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, s
 
 FunctionTracer::FunctionTracer(std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
     m_logPrefix(std::move(logPrefix)),
-    m_location(std::move(location)),
+    m_location(location),
     m_functionName(m_location.function_name()),
     m_arguments(std::move(arguments))
 {
     // Attempt to parse the function name, removing the return type, namespace prefixes, and arguments.
     const auto openingBracketPos = m_functionName.find_first_of('(');
-    if (openingBracketPos != m_functionName.npos) {
+    if (openingBracketPos != std::string_view::npos) {
         m_functionName.remove_suffix(m_functionName.size() - openingBracketPos);
     }
 
     const auto lastColonPos = m_functionName.find_last_of(':');
-    if (lastColonPos != m_functionName.npos) {
+    if (lastColonPos != std::string_view::npos) {
         m_functionName.remove_prefix(lastColonPos + 1);
     }
 
