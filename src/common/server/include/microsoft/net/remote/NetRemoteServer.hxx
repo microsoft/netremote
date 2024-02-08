@@ -4,12 +4,10 @@
 
 #include <memory>
 #include <string>
-#include <string_view>
 
 #include <grpcpp/server.h>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/NetRemoteService.hxx>
-#include <microsoft/net/wifi/AccessPointManager.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -20,12 +18,19 @@ struct NetRemoteServer
 {
     virtual ~NetRemoteServer();
 
+    NetRemoteServer() = delete;
+
     /**
      * @brief Construct a new NetRemoteServer object with the specified configuration.
      *
      * @param configuration
      */
-    NetRemoteServer(NetRemoteServerConfiguration configuration);
+    explicit NetRemoteServer(NetRemoteServerConfiguration configuration);
+
+    NetRemoteServer(const NetRemoteServer&) = delete;
+    NetRemoteServer& operator=(const NetRemoteServer&) = delete;
+    NetRemoteServer(NetRemoteServer&&) = delete;
+    NetRemoteServer& operator=(NetRemoteServer&&) = delete;
 
     /**
      * @brief Get the GrpcServer object.

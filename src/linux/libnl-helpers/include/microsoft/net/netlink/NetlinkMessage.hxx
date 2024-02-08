@@ -39,7 +39,7 @@ struct NetlinkMessage
      *
      * @param message The netlink message to manage.
      */
-    NetlinkMessage(struct nl_msg* message);
+    explicit NetlinkMessage(struct nl_msg* message);
 
     /**
      * @brief Delete the copy constructor to enforce unique ownership.
@@ -60,7 +60,7 @@ struct NetlinkMessage
      *
      * @param other The other instance to move from.
      */
-    NetlinkMessage(NetlinkMessage&& other);
+    NetlinkMessage(NetlinkMessage&& other) noexcept;
 
     /**
      * @brief Move-assign this instance from another instance. This takes
@@ -70,7 +70,7 @@ struct NetlinkMessage
      * @return NetlinkMessage&
      */
     NetlinkMessage&
-    operator=(NetlinkMessage&& other);
+    operator=(NetlinkMessage&& other) noexcept;
 
     /**
      * @brief Destroy the NetlinkMessage object, freeing the managed netlink
@@ -97,7 +97,7 @@ struct NetlinkMessage
      *
      * @return struct nl_msg * The netlink message managed by this object.
      */
-    operator struct nl_msg *() const noexcept;
+    operator struct nl_msg *() const noexcept;  // NOLINT(hicpp-explicit-conversions)
 
     /**
      * @brief Obtain the message header.

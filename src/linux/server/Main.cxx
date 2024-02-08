@@ -1,7 +1,10 @@
 
+#include <cerrno>
 #include <format>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
-#include <errno.h>
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
@@ -17,6 +20,7 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
+#include <plog/Logger.h>
 #include <unistd.h>
 
 using namespace Microsoft::Net::Remote;
@@ -60,6 +64,8 @@ main(int argc, char *argv[])
         accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
     }
 
+    const bool runInBackground{ configuration.RunInBackground };
+
     // Create the server.
     NetRemoteServer server{ std::move(configuration) };
 
@@ -68,7 +74,7 @@ main(int argc, char *argv[])
     server.Run();
 
     // If running in the background, daemonize the process.
-    if (configuration.RunInBackground) {
+    if (runInBackground) {
         constexpr int nochdir = 0; // Change current working directory to /
         constexpr int noclose = 0; // Don't redirect stdin, stdout to /dev/null
 

@@ -16,14 +16,14 @@ NetlinkSocket::NetlinkSocket(struct nl_sock* socket) :
 {
 }
 
-NetlinkSocket::NetlinkSocket(NetlinkSocket&& other) :
+NetlinkSocket::NetlinkSocket(NetlinkSocket&& other) noexcept :
     Socket(other.Socket)
 {
     other.Socket = nullptr;
 }
 
 NetlinkSocket&
-NetlinkSocket::operator=(NetlinkSocket&& other)
+NetlinkSocket::operator=(NetlinkSocket&& other) noexcept 
 {
     if (this != &other) {
         Reset();
@@ -40,7 +40,7 @@ NetlinkSocket::~NetlinkSocket()
 }
 
 void
-NetlinkSocket::Reset()
+NetlinkSocket::Reset() noexcept
 {
     if (Socket != nullptr) {
         nl_socket_free(Socket);

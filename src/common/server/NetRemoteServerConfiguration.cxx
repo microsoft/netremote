@@ -49,7 +49,7 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
         app.parse(std::forward<Args>(args)...);
     } catch (const CLI::ParseError& parseError) {
         if (throwOnParseError) {
-            throw parseError;
+            throw parseError;   // NOLINT(cert-err60-cpp)
         }
     }
 

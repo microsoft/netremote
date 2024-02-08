@@ -26,7 +26,15 @@ struct AccessPointControllerLinux :
      *
      * @param interfaceName The name of the interface to control.
      */
-    AccessPointControllerLinux(std::string_view interfaceName);
+    explicit AccessPointControllerLinux(std::string_view interfaceName);
+
+    /**
+     * Prevent copying and moving of this object. 
+     */
+    AccessPointControllerLinux(const AccessPointControllerLinux&) = delete;
+    AccessPointControllerLinux& operator=(const AccessPointControllerLinux&) = delete;
+    AccessPointControllerLinux(AccessPointControllerLinux&&) = delete;
+    AccessPointControllerLinux& operator=(AccessPointControllerLinux&&) = delete;
 
     /**
      * @brief Get whether the access point is enabled.

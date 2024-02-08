@@ -13,7 +13,17 @@
  */
 struct IWpaDaemonInstance
 {
+    IWpaDaemonInstance() = default;
+
     virtual ~IWpaDaemonInstance() = default;
+
+    /**
+     * Prevent copying and moving of IWpaDaemonInstance objects. 
+     */
+    IWpaDaemonInstance(const IWpaDaemonInstance&) = delete;
+    IWpaDaemonInstance& operator=(const IWpaDaemonInstance&) = delete;
+    IWpaDaemonInstance(IWpaDaemonInstance&&) = delete;
+    IWpaDaemonInstance& operator=(IWpaDaemonInstance&&) = delete;
 
     virtual bool
     Start() = 0;

@@ -1,5 +1,6 @@
 
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
+#include <netlink/msg.h>
 
 using namespace Microsoft::Net::Netlink;
 
@@ -7,7 +8,7 @@ using namespace Microsoft::Net::Netlink;
 NetlinkMessage
 NetlinkMessage::Allocate()
 {
-    auto message = nlmsg_alloc();
+    auto* message = nlmsg_alloc();
     return NetlinkMessage{ message };
 }
 
@@ -16,14 +17,14 @@ NetlinkMessage::NetlinkMessage(struct nl_msg* message) :
 {
 }
 
-NetlinkMessage::NetlinkMessage(NetlinkMessage&& other) :
+NetlinkMessage::NetlinkMessage(NetlinkMessage&& other) noexcept :
     Message(other.Message)
 {
     other.Message = nullptr;
 }
 
 NetlinkMessage&
-NetlinkMessage::operator=(NetlinkMessage&& other)
+NetlinkMessage::operator=(NetlinkMessage&& other) noexcept
 {
     if (this != &other) {
         Reset();
@@ -51,7 +52,7 @@ NetlinkMessage::Reset()
 struct nl_msg*
 NetlinkMessage::Release() noexcept
 {
-    auto message = Message;
+    auto* message = Message;
     Message = nullptr;
     return message;
 }

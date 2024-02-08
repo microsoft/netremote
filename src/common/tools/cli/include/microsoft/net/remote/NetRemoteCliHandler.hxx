@@ -17,7 +17,17 @@ struct NetRemoteCli;
  */
 struct NetRemoteCliHandler
 {
+    NetRemoteCliHandler() = default;
+
     virtual ~NetRemoteCliHandler() = default;
+
+    /**
+     * Prevent copying and moving of NetRemoteCliHandler objects. 
+     */
+    NetRemoteCliHandler(const NetRemoteCliHandler&) = delete;
+    NetRemoteCliHandler& operator=(const NetRemoteCliHandler&) = delete;
+    NetRemoteCliHandler(NetRemoteCliHandler&&) = delete;
+    NetRemoteCliHandler& operator=(NetRemoteCliHandler&&) = delete;
 
     /**
      * @brief Construct a new NetRemoteCliHandler object.

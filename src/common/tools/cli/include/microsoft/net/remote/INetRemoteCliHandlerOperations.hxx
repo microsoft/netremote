@@ -13,7 +13,17 @@ namespace Microsoft::Net::Remote
  */
 struct INetRemoteCliHandlerOperations
 {
+    INetRemoteCliHandlerOperations() = default;
+
     virtual ~INetRemoteCliHandlerOperations() = default;
+
+    /**
+     * Prevent copying and moving of INetRemoteCliHandlerOperations objects.
+     */
+    INetRemoteCliHandlerOperations(const INetRemoteCliHandlerOperations&) = delete;
+    INetRemoteCliHandlerOperations& operator=(const INetRemoteCliHandlerOperations&) = delete;
+    INetRemoteCliHandlerOperations(INetRemoteCliHandlerOperations&&) = delete;
+    INetRemoteCliHandlerOperations& operator=(INetRemoteCliHandlerOperations&&) = delete;
 
     /**
      * @brief Enumerate available WiFi access points.
@@ -27,7 +37,17 @@ struct INetRemoteCliHandlerOperations
  */
 struct INetRemoteCliHandlerOperationsFactory
 {
+    INetRemoteCliHandlerOperationsFactory() = default;
+
     virtual ~INetRemoteCliHandlerOperationsFactory() = default;
+
+    /**
+     * Prevent copying and moving of INetRemoteCliHandlerOperationsFactory objects. 
+     */
+    INetRemoteCliHandlerOperationsFactory(const INetRemoteCliHandlerOperationsFactory&) = delete;
+    INetRemoteCliHandlerOperationsFactory& operator=(const INetRemoteCliHandlerOperationsFactory&) = delete;
+    INetRemoteCliHandlerOperationsFactory(INetRemoteCliHandlerOperationsFactory&&) = delete;
+    INetRemoteCliHandlerOperationsFactory& operator=(INetRemoteCliHandlerOperationsFactory&&) = delete;
 
     /**
      * @brief Create a new INetRemoteCliHandlerOperationsFactory instance with the specified server connection.

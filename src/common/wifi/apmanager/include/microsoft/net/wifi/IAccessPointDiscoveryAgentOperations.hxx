@@ -27,7 +27,17 @@ using AccessPointPresenceEventCallback = std::function<void(AccessPointPresenceE
  */
 struct IAccessPointDiscoveryAgentOperations
 {
+    IAccessPointDiscoveryAgentOperations() = default;
+
     virtual ~IAccessPointDiscoveryAgentOperations() = default;
+
+    /**
+     * Prevent copying and moving of IAccessPointDiscoveryAgentOperations objects. 
+     */
+    IAccessPointDiscoveryAgentOperations(const IAccessPointDiscoveryAgentOperations&) = delete;
+    IAccessPointDiscoveryAgentOperations& operator=(const IAccessPointDiscoveryAgentOperations&) = delete;
+    IAccessPointDiscoveryAgentOperations(IAccessPointDiscoveryAgentOperations&&) = delete;
+    IAccessPointDiscoveryAgentOperations& operator=(IAccessPointDiscoveryAgentOperations&&) = delete;
 
     /**
      * @brief Start the discovery process.

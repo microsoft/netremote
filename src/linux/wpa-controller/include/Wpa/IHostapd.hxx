@@ -18,10 +18,20 @@ namespace Wpa
  */
 struct IHostapd
 {
+    IHostapd() = default;
+
     /**
      * @brief Default destructor supporting polymorphic destruction.
      */
     virtual ~IHostapd() = default;
+    
+    /**
+     * Prevent copying and moving of IHostapd objects.
+     */
+    IHostapd(const IHostapd&) = delete;
+    IHostapd& operator=(const IHostapd&) = delete;
+    IHostapd(IHostapd&&) = delete;
+    IHostapd& operator=(IHostapd&&) = delete;
 
     /**
      * @brief Enables the interface for use.

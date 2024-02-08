@@ -33,10 +33,20 @@ private:
  */
 struct IAccessPointController
 {
+    IAccessPointController() = default;
+
     /**
      * @brief Destroy the IAccessPointController object.
      */
     virtual ~IAccessPointController() = default;
+
+    /**
+     * Prevent copying and moving of IAccessPointController objects. 
+     */
+    IAccessPointController(const IAccessPointController&) = delete;
+    IAccessPointController& operator=(const IAccessPointController&) = delete;
+    IAccessPointController(IAccessPointController&&) = delete;
+    IAccessPointController& operator=(IAccessPointController&&) = delete;
 
     /**
      * @brief Get the interface name associated with this controller.
@@ -90,6 +100,18 @@ struct IAccessPointController
  */
 struct IAccessPointControllerFactory
 {
+    IAccessPointControllerFactory() = default;
+
+    virtual ~IAccessPointControllerFactory() = default;
+
+    /**
+     * Prevent copying and moving of IAccessPointControllerFactory objects. 
+     */
+    IAccessPointControllerFactory(const IAccessPointControllerFactory&) = delete;
+    IAccessPointControllerFactory& operator=(const IAccessPointControllerFactory&) = delete;
+    IAccessPointControllerFactory(IAccessPointControllerFactory&&) = delete;
+    IAccessPointControllerFactory& operator=(IAccessPointControllerFactory&&) = delete;
+
     /**
      * @brief Create a new IAccessPointController object.
      *

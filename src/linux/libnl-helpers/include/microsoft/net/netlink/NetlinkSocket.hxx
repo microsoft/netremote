@@ -51,7 +51,7 @@ struct NetlinkSocket
      *
      * @param other The other instance to move from.
      */
-    NetlinkSocket(NetlinkSocket&& other);
+    NetlinkSocket(NetlinkSocket&& other) noexcept;
 
     /**
      * @brief Move-assign this instance from another instance. This takes
@@ -61,7 +61,7 @@ struct NetlinkSocket
      * @return NetlinkSocket&
      */
     NetlinkSocket&
-    operator=(NetlinkSocket&& other);
+    operator=(NetlinkSocket&& other) noexcept;
 
     /**
      * @brief Construct a new NetlinkSocket that manages a pre-existing struct
@@ -82,7 +82,7 @@ struct NetlinkSocket
      * @brief Reset the managed netlink socket, freeing it if it exists.
      */
     void
-    Reset();
+    Reset() noexcept;
 
     /**
      * @brief Release ownership of the managed netlink socket, returning it to
@@ -97,7 +97,7 @@ struct NetlinkSocket
      *
      * @return struct nl_sock * The netlink socket managed by this object.
      */
-    operator struct nl_sock *() const noexcept;
+    operator struct nl_sock *() const noexcept; // NOLINT(hicpp-explicit-conversions)
 };
 } // namespace Microsoft::Net::Netlink
 
