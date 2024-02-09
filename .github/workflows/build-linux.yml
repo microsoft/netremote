@@ -7,6 +7,7 @@ jobs:
   build:
     name: build linux
     permissions:
+      contents: read
       actions: read
       security-events: write
     runs-on: ubuntu-latest
