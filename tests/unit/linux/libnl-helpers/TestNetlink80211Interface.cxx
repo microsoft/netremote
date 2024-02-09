@@ -1,6 +1,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
+#include <netlink/attr.h>
 
 TEST_CASE("Nl80211Interface instance creation", "[linux][libnl-helpers]")
 {

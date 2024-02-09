@@ -18,13 +18,13 @@ NetRemoteCliHandler::NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOpe
 void
 NetRemoteCliHandler::SetParent(std::weak_ptr<NetRemoteCli> parent)
 {
-    m_parent = parent;
+    m_parent = std::move(parent);
 }
 
 void
 NetRemoteCliHandler::SetConnection(std::shared_ptr<NetRemoteServerConnection> connection)
 {
-    m_connection = connection;
+    m_connection = std::move(connection);
     m_operations = m_operationsFactory->Create(m_connection);
 }
 

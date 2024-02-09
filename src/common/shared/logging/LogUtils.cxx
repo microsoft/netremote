@@ -18,7 +18,7 @@ logging::GetLogName(std::string_view componentName)
 
     std::stringstream ss;
 
-    ss << std::put_time(std::localtime(&t_c), "%Y%m%d")
+    ss << std::put_time(std::localtime(&t_c), "%Y%m%d") // NOLINT(concurrency-mt-unsafe)
        << "-LogNetRemote-"
        << componentName
        << ".txt";

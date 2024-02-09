@@ -97,7 +97,7 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
 void
 NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
 {
-    WifiEnumerateAccessPointsRequest request{};
+    const WifiEnumerateAccessPointsRequest request{};
     WifiEnumerateAccessPointsResult result{};
     grpc::ClientContext clientContext{};
 

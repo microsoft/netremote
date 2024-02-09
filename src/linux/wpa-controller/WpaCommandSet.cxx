@@ -9,7 +9,6 @@
 using namespace Wpa;
 
 WpaCommandSet::WpaCommandSet(std::string_view propertyName, std::string_view propertyValue) :
-    WpaCommand(),
     PropertyPayload(std::format("{} {} {}", ProtocolWpa::CommandPayloadSet, propertyName, propertyValue)),
     PropertyName(propertyName),
     PropertyValue(propertyValue)

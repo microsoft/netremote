@@ -2,6 +2,7 @@
 #ifndef NETLINK_82011_HXX
 #define NETLINK_82011_HXX
 
+#include <cstdint>
 #include <optional>
 #include <string_view>
 #include <unordered_map>
@@ -22,7 +23,7 @@ enum class Nl80211MulticastGroup {
 /**
  * @brief Map of multicast group enum values to names.
  */
-static const std::unordered_map<Nl80211MulticastGroup, std::string_view> Nl80211MulticastGroupNames{
+static const std::unordered_map<Nl80211MulticastGroup, std::string_view> Nl80211MulticastGroupNames{ // NOLINT(cert-err58-cpp)
     { Nl80211MulticastGroup::Configuration, NL80211_MULTICAST_GROUP_CONFIG },
     { Nl80211MulticastGroup::Scan, NL80211_MULTICAST_GROUP_SCAN },
     { Nl80211MulticastGroup::Regulatory, NL80211_MULTICAST_GROUP_REG },
@@ -54,7 +55,7 @@ Nl80211InterfaceTypeToString(nl80211_iftype type) noexcept;
  * @return std::string_view
  */
 std::string_view
-Nl80211CipherSuiteToString(uint32_t cipherType) noexcept;
+Nl80211CipherSuiteToString(uint32_t cipherSuite) noexcept;
 
 /**
  * @brief Create a netlink socket for use with Nl80211.

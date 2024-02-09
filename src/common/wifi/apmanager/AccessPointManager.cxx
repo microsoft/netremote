@@ -121,7 +121,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
 
     // Add the agent.
     {
-        std::unique_lock<std::shared_mutex> discoveryAgentLock{ m_discoveryAgentsGate };
+        const std::unique_lock<std::shared_mutex> discoveryAgentLock{ m_discoveryAgentsGate };
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
@@ -134,7 +134,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
         // If the operation completed, get the results and add those access points.
         if (waitResult == std::future_status::ready) {
             auto existingAccessPoints = existingAccessPointsProbe.get();
-            for (const auto& existingAccessPoint : existingAccessPoints) {
+            for (auto& existingAccessPoint : existingAccessPoints) {
                 AddAccessPoint(std::move(existingAccessPoint));
             }
         } else {

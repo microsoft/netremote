@@ -29,9 +29,6 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
-using Microsoft::Net::Netlink::NetlinkMessage;
-using Microsoft::Net::Netlink::NetlinkSocket;
-
 Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
     Name(name),
     Type(type),
@@ -75,7 +72,7 @@ Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
     }
 
     // Tease out parameters to populate the Nl80211Interface instance.
-    auto *interfaceName = static_cast<const char *>(nla_data(newInterfaceMessageAttributes[NL80211_ATTR_IFNAME]));
+    const auto *interfaceName = static_cast<const char *>(nla_data(newInterfaceMessageAttributes[NL80211_ATTR_IFNAME]));
     auto interfaceType = static_cast<nl80211_iftype>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_IFTYPE]));
     auto interfaceIndex = static_cast<uint32_t>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_IFINDEX]));
     auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_WIPHY]));
@@ -108,10 +105,9 @@ HandleNl80211InterfaceDumpResponse(struct nl_msg *nl80211Message, void *context)
     if (!nl80211Interface.has_value()) {
         LOGW << "Failed to parse nl80211 interface dump response";
         return NL_SKIP;
-    } else {
-        LOGD << std::format("Parsed nl80211 interface dump response: {}", nl80211Interface->ToString());
     }
-
+    
+    LOGD << std::format("Parsed nl80211 interface dump response: {}", nl80211Interface->ToString());
     nl80211Interfaces.push_back(std::move(nl80211Interface.value()));
 
     return NL_OK;

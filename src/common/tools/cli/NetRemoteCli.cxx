@@ -17,8 +17,8 @@
 using namespace Microsoft::Net::Remote;
 
 NetRemoteCli::NetRemoteCli(std::shared_ptr<NetRemoteCliData> cliData, std::shared_ptr<NetRemoteCliHandler> cliHandler) :
-    m_cliData{ cliData },
-    m_cliHandler{ cliHandler },
+    m_cliData{ std::move(cliData) },
+    m_cliHandler{ std::move(cliHandler) },
     m_cliApp{ CreateParser() }
 {
 }
@@ -46,7 +46,7 @@ NetRemoteCli::GetData() const
 }
 
 int
-NetRemoteCli::Parse(int argc, char* argv[]) noexcept
+NetRemoteCli::Parse(int argc, char* argv[]) noexcept // NOLINT(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 {
     try {
         m_cliApp->parse(argc, argv);
@@ -66,7 +66,7 @@ NetRemoteCli::CreateParser() noexcept
 
     app->require_subcommand();
 
-    auto optionServer = app->add_option_function<std::string>("-s,--server", [this](const std::string& serverAddress) {
+    auto* optionServer = app->add_option_function<std::string>("-s,--server", [this](const std::string& serverAddress) {
         OnServerAddressChanged(serverAddress);
     });
     optionServer->description("The address of the netremote server to connect to, with format '<hostname>[:port]");
@@ -93,7 +93,7 @@ NetRemoteCli::AddSubcommandWifi(CLI::App* parent)
 CLI::App*
 NetRemoteCli::AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent)
 {
-    auto cliAppWifiEnumerateAccessPoints = parent->add_subcommand("enumerate-access-points", "Enumerate available Wi-Fi access points");
+    auto* cliAppWifiEnumerateAccessPoints = parent->add_subcommand("enumerate-access-points", "Enumerate available Wi-Fi access points");
     cliAppWifiEnumerateAccessPoints->alias("enumaps");
     cliAppWifiEnumerateAccessPoints->callback([this] {
         OnWifiEnumerateAccessPoints();
@@ -109,7 +109,7 @@ NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 
     // Append the default port if not specified in command-line argument.
     auto serverAddress = serverAddressArg;
-    if (serverAddress.find(':') == serverAddress.npos) {
+    if (serverAddress.find(':') == std::string::npos) {
         serverAddress += std::format("{}{}", NetRemoteProtocol::PortSeparator, NetRemoteProtocol::PortDefault);
     }
 

@@ -64,7 +64,7 @@ WifiVirtualDeviceManager::CreateInterfacesForDriver(uint32_t numberOfInterfaces,
 
     // Load the specified kernel module, which should create the simulated wireless interface(s).
     const auto driverLoadCommand = std::format("sudo modprobe {} {}", driverName, driverArguments);
-    int ret = std::system(driverLoadCommand.c_str()); // NOLINT(cert-env33-c, cert-err34-c)
+    int ret = std::system(driverLoadCommand.c_str()); // NOLINT(cert-env33-c, cert-err34-c, concurrency-mt-unsafe)
     if (ret == -1) {
         ret = WEXITSTATUS(ret);
         std::cerr << std::format("Failed to load {} driver, load command '{}' failed (ret={})\n", driverName, driverLoadCommand, ret);

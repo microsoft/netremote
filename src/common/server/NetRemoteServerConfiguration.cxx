@@ -60,7 +60,7 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
 
 /* static */
 NetRemoteServerConfiguration
-NetRemoteServerConfiguration::FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError)
+NetRemoteServerConfiguration::FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError) // NOLINT(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 {
     return details::ParseCliAppOptions(throwOnParseError, argc, argv);
 }

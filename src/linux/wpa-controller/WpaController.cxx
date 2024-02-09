@@ -53,14 +53,14 @@ WpaController::GetCommandControlSocket()
 {
     // Check if a socket connection is already established.
     {
-        std::shared_lock lockShared{ m_controlSocketCommandGate };
+        const std::shared_lock lockShared{ m_controlSocketCommandGate };
         if (m_controlSocketCommand != nullptr) {
             return m_controlSocketCommand;
         }
     }
 
     // Check if socket was updated between releasing the shared lock and acquiring the exclusive lock.
-    std::scoped_lock lockExclusive{ m_controlSocketCommandGate };
+    const std::scoped_lock lockExclusive{ m_controlSocketCommandGate };
     if (m_controlSocketCommand != nullptr) {
         return m_controlSocketCommand;
     }

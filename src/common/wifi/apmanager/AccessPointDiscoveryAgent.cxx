@@ -41,14 +41,14 @@ AccessPointDiscoveryAgent::GetInstance() noexcept
 void
 AccessPointDiscoveryAgent::RegisterDiscoveryEventCallback(AccessPointPresenceEventCallback onDevicePresenceChanged)
 {
-    std::unique_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
+    const std::unique_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     m_onDevicePresenceChanged = std::move(onDevicePresenceChanged);
 }
 
 void
 AccessPointDiscoveryAgent::DevicePresenceChanged(AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPoint) const noexcept
 {
-    std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
+    const std::shared_lock<std::shared_mutex> onDevicePresenceChangedLock{ m_onDevicePresenceChangedGate };
     if (m_onDevicePresenceChanged) {
         LOGI << std::format("Access Point Discovery Event: Interface {} {}", accessPoint->GetInterfaceName(), magic_enum::enum_name(presence));
         m_onDevicePresenceChanged(presence, std::move(accessPoint));
