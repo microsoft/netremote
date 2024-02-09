@@ -52,7 +52,7 @@ struct AccessPointOperationStatus
     static AccessPointOperationStatus
     MakeSucceeded() noexcept;
 
-      /**
+    /**
      * @brief Implicit bool operator allowing AccessPointOperationStatus to be used directly in condition statements
      * (eg. if (status) // ...).
      *

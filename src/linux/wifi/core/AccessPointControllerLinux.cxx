@@ -275,17 +275,51 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetSssid([[maybe_unused]] std::string_view ssid)
+AccessPointControllerLinux::SetSssid(std::string_view ssid)
 {
+    AccessPointOperationStatus status{};
+
     // Ensure the ssid is not empty.
     if (std::empty(ssid)) {
-        LOGE << std::format("Empty SSID specified for interface {}", GetInterfaceName());
-        return {}; // TODO
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Message = "SSID cannot be empty";
+        LOGE << std::format("No SSID specified for interface {}", GetInterfaceName());
+        return status;
     }
 
-    // TODO: implement
+    // Attempt to set the SSID.
+    try {
+        const bool propertyWasSet = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid);
+        if (!propertyWasSet) {
+            LOGE << std::format("Failed to set SSID '{}' for interface {} (rejected)", ssid, GetInterfaceName());
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = std::format("Access point rejected SSID value '{}'", ssid);
+            return status;
+        }
+    } catch (Wpa::HostapdException& ex) {
+        LOGE << std::format("Failed to set SSID '{}' for interface {} ({})", ssid, GetInterfaceName(), ex.what());
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = ex.what();
+        return status;
+    }
 
-    return {}; // TOOD
+    // Reload the configuration to pick up the changes.
+    try {
+        const bool reloaded = m_hostapd.Reload();
+        if (!reloaded) {
+            LOGE << std::format("Failed to set SSID '{}' for interface {} (configuration reload failed)", ssid, GetInterfaceName());
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = "Failed to reload access point configuration";
+            return status;
+        }
+    } catch (Wpa::HostapdException& ex) {
+        LOGE << std::format("Failed to set SSID '{}' for interface {} ({})", ssid, GetInterfaceName(), ex.what());
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = ex.what();
+        return status;
+    }
+
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 std::unique_ptr<IAccessPointController>

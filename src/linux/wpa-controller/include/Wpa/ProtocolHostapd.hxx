@@ -201,6 +201,8 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
+    static constexpr auto PropertyNameSsid = "ssid";
+
 // Macros below used to avoid repeating the same string literals in multiple places.
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER "="
