@@ -16,6 +16,7 @@ enum class AccessPointOperationStatusCode {
     AccessPointInvalid,
     AccessPointNotEnabled,
     OperationNotSupported,
+    InternalError,
 };
 
 /**

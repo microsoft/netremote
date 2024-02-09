@@ -32,6 +32,8 @@ ToDot11AccessPointOperationStatusCode(AccessPointOperationStatusCode& accessPoin
         return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointNotEnabled;
     case AccessPointOperationStatusCode::OperationNotSupported:
         return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported;
+    case AccessPointOperationStatusCode::InternalError:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError;
     case AccessPointOperationStatusCode::Unknown:
     default:
         return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeUnknown;
@@ -52,6 +54,8 @@ FromDot11AccessPointOperationStatusCode(WifiAccessPointOperationStatusCode wifiA
         return AccessPointOperationStatusCode::AccessPointNotEnabled;
     case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported:
         return AccessPointOperationStatusCode::OperationNotSupported;
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError:
+        return AccessPointOperationStatusCode::InternalError;
     case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeUnknown:
     default:
         return AccessPointOperationStatusCode::Unknown;
