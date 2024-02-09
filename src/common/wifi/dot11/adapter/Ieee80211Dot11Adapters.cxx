@@ -7,6 +7,7 @@
 
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
@@ -14,6 +15,49 @@
 
 namespace Microsoft::Net::Wifi
 {
+using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
+using Microsoft::Net::Wifi::AccessPointOperationStatusCode;
+
+WifiAccessPointOperationStatusCode
+ToDot11AccessPointOperationStatusCode(AccessPointOperationStatusCode& accessPointOperationStatusCode) noexcept
+{
+    switch (accessPointOperationStatusCode) {
+    case AccessPointOperationStatusCode::Succeeded:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded;
+    case AccessPointOperationStatusCode::InvalidParameter:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter;
+    case AccessPointOperationStatusCode::AccessPointInvalid:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid;
+    case AccessPointOperationStatusCode::AccessPointNotEnabled:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointNotEnabled;
+    case AccessPointOperationStatusCode::OperationNotSupported:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported;
+    case AccessPointOperationStatusCode::Unknown:
+    default:
+        return WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeUnknown;
+    }
+}
+
+AccessPointOperationStatusCode
+FromDot11AccessPointOperationStatusCode(WifiAccessPointOperationStatusCode wifiAccessPointOperationStatusCode) noexcept
+{
+    switch (wifiAccessPointOperationStatusCode) {
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded:
+        return AccessPointOperationStatusCode::Succeeded;
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter:
+        return AccessPointOperationStatusCode::InvalidParameter;
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid:
+        return AccessPointOperationStatusCode::AccessPointInvalid;
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointNotEnabled:
+        return AccessPointOperationStatusCode::AccessPointNotEnabled;
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported:
+        return AccessPointOperationStatusCode::OperationNotSupported;
+    case WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeUnknown:
+    default:
+        return AccessPointOperationStatusCode::Unknown;
+    }
+}
+
 using Microsoft::Net::Wifi::Dot11PhyType;
 using Microsoft::Net::Wifi::Ieee80211Protocol;
 

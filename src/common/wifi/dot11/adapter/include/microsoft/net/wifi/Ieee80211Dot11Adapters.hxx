@@ -4,12 +4,32 @@
 
 #include <vector>
 
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
 {
+/**
+ * @brief Convert the specified WifiAccessPointOperationStatusCode to the equivalent AccessPointOperationStatus.
+ *
+ * @param accessPointOperationStatusCode The WifiAccessPointOperationStatusCode to convert.
+ * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode
+ */
+Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode
+ToDot11AccessPointOperationStatusCode(Microsoft::Net::Wifi::AccessPointOperationStatusCode& accessPointOperationStatusCode) noexcept;
+
+/**
+ * @brief Convert the specified AccessPointOperationStatus to the equivalent WifiAccessPointOperationStatusCode.
+ *
+ * @param wifiAccessPointOperationStatusCode The AccessPointOperationStatus to convert.
+ * @return Microsoft::Net::Wifi::AccessPointOperationStatusCode
+ */
+Microsoft::Net::Wifi::AccessPointOperationStatusCode
+FromDot11AccessPointOperationStatusCode(Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode wifiAccessPointOperationStatusCode) noexcept;
+
 /**
  * @brief Convert the specified Dot11PhyType to the equivalent IEEE 802.11 protocol.
  *
