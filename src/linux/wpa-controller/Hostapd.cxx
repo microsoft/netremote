@@ -61,7 +61,7 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
         throw HostapdException("Failed to send hostapd 'get' command");
     }
 
-    // Check Failed() and not IsOk() since the response will indicate failure
+    // Check Failed() instead of IsOk() since the response will indicate failure
     // with "FAIL", otherwise, the payload is the property value (not "OK").
     if (response->Failed()) {
         return false;
