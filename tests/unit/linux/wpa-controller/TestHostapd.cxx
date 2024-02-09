@@ -1,8 +1,12 @@
 
+#include <chrono>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <thread>
 
 #include <Wpa/Hostapd.hxx>
+#include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <catch2/catch_test_macros.hpp>
 
@@ -13,7 +17,7 @@ namespace Wpa::Test
 std::string_view
 GetPropertyEnablementValue(int valueToSet)
 {
-    return !!valueToSet ? ProtocolHostapd::PropertyEnabled : ProtocolHostapd::PropertyDisabled;
+    return (valueToSet != 0) ? ProtocolHostapd::PropertyEnabled : ProtocolHostapd::PropertyDisabled;
 }
 } // namespace Wpa::Test
 

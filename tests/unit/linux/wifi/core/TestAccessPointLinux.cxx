@@ -1,7 +1,9 @@
 
 #include <memory>
+#include <optional>
 
 #include <catch2/catch_test_macros.hpp>
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 

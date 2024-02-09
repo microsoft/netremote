@@ -1,11 +1,20 @@
 
+#include <algorithm>
+#include <array>
+#include <cstdint>
 #include <format>
+#include <iterator>
+#include <linux/nl80211.h>
+#include <optional>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211WiphyBand.hxx>
+#include <microsoft/net/netlink/nl80211/Netlink80211WiphyBandFrequency.hxx>
 #include <netlink/attr.h>
-#include <netlink/genl/genl.h>
+#include <netlink/errno.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Netlink::Nl80211;
@@ -42,7 +51,7 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
         vhtCapabilities = nla_get_u32(wiphyBandAttributes[NL80211_BAND_ATTR_VHT_CAPA]);
         if (wiphyBandAttributes[NL80211_BAND_ATTR_VHT_MCS_SET] != nullptr) {
             vhtMcsSetOpt.emplace();
-            auto& vhtMcsSet = vhtMcsSetOpt.value();
+            auto &vhtMcsSet = vhtMcsSetOpt.value();
             std::copy_n(static_cast<uint8_t *>(nla_data(wiphyBandAttributes[NL80211_BAND_ATTR_VHT_MCS_SET])), std::size(vhtMcsSet), std::begin(vhtMcsSet));
         }
     }

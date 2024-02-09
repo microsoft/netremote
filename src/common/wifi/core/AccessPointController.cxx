@@ -1,4 +1,6 @@
 
+#include <string_view>
+
 #include <microsoft/net/wifi/AccessPointController.hxx>
 
 using namespace Microsoft::Net::Wifi;

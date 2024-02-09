@@ -8,7 +8,7 @@
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/MessageOnlyFormatter.h>
 #include <plog/Init.h>
-#include <plog/Log.h>
+#include <plog/Severity.h>
 
 using Microsoft::Net::Remote::NetRemoteCli;
 using Microsoft::Net::Remote::NetRemoteCliData;

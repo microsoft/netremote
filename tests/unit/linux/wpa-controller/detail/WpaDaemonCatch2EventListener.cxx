@@ -1,19 +1,24 @@
 
 #include <algorithm>
-#include <cctype>
 #include <format>
 #include <iostream>
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <stdexcept>
 #include <string>
+#include <utility>
+#include <vector>
 
+#include <Wpa/WpaCore.hxx>
 #include <catch2/catch_test_case_info.hpp>
 #include <catch2/interfaces/catch_interfaces_reporter.hpp>
 #include <magic_enum.hpp>
 #include <strings/StringHelpers.hxx>
 
 #include "WpaDaemonCatch2EventListener.hxx"
+#include "detail/WifiVirtualDeviceManager.hxx"
+#include "detail/WpaDaemonInstance.hxx"
 
 namespace detail
 {
@@ -44,7 +49,7 @@ GetWpaDaemonTypeFromTags(const std::vector<Catch::Tag>& tags)
     });
 
     // Find the first entry which matches the tag name, ignoring case.
-    const auto result = std::ranges::find_first_of(wpaNames, tagNames, CaseInsensitiveStringEquals);
+    const auto* const result = std::ranges::find_first_of(wpaNames, tagNames, CaseInsensitiveStringEquals);
     if (result != std::cend(wpaNames)) {
         return magic_enum::enum_cast<Wpa::WpaType>(*result).value();
     }
@@ -60,7 +65,7 @@ WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& testIn
     // Determine if this test case has a tag corresponding to a wpa daemon type (WpaType).
     const auto wpaType = detail::GetWpaDaemonTypeFromTags(testInfo.tags);
     if (!wpaType.has_value()) {
-        std::cout << "Test case does not contain WpaType tag." << std::endl;
+        std::cout << "Test case does not contain WpaType tag.\n";
         return;
     }
 
@@ -69,8 +74,8 @@ WpaDaemonCatch2EventListener::testCaseStarting(Catch::TestCaseInfo const& testIn
     std::cout << std::format("Test case for {} daemon starting\n", wpaDaemon);
 
     // Remove any existing mac80211_hwsim virtual wifi devices for the test case.
-    const auto driverMac8021Hwsim = WifiVirtualDeviceManager::DriverMac80211HwsimName;
-    const auto driverRemoved = m_wifiVirtualDeviceManager.RemoveInterfaces(driverMac8021Hwsim);
+    const auto* driverMac8021Hwsim = WifiVirtualDeviceManager::DriverMac80211HwsimName;
+    const auto driverRemoved = WifiVirtualDeviceManager::RemoveInterfaces(driverMac8021Hwsim);
     if (!driverRemoved) {
         throw std::runtime_error(std::format("Failed to remove {} virtual wifi devices for test case.", driverMac8021Hwsim));
     }
@@ -112,7 +117,7 @@ WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& testCase
 {
     const auto wpaType = detail::GetWpaDaemonTypeFromTags(testCaseStats.testInfo->tags);
     if (!wpaType.has_value()) {
-        std::cout << "Test case does not contain WpaType tag." << std::endl;
+        std::cout << "Test case does not contain WpaType tag.\n";
         return;
     }
 
@@ -121,7 +126,7 @@ WpaDaemonCatch2EventListener::testCaseEnded(Catch::TestCaseStats const& testCase
     std::cout << std::format("Test case for {} daemon stopping\n", wpaDaemon);
     auto wpaDaemonInstanceNode = m_wpaDaemonInstances.extract(wpaType.value());
     if (wpaDaemonInstanceNode.empty()) {
-        std::cout << std::format("Test case for {} daemon does not have an instance.", wpaDaemon) << std::endl;
+        std::cout << std::format("Test case for {} daemon does not have an instance.\n", wpaDaemon);
         return;
     }
 

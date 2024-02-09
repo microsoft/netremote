@@ -1,4 +1,6 @@
 
+#include <string_view>
+
 #include <Wpa/WpaCore.hxx>
 
 std::string_view

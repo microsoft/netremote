@@ -3,10 +3,12 @@
 #define ACCESS_POINT_TEST_HXX
 
 #include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
@@ -32,7 +34,7 @@ struct AccessPointTest final :
      *
      * @param interfaceName The interface name to use for the access point.
      */
-    AccessPointTest(std::string_view interfaceName);
+    explicit AccessPointTest(std::string_view interfaceName);
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and capabilities.
@@ -42,12 +44,25 @@ struct AccessPointTest final :
      */
     AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities);
 
+    AccessPointTest() = delete;
+    ~AccessPointTest() override = default;
+
+    /**
+     * Prevent copying and moving of this object.
+     */
+    AccessPointTest(const AccessPointTest&) = delete;
+    AccessPointTest&
+    operator=(const AccessPointTest&) = delete;
+    AccessPointTest(AccessPointTest&&) = delete;
+    AccessPointTest&
+    operator=(AccessPointTest&&) = delete;
+
     /**
      * @brief Get the interface name of the access point.
      *
      * @return std::string_view
      */
-    virtual std::string_view
+    std::string_view
     GetInterfaceName() const override;
 
     /**
@@ -55,7 +70,7 @@ struct AccessPointTest final :
      *
      * @return std::unique_ptr<IAccessPointController>
      */
-    virtual std::unique_ptr<IAccessPointController>
+    std::unique_ptr<IAccessPointController>
     CreateController() override;
 };
 
@@ -67,7 +82,17 @@ struct AccessPointFactoryTest :
     public Microsoft::Net::Wifi::IAccessPointFactory
 {
     AccessPointFactoryTest() = default;
-    ~AccessPointFactoryTest() = default;
+    ~AccessPointFactoryTest() override = default;
+
+    /**
+     * Prevent copying and moving of this object.
+     */
+    AccessPointFactoryTest(const AccessPointFactoryTest&) = delete;
+    AccessPointFactoryTest&
+    operator=(const AccessPointFactoryTest&) = delete;
+    AccessPointFactoryTest(AccessPointFactoryTest&&) = delete;
+    AccessPointFactoryTest&
+    operator=(AccessPointFactoryTest&&) = delete;
 
     /**
      * @brief Create an AccessPoint for testing purposes.

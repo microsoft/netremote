@@ -1,12 +1,17 @@
 
+#include <filesystem>
 #include <memory>
 #include <optional>
+#include <string_view>
 
+#include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaResponse.hxx>
+#include <Wpa/WpaController.hxx>
+#include <Wpa/WpaCore.hxx>
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum.hpp>
 
 #include "detail/WpaDaemonManager.hxx"
-#include <Wpa/WpaController.hxx>
 
 namespace TestDetail
 {
@@ -25,11 +30,11 @@ TEST_CASE("Send/receive WpaController request/response (root)", "[wpa][hostapd][
         for (const auto& wpaType : TestDetail::WpaTypesSupported) {
             WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType);
 
-            WpaCommand wpaCommand("PING");
+            const WpaCommand wpaCommand("PING");
             std::shared_ptr<WpaResponse> wpaResponse;
             REQUIRE_NOTHROW(wpaResponse = wpaController.SendCommand(wpaCommand));
             REQUIRE(wpaResponse != nullptr);
-            REQUIRE(wpaResponse->Payload.starts_with("PONG"));
+            REQUIRE(wpaResponse->Payload().starts_with("PONG"));
         }
     }
 }
@@ -54,7 +59,7 @@ TEST_CASE("Create a WpaController", "[wpa][client][local]")
     SECTION("Create for each daemon type reflects correct type")
     {
         for (const auto& wpaType : magic_enum::enum_values<WpaType>()) {
-            WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType);
+            const WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType);
             REQUIRE(wpaController.Type() == wpaType);
         }
     }
@@ -87,7 +92,7 @@ TEST_CASE("Create a WpaController", "[wpa][client][local]")
     {
         for (const auto& wpaType : magic_enum::enum_values<WpaType>()) {
             // Create with control socket path encoded as std::filesystem::path.
-            WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType, ControlSocketPath);
+            const WpaController wpaController(WpaDaemonManager::InterfaceNameDefault, wpaType, ControlSocketPath);
             REQUIRE(wpaController.ControlSocketPath() == ControlSocketPath);
         }
     }

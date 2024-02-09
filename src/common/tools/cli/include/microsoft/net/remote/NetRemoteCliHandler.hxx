@@ -17,14 +17,24 @@ struct NetRemoteCli;
  */
 struct NetRemoteCliHandler
 {
+    NetRemoteCliHandler() = default;
+
     virtual ~NetRemoteCliHandler() = default;
+
+    /**
+     * Prevent copying and moving of NetRemoteCliHandler objects. 
+     */
+    NetRemoteCliHandler(const NetRemoteCliHandler&) = delete;
+    NetRemoteCliHandler& operator=(const NetRemoteCliHandler&) = delete;
+    NetRemoteCliHandler(NetRemoteCliHandler&&) = delete;
+    NetRemoteCliHandler& operator=(NetRemoteCliHandler&&) = delete;
 
     /**
      * @brief Construct a new NetRemoteCliHandler object.
      *
      * @param operationsFactory The factory to use to create the operations instance to use for handling commands.
      */
-    NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory);
+    explicit NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory);
 
     /**
      * @brief Assign the parent NetRemoteCli object.

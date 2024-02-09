@@ -2,7 +2,6 @@
 #ifndef WPA_CONTROLLER_HXX
 #define WPA_CONTROLLER_HXX
 
-#include <concepts>
 #include <filesystem>
 #include <memory>
 #include <shared_mutex>

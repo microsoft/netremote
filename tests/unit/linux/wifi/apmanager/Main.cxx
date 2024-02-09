@@ -3,9 +3,10 @@
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/MessageOnlyFormatter.h>
 #include <plog/Init.h>
-#include <plog/Log.h>
+#include <plog/Severity.h>
 
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
 

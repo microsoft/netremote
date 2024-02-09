@@ -1,9 +1,16 @@
 
+#include <memory>
 #include <stdexcept>
+#include <string_view>
+#include <utility>
+
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
+#include <microsoft/net/wifi/AccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
-#include <plog/Log.h>
 
 using Microsoft::Net::Netlink::Nl80211::Nl80211Interface;
 
@@ -30,7 +37,7 @@ AccessPointFactoryLinux::Create(std::string_view interfaceName)
 std::shared_ptr<IAccessPoint>
 AccessPointFactoryLinux::Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs)
 {
-    auto createArgsLinux = dynamic_cast<AccessPointCreateArgsLinux *>(createArgs.get());
+    auto *createArgsLinux = dynamic_cast<AccessPointCreateArgsLinux *>(createArgs.get());
     if (createArgsLinux == nullptr) {
         throw std::runtime_error("invalid arguments passed to AccessPointFactoryLinux::Create; this is a bug!");
     }

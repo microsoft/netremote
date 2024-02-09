@@ -2,11 +2,9 @@
 #ifndef HOSTAPD_PROTOCOL_HXX
 #define HOSTAPD_PROTOCOL_HXX
 
-#include <array>
-#include <cstdint>
 #include <optional>
 #include <string>
-#include <vector>
+#include <string_view>
 
 #include <Wpa/ProtocolWpa.hxx>
 
@@ -203,6 +201,8 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
+// Macros below used to avoid repeating the same string literals in multiple places.
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER "="
 #define HOSTAPD_PROPERTY_NAME_IEEE80211N     "ieee80211n"
 #define HOSTAPD_PROPERTY_NAME_DISABLE11N     "disable_11n"
@@ -214,6 +214,7 @@ struct ProtocolHostapd :
 
 // Helper macro to create a hostapd configuration file key with value delimiter.
 #define HOSTAPD_DELIMITED_KEY(name) name HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER
+    // NOLINTEND(cppcoreguidelines-macro-usage)
 
     static constexpr auto ProperyKeyValueNameDelimeter = HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER;
     static constexpr auto PropertyNameIeee80211N = HOSTAPD_PROPERTY_NAME_IEEE80211N;

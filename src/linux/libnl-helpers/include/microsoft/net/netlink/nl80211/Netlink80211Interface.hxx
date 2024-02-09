@@ -23,8 +23,8 @@ struct Nl80211Interface
 {
     std::string Name;
     nl80211_iftype Type{ nl80211_iftype::NL80211_IFTYPE_UNSPECIFIED };
-    uint32_t Index;
-    uint32_t WiphyIndex;
+    uint32_t Index{ 0 };
+    uint32_t WiphyIndex{ 0 };
 
     Nl80211Interface() = default;
 

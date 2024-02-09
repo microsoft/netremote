@@ -1,12 +1,15 @@
 
 #include <array>
+#include <cstdint>
 #include <format>
+#include <optional>
 #include <sstream>
+#include <string>
 
-#include <magic_enum.hpp>
+#include <linux/nl80211.h>
 #include <microsoft/net/netlink/nl80211/Netlink80211WiphyBandFrequency.hxx>
 #include <netlink/attr.h>
-#include <netlink/genl/genl.h>
+#include <netlink/errno.h>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Netlink::Nl80211;

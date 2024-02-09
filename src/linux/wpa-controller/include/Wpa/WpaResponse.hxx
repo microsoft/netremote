@@ -29,7 +29,15 @@ struct WpaResponse
      *
      * @param payload The payload of a WPA control command response.
      */
-    WpaResponse(std::string_view payload);
+    explicit WpaResponse(std::string_view payload);
+
+    /**
+     * Prevent copying and moving of this object. 
+     */
+    WpaResponse(const WpaResponse&) = delete;
+    WpaResponse& operator=(const WpaResponse&) = delete;
+    WpaResponse(WpaResponse&&) = delete;
+    WpaResponse& operator=(WpaResponse&&) = delete;
 
     /**
      * @brief Implicit bool operator allowing WpaResponse to be used directly in
@@ -38,7 +46,7 @@ struct WpaResponse
      * @return true
      * @return false
      */
-    operator bool() const;
+    operator bool() const; // NOLINT(hicpp-explicit-conversions)
 
     /**
      * @brief Indicates whether the response describes a successful result.
@@ -58,17 +66,16 @@ struct WpaResponse
     bool
     Failed() const;
 
-private:
     /**
-     * @brief Note: this must be declared prior to Payload since Payload is
-     * initialized with its contents and the constructor initialization order
-     * follows the order of declaration irrespective of the order of
-     * initialization in the constructor.
+     * @brief Provides the response payload.
+     * 
+     * @return std::string_view 
      */
-    const std::string m_payload;
+    std::string_view
+    Payload() const;
 
-public:
-    std::string_view Payload;
+private:
+    std::string m_payload;
 };
 } // namespace Wpa
 

@@ -3,7 +3,6 @@
 #define MICROSOFT_NET_NETLINK_NETLINK_SOCKET_HXX
 
 #include <netlink/netlink.h>
-#include <netlink/socket.h>
 
 namespace Microsoft::Net::Netlink
 {
@@ -51,7 +50,7 @@ struct NetlinkSocket
      *
      * @param other The other instance to move from.
      */
-    NetlinkSocket(NetlinkSocket&& other);
+    NetlinkSocket(NetlinkSocket&& other) noexcept;
 
     /**
      * @brief Move-assign this instance from another instance. This takes
@@ -61,7 +60,7 @@ struct NetlinkSocket
      * @return NetlinkSocket&
      */
     NetlinkSocket&
-    operator=(NetlinkSocket&& other);
+    operator=(NetlinkSocket&& other) noexcept;
 
     /**
      * @brief Construct a new NetlinkSocket that manages a pre-existing struct
@@ -70,7 +69,7 @@ struct NetlinkSocket
      *
      * @param socket The netlink socket to manage.
      */
-    NetlinkSocket(struct nl_sock* socket);
+    explicit NetlinkSocket(struct nl_sock* socket);
 
     /**
      * @brief Destroy the NetlinkSocket object, freeing the managed netlink
@@ -82,7 +81,7 @@ struct NetlinkSocket
      * @brief Reset the managed netlink socket, freeing it if it exists.
      */
     void
-    Reset();
+    Reset() noexcept;
 
     /**
      * @brief Release ownership of the managed netlink socket, returning it to
@@ -97,7 +96,7 @@ struct NetlinkSocket
      *
      * @return struct nl_sock * The netlink socket managed by this object.
      */
-    operator struct nl_sock *() const noexcept;
+    operator struct nl_sock *() const noexcept; // NOLINT(hicpp-explicit-conversions)
 };
 } // namespace Microsoft::Net::Netlink
 

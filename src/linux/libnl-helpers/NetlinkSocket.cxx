@@ -1,5 +1,7 @@
 
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <netlink/handlers.h>
+#include <netlink/socket.h>
 
 using namespace Microsoft::Net::Netlink;
 
@@ -7,7 +9,7 @@ using namespace Microsoft::Net::Netlink;
 NetlinkSocket
 NetlinkSocket::Allocate()
 {
-    auto socket = nl_socket_alloc();
+    auto* socket = nl_socket_alloc();
     return NetlinkSocket{ socket };
 }
 
@@ -16,14 +18,14 @@ NetlinkSocket::NetlinkSocket(struct nl_sock* socket) :
 {
 }
 
-NetlinkSocket::NetlinkSocket(NetlinkSocket&& other) :
+NetlinkSocket::NetlinkSocket(NetlinkSocket&& other) noexcept :
     Socket(other.Socket)
 {
     other.Socket = nullptr;
 }
 
 NetlinkSocket&
-NetlinkSocket::operator=(NetlinkSocket&& other)
+NetlinkSocket::operator=(NetlinkSocket&& other) noexcept
 {
     if (this != &other) {
         Reset();
@@ -40,7 +42,7 @@ NetlinkSocket::~NetlinkSocket()
 }
 
 void
-NetlinkSocket::Reset()
+NetlinkSocket::Reset() noexcept
 {
     if (Socket != nullptr) {
         nl_socket_free(Socket);
@@ -51,7 +53,7 @@ NetlinkSocket::Reset()
 struct nl_sock*
 NetlinkSocket::Release() noexcept
 {
-    auto socket = Socket;
+    auto* socket = Socket;
     Socket = nullptr;
     return socket;
 }

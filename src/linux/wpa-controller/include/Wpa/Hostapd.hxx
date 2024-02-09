@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include <Wpa/IHostapd.hxx>
+#include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/WpaController.hxx>
 
 namespace Wpa
@@ -21,7 +22,7 @@ struct Hostapd :
      *
      * @param interfaceName The name of the intrerface to control. Eg. wlan1.
      */
-    Hostapd(std::string_view interfaceName);
+    explicit Hostapd(std::string_view interfaceName);
 
     /**
      * @brief Enables the interface for use.

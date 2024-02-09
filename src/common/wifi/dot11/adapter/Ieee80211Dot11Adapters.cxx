@@ -1,8 +1,16 @@
 
+#include <algorithm>
+#include <cstddef>
+#include <iterator>
 #include <ranges>
 #include <vector>
 
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
+#include <notstd/Exceptions.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -116,9 +124,9 @@ using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
 using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
 
 Dot11AuthenticationAlgorithm
-ToDot11AuthenticationAlgorithm(const Ieee80211AuthenticationAlgorithm ieeeAuthenticationAlgorithm) noexcept
+ToDot11AuthenticationAlgorithm(const Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept
 {
-    switch (ieeeAuthenticationAlgorithm) {
+    switch (ieee80211AuthenticationAlgorithm) {
     case Ieee80211AuthenticationAlgorithm::OpenSystem:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmOpenSystem;
     case Ieee80211AuthenticationAlgorithm::SharedKey:
@@ -171,9 +179,9 @@ using Microsoft::Net::Wifi::Dot11AkmSuite;
 using Microsoft::Net::Wifi::Ieee80211AkmSuite;
 
 Dot11AkmSuite
-ToDot11AkmSuite(const Ieee80211AkmSuite ieeeAkmSuite) noexcept
+ToDot11AkmSuite(const Ieee80211AkmSuite ieee80211AkmSuite) noexcept
 {
-    switch (ieeeAkmSuite) {
+    switch (ieee80211AkmSuite) {
     case Ieee80211AkmSuite::Reserved0:
         return Dot11AkmSuite::Dot11AkmSuiteReserved0;
     case Ieee80211AkmSuite::Ieee8021x:
@@ -276,9 +284,9 @@ using Microsoft::Net::Wifi::Dot11CipherSuite;
 using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
 Dot11CipherSuite
-ToDot11CipherSuite(const Ieee80211CipherSuite ieeeCipherSuite) noexcept
+ToDot11CipherSuite(const Ieee80211CipherSuite ieee80211CipherSuite) noexcept
 {
-    switch (ieeeCipherSuite) {
+    switch (ieee80211CipherSuite) {
     case Ieee80211CipherSuite::BipCmac128:
         return Dot11CipherSuite::Dot11CipherSuiteBipCmac128;
     case Ieee80211CipherSuite::BipCmac256:
@@ -350,36 +358,36 @@ using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
 using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
 Dot11AccessPointCapabilities
-ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities ieeeAccessPointCapabilities) noexcept
+ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept
 {
     Dot11AccessPointCapabilities dot11Capabilities{};
 
-    std::vector<Dot11PhyType> phyTypes(std::size(ieeeAccessPointCapabilities.Protocols));
-    std::ranges::transform(ieeeAccessPointCapabilities.Protocols, std::begin(phyTypes), ToDot11PhyType);
+    std::vector<Dot11PhyType> phyTypes(std::size(ieee80211AccessPointCapabilities.Protocols));
+    std::ranges::transform(ieee80211AccessPointCapabilities.Protocols, std::begin(phyTypes), ToDot11PhyType);
 
     *dot11Capabilities.mutable_phytypes() = {
         std::make_move_iterator(std::begin(phyTypes)),
         std::make_move_iterator(std::end(phyTypes))
     };
 
-    std::vector<Dot11FrequencyBand> bands(std::size(ieeeAccessPointCapabilities.FrequencyBands));
-    std::ranges::transform(ieeeAccessPointCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
+    std::vector<Dot11FrequencyBand> bands(std::size(ieee80211AccessPointCapabilities.FrequencyBands));
+    std::ranges::transform(ieee80211AccessPointCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
 
     *dot11Capabilities.mutable_bands() = {
         std::make_move_iterator(std::begin(bands)),
         std::make_move_iterator(std::end(bands))
     };
 
-    std::vector<Dot11AkmSuite> akmSuites(std::size(ieeeAccessPointCapabilities.AkmSuites));
-    std::ranges::transform(ieeeAccessPointCapabilities.AkmSuites, std::begin(akmSuites), ToDot11AkmSuite);
+    std::vector<Dot11AkmSuite> akmSuites(std::size(ieee80211AccessPointCapabilities.AkmSuites));
+    std::ranges::transform(ieee80211AccessPointCapabilities.AkmSuites, std::begin(akmSuites), ToDot11AkmSuite);
 
     *dot11Capabilities.mutable_akmsuites() = {
         std::make_move_iterator(std::begin(akmSuites)),
         std::make_move_iterator(std::end(akmSuites))
     };
 
-    std::vector<Dot11CipherSuite> cipherSuites(std::size(ieeeAccessPointCapabilities.CipherSuites));
-    std::ranges::transform(ieeeAccessPointCapabilities.CipherSuites, std::begin(cipherSuites), ToDot11CipherSuite);
+    std::vector<Dot11CipherSuite> cipherSuites(std::size(ieee80211AccessPointCapabilities.CipherSuites));
+    std::ranges::transform(ieee80211AccessPointCapabilities.CipherSuites, std::begin(cipherSuites), ToDot11CipherSuite);
 
     *dot11Capabilities.mutable_ciphersuites() = {
         std::make_move_iterator(std::begin(cipherSuites)),
@@ -390,14 +398,9 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities ieeeAccess
 }
 
 Ieee80211AccessPointCapabilities
-FromDot11AccessPointCapabilities([[maybe_unused]] const Dot11AccessPointCapabilities dot11AccessPointCapabilities) noexcept
+FromDot11AccessPointCapabilities([[maybe_unused]] const Dot11AccessPointCapabilities& dot11AccessPointCapabilities) /* noexcept */
 {
-    Ieee80211AccessPointCapabilities ieee80211Capabilities{};
-
-    std::vector<Ieee80211Protocol> protocols(static_cast<std::size_t>(std::size(dot11AccessPointCapabilities.phytypes())));
-    // TODO
-
-    return {};
+    throw notstd::NotImplementedException();
 }
 
 } // namespace Microsoft::Net::Wifi

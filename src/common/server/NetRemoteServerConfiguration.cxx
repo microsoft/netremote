@@ -1,7 +1,10 @@
 
+#include <string>
 #include <utility>
+#include <vector>
 
-#include <CLI/CLI.hpp>
+#include <CLI/App.hpp>
+#include <CLI/Error.hpp>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 
 using namespace Microsoft::Net::Remote;
@@ -46,7 +49,7 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
         app.parse(std::forward<Args>(args)...);
     } catch (const CLI::ParseError& parseError) {
         if (throwOnParseError) {
-            throw parseError;
+            throw parseError;   // NOLINT(cert-err60-cpp)
         }
     }
 
@@ -57,7 +60,7 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
 
 /* static */
 NetRemoteServerConfiguration
-NetRemoteServerConfiguration::FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError)
+NetRemoteServerConfiguration::FromCommandLineArguments(int argc, char* argv[], bool throwOnParseError) // NOLINT(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 {
     return details::ParseCliAppOptions(throwOnParseError, argc, argv);
 }

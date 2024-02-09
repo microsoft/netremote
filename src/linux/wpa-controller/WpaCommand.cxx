@@ -1,12 +1,23 @@
 
+#include <memory>
+#include <string_view>
+
 #include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaResponse.hxx>
+#include <Wpa/WpaResponseParser.hxx>
 
 using namespace Wpa;
 
 void
 WpaCommand::SetPayload(std::string_view payload)
 {
-    Payload = payload;
+    m_payload = payload;
+}
+
+std::string_view
+WpaCommand::GetPayload() const noexcept
+{
+    return m_payload;
 }
 
 std::shared_ptr<WpaResponse>

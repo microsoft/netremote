@@ -1,4 +1,6 @@
 
+#include <string_view>
+
 #include <Wpa/IHostapd.hxx>
 
 using namespace Wpa;

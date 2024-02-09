@@ -1,13 +1,22 @@
 
 #include <algorithm>
-#include <chrono>
+#include <chrono> // NOLINT(misc-include-cleaner)
+#include <format>
+#include <future>
 #include <iterator>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <shared_mutex>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include <magic_enum.hpp>
-#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>
 
@@ -112,7 +121,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
 
     // Add the agent.
     {
-        std::unique_lock<std::shared_mutex> discoveryAgentLock{ m_discoveryAgentsGate };
+        const std::unique_lock<std::shared_mutex> discoveryAgentLock{ m_discoveryAgentsGate };
         m_discoveryAgents.push_back(std::move(discoveryAgent));
     }
 
@@ -125,7 +134,7 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
         // If the operation completed, get the results and add those access points.
         if (waitResult == std::future_status::ready) {
             auto existingAccessPoints = existingAccessPointsProbe.get();
-            for (const auto& existingAccessPoint : existingAccessPoints) {
+            for (auto& existingAccessPoint : existingAccessPoints) {
                 AddAccessPoint(std::move(existingAccessPoint));
             }
         } else {

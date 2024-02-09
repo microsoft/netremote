@@ -1,14 +1,15 @@
 
-#include <format>
-#include <optional>
-
-#include <notstd/Exceptions.hxx>
+#include <string>
+#include <string_view>
 
 #include <Wpa/Hostapd.hxx>
+#include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/WpaCommand.hxx>
 #include <Wpa/WpaCommandGet.hxx>
 #include <Wpa/WpaCommandSet.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
+#include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 
 using namespace Wpa;
@@ -35,7 +36,7 @@ Hostapd::Ping()
         throw HostapdException("Failed to ping hostapd");
     }
 
-    return response->Payload.starts_with(ProtocolHostapd::ResponsePayloadPing);
+    return response->Payload().starts_with(ProtocolHostapd::ResponsePayloadPing);
 }
 
 HostapdStatus
@@ -59,13 +60,14 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
     if (!response) {
         throw HostapdException("Failed to send hostapd 'get' command");
     }
+
     // Check Failed() and not IsOk() since the response will indicate failure
     // with "FAIL", otherwise, the payload is the property value (not "OK").
-    else if (response->Failed()) {
+    if (response->Failed()) {
         return false;
     }
 
-    propertyValue = response->Payload;
+    propertyValue = response->Payload();
     return true;
 }
 
@@ -89,7 +91,9 @@ Hostapd::Enable()
     const auto response = m_controller.SendCommand(EnableCommand);
     if (!response) {
         throw HostapdException("Failed to send hostapd 'enable' command");
-    } else if (response->IsOk()) {
+    }
+
+    if (response->IsOk()) {
         return true;
     }
 
@@ -109,7 +113,9 @@ Hostapd::Disable()
     const auto response = m_controller.SendCommand(DisableCommand);
     if (!response) {
         throw HostapdException("Failed to send hostapd 'disable' command");
-    } else if (response->IsOk()) {
+    }
+
+    if (response->IsOk()) {
         return true;
     }
 

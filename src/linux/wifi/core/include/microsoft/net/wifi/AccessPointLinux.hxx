@@ -5,6 +5,8 @@
 #include <memory>
 #include <string_view>
 
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 
@@ -31,7 +33,7 @@ struct AccessPointLinux :
      * 
      * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController> 
      */
-    virtual std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
+    std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
     CreateController() override;
 
 private:
@@ -52,7 +54,7 @@ struct AccessPointFactoryLinux :
      * @param interfaceName The name of the interface.
      * @return std::shared_ptr<IAccessPoint>
      */
-    virtual std::shared_ptr<IAccessPoint>
+    std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName) override;
 
     /**
@@ -62,7 +64,7 @@ struct AccessPointFactoryLinux :
      * @param createArgs Arguments to be passed to the access point during creation.
      * @return std::shared_ptr<IAccessPoint>
      */
-    virtual std::shared_ptr<IAccessPoint>
+    std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
 };
 
@@ -77,7 +79,7 @@ struct AccessPointCreateArgsLinux :
      * 
      * @param nl80211Interface The nl80211 interface object.
      */
-    AccessPointCreateArgsLinux(Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
+    explicit AccessPointCreateArgsLinux(Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
 
     Microsoft::Net::Netlink::Nl80211::Nl80211Interface Interface;
 };

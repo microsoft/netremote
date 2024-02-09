@@ -1,10 +1,13 @@
 
 #include <initializer_list>
-#include <unordered_map>
 
 #include <microsoft/net/wifi/Ieee80211.hxx>
 
 #include <catch2/catch_test_macros.hpp>
+
+// Disable flagging magic numbers as the whole point of a user-defined literal is to be able to use a more descriptive
+// literal in the code. 
+// NOLINT(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 
 #ifndef _MSC_VER 
 TEST_CASE("IeeeDot11FrequencyBand GHz literals translate correctly", "[wifi][core]")

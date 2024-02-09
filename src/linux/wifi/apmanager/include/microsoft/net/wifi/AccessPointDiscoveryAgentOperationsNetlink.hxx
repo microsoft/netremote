@@ -3,21 +3,20 @@
 #define ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_NETLINK_HXX
 
 #include <cstdint>
+#include <future>
 #include <memory>
 #include <stop_token>
-#include <string>
 #include <thread>
 #include <unordered_set>
+#include <vector>
 
-#include <linux/nl80211.h>
-#include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointDiscoveryAgentOperations.hxx>
-#include <netlink/netlink.h>
+#include <netlink/attr.h>
 
 namespace Microsoft::Net::Wifi
 {
@@ -35,9 +34,16 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
      *
      * @param accessPointFactory The access point factory to use for creating access points.
      */
-    AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory);
+    explicit AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory);
 
-    virtual ~AccessPointDiscoveryAgentOperationsNetlink();
+    ~AccessPointDiscoveryAgentOperationsNetlink() override;
+
+    AccessPointDiscoveryAgentOperationsNetlink(const AccessPointDiscoveryAgentOperationsNetlink &) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink &
+    operator=(const AccessPointDiscoveryAgentOperationsNetlink &) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink(AccessPointDiscoveryAgentOperationsNetlink &&) = delete;
+    AccessPointDiscoveryAgentOperationsNetlink &
+    operator=(AccessPointDiscoveryAgentOperationsNetlink &&) = delete;
 
     /**
      * @brief Start the discovery process.
@@ -110,9 +116,9 @@ private:
     std::shared_ptr<AccessPointFactoryLinux> m_accessPointFactory;
 
     // Cookie used to validate that the callback context is valid.
-    static constexpr uint32_t CookieValid{ 0x8BADF00Du };
+    static constexpr uint32_t CookieValid{ 0x8BADF00DU };
     // Cookie used to invalidate the callback context.
-    static constexpr uint32_t CookieInvalid{ 0xDEADBEEFu };
+    static constexpr uint32_t CookieInvalid{ 0xDEADBEEFU };
 
     uint32_t m_cookie{ CookieInvalid };
     AccessPointPresenceEventCallback m_accessPointPresenceCallback{ nullptr };

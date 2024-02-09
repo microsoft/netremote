@@ -55,7 +55,7 @@ struct NetRemoteCli :
      * @return int
      */
     int
-    Parse(int argc, char* argv[]) noexcept;
+    Parse(int argc, char* argv[]) noexcept; // NOLINT(cppcoreguidelines-avoid-c-arrays,modernize-avoid-c-arrays, hicpp-avoid-c-arrays)
 
 protected:
     /**

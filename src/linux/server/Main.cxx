@@ -1,7 +1,10 @@
 
+#include <cerrno>
 #include <format>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
-#include <errno.h>
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
@@ -17,6 +20,7 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 #include <plog/Log.h>
+#include <plog/Logger.h>
 #include <unistd.h>
 
 using namespace Microsoft::Net::Remote;
@@ -61,7 +65,7 @@ main(int argc, char *argv[])
     }
 
     // Create the server.
-    NetRemoteServer server{ std::move(configuration) };
+    NetRemoteServer server{ configuration };
 
     // Start the server.
     LOGI << "Netremote server starting";

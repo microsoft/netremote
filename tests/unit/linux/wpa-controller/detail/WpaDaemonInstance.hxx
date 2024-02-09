@@ -13,7 +13,17 @@
  */
 struct IWpaDaemonInstance
 {
+    IWpaDaemonInstance() = default;
+
     virtual ~IWpaDaemonInstance() = default;
+
+    /**
+     * Prevent copying and moving of IWpaDaemonInstance objects. 
+     */
+    IWpaDaemonInstance(const IWpaDaemonInstance&) = delete;
+    IWpaDaemonInstance& operator=(const IWpaDaemonInstance&) = delete;
+    IWpaDaemonInstance(IWpaDaemonInstance&&) = delete;
+    IWpaDaemonInstance& operator=(IWpaDaemonInstance&&) = delete;
 
     virtual bool
     Start() = 0;
@@ -45,7 +55,7 @@ struct WpaDaemonInstance :
             return false;
         }
 
-        m_instanceToken = std::move(instanceToken);
+        m_instanceToken = instanceToken;
         return true;
     }
 
@@ -68,7 +78,8 @@ struct WpaDaemonInstance :
 
 private:
     std::optional<WpaDaemonInstanceHandle> m_instanceToken;
-    const std::string_view m_wpaDaemonName;
+    std::string_view m_wpaDaemonName;
+
     static constexpr Wpa::WpaType m_wpaType{ wpaType };
 };
 

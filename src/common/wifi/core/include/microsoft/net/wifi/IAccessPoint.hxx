@@ -14,10 +14,20 @@ namespace Microsoft::Net::Wifi
  */
 struct IAccessPoint
 {
+    IAccessPoint() = default;
+
     /**
      * @brief Destroy the IAccessPoint object.
      */
     virtual ~IAccessPoint() = default;
+
+    /**
+     * Prevent copying and moving of IAccessPoint objects.
+     */
+    IAccessPoint(const IAccessPoint&) = delete;
+    IAccessPoint& operator=(const IAccessPoint&) = delete;
+    IAccessPoint(IAccessPoint&&) = delete;
+    IAccessPoint& operator=(IAccessPoint&&) = delete;
 
     /**
      * @brief Get the network interface name representing the access point.
@@ -41,7 +51,17 @@ struct IAccessPoint
  */
 struct IAccessPointCreateArgs 
 {
+    IAccessPointCreateArgs() = default;
+
     virtual ~IAccessPointCreateArgs() = default;
+
+    /**
+     * Prevent copying and moving of IAccessPointCreateArgs objects.
+     */
+    IAccessPointCreateArgs(const IAccessPointCreateArgs&) = delete;
+    IAccessPointCreateArgs& operator=(const IAccessPointCreateArgs&) = delete;
+    IAccessPointCreateArgs(IAccessPointCreateArgs&&) = delete;
+    IAccessPointCreateArgs& operator=(IAccessPointCreateArgs&&) = delete;
 };
 
 /**
@@ -49,10 +69,20 @@ struct IAccessPointCreateArgs
  */
 struct IAccessPointFactory
 {
+    IAccessPointFactory() = default;
+
     /**
      * @brief Destroy the IAccessPointFactory object.
      */
     virtual ~IAccessPointFactory() = default;
+
+    /**
+     * Prevent copying and moving of IAccessPointFactory objects. 
+     */
+    IAccessPointFactory(const IAccessPointFactory&) = delete;
+    IAccessPointFactory& operator=(const IAccessPointFactory&) = delete;
+    IAccessPointFactory(IAccessPointFactory&&) = delete;
+    IAccessPointFactory& operator=(IAccessPointFactory&&) = delete;
 
     /**
      * @brief Create a new access point object for the given network interface.

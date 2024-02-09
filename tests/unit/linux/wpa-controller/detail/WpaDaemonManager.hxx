@@ -44,7 +44,7 @@ struct WpaDaemonManager
      * @return std::filesystem::path The path to the daemon binary, if found. Otherwise, an empty path.
      */
     static std::filesystem::path
-    FindDaemonBinary(Wpa::WpaType wpaType, std::filesystem::path searchPath = std::filesystem::current_path());
+    FindDaemonBinary(Wpa::WpaType wpaType, const std::filesystem::path& searchPath = std::filesystem::current_path());
 
     /**
      * @brief Create and write a default configuration file to disk for the

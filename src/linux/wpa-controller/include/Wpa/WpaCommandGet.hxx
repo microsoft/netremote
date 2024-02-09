@@ -20,7 +20,7 @@ struct WpaCommandGet :
      *
      * @param propertyName The name of the property to retrieve.
      */
-    WpaCommandGet(std::string_view propertyName);
+    explicit WpaCommandGet(std::string_view propertyName);
 
     std::string PropertyPayload;
     std::string_view PropertyName;

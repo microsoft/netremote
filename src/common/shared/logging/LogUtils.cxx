@@ -1,9 +1,14 @@
 
 #include <chrono>
+#include <cstdint>
+#include <ctime>
 #include <iomanip>
 #include <sstream>
+#include <string>
+#include <string_view>
 
 #include <logging/LogUtils.hxx>
+#include <plog/Severity.h>
 
 std::string
 logging::GetLogName(std::string_view componentName)
@@ -13,7 +18,7 @@ logging::GetLogName(std::string_view componentName)
 
     std::stringstream ss;
 
-    ss << std::put_time(std::localtime(&t_c), "%Y%m%d")
+    ss << std::put_time(std::localtime(&t_c), "%Y%m%d") // NOLINT(concurrency-mt-unsafe)
        << "-LogNetRemote-"
        << componentName
        << ".txt";
