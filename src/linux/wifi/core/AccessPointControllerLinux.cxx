@@ -16,6 +16,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -193,7 +194,7 @@ bool
 AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
     bool isOk = false;
-    Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    const Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
 
     try {
         // Set the hostapd hw_mode property.
@@ -249,7 +250,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     }
 
     std::string setBandArgumentAll = setBandArgumentBuilder.str();
-    std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
+    const std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
 
     bool isOk = false;
     try {
@@ -273,11 +274,18 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     return true;
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerLinux::SetSssid([[maybe_unused]] std::string_view ssid)
 {
+    // Ensure the ssid is not empty.
+    if (std::empty(ssid)) {
+        LOGE << std::format("Empty SSID specified for interface {}", GetInterfaceName());
+        return {}; // TODO
+    }
+
     // TODO: implement
-    return false;
+
+    return {}; // TOOD
 }
 
 std::unique_ptr<IAccessPointController>

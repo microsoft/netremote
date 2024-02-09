@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -92,12 +93,11 @@ struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPoi
 
     /**
      * @brief Set the SSID of the access point.
-     *
+     * 
      * @param ssid The SSID to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus 
      */
-    bool
+    AccessPointOperationStatus
     SetSssid(std::string_view ssid) override;
 };
 

@@ -1,5 +1,4 @@
 
-
 #include <algorithm>
 #include <format>
 #include <iterator>
@@ -10,6 +9,7 @@
 #include <vector>
 
 #include <magic_enum.hpp>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -83,7 +83,7 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
     return true;
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerTest::SetSssid(std::string_view ssid)
 {
     if (AccessPoint == nullptr) {
@@ -91,7 +91,7 @@ AccessPointControllerTest::SetSssid(std::string_view ssid)
     }
 
     AccessPoint->Ssid = ssid;
-    return true;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :

@@ -2,12 +2,16 @@
 #ifndef ACCESS_POINT_CONTROLLER_LINUX_HXX
 #define ACCESS_POINT_CONTROLLER_LINUX_HXX
 
+#include <memory>
 #include <string_view>
 #include <vector>
 
 #include <Wpa/Hostapd.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -29,12 +33,14 @@ struct AccessPointControllerLinux :
     explicit AccessPointControllerLinux(std::string_view interfaceName);
 
     /**
-     * Prevent copying and moving of this object. 
+     * Prevent copying and moving of this object.
      */
     AccessPointControllerLinux(const AccessPointControllerLinux&) = delete;
-    AccessPointControllerLinux& operator=(const AccessPointControllerLinux&) = delete;
+    AccessPointControllerLinux&
+    operator=(const AccessPointControllerLinux&) = delete;
     AccessPointControllerLinux(AccessPointControllerLinux&&) = delete;
-    AccessPointControllerLinux& operator=(AccessPointControllerLinux&&) = delete;
+    AccessPointControllerLinux&
+    operator=(AccessPointControllerLinux&&) = delete;
 
     /**
      * @brief Get whether the access point is enabled.
@@ -75,12 +81,11 @@ struct AccessPointControllerLinux :
 
     /**
      * @brief Set the SSID of the access point.
-     * 
+     *
      * @param ssid The SSID to be set.
-     * @return true 
-     * @return false 
+     * @return AccessPointOperationStatus
      */
-    bool
+    AccessPointOperationStatus
     SetSssid(std::string_view ssid) override;
 
 private:
@@ -98,12 +103,14 @@ struct AccessPointControllerLinuxFactory :
     ~AccessPointControllerLinuxFactory() override = default;
 
     /**
-     * Prevent copying and moving of this object. 
+     * Prevent copying and moving of this object.
      */
     AccessPointControllerLinuxFactory(const AccessPointControllerLinuxFactory&) = delete;
-    AccessPointControllerLinuxFactory& operator=(const AccessPointControllerLinuxFactory&) = delete;
+    AccessPointControllerLinuxFactory&
+    operator=(const AccessPointControllerLinuxFactory&) = delete;
     AccessPointControllerLinuxFactory(AccessPointControllerLinuxFactory&&) = delete;
-    AccessPointControllerLinuxFactory& operator=(AccessPointControllerLinuxFactory&&) = delete;
+    AccessPointControllerLinuxFactory&
+    operator=(AccessPointControllerLinuxFactory&&) = delete;
 
     /**
      * @brief Create a new IAccessPointController object.
