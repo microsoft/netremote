@@ -75,6 +75,16 @@ struct AccessPointControllerTest final :
      */
     virtual bool
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
+
+    /**
+     * @brief Set the SSID of the access point.
+     *
+     * @param ssid The SSID to be set.
+     * @return true
+     * @return false
+     */
+    bool
+    SetSssid(std::string_view ssid) override;
 };
 
 /**

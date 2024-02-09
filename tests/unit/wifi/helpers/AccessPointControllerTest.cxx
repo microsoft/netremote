@@ -83,6 +83,17 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
     return true;
 }
 
+bool
+AccessPointControllerTest::SetSssid(std::string_view ssid)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetSssid called with null AccessPoint");
+    }
+
+    AccessPoint->Ssid = ssid;
+    return true;
+}
+
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
     AccessPoint(accessPoint)
 {}

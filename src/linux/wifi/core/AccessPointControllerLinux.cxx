@@ -273,6 +273,13 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     return true;
 }
 
+bool
+AccessPointControllerLinux::SetSssid([[maybe_unused]] std::string_view ssid)
+{
+    // TODO: implement
+    return false;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {

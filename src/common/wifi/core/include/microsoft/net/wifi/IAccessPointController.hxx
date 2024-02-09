@@ -93,6 +93,16 @@ struct IAccessPointController
      */
     virtual bool
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) = 0;
+
+    /**
+     * @brief Set the SSID of the access point.
+     * 
+     * @param ssid The SSID to be set.
+     * @return true 
+     * @return false 
+     */
+    virtual bool
+    SetSssid(std::string_view ssid) = 0;
 };
 
 /**
