@@ -20,13 +20,13 @@ public:
     NetRemoteCallbackService() = default;
 
 private:
-    virtual ::grpc::ServerReadReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+    virtual ::grpc::ServerReadReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>*
     WifiDataStreamUpload(::grpc::CallbackServerContext* context, ::Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* result) override;
 
-    virtual ::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+    virtual ::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadData>*
     WifiDataStreamDownload(::grpc::CallbackServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request) override;
 
-    virtual ::grpc::ServerBidiReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamData, ::Microsoft::Net::Remote::Wifi::WifiDataStreamData>*
+    virtual ::grpc::ServerBidiReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData, ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadData>*
     WifiDataStreamBidirectional(::grpc::CallbackServerContext* context) override;
 };
 } // namespace Microsoft::Net::Remote::Service

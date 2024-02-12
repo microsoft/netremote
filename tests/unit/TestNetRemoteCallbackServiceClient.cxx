@@ -33,7 +33,7 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        class StreamWriter : public grpc::ClientWriteReactor<WifiDataStreamData>
+        class StreamWriter : public grpc::ClientWriteReactor<WifiDataStreamUploadData>
         {
         public:
             StreamWriter(NetRemoteCallback::Stub* client, uint32_t dataToWriteCount) :
@@ -89,7 +89,7 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
 
         private:
             grpc::ClientContext m_clientContext{};
-            WifiDataStreamData m_data{};
+            WifiDataStreamUploadData m_data{};
             WifiDataStreamUploadResult m_result{};
             uint32_t m_dataToWriteCount{};
             uint32_t m_dataSentCount{};
@@ -130,7 +130,7 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        class StreamReader : public grpc::ClientReadReactor<WifiDataStreamData>
+        class StreamReader : public grpc::ClientReadReactor<WifiDataStreamDownloadData>
         {
         public:
             StreamReader(NetRemoteCallback::Stub* client, WifiDataStreamDownloadRequest* request)
@@ -158,7 +158,7 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
                 m_cv.notify_one();
             }
 
-            grpc::Status Await(uint32_t* dataReceivedCount)
+            grpc::Status Await(uint32_t* dataReceivedCount, WifiDataStreamOperationStatus* operationStatus)
             {
                 std::unique_lock lock(m_mutex);
 
@@ -166,13 +166,14 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
                     return m_done;
                 });
                 *dataReceivedCount = m_dataReceivedCount;
+                *operationStatus = m_data.status();
 
                 return m_status;
             }
 
         private:
             grpc::ClientContext m_clientContext{};
-            WifiDataStreamData m_data{};
+            WifiDataStreamDownloadData m_data{};
             uint32_t m_dataReceivedCount{};
             grpc::Status m_status{};
             std::mutex m_mutex{};
@@ -186,9 +187,11 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
         auto streamReader = std::make_unique<StreamReader>(client.get(), &request);
 
         uint32_t dataReceivedCount{};
-        grpc::Status status = streamReader->Await(&dataReceivedCount);
+        WifiDataStreamOperationStatus operationStatus{};
+        grpc::Status status = streamReader->Await(&dataReceivedCount, &operationStatus);
         REQUIRE(status.ok());
         REQUIRE(dataReceivedCount == dataRequestedCount);
+        REQUIRE(operationStatus.code() == WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeSucceeded);
     }
 }
 
@@ -212,7 +215,7 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        class StreamReaderWriter : public grpc::ClientBidiReactor<WifiDataStreamData, WifiDataStreamData>
+        class StreamReaderWriter : public grpc::ClientBidiReactor<WifiDataStreamUploadData, WifiDataStreamDownloadData>
         {
         public:
             StreamReaderWriter(NetRemoteCallback::Stub* client, uint32_t dataToWriteCount) :
@@ -250,13 +253,14 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
                 m_cv.notify_one();
             }
 
-            grpc::Status Await()
+            grpc::Status Await(WifiDataStreamOperationStatus* operationStatus)
             {
                 std::unique_lock lock(m_mutex);
 
                 m_cv.wait(lock, [this] {
                     return m_done;
                 });
+                *operationStatus = m_readData.status();
 
                 return m_status;
             }
@@ -276,8 +280,8 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
 
         private:
             grpc::ClientContext m_clientContext{};
-            WifiDataStreamData m_readData{};
-            WifiDataStreamData m_writeData{};
+            WifiDataStreamDownloadData m_readData{};
+            WifiDataStreamUploadData m_writeData{};
             uint32_t m_dataToWriteCount{};
             uint32_t m_dataSentCount{};
             uint32_t m_dataReceivedCount{};
@@ -290,7 +294,9 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
         static constexpr auto dataToWriteCount = 10;
         auto streamReaderWriter = std::make_unique<StreamReaderWriter>(client.get(), dataToWriteCount);
 
-        grpc::Status status = streamReaderWriter->Await();
+        WifiDataStreamOperationStatus operationStatus{};
+        grpc::Status status = streamReaderWriter->Await(&operationStatus);
         REQUIRE(status.ok());
+        REQUIRE(operationStatus.code() == WifiDataStreamOperationStatusCodeSucceeded);
     }
 }
