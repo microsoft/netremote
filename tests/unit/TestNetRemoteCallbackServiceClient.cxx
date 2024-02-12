@@ -78,7 +78,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
             void NextWrite()
             {
                 if (m_dataToWriteCount > 0) {
-                    m_data.set_data("Data");
+                    m_data.set_data(std::format("Data #{}", ++m_dataSentCount));
+                    m_data.set_count(m_dataSentCount);
                     StartWrite(&m_data);
                     m_dataToWriteCount--;
                 } else {
@@ -88,9 +89,10 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
 
         private:
             grpc::ClientContext m_clientContext{};
+            WifiDataStreamData m_data{};
             WifiDataStreamUploadResult m_result{};
             uint32_t m_dataToWriteCount{};
-            WifiDataStreamData m_data{};
+            uint32_t m_dataSentCount{};
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};
@@ -141,7 +143,7 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
             void OnReadDone(bool ok) override
             {
                 if (ok) {
-                    m_dataReceivedCount++;
+                    REQUIRE(m_data.count() == ++m_dataReceivedCount);
                     StartRead(&m_data);
                 }
                 // If read fails, then there is likely no more data to be read, so do nothing.
@@ -170,8 +172,8 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
 
         private:
             grpc::ClientContext m_clientContext{};
-            uint32_t m_dataReceivedCount{};
             WifiDataStreamData m_data{};
+            uint32_t m_dataReceivedCount{};
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};
@@ -225,6 +227,7 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
             void OnReadDone(bool ok) override
             {
                 if (ok) {
+                    REQUIRE(m_readData.count() == ++m_dataReceivedCount);
                     StartRead(&m_readData);
                 }
             }
@@ -262,7 +265,8 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
             void NextWrite()
             {
                 if (m_dataToWriteCount > 0) {
-                    m_writeData.set_data("Data");
+                    m_writeData.set_data(std::format("Data #{}", ++m_dataSentCount));
+                    m_writeData.set_count(m_dataSentCount);
                     StartWrite(&m_writeData);
                     m_dataToWriteCount--;
                 } else {
@@ -272,9 +276,11 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
 
         private:
             grpc::ClientContext m_clientContext{};
-            uint32_t m_dataToWriteCount{};
             WifiDataStreamData m_readData{};
             WifiDataStreamData m_writeData{};
+            uint32_t m_dataToWriteCount{};
+            uint32_t m_dataSentCount{};
+            uint32_t m_dataReceivedCount{};
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};

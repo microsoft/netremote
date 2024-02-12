@@ -23,8 +23,14 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
         void OnReadDone(bool ok) override
         {
             if (ok) {
+                if (m_data.count() != ++m_dataReceivedCount) {
+                    LOGE << std::format("Client data count {} does not match received data count {}", m_data.count(), m_dataReceivedCount);
+                    m_readStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeFailed);
+                    m_readStatus.set_message(std::format("Client data count {} does not match received data count {}", m_data.count(), m_dataReceivedCount));
+                    return;
+                }
+
                 LOGD << "Data read successful";
-                m_dataReceivedCount++;
                 m_readStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeSucceeded);
                 m_readStatus.set_message("Data read successful");
                 StartRead(&m_data);
@@ -96,7 +102,8 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
         void NextWrite()
         {
             if (m_dataRequestedCount > 0) {
-                m_data.set_data("Data");
+                m_data.set_data(std::format("Data #{}", ++m_dataSentCount));
+                m_data.set_count(m_dataSentCount);
                 StartWrite(&m_data);
             } else {
                 // No more data to write
@@ -105,8 +112,9 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
         }
 
     private:
-        uint32_t m_dataRequestedCount{};
         ::Microsoft::Net::Remote::Wifi::WifiDataStreamData m_data{};
+        uint32_t m_dataRequestedCount{};
+        uint32_t m_dataSentCount{};
     };
 
     return new StreamWriter(request);
@@ -129,6 +137,11 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
         void OnReadDone(bool ok) override
         {
             if (ok) {
+                if (m_readData.count() != ++m_dataReceivedCount) {
+                    LOGE << std::format("Client data count {} does not match received data count {}", m_readData.count(), m_dataReceivedCount);
+                    Finish(::grpc::Status::OK);
+                    return;
+                }
                 StartRead(&m_readData);
             } else {
                 Finish(::grpc::Status::OK);
@@ -155,13 +168,16 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
     private:
         void NextWrite()
         {
-            m_writeData.set_data("Data");
+            m_writeData.set_data(std::format("Data #{}", ++m_dataSentCount));
+            m_writeData.set_count(m_dataSentCount);
             StartWrite(&m_writeData);
         }
 
     private:
         ::Microsoft::Net::Remote::Wifi::WifiDataStreamData m_readData{};
         ::Microsoft::Net::Remote::Wifi::WifiDataStreamData m_writeData{};
+        uint32_t m_dataReceivedCount{};
+        uint32_t m_dataSentCount{};
     };
 
     return new StreamReaderWriter();

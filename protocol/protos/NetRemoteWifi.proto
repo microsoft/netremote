@@ -106,6 +106,7 @@ message WifiAccessPointSetFrequencyBandsResult
 message WifiDataStreamData
 {
     string Data = 1;
+    uint32 Count = 2;
 }
 
 message WifiDataStreamUploadResult
