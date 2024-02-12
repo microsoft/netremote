@@ -45,8 +45,6 @@ enum WifiDataStreamOperationStatusCode
     WifiDataStreamOperationStatusCodeUnknown = 0;
     WifiDataStreamOperationStatusCodeSucceeded = 1;
     WifiDataStreamOperationStatusCodeFailed = 2;
-    WifiDataStreamOperationStatusCodeInvalidParameter = 3;
-    WifiDataStreamOperationStatusCodeOperationNotSupported = 4;
 }
 
 message WifiDataStreamOperationStatus
