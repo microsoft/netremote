@@ -23,18 +23,8 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
         void OnReadDone(bool ok) override
         {
             if (ok) {
-                if (m_data.count() != ++m_dataReceivedCount) {
-                    LOGE << std::format("Client data count {} does not match received data count {}", m_data.count(), m_dataReceivedCount);
-                    m_readStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeFailed);
-                    m_readStatus.set_message(std::format("Client data count {} does not match received data count {}", m_data.count(), m_dataReceivedCount));
-
-                    m_result->set_datareceivedcount(m_dataReceivedCount);
-                    *m_result->mutable_status() = std::move(m_readStatus);
-                    Finish(::grpc::Status::OK);
-                    return;
-                }
-
                 LOGD << "Data read successful";
+                m_dataReceivedCount++;
                 m_readStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeSucceeded);
                 m_readStatus.set_message("Data read successful");
                 StartRead(&m_data);
@@ -167,14 +157,8 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
         void OnReadDone(bool ok) override
         {
             if (ok) {
-                if (m_readData.count() != ++m_dataReceivedCount) {
-                    const auto failureMessage = std::format("Client data count {} does not match received data count {}", m_readData.count(), m_dataReceivedCount);
-                    LOGE << failureMessage;
-                    HandleFailure(failureMessage);
-                    return;
-                }
-
                 LOGD << "Data read successful";
+                m_dataReceivedCount++;
                 m_status.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeSucceeded);
                 m_status.set_message("Data read successful");
                 StartRead(&m_readData);

@@ -79,7 +79,6 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
             {
                 if (m_dataToWriteCount > 0) {
                     m_data.set_data(std::format("Data #{}", ++m_dataSentCount));
-                    m_data.set_count(m_dataSentCount);
                     StartWrite(&m_data);
                     m_dataToWriteCount--;
                 } else {
@@ -270,7 +269,6 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
             {
                 if (m_dataToWriteCount > 0) {
                     m_writeData.set_data(std::format("Data #{}", ++m_dataSentCount));
-                    m_writeData.set_count(m_dataSentCount);
                     StartWrite(&m_writeData);
                     m_dataToWriteCount--;
                 } else {
