@@ -44,7 +44,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
                 NextWrite();
             }
 
-            void OnWriteDone(bool ok) override
+            void
+            OnWriteDone(bool ok) override
             {
                 if (ok) {
                     NextWrite();
@@ -53,7 +54,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
                 }
             }
 
-            void OnDone(const grpc::Status& status) override
+            void
+            OnDone(const grpc::Status& status) override
             {
                 std::unique_lock lock(m_mutex);
 
@@ -62,7 +64,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
                 m_cv.notify_one();
             }
 
-            grpc::Status Await(WifiDataStreamUploadResult* result)
+            grpc::Status
+            Await(WifiDataStreamUploadResult* result)
             {
                 std::unique_lock lock(m_mutex);
 
@@ -75,7 +78,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
             }
 
         private:
-            void NextWrite()
+            void
+            NextWrite()
             {
                 if (m_dataToWriteCount > 0) {
                     m_data.set_data(std::format("Data #{}", ++m_dataSentCount));
@@ -95,7 +99,7 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};
-            bool m_done{false};
+            bool m_done{ false };
         };
 
         static constexpr auto dataToWriteCount = 10;
@@ -139,7 +143,8 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
                 StartRead(&m_data);
             }
 
-            void OnReadDone(bool ok) override
+            void
+            OnReadDone(bool ok) override
             {
                 if (ok) {
                     REQUIRE(m_data.count() == ++m_dataReceivedCount);
@@ -148,7 +153,8 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
                 // If read fails, then there is likely no more data to be read, so do nothing.
             }
 
-            void OnDone(const grpc::Status& status) override
+            void
+            OnDone(const grpc::Status& status) override
             {
                 std::unique_lock lock(m_mutex);
 
@@ -157,7 +163,8 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
                 m_cv.notify_one();
             }
 
-            grpc::Status Await(uint32_t* dataReceivedCount, WifiDataStreamOperationStatus* operationStatus)
+            grpc::Status
+            Await(uint32_t* dataReceivedCount, WifiDataStreamOperationStatus* operationStatus)
             {
                 std::unique_lock lock(m_mutex);
 
@@ -177,7 +184,7 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};
-            bool m_done{false};
+            bool m_done{ false };
         };
 
         static constexpr auto dataRequestedCount = 10;
@@ -226,15 +233,17 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
                 NextWrite();
             }
 
-            void OnReadDone(bool ok) override
+            void
+            OnReadDone(bool ok) override
             {
                 if (ok) {
                     REQUIRE(m_readData.count() == ++m_dataReceivedCount);
                     StartRead(&m_readData);
                 }
             }
-        
-            void OnWriteDone(bool ok) override
+
+            void
+            OnWriteDone(bool ok) override
             {
                 if (ok) {
                     NextWrite();
@@ -243,7 +252,8 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
                 }
             }
 
-            void OnDone(const grpc::Status& status) override
+            void
+            OnDone(const grpc::Status& status) override
             {
                 std::unique_lock lock(m_mutex);
 
@@ -252,7 +262,8 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
                 m_cv.notify_one();
             }
 
-            grpc::Status Await(WifiDataStreamOperationStatus* operationStatus)
+            grpc::Status
+            Await(WifiDataStreamOperationStatus* operationStatus)
             {
                 std::unique_lock lock(m_mutex);
 
@@ -265,7 +276,8 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
             }
 
         private:
-            void NextWrite()
+            void
+            NextWrite()
             {
                 if (m_dataToWriteCount > 0) {
                     m_writeData.set_data(std::format("Data #{}", ++m_dataSentCount));
@@ -286,7 +298,7 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
             grpc::Status m_status{};
             std::mutex m_mutex{};
             std::condition_variable m_cv{};
-            bool m_done{false};
+            bool m_done{ false };
         };
 
         static constexpr auto dataToWriteCount = 10;

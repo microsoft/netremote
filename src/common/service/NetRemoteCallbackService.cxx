@@ -20,7 +20,8 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
             StartRead(&m_data);
         }
 
-        void OnReadDone(bool ok) override
+        void
+        OnReadDone(bool ok) override
         {
             if (ok) {
                 LOGD << "Data read successful";
@@ -31,7 +32,7 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
             } else {
                 // A false "ok" value could either mean a failed RPC or that no more data is available.
                 // Unfortunately, there is no clear way to tell which situation occurred.
-                LOGD << "Data read failed (RPC failed OR no more data)";    
+                LOGD << "Data read failed (RPC failed OR no more data)";
 
                 m_result->set_datareceivedcount(m_dataReceivedCount);
                 *m_result->mutable_status() = std::move(m_readStatus);
@@ -39,7 +40,8 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
             }
         }
 
-        void OnCancel() override
+        void
+        OnCancel() override
         {
             LOGE << "RPC cancelled";
             m_result->set_datareceivedcount(m_dataReceivedCount);
@@ -47,7 +49,8 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
             Finish(::grpc::Status::CANCELLED);
         }
 
-        void OnDone() override
+        void
+        OnDone() override
         {
             delete this;
         }
@@ -78,7 +81,8 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
             NextWrite();
         }
 
-        void OnWriteDone(bool ok) override
+        void
+        OnWriteDone(bool ok) override
         {
             // Check for a failed status code from HandleWriteFailure since that invoked a final write, thus causing this callback to be invoked.
             if (m_writeStatus.code() == WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeFailed) {
@@ -98,13 +102,15 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
             }
         }
 
-        void OnDone() override
+        void
+        OnDone() override
         {
             delete this;
         }
 
     private:
-        void NextWrite()
+        void
+        NextWrite()
         {
             if (m_dataRequestedCount > 0) {
                 const auto data = std::format("Data #{}", ++m_dataSentCount);
@@ -119,7 +125,8 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
             }
         }
 
-        void HandleWriteFailure()
+        void
+        HandleWriteFailure()
         {
             LOGD << "HandleWriteFailure called";
             m_writeStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeFailed);
@@ -154,7 +161,8 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
             NextWrite();
         }
 
-        void OnReadDone(bool ok) override
+        void
+        OnReadDone(bool ok) override
         {
             if (ok) {
                 LOGD << "Data read successful";
@@ -168,7 +176,8 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
             }
         }
 
-        void OnWriteDone(bool ok) override
+        void
+        OnWriteDone(bool ok) override
         {
             // Check for a failed status code from HandleFailure since that invoked a final write, thus causing this callback to be invoked.
             if (m_status.code() == WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeFailed) {
@@ -181,25 +190,28 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
                 m_status.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeSucceeded);
                 m_status.set_message("Data write successful");
                 NextWrite();
-            } //else {
-                //LOGE << "Data write failed";
-                //HandleFailure("Data write failed");
+            } // else {
+              // LOGE << "Data write failed";
+              // HandleFailure("Data write failed");
             //}
         }
 
-        void OnCancel() override
+        void
+        OnCancel() override
         {
             LOGE << "RPC cancelled";
             Finish(::grpc::Status::CANCELLED);
         }
 
-        void OnDone() override
+        void
+        OnDone() override
         {
             delete this;
         }
 
     private:
-        void NextWrite()
+        void
+        NextWrite()
         {
             const auto data = std::format("Data #{}", ++m_dataSentCount);
             LOGD << "Writing " << data;
@@ -209,7 +221,8 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
             StartWrite(&m_writeData);
         }
 
-        void HandleFailure(const std::string failureMessage)
+        void
+        HandleFailure(const std::string failureMessage)
         {
             LOGD << "HandleFailure called";
             m_status.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeFailed);
