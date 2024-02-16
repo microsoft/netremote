@@ -11,6 +11,7 @@
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <plog/Log.h>
 
 using namespace Wpa;
 
@@ -50,6 +51,27 @@ Hostapd::GetStatus()
     }
 
     return response->Status;
+}
+
+bool
+Hostapd::SetSsid(std::string_view ssid, bool reload)
+{
+    const bool ssidWasSet = SetProperty(ProtocolHostapd::PropertyNameSsid, ssid);
+    if (!ssidWasSet) {
+        throw HostapdException("Failed to set hostapd 'ssid' property");
+    }
+
+    if (!reload) {
+        LOGW << "Skipping hostapd reload after setting 'ssid' (requested)";
+        return true;
+    }
+
+    const bool configurationReloadSucceeded = Reload();
+    if (!configurationReloadSucceeded) {
+        throw HostapdException("Failed to reload hostapd configuration");
+    }
+
+    return true;
 }
 
 bool
