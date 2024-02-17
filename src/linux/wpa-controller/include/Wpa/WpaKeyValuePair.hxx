@@ -4,6 +4,7 @@
 
 #include <format>
 #include <optional>
+#include <stdexcept>
 #include <string_view>
 
 #include <Wpa/ProtocolWpa.hxx>
@@ -38,27 +39,27 @@ struct WpaKeyValuePair
      *
      * @param key The key of the property.
      * @param presence Whether the property is required or optional.
+     * @param isIndexed Whether the property is indexed (i.e. has a numeric suffix in its key name).
      */
-    constexpr WpaKeyValuePair(std::string_view key, WpaValuePresence presence) :
+    constexpr WpaKeyValuePair(std::string_view key, WpaValuePresence presence, bool isIndexed = false) :
         Key(key),
-        IsRequired(notstd::to_underlying(presence))
+        IsRequired(notstd::to_underlying(presence)),
+        IsIndexed(isIndexed)
     {
         // Ensure the specified key ends with the delimiter. If not, this is a
         // programming error so throw a runtime exception.
-        if (!Key.ends_with(KeyDelimiter)) {
+        if (!IsIndexed && !Key.ends_with(KeyDelimiter)) {
             throw std::runtime_error(std::format("Key must end with {} delimiter.", KeyDelimiter));
         }
     }
 
     /**
-     * Parses the input string and attempts to resolve the property value,
-     * assigning it to the Value member if found. Note that this function does
-     * not parse the value itself, it only resolves the value location in the
-     * input string, making it available for later parsing by derived classes
-     * that know its type/structure.
+     * @brief Parses the input string and attempts to resolve the property value, assigning it to the Value member if
+     * found. Note that this function does * not parse the value itself, it only resolves the value location in the
+     * input string, making it available for later parsing by derived classes that know its type/structure.
      *
      * The input string is expected to contain a property of the form:
-     * key=value, as is encoded by the WPA control protocol.    * @brief
+     * key=value, as is encoded by the WPA control protocol.
      *
      * @param input
      * @return std::optional<std::string_view>
@@ -69,6 +70,7 @@ struct WpaKeyValuePair
     std::string_view Key;
     std::optional<std::string_view> Value;
     bool IsRequired{ true };
+    bool IsIndexed{ false };
 };
 } // namespace Wpa
 
