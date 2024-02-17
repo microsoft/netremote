@@ -212,20 +212,31 @@ struct ProtocolHostapd :
 #define HOSTAPD_PROPERTY_NAME_DISABLE11AC    "disable_11ac"
 #define HOSTAPD_PROPERTY_NAME_IEEE80211AX    "ieee80211ax"
 #define HOSTAPD_PROPERTY_NAME_DISABLE11AX    "disable_11ax"
+#define HOSTAPD_PROPERTY_NAME_WMM_ENABLED    "wmm_enabled"
 #define HOSTAPD_PROPERTY_NAME_STATE          "state"
+#define HOSTAPD_PROPERTY_NAME_BSS            "bss"
+#define HOSTAPD_PROPERTY_NAME_BSS_BSSID      "bssid"
+#define HOSTAPD_PROPERTY_NAME_BSS_SSID       "ssid"
+#define HOSTAPD_PROPERTY_NAME_BSS_NUM_STA    "num_sta"
 
 // Helper macro to create a hostapd configuration file key with value delimiter.
 #define HOSTAPD_DELIMITED_KEY(name) name HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER
-    // NOLINTEND(cppcoreguidelines-macro-usage)
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
-    static constexpr auto ProperyKeyValueNameDelimeter = HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER;
     static constexpr auto PropertyNameIeee80211N = HOSTAPD_PROPERTY_NAME_IEEE80211N;
     static constexpr auto PropertyNameDisable11N = HOSTAPD_PROPERTY_NAME_DISABLE11N;
     static constexpr auto PropertyNameIeee80211AC = HOSTAPD_PROPERTY_NAME_IEEE80211AC;
     static constexpr auto PropertyNameDisable11AC = HOSTAPD_PROPERTY_NAME_DISABLE11AC;
     static constexpr auto PropertyNameIeee80211AX = HOSTAPD_PROPERTY_NAME_IEEE80211AX;
     static constexpr auto PropertyNameDisable11AX = HOSTAPD_PROPERTY_NAME_DISABLE11AX;
-    static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
+    static constexpr auto PropertyNameWmmEnabled = HOSTAPD_PROPERTY_NAME_WMM_ENABLED;
+    static constexpr auto PropertyNameState = HOSTAPD_PROPERTY_NAME_STATE;
+
+    // Indexed property names for BSS entries in the "STATUS" response.
+    static constexpr auto PropertyNameBss = HOSTAPD_PROPERTY_NAME_BSS;
+    static constexpr auto PropertyNameBssBssid = HOSTAPD_PROPERTY_NAME_BSS_BSSID;
+    static constexpr auto PropertyNameBssSsid = HOSTAPD_PROPERTY_NAME_BSS_SSID;
+    static constexpr auto PropertyNameNumStations = HOSTAPD_PROPERTY_NAME_BSS_NUM_STA;
 
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
