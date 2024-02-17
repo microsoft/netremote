@@ -13,6 +13,7 @@ struct ProtocolWpa
 {
     // The delimeter used to separate key-value pairs in the WPA control protocol.
     static constexpr auto KeyValueDelimiter = '=';
+    static constexpr auto KeyValueLineDelimeter = '\n';
 
     // Command payloads.
     static constexpr auto CommandPayloadPing = "PING";
