@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <Wpa/ProtocolWpa.hxx>
 
@@ -49,6 +50,7 @@ struct BssInfo
     int NumStations{ 0 };
     std::string Bssid;
     std::string Interface;
+    std::string Ssid;
 
     // Present with:
     //  - CONFIG_IEEE80211BE compilation option
@@ -156,8 +158,8 @@ struct HostapdStatus
     // //  - The current operational mode supports the currently active frequency.
     // std::optional<unsigned> MaxTxPower;
 
-    // // Always present (but may be empty).
-    // std::vector<BssInfo> Bss;
+    // Always present (but may be empty).
+    std::vector<BssInfo> Bss;
 
     // // Present with:
     // //  - Non-zero channel utilization.
