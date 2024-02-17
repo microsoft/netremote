@@ -2,9 +2,7 @@
 #ifndef WPA_KEY_VALUE_PAIR_HXX
 #define WPA_KEY_VALUE_PAIR_HXX
 
-#include <format>
 #include <optional>
-#include <stdexcept>
 #include <string_view>
 
 #include <Wpa/ProtocolWpa.hxx>
@@ -46,26 +44,7 @@ struct WpaKeyValuePair
         IsRequired(notstd::to_underlying(presence)),
         IsIndexed(isIndexed)
     {
-        // Ensure the specified key ends with the delimiter. If not, this is a
-        // programming error so throw a runtime exception.
-        if (!IsIndexed && !Key.ends_with(KeyDelimiter)) {
-            throw std::runtime_error(std::format("Key must end with {} delimiter.", KeyDelimiter));
-        }
     }
-
-    /**
-     * @brief Parses the input string and attempts to resolve the property value, assigning it to the Value member if
-     * found. Note that this function does * not parse the value itself, it only resolves the value location in the
-     * input string, making it available for later parsing by derived classes that know its type/structure.
-     *
-     * The input string is expected to contain a property of the form:
-     * key=value, as is encoded by the WPA control protocol.
-     *
-     * @param input
-     * @return std::optional<std::string_view>
-     */
-    std::optional<std::string_view>
-    TryParseValue(std::string_view input);
 
     std::string_view Key;
     std::optional<std::string_view> Value;

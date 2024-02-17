@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <format>
 #include <initializer_list>
 #include <iterator>
@@ -60,6 +61,14 @@ WpaResponseParser::TryParseProperties()
     constexpr auto toStringView = [](auto&& sv) {
         return std::string_view{ std::data(sv), std::size(sv) };
     };
+    // Convert a key-value pair to its key.
+    constexpr auto toKey = [](auto&& keyValuePair) {
+        return keyValuePair.Key;
+    };
+    // Determine if the property map has the specified key.
+    const auto hasKey = [&](auto&& key) {
+        return m_properties.contains(key);
+    };
 
     if (std::empty(m_propertiesToParse)) {
         return true;
@@ -68,8 +77,7 @@ WpaResponseParser::TryParseProperties()
     // Parse the payload into individual lines containing key value pairs.
     auto lines = m_responsePayload | std::views::split(ProtocolWpa::KeyValueLineDelimeter) | std::views::transform(toStringView);
 
-    // Parse each line into a key-value pair, and populate a map with them.
-    std::unordered_map<std::string_view, std::string_view> properties;
+    // Parse each line into a key-value pair, and populate the property map with them.
     for (const auto line : lines) {
         auto keyValuePair = line | std::views::split(ProtocolWpa::KeyValueDelimiter) | std::views::transform(toStringView);
         auto keyValuePairIterator = std::begin(keyValuePair);
@@ -89,26 +97,16 @@ WpaResponseParser::TryParseProperties()
         // Parse out the key and value, ensuring the key is non-empty (empty values are allowed).
         const auto key = *std::next(keyValuePairIterator, 0);
         const auto value = *std::next(keyValuePairIterator, 1);
-        if (!std::empty(key)) {
-            properties[key] = value;
-            LOGV << std::format("[{}] {}={}", std::size(properties), key, value);
-        }
-    }
-
-    for (auto propertyToParseIterator = std::begin(m_propertiesToParse); propertyToParseIterator != std::end(m_propertiesToParse);) {
-        auto& propertyToParse = *propertyToParseIterator;
-        auto propertyValue = propertyToParse.TryParseValue(m_responsePayload);
-        if (propertyValue.has_value()) {
-            m_properties[propertyToParse.Key] = *propertyValue;
-            propertyToParseIterator = m_propertiesToParse.erase(propertyToParseIterator);
+        if (std::empty(key)) {
             continue;
         }
-        if (propertyToParse.IsRequired) {
-            LOGE << std::format("Failed to parse required property: {}\nPayload {}\n", propertyToParse.Key, m_responsePayload);
-            return false;
-        }
-        ++propertyToParseIterator;
+
+        m_properties[key] = value;
+        LOGV << std::format("Parsed [{:03}] {}={}", std::size(m_properties), key, value);
     }
+
+    // Remove parsed properties from the list of properties to parse.
+    m_propertiesToParse.erase(std::begin(std::ranges::remove_if(m_propertiesToParse, hasKey, toKey)), std::end(m_propertiesToParse));
 
     return true;
 }
