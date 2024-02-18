@@ -1,12 +1,16 @@
 
 #include <algorithm>
+#include <cstdlib>
 #include <format>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <ranges>
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 
 #include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaKeyValuePair.hxx>
@@ -23,7 +27,7 @@ WpaResponseParser::WpaResponseParser(const WpaCommand* command, std::string_view
 {
 }
 
-const std::unordered_map<std::string_view, std::string_view>&
+const std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>>&
 WpaResponseParser::GetProperties() const noexcept
 {
     return m_properties;
@@ -95,14 +99,29 @@ WpaResponseParser::TryParseProperties()
         }
 
         // Parse out the key and value, ensuring the key is non-empty (empty values are allowed).
-        const auto key = *std::next(keyValuePairIterator, 0);
+        auto key = *std::next(keyValuePairIterator, 0);
         const auto value = *std::next(keyValuePairIterator, 1);
         if (std::empty(key)) {
             continue;
         }
 
-        m_properties[key] = value;
-        LOGV << std::format("Parsed [{:03}] {}={}", std::size(m_properties), key, value);
+        // Check and parse key index in the form of "[<index>]".
+        std::string keyIndexString{};
+        std::optional<std::size_t> keyIndex{ std::nullopt };
+        const auto indexStart = key.find(ProtocolWpa::KeyValueIndexDelimeterStart);
+        if (indexStart != std::string_view::npos) {
+            const auto indexEnd = key.find(ProtocolWpa::KeyValueIndexDelimeterEnd);
+            if (indexEnd != std::string_view::npos) {
+                keyIndexString = std::string(key.substr(indexStart + 1, indexEnd - indexStart - 1));
+                keyIndex = std::stoul(keyIndexString);
+                key = key.substr(0, indexStart);
+            }
+        } else {
+            keyIndexString = '*';
+        }
+
+        m_properties[key] = std::make_pair(value, keyIndex);
+        LOGV << std::format("Parsed [{:03}/{}] {}={}", std::size(m_properties), keyIndexString, key, value);
     }
 
     // Remove parsed properties from the list of properties to parse.

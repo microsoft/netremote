@@ -4,11 +4,13 @@
 #include <utility>
 
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaKeyValuePair.hxx>
 #include <Wpa/WpaResponse.hxx>
 #include <Wpa/WpaResponseParser.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <plog/Log.h>
 
 #include "WpaParsingUtilities.hxx"
 
@@ -27,6 +29,10 @@ WpaStatusResponseParser::WpaStatusResponseParser(const WpaCommand* command, std:
         { ProtocolHostapd::ResponseStatusPropertyKeyIeee80211N, WpaValuePresence::Required },
         { ProtocolHostapd::ResponseStatusPropertyKeyIeee80211AC, WpaValuePresence::Required },
         { ProtocolHostapd::ResponseStatusPropertyKeyIeee80211AX, WpaValuePresence::Required },
+        { ProtocolHostapd::PropertyNameBss, WpaValuePresence::Required },
+        { ProtocolHostapd::PropertyNameBssSsid, WpaValuePresence::Required },
+        { ProtocolHostapd::PropertyNameBssBssid, WpaValuePresence::Required },
+        { ProtocolHostapd::PropertyNameBssNumStations, WpaValuePresence::Required },
     })
 // clang-format on
 {
@@ -37,12 +43,18 @@ WpaStatusResponseParser::ParsePayload()
 {
     using namespace Wpa::Parsing;
 
-    const auto properties = GetProperties();
+    const auto& properties = GetProperties();
     const auto response = std::make_shared<WpaResponseStatus>();
     auto& status = response->Status;
-    BssInfo bssInfo{};
 
-    for (const auto& [key, value] : properties) {
+    const auto enforceRequiredBssInfoSize = [&](const auto sizeRequired) {
+        if (std::size(status.Bss) < sizeRequired) {
+            status.Bss.resize(sizeRequired);
+        }
+    };
+
+    for (const auto& [key, mapped] : properties) {
+        const auto& [value, index] = mapped;
         if (key == ProtocolHostapd::ResponseStatusPropertyKeyState) {
             status.State = HostapdInterfaceStateFromString(value);
         } else if (key == ProtocolHostapd::ResponseStatusPropertyKeyIeee80211N) {
@@ -57,20 +69,18 @@ WpaStatusResponseParser::ParsePayload()
             ParseInt(value, status.Ieee80211ax);
         } else if (key == ProtocolHostapd::ResponseStatusPropertyKeyDisableAX) {
             ParseInt(value, status.Disable11ax);
-        } else if (key.starts_with(ProtocolHostapd::PropertyNameBss)) {
-            bssInfo.Interface = key;
-        } else if (key.starts_with(ProtocolHostapd::PropertyNameBssBssid)) {
-            bssInfo.Bssid = value;
-        } else if (key.starts_with(ProtocolHostapd::PropertyNameBssSsid)) {
-            bssInfo.Ssid = value;
-        } else if (key.starts_with(ProtocolHostapd::PropertyNameBssNumStations)) {
-            ParseInt(value, bssInfo.NumStations);
-            // TODO: this assumes num_sta is the last property per bss entry. This is currently true, but the code
-            // should not make this assumption to protect against future changes in hostapd control interface protocol.
-            // Instead, the property index should be read and when it changes, the bssInfo should be added to the
-            // response and a new bssInfo should be created.
-            status.Bss.push_back(std::move(bssInfo));
-            bssInfo = {};
+        } else if (key == ProtocolHostapd::PropertyNameBss) {
+            enforceRequiredBssInfoSize(index.value() + 1);
+            status.Bss[index.value()].Interface = value;
+        } else if (key == ProtocolHostapd::PropertyNameBssBssid) {
+            enforceRequiredBssInfoSize(index.value() + 1);
+            status.Bss[index.value()].Bssid = value;
+        } else if (key == ProtocolHostapd::PropertyNameBssSsid) {
+            enforceRequiredBssInfoSize(index.value() + 1);
+            status.Bss[index.value()].Ssid = value;
+        } else if (key == ProtocolHostapd::PropertyNameBssNumStations) {
+            enforceRequiredBssInfoSize(index.value() + 1);
+            ParseInt(value, status.Bss[index.value()].NumStations);
         }
     }
 
