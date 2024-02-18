@@ -85,8 +85,8 @@ protected:
 
     /**
      * @brief Obtain the map of parsed properties.
-     * 
-     * @return const std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>>& 
+     *
+     * @return const std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>>&
      */
     const std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>>&
     GetProperties() const noexcept;

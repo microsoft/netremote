@@ -1,5 +1,6 @@
 
 #include <chrono>
+#include <initializer_list>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -300,4 +301,58 @@ TEST_CASE("Send command: Terminate() ping failure (root)", "[wpa][hostapd][clien
     std::this_thread::sleep_for(TerminationWaitTime);
 
     REQUIRE_THROWS_AS(hostapd.Ping(), HostapdException);
+}
+
+TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    constexpr auto SsidValid{ "whatever" };
+    constexpr auto SsidInvalidNonPrintableCharacters {"SSID\x01\x02\x03"};
+    constexpr auto SsidInvalidTooLong{ "This SSID is way too long to be valid because it has more than 32 characters" };
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("SetSsid() doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetSsid(SsidValid));
+    }
+
+    SECTION("SetSsid() returns true for valid SSID")
+    {
+        REQUIRE(hostapd.SetSsid(SsidValid));
+    }
+
+    SECTION("SetSsid() throws for empty SSID")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetSsid(""), HostapdException);
+    }
+
+    SECTION("SetSsid() throws for SSID with length > 32")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetSsid(SsidInvalidTooLong), HostapdException);
+    }
+
+    SECTION("SetSsid() throws for SSID with non-printable characters")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetSsid(SsidInvalidNonPrintableCharacters), HostapdException);
+    }
+
+    SECTION("SetSsid() changes the SSID for valid input")
+    {
+        constexpr auto SsidToSet{ SsidValid };
+        REQUIRE(hostapd.SetSsid(SsidToSet));
+        const auto status = hostapd.GetStatus();
+        REQUIRE(!std::empty(status.Bss));
+        REQUIRE(status.Bss[0].Ssid == SsidToSet);
+    }
+
+    SECTION("SetSsid() does not change the SSID for invalid inputs")
+    {
+        const auto* const SsidToSet{ SsidInvalidTooLong };
+        REQUIRE_THROWS_AS(hostapd.SetSsid(SsidToSet), HostapdException);
+        const auto status = hostapd.GetStatus();
+        REQUIRE(!std::empty(status.Bss));
+        REQUIRE(status.Bss[0].Ssid != SsidToSet);
+    }
 }
