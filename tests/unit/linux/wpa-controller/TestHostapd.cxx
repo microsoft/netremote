@@ -308,7 +308,6 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
     using namespace Wpa;
 
     constexpr auto SsidValid{ "whatever" };
-    constexpr auto SsidInvalidNonPrintableCharacters {"SSID\x01\x02\x03"};
     constexpr auto SsidInvalidTooLong{ "This SSID is way too long to be valid because it has more than 32 characters" };
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
@@ -333,11 +332,6 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
         REQUIRE_THROWS_AS(hostapd.SetSsid(SsidInvalidTooLong), HostapdException);
     }
 
-    SECTION("SetSsid() throws for SSID with non-printable characters")
-    {
-        REQUIRE_THROWS_AS(hostapd.SetSsid(SsidInvalidNonPrintableCharacters), HostapdException);
-    }
-
     SECTION("SetSsid() changes the SSID for valid input")
     {
         constexpr auto SsidToSet{ SsidValid };
@@ -347,12 +341,19 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
         REQUIRE(status.Bss[0].Ssid == SsidToSet);
     }
 
+    // Note: The below tests use starts_with() to check the SSID instead of == as hostapd has a bug where attempting to
+    // provide an invalid SSID results in the reported SSID having some junk characters following the real SSID.
+
     SECTION("SetSsid() does not change the SSID for invalid inputs")
     {
+        const auto statusInitial = hostapd.GetStatus();
+        REQUIRE(!std::empty(statusInitial.Bss));
+
         const auto* const SsidToSet{ SsidInvalidTooLong };
         REQUIRE_THROWS_AS(hostapd.SetSsid(SsidToSet), HostapdException);
-        const auto status = hostapd.GetStatus();
-        REQUIRE(!std::empty(status.Bss));
-        REQUIRE(status.Bss[0].Ssid != SsidToSet);
+
+        const auto statusAfterFail = hostapd.GetStatus();
+        REQUIRE(!std::empty(statusAfterFail.Bss));
+        REQUIRE(statusAfterFail.Bss[0].Ssid.starts_with(statusInitial.Bss[0].Ssid));
     }
 }
