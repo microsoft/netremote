@@ -1,4 +1,5 @@
 
+#include <format>
 #include <string>
 #include <string_view>
 
@@ -96,6 +97,8 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
 bool
 Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue)
 {
+    LOGD << std::format("Attempting to set hostapd property '{}'({}) to '{}'({})", propertyName, std::size(propertyName), propertyValue, std::size(propertyValue));
+
     const WpaCommandSet setCommand(propertyName, propertyValue);
     const auto response = m_controller.SendCommand(setCommand);
     if (!response) {
