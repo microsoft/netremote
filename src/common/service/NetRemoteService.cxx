@@ -31,22 +31,23 @@ using namespace Microsoft::Net::Wifi;
 namespace detail
 {
 /**
- * @brief Handle a failure for a request that referecnes an access point.
+ * @brief Handle a failure for a request that references an access point.
  *
  * @tparam RequestT The request type. This must contain an access point id (trait).
  * @tparam ResultT The result type. This must contain an access point id and a status (traits).
+ * @return ReturnT The type of the return value. Defaults to grpc::Status with a value of grpc::OK.
  * @param request A reference to the request.
  * @param result A reference to the result.
  * @param code The error code to set in the result message.
  * @param message The error message to set in the result message.
- * @param grpcStatus The status to be returned to the client.
- * @return grpc::Status
+ * @param returnValue The value to return from the function.
  */
 template <
     typename RequestT,
-    typename ResultT>
-grpc::Status
-HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatusCode code, std::string_view message, grpc::Status grpcStatus = grpc::Status::OK)
+    typename ResultT,
+    typename ReturnT = grpc::Status>
+ReturnT
+HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatusCode code, std::string_view message, ReturnT returnValue = {})
 {
     LOGE << message;
 
@@ -59,7 +60,7 @@ HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatus
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(status);
 
-    return grpcStatus;
+    return returnValue;
 }
 
 /**
@@ -83,16 +84,14 @@ TryGetAccessPoint(RequestT& request, ResultT& result, std::shared_ptr<AccessPoin
     // Find the requested AP.
     auto accessPointOpt = accessPointManager->GetAccessPoint(accessPointId);
     if (!accessPointOpt.has_value()) {
-        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} not found", accessPointId));
-        return nullptr;
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} not found", accessPointId), nullptr);
     }
 
     // Attempt to promote the weak reference to a strong reference.
     auto accessPointWeak{ accessPointOpt.value() };
     auto accessPoint = accessPointWeak.lock();
     if (accessPoint == nullptr) {
-        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} is no longer valid", accessPointId));
-        return nullptr;
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Access point {} is no longer valid", accessPointId), nullptr);
     }
 
     return accessPoint;
@@ -119,14 +118,13 @@ TryGetAccessPointController(RequestT& request, ResultT& result, std::shared_ptr<
     // Find the requested AP.
     auto accessPoint = TryGetAccessPoint(request, result, accessPointManager);
     if (accessPoint == nullptr) {
-        return nullptr;
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid, std::format("Failed to find access point {}", accessPointId), nullptr);
     }
 
     // Create a controller for this access point.
     auto accessPointController = accessPoint->CreateController();
     if (accessPointController == nullptr) {
-        HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to create controller for access point {}", accessPointId));
-        return nullptr;
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to create controller for access point {}", accessPointId), nullptr);
     }
 
     return accessPointController;
@@ -211,6 +209,8 @@ NetRemoteAccessPointResultItemIsInvalid(const WifiEnumerateAccessPointsResultIte
 
 } // namespace detail
 
+using detail::HandleFailure;
+
 NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
     m_accessPointManager(std::move(accessPointManager))
 {}
@@ -286,21 +286,9 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext
 
     WifiAccessPointOperationStatus status{};
 
-    auto handleFailure = [&](WifiAccessPointOperationStatusCode statusCode, std::string statusMessage) {
-        LOGE << statusMessage;
-
-        status.set_code(statusCode);
-        status.set_message(statusMessage);
-
-        result->set_accesspointid(request->accesspointid());
-        *result->mutable_status() = std::move(status);
-
-        return grpc::Status::OK;
-    };
-
     // Check if PHY type is provided.
     if (request->phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
-        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No PHY type provided");
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No PHY type provided");
     }
 
     // Create an AP controller for the requested AP.
@@ -317,20 +305,19 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext
         auto accessPointCapabilities = accessPointController->GetCapabilities();
         const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
         if (std::ranges::find(supportedIeee80211Protocols, ieee80211Protocol) == std::cend(supportedIeee80211Protocols)) {
-            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
+            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
-        LOGE << std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what());
-        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what()));
     }
 
     // Set the Ieee80211 protocol.
     try {
         if (!accessPointController->SetProtocol(ieee80211Protocol)) {
-            return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
+            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
-        return handleFailure(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set PHY type for access point {} ({})", request->accesspointid(), apce.what()));
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set PHY type for access point {} ({})", request->accesspointid(), apce.what()));
     }
 
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
@@ -347,12 +334,10 @@ NetRemoteService::ValidateWifiSetFrequencyBandsRequest(const WifiAccessPointSetF
     const auto& frequencyBands = request->frequencybands();
 
     if (std::empty(frequencyBands)) {
-        detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No frequency band provided");
-        return false;
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "No frequency band provided", false);
     }
     if (std::ranges::find(frequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(frequencyBands)) {
-        detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "Invalid frequency band provided");
-        return false;
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter, "Invalid frequency band provided", false);
     }
 
     return true;
@@ -382,13 +367,13 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     try {
         accessPointCapabilities = accessPointController->GetCapabilities();
     } catch (const AccessPointControllerException& apce) {
-        return detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what()));
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what()));
     }
 
     // Check if requested bands are supported by the AP.
     for (const auto& requestedFrequencyBand : ieee80211FrequencyBands) {
         if (std::ranges::find(accessPointCapabilities.FrequencyBands, requestedFrequencyBand) == std::cend(accessPointCapabilities.FrequencyBands)) {
-            return detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Frequency band {} not supported by access point {}", magic_enum::enum_name(requestedFrequencyBand), request->accesspointid()));
+            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Frequency band {} not supported by access point {}", magic_enum::enum_name(requestedFrequencyBand), request->accesspointid()));
         }
     }
 
@@ -396,10 +381,10 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     try {
         const auto setBandsSucceeded = accessPointController->SetFrequencyBands(std::move(ieee80211FrequencyBands));
         if (!setBandsSucceeded) {
-            return detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set frequency bands for access point {}", request->accesspointid()));
+            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set frequency bands for access point {}", request->accesspointid()));
         }
     } catch (const AccessPointControllerException& apce) {
-        return detail::HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), apce.what()));
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), apce.what()));
     }
 
     // Prepare result with success indication.
