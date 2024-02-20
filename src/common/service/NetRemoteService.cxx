@@ -31,7 +31,7 @@ using namespace Microsoft::Net::Wifi;
 namespace detail
 {
 /**
- * @brief Handle a failure for a request that referecnes an access point.
+ * @brief Handle a failure for a request that references an access point.
  *
  * @tparam RequestT The request type. This must contain an access point id (trait).
  * @tparam ResultT The result type. This must contain an access point id and a status (traits).
