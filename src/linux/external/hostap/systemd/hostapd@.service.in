@@ -2,6 +2,7 @@
 Description=Hostapd Daemon
 Requires=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
+AssertPathExists=@CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
 
 [Service]
 Type=simple
