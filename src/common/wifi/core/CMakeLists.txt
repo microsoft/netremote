@@ -10,12 +10,14 @@ target_sources(wifi-core
         AccessPoint.cxx
         AccessPointController.cxx
         AccessPointControllerException.cxx
+        AccessPointOperationStatus.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_PUBLIC_INCLUDE}
     FILES
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointController.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointOperationStatus.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211.hxx

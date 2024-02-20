@@ -74,6 +74,16 @@ struct Hostapd :
     GetStatus() override;
 
     /**
+     * @brief Set the ssid of the access point.
+     *
+     * @param ssid The ssid to set.
+     * @return true
+     * @return false
+     */
+    bool
+    SetSsid(std::string_view ssid, bool reload = true);
+
+    /**
      * @brief Get a property value for the interface.
      *
      * @param propertyName The name of the property to retrieve.

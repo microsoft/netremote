@@ -2,10 +2,13 @@
 #ifndef WPA_RESPONSE_PARSER_HXX
 #define WPA_RESPONSE_PARSER_HXX
 
+#include <cstddef>
 #include <initializer_list>
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <Wpa/WpaKeyValuePair.hxx>
@@ -26,12 +29,14 @@ struct WpaResponseParser
     virtual ~WpaResponseParser() = default;
 
     /**
-     * Prevent copy and move operations. 
+     * Prevent copy and move operations.
      */
     WpaResponseParser(const WpaResponseParser&) = delete;
     WpaResponseParser(WpaResponseParser&&) = delete;
-    WpaResponseParser& operator=(const WpaResponseParser&) = delete;
-    WpaResponseParser& operator=(WpaResponseParser&&) = delete;
+    WpaResponseParser&
+    operator=(const WpaResponseParser&) = delete;
+    WpaResponseParser&
+    operator=(WpaResponseParser&&) = delete;
 
     /**
      * @brief Construct a new WpaResponseParser object.
@@ -53,16 +58,16 @@ struct WpaResponseParser
 
     /**
      * @brief Get the command associated with the response payload.
-     * 
-     * @return const WpaCommand* 
+     *
+     * @return const WpaCommand*
      */
     const WpaCommand*
     GetCommand() const noexcept;
 
     /**
      * @brief Get the response payload.
-     * 
-     * @return std::string_view 
+     *
+     * @return std::string_view
      */
     std::string_view
     GetResponsePayload() const noexcept;
@@ -81,9 +86,9 @@ protected:
     /**
      * @brief Obtain the map of parsed properties.
      *
-     * @return const std::unordered_map<std::string_view, std::string_view>&
+     * @return const std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>>&
      */
-    const std::unordered_map<std::string_view, std::string_view>&
+    const std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>>&
     GetProperties() const noexcept;
 
 private:
@@ -103,7 +108,7 @@ private:
     const WpaCommand* m_command;
     std::string_view m_responsePayload;
     std::vector<WpaKeyValuePair> m_propertiesToParse;
-    std::unordered_map<std::string_view, std::string_view> m_properties{};
+    std::unordered_map<std::string_view, std::pair<std::string_view, std::optional<std::size_t>>> m_properties{};
 };
 
 /**
@@ -116,12 +121,14 @@ struct WpaResponseParserFactory
     virtual ~WpaResponseParserFactory() = default;
 
     /**
-     * Prevent copy and move operations. 
+     * Prevent copy and move operations.
      */
     WpaResponseParserFactory(const WpaResponseParserFactory&) = delete;
     WpaResponseParserFactory(WpaResponseParserFactory&&) = delete;
-    WpaResponseParserFactory& operator=(const WpaResponseParserFactory&) = delete;
-    WpaResponseParserFactory& operator=(WpaResponseParserFactory&&) = delete;
+    WpaResponseParserFactory&
+    operator=(const WpaResponseParserFactory&) = delete;
+    WpaResponseParserFactory&
+    operator=(WpaResponseParserFactory&&) = delete;
 
     /**
      * @brief Create a response parser object.

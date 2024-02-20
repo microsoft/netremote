@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <Wpa/ProtocolWpa.hxx>
 
@@ -49,6 +50,7 @@ struct BssInfo
     int NumStations{ 0 };
     std::string Bssid;
     std::string Interface;
+    std::string Ssid;
 
     // Present with:
     //  - CONFIG_IEEE80211BE compilation option
@@ -156,8 +158,8 @@ struct HostapdStatus
     // //  - The current operational mode supports the currently active frequency.
     // std::optional<unsigned> MaxTxPower;
 
-    // // Always present (but may be empty).
-    // std::vector<BssInfo> Bss;
+    // Always present (but may be empty).
+    std::vector<BssInfo> Bss;
 
     // // Present with:
     // //  - Non-zero channel utilization.
@@ -201,40 +203,32 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
-// Macros below used to avoid repeating the same string literals in multiple places.
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
-#define HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER "="
-#define HOSTAPD_PROPERTY_NAME_IEEE80211N     "ieee80211n"
-#define HOSTAPD_PROPERTY_NAME_DISABLE11N     "disable_11n"
-#define HOSTAPD_PROPERTY_NAME_IEEE80211AC    "ieee80211ac"
-#define HOSTAPD_PROPERTY_NAME_DISABLE11AC    "disable_11ac"
-#define HOSTAPD_PROPERTY_NAME_IEEE80211AX    "ieee80211ax"
-#define HOSTAPD_PROPERTY_NAME_DISABLE11AX    "disable_11ax"
-#define HOSTAPD_PROPERTY_NAME_STATE          "state"
+    static constexpr auto PropertyNameSsid = "ssid";
 
-// Helper macro to create a hostapd configuration file key with value delimiter.
-#define HOSTAPD_DELIMITED_KEY(name) name HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER
-    // NOLINTEND(cppcoreguidelines-macro-usage)
-
-    static constexpr auto ProperyKeyValueNameDelimeter = HOSTAPD_PROPERTY_KEY_VALUE_DELIMETER;
-    static constexpr auto PropertyNameIeee80211N = HOSTAPD_PROPERTY_NAME_IEEE80211N;
-    static constexpr auto PropertyNameDisable11N = HOSTAPD_PROPERTY_NAME_DISABLE11N;
-    static constexpr auto PropertyNameIeee80211AC = HOSTAPD_PROPERTY_NAME_IEEE80211AC;
-    static constexpr auto PropertyNameDisable11AC = HOSTAPD_PROPERTY_NAME_DISABLE11AC;
-    static constexpr auto PropertyNameIeee80211AX = HOSTAPD_PROPERTY_NAME_IEEE80211AX;
-    static constexpr auto PropertyNameDisable11AX = HOSTAPD_PROPERTY_NAME_DISABLE11AX;
+    static constexpr auto PropertyNameIeee80211N = "ieee80211n";
+    static constexpr auto PropertyNameDisable11N = "disable_11n";
+    static constexpr auto PropertyNameIeee80211AC = "ieee80211ac";
+    static constexpr auto PropertyNameDisable11AC = "disable_11ac";
+    static constexpr auto PropertyNameIeee80211AX = "ieee80211ax";
+    static constexpr auto PropertyNameDisable11AX = "disable_11ax";
     static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
+    static constexpr auto PropertyNameState = "state";
+
+    // Indexed property names for BSS entries in the "STATUS" response.
+    static constexpr auto PropertyNameBss = "bss";
+    static constexpr auto PropertyNameBssBssid = "bssid";
+    static constexpr auto PropertyNameBssSsid = "ssid";
+    static constexpr auto PropertyNameBssNumStations = "num_sta";
 
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
-    static constexpr auto PropertyNameState = HOSTAPD_PROPERTY_NAME_STATE;
-    static constexpr auto ResponseStatusPropertyKeyState = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_STATE);
-    static constexpr auto ResponseStatusPropertyKeyIeee80211N = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_IEEE80211N);
-    static constexpr auto ResponseStatusPropertyKeyDisable11N = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_DISABLE11N);
-    static constexpr auto ResponseStatusPropertyKeyIeee80211AC = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_IEEE80211AC);
-    static constexpr auto ResponseStatusPropertyKeyDisableAC = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_DISABLE11AC);
-    static constexpr auto ResponseStatusPropertyKeyIeee80211AX = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_IEEE80211AX);
-    static constexpr auto ResponseStatusPropertyKeyDisableAX = HOSTAPD_DELIMITED_KEY(HOSTAPD_PROPERTY_NAME_DISABLE11AX);
+    static constexpr auto ResponseStatusPropertyKeyState = PropertyNameState;
+    static constexpr auto ResponseStatusPropertyKeyIeee80211N = PropertyNameIeee80211N;
+    static constexpr auto ResponseStatusPropertyKeyDisable11N = PropertyNameDisable11N;
+    static constexpr auto ResponseStatusPropertyKeyIeee80211AC = PropertyNameIeee80211AC;
+    static constexpr auto ResponseStatusPropertyKeyDisableAC = PropertyNameDisable11AC;
+    static constexpr auto ResponseStatusPropertyKeyIeee80211AX = PropertyNameIeee80211AX;
+    static constexpr auto ResponseStatusPropertyKeyDisableAX = PropertyNameDisable11AX;
 };
 
 /**
