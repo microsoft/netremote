@@ -61,9 +61,9 @@ WpaResponseParser::GetResponsePayload() const noexcept
 bool
 WpaResponseParser::TryParseProperties()
 {
-    // Convert a range to a string-view for pre-C++23 where std::string_view doesn't have a range constructor.
+    // Convert a range to a string-view.
     constexpr auto toStringView = [](auto&& sv) {
-        return std::string_view{ std::data(sv), std::size(sv) };
+        return std::string_view(sv);
     };
     // Convert a key-value pair to its key.
     constexpr auto toKey = [](auto&& keyValuePair) {

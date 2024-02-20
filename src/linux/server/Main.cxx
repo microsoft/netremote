@@ -13,7 +13,6 @@
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
-#include <notstd/Utility.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/MessageOnlyFormatter.h>
@@ -44,11 +43,11 @@ main(int argc, char *argv[])
     const auto logSeverity = logging::LogVerbosityToPlogSeverity(configuration.LogVerbosity);
 
     // Configure logging, appending all loggers to the default instance.
-    plog::init<notstd::to_underlying(LogInstanceId::Console)>(logSeverity, &colorConsoleAppender);
-    plog::init(logSeverity).addAppender(plog::get<notstd::to_underlying(LogInstanceId::Console)>());
+    plog::init<std::to_underlying(LogInstanceId::Console)>(logSeverity, &colorConsoleAppender);
+    plog::init(logSeverity).addAppender(plog::get<std::to_underlying(LogInstanceId::Console)>());
     if (configuration.EnableFileLogging) {
-        plog::init<notstd::to_underlying(LogInstanceId::File)>(logSeverity, &rollingFileAppender);
-        plog::init(logSeverity).addAppender(plog::get<notstd::to_underlying(LogInstanceId::File)>());
+        plog::init<std::to_underlying(LogInstanceId::File)>(logSeverity, &rollingFileAppender);
+        plog::init(logSeverity).addAppender(plog::get<std::to_underlying(LogInstanceId::File)>());
     }
 
     // Create an access point manager and discovery agent.
