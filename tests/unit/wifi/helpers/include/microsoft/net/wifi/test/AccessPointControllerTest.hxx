@@ -6,7 +6,10 @@
 #include <string_view>
 #include <vector>
 
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {
@@ -18,10 +21,12 @@ struct AccessPointTest;
  * This implementation takes an AccessPointTest object which it uses to implement the IAccessPointController interface.
  * The owner of this class must ensure that the passes AccessPointTest* remains valid for the lifetime of this object.
  */
-struct AccessPointControllerTest final :
-    public Microsoft::Net::Wifi::IAccessPointController
+struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPointController
 {
     AccessPointTest *AccessPoint{ nullptr };
+
+    AccessPointControllerTest() = default;
+    ~AccessPointControllerTest() override = default;
 
     /**
      * @brief Construct a new AccessPointControllerTest object that uses the specified AccessPointTest to implement the
@@ -29,14 +34,24 @@ struct AccessPointControllerTest final :
      *
      * @param accessPoint The access point to use.
      */
-    AccessPointControllerTest(AccessPointTest *accessPoint);
+    explicit AccessPointControllerTest(AccessPointTest *accessPoint);
+
+    /**
+     * Prevent copying and moving of AccessPointControllerTest objects.
+     */
+    AccessPointControllerTest(const AccessPointControllerTest &) = delete;
+    AccessPointControllerTest &
+    operator=(const AccessPointControllerTest &) = delete;
+    AccessPointControllerTest(AccessPointControllerTest &&) = delete;
+    AccessPointControllerTest &
+    operator=(AccessPointControllerTest &&) = delete;
 
     /**
      * @brief Get the interface name associated with this controller.
      *
      * @return std::string_view
      */
-    virtual std::string_view
+    std::string_view
     GetInterfaceName() const override;
 
     /**
@@ -45,7 +60,7 @@ struct AccessPointControllerTest final :
      * @return true
      * @return false
      */
-    virtual bool
+    bool
     GetIsEnabled() override;
 
     /**
@@ -53,7 +68,7 @@ struct AccessPointControllerTest final :
      *
      * @return Ieee80211AccessPointCapabilities
      */
-    virtual Ieee80211AccessPointCapabilities
+    Ieee80211AccessPointCapabilities
     GetCapabilities() override;
 
     /**
@@ -63,7 +78,7 @@ struct AccessPointControllerTest final :
      * @return true
      * @return false
      */
-    virtual bool
+    bool
     SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
 
     /**
@@ -73,17 +88,27 @@ struct AccessPointControllerTest final :
      * @return true
      * @return false
      */
-    virtual bool
+    bool
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
+
+    /**
+     * @brief Set the SSID of the access point.
+     * 
+     * @param ssid The SSID to be set.
+     * @return AccessPointOperationStatus 
+     */
+    AccessPointOperationStatus
+    SetSssid(std::string_view ssid) override;
 };
 
 /**
  * @brief IAccessPointControllerFactory implementation for testing purposes.
  */
-struct AccessPointControllerFactoryTest final :
-    public Microsoft::Net::Wifi::IAccessPointControllerFactory
+struct AccessPointControllerFactoryTest final : public Microsoft::Net::Wifi::IAccessPointControllerFactory
 {
     AccessPointTest *AccessPoint{ nullptr };
+
+    ~AccessPointControllerFactoryTest() override = default;
 
     /**
      * @brief Construct a new AccessPointControllerFactoryTest object with no AccessPointTest parent/owner. This may
@@ -95,11 +120,22 @@ struct AccessPointControllerFactoryTest final :
     AccessPointControllerFactoryTest() = default;
 
     /**
-     * @brief Construct a new AccessPointControllerFactoryTest object. The owner of this object must ensure that the passed AccessPointTest remains valid for the lifetime of this object.
+     * @brief Construct a new AccessPointControllerFactoryTest object. The owner of this object must ensure that the
+     * passed AccessPointTest remains valid for the lifetime of this object.
      *
      * @param accessPoint The access point to create controllers for.
      */
-    AccessPointControllerFactoryTest(AccessPointTest *accessPoint);
+    explicit AccessPointControllerFactoryTest(AccessPointTest *accessPoint);
+
+    /**
+     * Prevent copying and moving of AccessPointControllerFactoryTest objects.
+     */
+    AccessPointControllerFactoryTest(const AccessPointControllerFactoryTest &) = delete;
+    AccessPointControllerFactoryTest &
+    operator=(const AccessPointControllerFactoryTest &) = delete;
+    AccessPointControllerFactoryTest(AccessPointControllerFactoryTest &&) = delete;
+    AccessPointControllerFactoryTest &
+    operator=(AccessPointControllerFactoryTest &&) = delete;
 
     /**
      * @brief Create a new instance that can control the access point.

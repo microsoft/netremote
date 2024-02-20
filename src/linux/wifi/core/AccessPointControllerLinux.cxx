@@ -16,6 +16,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -193,7 +194,7 @@ bool
 AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {
     bool isOk = false;
-    Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    const Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
 
     try {
         // Set the hostapd hw_mode property.
@@ -249,7 +250,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     }
 
     std::string setBandArgumentAll = setBandArgumentBuilder.str();
-    std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
+    const std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
 
     bool isOk = false;
     try {
@@ -271,6 +272,54 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     }
 
     return true;
+}
+
+AccessPointOperationStatus
+AccessPointControllerLinux::SetSssid(std::string_view ssid)
+{
+    AccessPointOperationStatus status{};
+
+    // Ensure the ssid is not empty.
+    if (std::empty(ssid)) {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Message = "SSID cannot be empty";
+        LOGE << std::format("No SSID specified for interface {}", GetInterfaceName());
+        return status;
+    }
+
+    // Attempt to set the SSID.
+    try {
+        const bool propertyWasSet = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid);
+        if (!propertyWasSet) {
+            LOGE << std::format("Failed to set SSID '{}' for interface {} (rejected)", ssid, GetInterfaceName());
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = std::format("Access point rejected SSID value '{}'", ssid);
+            return status;
+        }
+    } catch (Wpa::HostapdException& ex) {
+        LOGE << std::format("Failed to set SSID '{}' for interface {} ({})", ssid, GetInterfaceName(), ex.what());
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = ex.what();
+        return status;
+    }
+
+    // Reload the configuration to pick up the changes.
+    try {
+        const bool reloaded = m_hostapd.Reload();
+        if (!reloaded) {
+            LOGE << std::format("Failed to set SSID '{}' for interface {} (configuration reload failed)", ssid, GetInterfaceName());
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = "Failed to reload access point configuration";
+            return status;
+        }
+    } catch (Wpa::HostapdException& ex) {
+        LOGE << std::format("Failed to set SSID '{}' for interface {} ({})", ssid, GetInterfaceName(), ex.what());
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = ex.what();
+        return status;
+    }
+
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 std::unique_ptr<IAccessPointController>

@@ -8,6 +8,7 @@
 #include <string_view>
 #include <vector>
 
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 
@@ -41,12 +42,14 @@ struct IAccessPointController
     virtual ~IAccessPointController() = default;
 
     /**
-     * Prevent copying and moving of IAccessPointController objects. 
+     * Prevent copying and moving of IAccessPointController objects.
      */
     IAccessPointController(const IAccessPointController&) = delete;
-    IAccessPointController& operator=(const IAccessPointController&) = delete;
+    IAccessPointController&
+    operator=(const IAccessPointController&) = delete;
     IAccessPointController(IAccessPointController&&) = delete;
-    IAccessPointController& operator=(IAccessPointController&&) = delete;
+    IAccessPointController&
+    operator=(IAccessPointController&&) = delete;
 
     /**
      * @brief Get the interface name associated with this controller.
@@ -93,6 +96,15 @@ struct IAccessPointController
      */
     virtual bool
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) = 0;
+
+    /**
+     * @brief Set the SSID of the access point.
+     * 
+     * @param ssid The SSID to be set.
+     * @return AccessPointOperationStatus 
+     */
+    virtual AccessPointOperationStatus
+    SetSssid(std::string_view ssid) = 0;
 };
 
 /**
@@ -105,12 +117,14 @@ struct IAccessPointControllerFactory
     virtual ~IAccessPointControllerFactory() = default;
 
     /**
-     * Prevent copying and moving of IAccessPointControllerFactory objects. 
+     * Prevent copying and moving of IAccessPointControllerFactory objects.
      */
     IAccessPointControllerFactory(const IAccessPointControllerFactory&) = delete;
-    IAccessPointControllerFactory& operator=(const IAccessPointControllerFactory&) = delete;
+    IAccessPointControllerFactory&
+    operator=(const IAccessPointControllerFactory&) = delete;
     IAccessPointControllerFactory(IAccessPointControllerFactory&&) = delete;
-    IAccessPointControllerFactory& operator=(IAccessPointControllerFactory&&) = delete;
+    IAccessPointControllerFactory&
+    operator=(IAccessPointControllerFactory&&) = delete;
 
     /**
      * @brief Create a new IAccessPointController object.

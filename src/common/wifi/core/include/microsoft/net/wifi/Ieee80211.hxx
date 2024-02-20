@@ -2,9 +2,11 @@
 #ifndef IEEE_80211_HXX
 #define IEEE_80211_HXX
 
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <initializer_list>
+#include <string>
 
 #include <notstd/Utility.hxx>
 
@@ -266,6 +268,39 @@ enum class Ieee80211CipherSuite : uint32_t {
     UseGroup = MakeIeee80211Suite(Ieee80211CipherSuiteIdUseGroup),
     Wep104 = MakeIeee80211Suite(Ieee80211CipherSuiteIdWep104),
     Wep40 = MakeIeee80211Suite(Ieee80211CipherSuiteIdWep40),
+};
+
+/**
+ * @brief IEEE 802.11 BSS Types.
+ *
+ * Defined in IEEE 802.11-2020, Section 4.3.
+ */
+enum class Ieee80211BssType {
+    Unknown,
+    Infrastructure, // ESS
+    Independent,    // IBSS
+    Personal,       // PBSS
+    Mesh,           // MBSS
+};
+
+/**
+ * @brief Number of octets per BSSID.
+ */
+static constexpr auto BssidNumOctets = 6;
+
+/**
+ * @brief BSSID type.
+ */
+using Ieee80211Bssid = std::array<uint8_t, BssidNumOctets>;
+
+/**
+ * @brief Information about a BSS.
+ */
+struct Ieee80211Bss
+{
+    Ieee80211BssType Type;
+    Ieee80211Bssid Bssid;
+    std::string Ssid;
 };
 
 } // namespace Microsoft::Net::Wifi

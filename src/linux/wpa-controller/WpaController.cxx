@@ -70,7 +70,7 @@ WpaController::GetCommandControlSocket()
     const auto controlSocketPath = m_controlSocketPath / m_interfaceName;
     struct wpa_ctrl* controlSocket = wpa_ctrl_open(controlSocketPath.c_str());
     if (controlSocket == nullptr) {
-        LOGE << std::format("Failed to open control socket for {} interface at {}.\n", m_interfaceName, controlSocketPath.c_str());
+        LOGE << std::format("Failed to open control socket for {} interface at {}.", m_interfaceName, controlSocketPath.c_str());
         return nullptr;
     }
 
@@ -85,29 +85,30 @@ WpaController::SendCommand(const WpaCommand& command)
     // Obtain a control socket connection to send the command over.
     struct wpa_ctrl* controlSocket = GetCommandControlSocket();
     if (controlSocket == nullptr) {
-        LOGE << std::format("Failed to get control socket for {}.\n", m_interfaceName);
+        LOGE << std::format("Failed to get control socket for {}.", m_interfaceName);
         return nullptr;
     }
 
     // Send the command and receive the response.
-    std::array<char, WpaControlSocket::MessageSizeMax> responseBuffer;
+    std::array<char, WpaControlSocket::MessageSizeMax> responseBuffer{};
     std::size_t responseSize = std::size(responseBuffer);
 
     auto commandPayload = command.GetPayload();
+    LOGD << std::format("Sending wpa command to {} interface: '{}'", m_interfaceName, commandPayload);
     int ret = wpa_ctrl_request(controlSocket, std::data(commandPayload), std::size(commandPayload), std::data(responseBuffer), &responseSize, nullptr);
     switch (ret) {
     case 0: {
-        std::string_view responsePayload{ std::data(responseBuffer), responseSize };
+        const std::string_view responsePayload{ std::data(responseBuffer), responseSize };
         return command.ParseResponse(responsePayload);
     }
     case -1:
-        LOGE << std::format("Failed to send or receive command to {} interface.\n", m_interfaceName);
+        LOGE << std::format("Failed to send or receive command to/from {} interface.", m_interfaceName);
         return nullptr;
     case -2:
-        LOGE << std::format("Sending command to {} interface timed out.\n", m_interfaceName);
+        LOGE << std::format("Sending command to {} interface timed out.", m_interfaceName);
         return nullptr;
     default:
-        LOGE << std::format("Unknown error sending command to {} interface (ret={}).\n", m_interfaceName, ret);
+        LOGE << std::format("Unknown error sending command to {} interface (ret={}).", m_interfaceName, ret);
         return nullptr;
     }
 }

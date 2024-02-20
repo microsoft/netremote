@@ -1,4 +1,5 @@
 
+#include <format>
 #include <string>
 #include <string_view>
 
@@ -11,6 +12,7 @@
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <plog/Log.h>
 
 using namespace Wpa;
 
@@ -53,6 +55,27 @@ Hostapd::GetStatus()
 }
 
 bool
+Hostapd::SetSsid(std::string_view ssid, bool reload)
+{
+    const bool ssidWasSet = SetProperty(ProtocolHostapd::PropertyNameSsid, ssid);
+    if (!ssidWasSet) {
+        throw HostapdException("Failed to set hostapd 'ssid' property");
+    }
+
+    if (!reload) {
+        LOGW << "Skipping hostapd reload after setting 'ssid' (requested)";
+        return true;
+    }
+
+    const bool configurationReloadSucceeded = Reload();
+    if (!configurationReloadSucceeded) {
+        throw HostapdException("Failed to reload hostapd configuration");
+    }
+
+    return true;
+}
+
+bool
 Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
 {
     const WpaCommandGet getCommand(propertyName);
@@ -61,7 +84,7 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
         throw HostapdException("Failed to send hostapd 'get' command");
     }
 
-    // Check Failed() and not IsOk() since the response will indicate failure
+    // Check Failed() instead of IsOk() since the response will indicate failure
     // with "FAIL", otherwise, the payload is the property value (not "OK").
     if (response->Failed()) {
         return false;
@@ -74,6 +97,8 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
 bool
 Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue)
 {
+    LOGD << std::format("Attempting to set hostapd property '{}'({}) to '{}'({})", propertyName, std::size(propertyName), propertyValue, std::size(propertyValue));
+
     const WpaCommandSet setCommand(propertyName, propertyValue);
     const auto response = m_controller.SendCommand(setCommand);
     if (!response) {
