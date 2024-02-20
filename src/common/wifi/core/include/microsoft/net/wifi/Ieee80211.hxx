@@ -7,8 +7,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <string>
-
-#include <notstd/Utility.hxx>
+#include <utility>
 
 namespace Microsoft::Net::Wifi
 {
@@ -205,27 +204,27 @@ enum class Ieee80211AkmSuite : uint32_t {
  * only supports enums with values up to UINT16_MAX-1, and the AKM suite underlying type is uint32_t, so cannot be used.
  */
 constexpr std::initializer_list<uint32_t> AllIeee80211Akms{
-    notstd::to_underlying(Ieee80211AkmSuite::Reserved0),
-    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021x),
-    notstd::to_underlying(Ieee80211AkmSuite::Psk),
-    notstd::to_underlying(Ieee80211AkmSuite::Ft8021x),
-    notstd::to_underlying(Ieee80211AkmSuite::FtPsk),
-    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021xSha256),
-    notstd::to_underlying(Ieee80211AkmSuite::PskSha256),
-    notstd::to_underlying(Ieee80211AkmSuite::Tdls),
-    notstd::to_underlying(Ieee80211AkmSuite::Sae),
-    notstd::to_underlying(Ieee80211AkmSuite::FtSae),
-    notstd::to_underlying(Ieee80211AkmSuite::ApPeerKey),
-    notstd::to_underlying(Ieee80211AkmSuite::Ieee8021xSuiteB),
-    notstd::to_underlying(Ieee80211AkmSuite::Ieee8011xSuiteB192),
-    notstd::to_underlying(Ieee80211AkmSuite::Ft8021xSha384),
-    notstd::to_underlying(Ieee80211AkmSuite::FilsSha256),
-    notstd::to_underlying(Ieee80211AkmSuite::FilsSha384),
-    notstd::to_underlying(Ieee80211AkmSuite::FtFilsSha256),
-    notstd::to_underlying(Ieee80211AkmSuite::FtFilsSha384),
-    notstd::to_underlying(Ieee80211AkmSuite::Owe),
-    notstd::to_underlying(Ieee80211AkmSuite::FtPskSha384),
-    notstd::to_underlying(Ieee80211AkmSuite::PskSha384),
+    std::to_underlying(Ieee80211AkmSuite::Reserved0),
+    std::to_underlying(Ieee80211AkmSuite::Ieee8021x),
+    std::to_underlying(Ieee80211AkmSuite::Psk),
+    std::to_underlying(Ieee80211AkmSuite::Ft8021x),
+    std::to_underlying(Ieee80211AkmSuite::FtPsk),
+    std::to_underlying(Ieee80211AkmSuite::Ieee8021xSha256),
+    std::to_underlying(Ieee80211AkmSuite::PskSha256),
+    std::to_underlying(Ieee80211AkmSuite::Tdls),
+    std::to_underlying(Ieee80211AkmSuite::Sae),
+    std::to_underlying(Ieee80211AkmSuite::FtSae),
+    std::to_underlying(Ieee80211AkmSuite::ApPeerKey),
+    std::to_underlying(Ieee80211AkmSuite::Ieee8021xSuiteB),
+    std::to_underlying(Ieee80211AkmSuite::Ieee8011xSuiteB192),
+    std::to_underlying(Ieee80211AkmSuite::Ft8021xSha384),
+    std::to_underlying(Ieee80211AkmSuite::FilsSha256),
+    std::to_underlying(Ieee80211AkmSuite::FilsSha384),
+    std::to_underlying(Ieee80211AkmSuite::FtFilsSha256),
+    std::to_underlying(Ieee80211AkmSuite::FtFilsSha384),
+    std::to_underlying(Ieee80211AkmSuite::Owe),
+    std::to_underlying(Ieee80211AkmSuite::FtPskSha384),
+    std::to_underlying(Ieee80211AkmSuite::PskSha384),
 };
 
 /**

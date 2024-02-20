@@ -4,9 +4,9 @@
 
 #include <optional>
 #include <string_view>
+#include <utility>
 
 #include <Wpa/ProtocolWpa.hxx>
-#include <notstd/Utility.hxx>
 
 namespace Wpa
 {
@@ -41,7 +41,7 @@ struct WpaKeyValuePair
      */
     constexpr WpaKeyValuePair(std::string_view key, WpaValuePresence presence, bool isIndexed = false) :
         Key(key),
-        IsRequired(notstd::to_underlying(presence)),
+        IsRequired(std::to_underlying(presence)),
         IsIndexed(isIndexed)
     {
     }
