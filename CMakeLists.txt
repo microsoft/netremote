@@ -49,7 +49,7 @@ MESSAGE(STATUS "Target OS ${CMAKE_SYSTEM_NAME} detected")
 # common denominator for all the OS-dependent projects. In practice, since this
 # project must build under the Windows build system (build.exe), its toolchain
 # is typically the limiting factor.
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
