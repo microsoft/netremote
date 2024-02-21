@@ -40,7 +40,7 @@ install(
 
 install(
     FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/hostapd@.service
+        ${CMAKE_CURRENT_BINARY_DIR}/hostapd-debug@.service
     CONFIGURATIONS Debug RelWithDebInfo MinSizeRel
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
     RENAME hostapd@.service
