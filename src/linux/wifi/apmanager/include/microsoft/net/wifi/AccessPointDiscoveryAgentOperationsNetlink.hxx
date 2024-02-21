@@ -72,14 +72,14 @@ private:
      * @brief Request that the netlink processing loop stop.
      */
     void
-    RequestNetlinkProcessingLoopStop();
+    RequestNetlinkProcessingLoopStop() const;
 
     /**
      * @brief Handles when the netlink socket is ready for reading.
      *
      * @param netlinkSocket The netlink socket that is ready for reading.
      */
-    void
+    static void
     HandleNetlinkSocketReady(Microsoft::Net::Netlink::NetlinkSocket &netlinkSocket);
 
     /**

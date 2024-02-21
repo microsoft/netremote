@@ -18,7 +18,6 @@
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
-#include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
@@ -43,9 +42,10 @@
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Netlink::Nl80211;
 
-using Microsoft::Net::Netlink::NetlinkMessage;
 using Microsoft::Net::Netlink::NetlinkSocket;
 using Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState;
+
+// NOLINTBEGIN(concurrency-mt-unsafe)
 
 AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory) :
     m_accessPointFactory(std::move(accessPointFactory)),
@@ -57,12 +57,12 @@ AccessPointDiscoveryAgentOperationsNetlink::~AccessPointDiscoveryAgentOperations
 {
     RequestNetlinkProcessingLoopStop();
 
-    // Explicitly stop the netlink message processing thread to force the thread
-    // to tear down predictably. This isn't technically required since the
-    // member variables are ordered such that the thread will be stopped before
-    // the netlink socket is destroyed, but it is good practice to be explicit
-    // and avoids any potential issues if members are re-ordered.
-    Stop();
+    // Explicitly stop the netlink message processing thread to force the thread to tear down predictably. This isn't
+    // technically required since the member variables are ordered such that the thread will be stopped before the
+    // netlink socket is destroyed, but it is good practice to be explicit and avoids any potential issues if members
+    // are re-ordered. Since Stop() is a virtual function, it is invoked on the derived (this) class directly here to
+    // avoid any issues with the vtable.
+    AccessPointDiscoveryAgentOperationsNetlink::Stop();
 
     // Invalidate the cookie as a rudimentary way to detect use-after-free
     // within the netlink thread.
@@ -70,7 +70,7 @@ AccessPointDiscoveryAgentOperationsNetlink::~AccessPointDiscoveryAgentOperations
 }
 
 void
-AccessPointDiscoveryAgentOperationsNetlink::RequestNetlinkProcessingLoopStop()
+AccessPointDiscoveryAgentOperationsNetlink::RequestNetlinkProcessingLoopStop() const
 {
     if (m_eventLoopStopFd == -1) {
         return;
@@ -81,10 +81,10 @@ AccessPointDiscoveryAgentOperationsNetlink::RequestNetlinkProcessingLoopStop()
     // Write any value to the eventfd to signal the netlink processing loop to
     // stop. The value itself is meaningless, but the write to the file
     // descriptor will interrupt the epoll_wait call and set the stop flag.
-    ssize_t numWritten = write(m_eventLoopStopFd, &StopValue, sizeof StopValue);
+    const ssize_t numWritten = write(m_eventLoopStopFd, &StopValue, sizeof StopValue);
     if (numWritten != sizeof StopValue) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to write to event loop stop fd with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to write to event loop stop fd with error {} ({})", err, strerror(err));
     }
 }
 
@@ -92,7 +92,7 @@ void
 AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallback accessPointPresenceEventCallback)
 {
     if (m_netlinkMessageProcessingThread.joinable()) {
-        LOG_WARNING << "Netlink message processing thread is already running";
+        LOGW << "Netlink message processing thread is already running";
         Stop();
     }
 
@@ -101,18 +101,18 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     // Allocate a new netlink socket for use with nl80211.
     auto nl80211SocketOpt{ CreateNl80211Socket() };
     if (nl80211SocketOpt == nullptr) {
-        LOG_ERROR << "Failed to allocate new netlink socket for nl control";
+        LOGE << "Failed to allocate new netlink socket for nl control";
         return;
     }
 
     auto nl80211Socket{ std::move(nl80211SocketOpt.value()) };
 
     // Subscribe to configuration messages.
-    int nl80211MulticastGroupIdConfig = m_netlink80211ProtocolState.MulticastGroupId[Nl80211MulticastGroup::Configuration];
-    int ret = nl_socket_add_membership(nl80211Socket, nl80211MulticastGroupIdConfig);
+    const int nl80211MulticastGroupIdConfig = m_netlink80211ProtocolState.MulticastGroupId[Nl80211MulticastGroup::Configuration];
+    const int ret = nl_socket_add_membership(nl80211Socket, nl80211MulticastGroupIdConfig);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to add netlink socket membership for '" NL80211_MULTICAST_GROUP_CONFIG "' group with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to add netlink socket membership for '" NL80211_MULTICAST_GROUP_CONFIG "' group with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -128,7 +128,7 @@ void
 AccessPointDiscoveryAgentOperationsNetlink::Stop()
 {
     if (m_netlinkMessageProcessingThread.joinable()) {
-        LOG_VERBOSE << "Stopping netlink message processing thread";
+        LOGD << "Stopping netlink message processing thread";
         RequestNetlinkProcessingLoopStop();
         m_netlinkMessageProcessingThread.request_stop();
         m_netlinkMessageProcessingThread.join();
@@ -160,9 +160,8 @@ IsNl80211InterfaceTypeAp(const Nl80211Interface &nl80211Interface)
 std::shared_ptr<IAccessPoint>
 MakeAccessPoint(const std::shared_ptr<AccessPointFactoryLinux> &accessPointFactory, const Nl80211Interface &nl80211Interface)
 {
-    auto &interfaceName = nl80211Interface.Name;
-    auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface));
-    return accessPointFactory->Create(interfaceName, std::move(createArgs));
+    auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(nl80211Interface);
+    return accessPointFactory->Create(nl80211Interface.Name, std::move(createArgs));
 }
 } // namespace detail
 
@@ -195,7 +194,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     // Ensure the message has a genl header.
     auto *netlinkMessageHeader{ static_cast<struct nlmsghdr *>(nlmsg_hdr(netlinkMessage)) };
     if (genlmsg_valid_hdr(netlinkMessageHeader, 1) == 0) {
-        LOG_ERROR << "Netlink genl message header is invalid, ignoring message";
+        LOGE << "Netlink genl message header is invalid, ignoring message";
         return NL_SKIP;
     }
 
@@ -207,14 +206,14 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     std::array<struct nlattr *, NL80211_ATTR_MAX + 1> netlinkMessageAttributes{};
     int ret = nla_parse(std::data(netlinkMessageAttributes), std::size(netlinkMessageAttributes), genlmsg_attrdata(genlMessageHeader, 0), genlmsg_attrlen(genlMessageHeader, 0), nullptr);
     if (ret < 0) {
-        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
         return NL_SKIP;
     }
 
     if (genlMessageHeader->cmd != NL80211_CMD_NEW_INTERFACE &&
         genlMessageHeader->cmd != NL80211_CMD_DEL_INTERFACE &&
         genlMessageHeader->cmd != NL80211_CMD_SET_INTERFACE) {
-        LOGV << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
+        LOGD << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
     }
 
     LOGD << std::format("Received {} nl80211 command message", nl80211CommandName);
@@ -226,14 +225,14 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         return NL_OK;
     }
 
-    AccessPointPresenceEvent accessPointPresenceEvent;
+    AccessPointPresenceEvent accessPointPresenceEvent{};
     auto &nl80211Interface = nl80211InterfaceOpt.value();
 
     switch (genlMessageHeader->cmd) {
     case NL80211_CMD_NEW_INTERFACE:
     case NL80211_CMD_DEL_INTERFACE: {
         if (!nl80211Interface.IsAccessPoint()) {
-            LOGV << std::format("Ignoring interface presence change nl80211 message for non-ap wi-fi interface (type={})", Nl80211InterfaceTypeToString(nl80211Interface.Type));
+            LOGD << std::format("Ignoring interface presence change nl80211 message for non-ap wi-fi interface (type={})", Nl80211InterfaceTypeToString(nl80211Interface.Type));
             return NL_OK;
         }
         accessPointPresenceEvent = (genlMessageHeader->cmd == NL80211_CMD_NEW_INTERFACE) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
@@ -244,7 +243,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         break;
     }
     default: {
-        PLOG_VERBOSE << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
+        LOGD << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
         return NL_SKIP;
     }
     }
@@ -265,7 +264,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     // Invoke presence event callback if present.
     if (accessPointPresenceEventCallback != nullptr) {
         const auto interfaceName{ nl80211Interface.Name };
-        LOGV << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", interfaceName, magic_enum::enum_name(accessPointPresenceEvent));
+        LOGD << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", interfaceName, magic_enum::enum_name(accessPointPresenceEvent));
         auto accessPointCreateArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface));
         auto accessPoint = m_accessPointFactory->Create(interfaceName, std::move(accessPointCreateArgs));
 
@@ -279,27 +278,31 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
 int
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesCallback(struct nl_msg *netlinkMessage, void *contextArgument)
 {
-    LOG_VERBOSE << "Received netlink message callback";
+    LOGD << "Received netlink message callback";
 
     // Validate the context argument and cookie to ensure the discovery agent is still alive.
     auto *instance{ static_cast<AccessPointDiscoveryAgentOperationsNetlink *>(contextArgument) };
     if (instance == nullptr) {
         static constexpr auto errorMessage{ "Netlink message callback context is null; this is a bug!" };
-        LOG_FATAL << errorMessage;
+        LOGF << errorMessage;
         throw std::runtime_error(errorMessage);
-    } else if (instance->m_cookie != CookieValid) {
-        LOG_ERROR << "Netlink message callback context cookie is invalid; discovery agent instance has been destroyed";
+    }
+    if (instance->m_cookie != CookieValid) {
+        LOGE << "Netlink message callback context cookie is invalid; discovery agent instance has been destroyed";
         return NL_STOP;
     }
 
     auto ret = instance->ProcessNetlinkMessage(netlinkMessage, instance->m_accessPointPresenceCallback);
-    LOG_VERBOSE << std::format("Processed netlink message with result {}", ret);
+    LOGD << std::format("Processed netlink message with result {}", ret);
 
     return ret;
 }
 
+// NOLINTBEGIN(performance-unnecessary-value-param)
+// This function is not performance-critical and the std::stop_token passed as a value is required for the jthread constructor.
 void
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(NetlinkSocket netlinkSocket, std::stop_token stopToken)
+// NOLINTEND(performance-unnecessary-value-param)
 {
     // Disable sequence number checking since it is not required for event notifications.
     nl_socket_disable_seq_check(netlinkSocket);
@@ -308,7 +311,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     int ret = nl_socket_modify_cb(netlinkSocket, NL_CB_VALID, NL_CB_CUSTOM, ProcessNetlinkMessagesCallback, this);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to modify netlink socket callback with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to modify netlink socket callback with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -316,7 +319,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     ret = nl_socket_set_nonblocking(netlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to set netlink socket to non-blocking mode with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to set netlink socket to non-blocking mode with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -324,15 +327,15 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     auto netlinkSocketFileDescriptor = nl_socket_get_fd(netlinkSocket);
     if (netlinkSocketFileDescriptor < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to obtain netlink socket file descriptor with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to obtain netlink socket file descriptor with error {} ({})", err, strerror(err));
         return;
     }
 
     // Configure epoll to monitor the netlink socket for readability.
-    int fdEpoll = epoll_create1(0);
+    const int fdEpoll = epoll_create1(0);
     if (fdEpoll < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to create epoll instance with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to create epoll instance with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -343,10 +346,10 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
 
     // Allocate space for two events: one for the netlink socket and one for the eventfd to stop the event loop.
     static constexpr int EpollEventsMax{ 2 };
-    struct epoll_event events[EpollEventsMax] = {};
+    std::array<epoll_event, EpollEventsMax> events{};
 
     // Populate the epoll event for the netlink socket.
-    struct epoll_event *epollEventNetlinkSocket = &events[0];
+    struct epoll_event *epollEventNetlinkSocket = std::data(events);
     epollEventNetlinkSocket->events = EPOLLIN;
     epollEventNetlinkSocket->data.fd = netlinkSocketFileDescriptor;
 
@@ -354,15 +357,15 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     ret = epoll_ctl(fdEpoll, EPOLL_CTL_ADD, netlinkSocketFileDescriptor, epollEventNetlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to register netlink socket event with epoll with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to register netlink socket event with epoll with error {} ({})", err, strerror(err));
         return;
     }
 
     // Create a new epoll event to allow stopping the processing loop using eventfd.
-    int eventLoopStopFd = eventfd(0, 0);
+    const int eventLoopStopFd = eventfd(0, 0);
     if (eventLoopStopFd < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to create eventfd for stopping event loop with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to create eventfd for stopping event loop with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -381,7 +384,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     ret = epoll_ctl(fdEpoll, EPOLL_CTL_ADD, eventLoopStopFd, epollEventLoopStopFd);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to register event loop stop fd event with epoll with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to register event loop stop fd event with epoll with error {} ({})", err, strerror(err));
         return;
     }
 
@@ -393,59 +396,62 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
     // Event loop to wait for netlink messages and process them.
     for (;;) {
         if (stopToken.stop_requested() || stopRequested) {
-            LOG_VERBOSE << "Netlink message processing thread has been requested to stop";
+            LOGD << "Netlink message processing thread has been requested to stop";
             break;
         }
 
         // Wait for at least one event file descriptor to become ready.
-        int numEventsReady = epoll_wait(fdEpoll, events, EpollEventsMax, -1);
+        const int numEventsReady = epoll_wait(fdEpoll, std::data(events), EpollEventsMax, -1);
         if (numEventsReady < 0) {
             const auto err = errno;
             if (err == EINTR) {
-                LOG_VERBOSE << "Interrupted while waiting for epoll events, retrying";
+                LOGD << "Interrupted while waiting for epoll events, retrying";
                 continue;
             }
 
-            LOG_ERROR << std::format("Failed to wait for epoll events with error {} ({})", err, strerror(err));
+            LOGE << std::format("Failed to wait for epoll events with error {} ({})", err, strerror(err));
             break;
         }
 
         // Determine which file descriptor(s) became ready and handle them.
-        for (auto i = 0; i < numEventsReady; i++) {
-            const auto &eventReady = events[i];
+        for (std::size_t i = 0; i < std::size_t(numEventsReady); i++) {
+            const auto &eventReady = events.at(i);
             if (eventReady.data.fd == netlinkSocketFileDescriptor) {
                 HandleNetlinkSocketReady(netlinkSocket);
             } else if (eventReady.data.fd == eventLoopStopFd) {
                 stopRequested = true;
             } else {
-                LOG_WARNING << std::format("Unknown file descriptor {} is ready for reading", eventReady.data.fd);
+                LOGW << std::format("Unknown file descriptor {} is ready for reading", eventReady.data.fd);
             }
         }
     }
 
-    LOG_INFO << "Netlink message processing thread has exited";
+    LOGI << "Netlink message processing thread has exited";
 }
 
+/* static */
 void
 AccessPointDiscoveryAgentOperationsNetlink::HandleNetlinkSocketReady(NetlinkSocket &netlinkSocket)
 {
-    LOG_VERBOSE << "Handling netlink socket read availabilty";
+    LOGD << "Handling netlink socket read availabilty";
 
     // Read all pending netlink messages.
     for (;;) {
-        int ret = nl_recvmsgs_default(netlinkSocket);
+        const int ret = nl_recvmsgs_default(netlinkSocket);
         if (ret < 0) {
             const auto err = errno;
             if (err == EINTR) {
-                LOG_VERBOSE << "Interrupted while waiting for netlink messages, retrying";
+                LOGD << "Interrupted while waiting for netlink messages, retrying";
                 continue;
-            } else {
-                LOG_ERROR << std::format("Failed to receive netlink messages with error {} ({})", err, strerror(err));
-                break;
             }
-        } else {
-            LOG_VERBOSE << "Successfully processed netlink messages";
+
+            LOGE << std::format("Failed to receive netlink messages with error {} ({})", err, strerror(err));
             break;
         }
+
+        LOGD << "Successfully processed netlink messages";
+        break;
     }
 }
+
+// NOLINTEND(concurrency-mt-unsafe)
