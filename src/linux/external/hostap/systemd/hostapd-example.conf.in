@@ -4,12 +4,12 @@
 # To use this with the provided systemd service unit template hostapd@.service, 
 # (eg. via 'systemctl enable hostapd@wlan0'), copy this file to 
 # /etc/hostapd/hostapd-<interface>.conf. For example, to use it with wlan0, copy this file to
-# /etc/hostapd/hostapd-wlan0.conf.
-#
+# /etc/hostapd/hostapd-wlan0.conf and specify the desired SSID after the 'ssid' property below.
+# 
 
 driver=nl80211
 ctrl_interface=${CMAKE_INSTALL_FULL_RUNSTATEDIR}/hostapd
-ssid=wificontrollertest
+ssid=
 hw_mode=g
 channel=1
 auth_algs=3

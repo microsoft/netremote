@@ -2,11 +2,12 @@
 Description=Hostapd Daemon
 Requires=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
+AssertPathExists=@CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
 
 [Service]
 Type=simple
 Restart=on-failure
-ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/hostapd ${HOSTAPD_XTRA_ARGS} -i %i @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
+ExecStart=@CMAKE_INSTALL_FULL_SBINDIR@/hostapd -i %i @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
 
 [Install]
 WantedBy=default.target

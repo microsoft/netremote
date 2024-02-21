@@ -1,0 +1,9 @@
+[Unit]
+Description=Generate default hostapd configuration file
+AssertPathExists=@CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-example.conf
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/cp @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-example.conf @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
+ExecStart=/usr/bin/sed -i 's/ssid=/ssid=%l-ap-%i/' @CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
