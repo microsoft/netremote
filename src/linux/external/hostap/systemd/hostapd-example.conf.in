@@ -4,7 +4,7 @@
 # To use this with the provided systemd service unit template hostapd@.service, 
 # (eg. via 'systemctl enable hostapd@wlan0'), copy this file to 
 # /etc/hostapd/hostapd-<interface>.conf. For example, to use it with wlan0, copy this file to
-# /etc/hostapd/hostapd-wlan0.conf and specify the desired SSID after for the ssid property below.
+# /etc/hostapd/hostapd-wlan0.conf and specify the desired SSID after the 'ssid' property below.
 # 
 
 driver=nl80211
