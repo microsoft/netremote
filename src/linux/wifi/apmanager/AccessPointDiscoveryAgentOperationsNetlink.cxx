@@ -158,10 +158,11 @@ IsNl80211InterfaceTypeAp(const Nl80211Interface &nl80211Interface)
  * @return std::shared_ptr<IAccessPoint>
  */
 std::shared_ptr<IAccessPoint>
-MakeAccessPoint(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory, const Nl80211Interface &nl80211Interface)
+MakeAccessPoint(const std::shared_ptr<AccessPointFactoryLinux> &accessPointFactory, const Nl80211Interface &nl80211Interface)
 {
+    auto &interfaceName = nl80211Interface.Name;
     auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface));
-    return accessPointFactory->Create(nl80211Interface.Name, std::move(createArgs));
+    return accessPointFactory->Create(interfaceName, std::move(createArgs));
 }
 } // namespace detail
 
