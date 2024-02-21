@@ -119,7 +119,33 @@ message WifiDataStreamUploadResult
     WifiDataStreamOperationStatus Status = 2;
 }
 
+enum WifiDataStreamType
+{
+    Fixed = 0;
+    Continuous = 1;
+}
+
+message WifiDataStreamFixedTypeProperties
+{
+    uint32 NumberOfDataBlocksToStream = 1;
+}
+
+message WifiDataStreamContinuousTypeProperties
+{
+
+}
+
+message WifiDataStreamProperties
+{
+    WifiDataStreamType Type = 1;
+    oneof Properties
+    {
+        WifiDataStreamFixedTypeProperties FixedTypeProperties = 2;
+        WifiDataStreamContinuousTypeProperties ContinuousTypeProperties = 3;
+    }
+}
+
 message WifiDataStreamDownloadRequest
 {
-    uint32 DataRequestedCount = 1;
+    WifiDataStreamProperties Properties = 1;
 }

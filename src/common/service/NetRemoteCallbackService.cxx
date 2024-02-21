@@ -65,6 +65,8 @@ NetRemoteCallbackService::WifiDataStreamUpload([[maybe_unused]] ::grpc::Callback
     return new StreamReader(result);
 }
 
+using Microsoft::Net::Remote::Wifi::WifiDataStreamType;
+
 ::grpc::ServerWriteReactor<::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadData>*
 NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::CallbackServerContext* context, const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request)
 {
@@ -75,7 +77,11 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
     public:
         StreamWriter(const ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadRequest* request)
         {
-            m_dataRequestedCount = request->datarequestedcount();
+            m_streamProperties = request->properties();
+            if (m_streamProperties.type() == WifiDataStreamType::Fixed) {
+                // TODO: Ensure that m_streamProperties.Value_case() == WifiDataStreamProperties.kFixedTypeProperties
+                m_dataRequestedCount = m_streamProperties.fixedtypeproperties().numberofdatablockstostream();
+            }
             m_writeStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeUnknown);
             m_writeStatus.set_message("No data sent yet");
             NextWrite();
@@ -92,7 +98,9 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
 
             if (ok) {
                 LOGD << "Data write successful";
-                m_dataRequestedCount--;
+                if (m_streamProperties.type() == WifiDataStreamType::Fixed) {
+                    m_dataRequestedCount--;
+                }
                 m_writeStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeSucceeded);
                 m_writeStatus.set_message("Data write successful");
                 NextWrite();
@@ -101,6 +109,8 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
                 HandleWriteFailure();
             }
         }
+
+        // TODO: Implement OnCancel() to handle continuous streaming
 
         void
         OnDone() override
@@ -112,7 +122,7 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
         void
         NextWrite()
         {
-            if (m_dataRequestedCount > 0) {
+            if (m_streamProperties.type() == WifiDataStreamType::Continuous || m_dataRequestedCount > 0) {
                 const auto data = std::format("Data #{}", ++m_dataSentCount);
                 LOGD << "Writing " << data;
                 m_data.set_data(data);
@@ -136,6 +146,7 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
 
     private:
         ::Microsoft::Net::Remote::Wifi::WifiDataStreamDownloadData m_data{};
+        ::Microsoft::Net::Remote::Wifi::WifiDataStreamProperties m_streamProperties{};
         uint32_t m_dataRequestedCount{};
         uint32_t m_dataSentCount{};
         ::Microsoft::Net::Remote::Wifi::WifiDataStreamOperationStatus m_writeStatus{};

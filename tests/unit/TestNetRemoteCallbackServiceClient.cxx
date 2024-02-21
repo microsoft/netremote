@@ -131,7 +131,7 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemoteCallback::NewStub(channel);
 
-    SECTION("Can be called")
+    SECTION("Can be called with WifiDataStreamType::Fixed")
     {
         class StreamReader : public grpc::ClientReadReactor<WifiDataStreamDownloadData>
         {
@@ -189,7 +189,16 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
 
         static constexpr auto dataRequestedCount = 10;
         WifiDataStreamDownloadRequest request{};
-        request.set_datarequestedcount(dataRequestedCount);
+
+        WifiDataStreamProperties streamProperties{};
+        streamProperties.set_type(WifiDataStreamType::Fixed);
+
+        WifiDataStreamFixedTypeProperties fixedTypeProperties{};
+        fixedTypeProperties.set_numberofdatablockstostream(dataRequestedCount);
+
+        *streamProperties.mutable_fixedtypeproperties() = std::move(fixedTypeProperties);
+
+        *request.mutable_properties() = std::move(streamProperties);
         auto streamReader = std::make_unique<StreamReader>(client.get(), &request);
 
         uint32_t dataReceivedCount{};
