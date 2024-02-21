@@ -103,12 +103,12 @@ message WifiAccessPointSetFrequencyBandsResult
 
 message WifiDataStreamUploadData
 {
-    string Data = 1;
+    bytes Data = 1;
 }
 
 message WifiDataStreamDownloadData
 {
-    string Data = 1;
+    bytes Data = 1;
     uint32 Count = 2;
     WifiDataStreamOperationStatus Status = 3;
 }
