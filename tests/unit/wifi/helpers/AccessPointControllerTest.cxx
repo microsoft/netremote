@@ -35,10 +35,10 @@ AccessPointControllerTest::GetInterfaceName() const
 }
 
 bool
-AccessPointControllerTest::GetIsEnabled()
+AccessPointControllerTest::GetOperationalState()
 {
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::GetIsEnabled called with null AccessPoint");
+        throw std::runtime_error("AccessPointControllerTest::GetOperationalState called with null AccessPoint");
     }
 
     return AccessPoint->IsEnabled;

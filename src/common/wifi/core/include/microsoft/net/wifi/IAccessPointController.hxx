@@ -66,7 +66,7 @@ struct IAccessPointController
      * @return false
      */
     virtual bool
-    GetIsEnabled() = 0;
+    GetOperationalState() = 0;
 
     /**
      * @brief Get the capabilities of the access point.

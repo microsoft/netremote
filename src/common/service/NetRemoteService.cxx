@@ -187,7 +187,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     }
 
     try {
-        isEnabled = accessPointController->GetIsEnabled();
+        isEnabled = accessPointController->GetOperationalState();
     } catch (const AccessPointControllerException& apce) {
         LOGE << std::format("Failed to get enabled state for access point {} ({})", interfaceName, apce.what());
         return MakeInvalidAccessPointResultItem();
@@ -300,7 +300,7 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
 
     bool isEnabled{ false };
     try {
-        isEnabled = accessPointController->GetIsEnabled();
+        isEnabled = accessPointController->GetOperationalState();
     } catch (const AccessPointControllerException& apce) {
         return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get enabled state for access point {} ({})", request->accesspointid(), apce.what()));
     }

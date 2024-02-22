@@ -62,7 +62,7 @@ struct AccessPointControllerTest final :
      * @return false
      */
     bool
-    GetIsEnabled() override;
+    GetOperationalState() override;
 
     /**
      * @brief Get the capabilities of the access point.

@@ -176,7 +176,7 @@ AccessPointControllerLinux::GetCapabilities()
 }
 
 bool
-AccessPointControllerLinux::GetIsEnabled()
+AccessPointControllerLinux::GetOperationalState()
 {
     bool isEnabled{ false };
 

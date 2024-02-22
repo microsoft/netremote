@@ -49,7 +49,7 @@ struct AccessPointControllerLinux :
      * @return false
      */
     bool
-    GetIsEnabled() override;
+    GetOperationalState() override;
 
     /**
      * @brief Get the Capabilities object
