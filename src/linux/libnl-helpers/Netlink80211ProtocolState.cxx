@@ -23,10 +23,10 @@ Nl80211ProtocolState::Nl80211ProtocolState()
     auto netlinkSocket{ NetlinkSocket::Allocate() };
 
     // Connect the socket to the generic netlink family.
-    int ret = genl_connect(netlinkSocket);
+    const int ret = genl_connect(netlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOGE << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err)); // NOLINT(concurrency-mt-unsafe)
         throw err;
     }
 

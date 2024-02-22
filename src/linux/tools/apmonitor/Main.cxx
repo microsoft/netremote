@@ -1,5 +1,9 @@
 
-#include <csignal> // NOLINT(misc-include-cleaner)
+// NOLINTBEGIN(misc-include-cleaner, concurrency-mt-unsafe)
+// clang-tidy can't seem to figure out that sig/SIG* stuff is indirectly included by <csignal>. While we could include
+// the actual headers directly, this goes against the std library's convention of including the top-level header.
+
+#include <csignal>
 #include <format>
 #include <memory>
 #include <utility>
@@ -37,7 +41,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     accessPointDiscoveryAgent->Start();
 
     // Mask SIGTERM and SIGINT so they can be explicitly waited on from the main thread.
-    int signal;
+    int signal = 0;
     sigset_t mask;
     sigemptyset(&mask);
     sigaddset(&mask, SIGTERM);
@@ -49,11 +53,14 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
 
     // Wait for the process to be signaled to exit.
-    while (sigwait(&mask, &signal) != 0)
+    while (sigwait(&mask, &signal) != 0) {
         ;
+    }
 
     // Received interrupt or terminate signal, so shut down.
     accessPointDiscoveryAgent->Stop();
 
     return 0;
 }
+
+// NOLINTEND(misc-include-cleaner, concurrency-mt-unsafe)

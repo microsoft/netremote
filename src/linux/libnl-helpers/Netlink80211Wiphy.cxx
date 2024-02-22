@@ -76,7 +76,7 @@ HandleNl80211GetWiphyResponse(struct nl_msg *nl80211Message, void *context) noex
 
 /* static */
 std::optional<Nl80211Wiphy>
-Nl80211Wiphy::FromId(std::function<void(Microsoft::Net::Netlink::NetlinkMessage &)> addWiphyIdentifier)
+Nl80211Wiphy::FromId(const std::function<void(Microsoft::Net::Netlink::NetlinkMessage &)> &addWiphyIdentifier)
 {
     // Allocate a new netlink socket.
     auto nl80211SocketOpt{ CreateNl80211Socket() };
@@ -178,7 +178,7 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     std::array<struct nlattr *, NL80211_ATTR_MAX + 1> wiphyAttributes{};
     int ret = nla_parse(std::data(wiphyAttributes), std::size(wiphyAttributes), genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
     if (ret < 0) {
-        LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret)); // NOLINT(concurrency-mt-unsafe)
         return std::nullopt;
     }
 
@@ -189,14 +189,14 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     }
 
     auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(wiphyAttributes[NL80211_ATTR_WIPHY]));
-    auto wiphyName = static_cast<const char *>(nla_data(wiphyAttributes[NL80211_ATTR_WIPHY_NAME]));
+    const auto *wiphyName = static_cast<const char *>(nla_data(wiphyAttributes[NL80211_ATTR_WIPHY_NAME]));
 
     // Process bands.
-    auto wiphyBands = wiphyAttributes[NL80211_ATTR_WIPHY_BANDS];
+    auto *wiphyBands = wiphyAttributes[NL80211_ATTR_WIPHY_BANDS];
     std::unordered_map<nl80211_band, Nl80211WiphyBand> wiphyBandMap{};
     if (wiphyBands != nullptr) {
-        int remainingBands;
-        struct nlattr *wiphyBand;
+        int remainingBands = 0;
+        struct nlattr *wiphyBand = nullptr;
 
         nla_for_each_nested(wiphyBand, wiphyBands, remainingBands)
         {
@@ -214,13 +214,13 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
 
     // Process AKM suites.
     // Note: NL80211_ATTR_AKM_SUITES describes the AKMs supported by the PHY (wiphy) and is not specific to an interface.
-    uint32_t *wiphyAkmSuites;
+    uint32_t *wiphyAkmSuites = nullptr;
     std::size_t wiphyNumAkmSuites = 0;
     std::vector<uint32_t> akmSuites{};
     if (wiphyAttributes[NL80211_ATTR_AKM_SUITES] != nullptr) {
         wiphyAkmSuites = static_cast<uint32_t *>(nla_data(wiphyAttributes[NL80211_ATTR_AKM_SUITES]));
         wiphyNumAkmSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_AKM_SUITES])) / sizeof(*wiphyAkmSuites);
-        akmSuites = std::vector<uint32_t>(wiphyAkmSuites, wiphyAkmSuites + wiphyNumAkmSuites);
+        akmSuites = std::vector<uint32_t>(wiphyAkmSuites, wiphyAkmSuites + wiphyNumAkmSuites); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     } else {
         // Per nl80211 documentation, if this attribute is not present, userspace should assume all AKMs are supported.
         akmSuites = Microsoft::Net::Wifi::AllIeee80211Akms;
@@ -230,17 +230,17 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     std::size_t wiphyNumCipherSuites = 0;
     std::vector<uint32_t> cipherSuites{};
     if (wiphyAttributes[NL80211_ATTR_CIPHER_SUITES] != nullptr) {
-        uint32_t *wiphyCipherSuites;
+        uint32_t *wiphyCipherSuites = nullptr;
         wiphyNumCipherSuites = static_cast<std::size_t>(nla_len(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES])) / sizeof(*wiphyCipherSuites);
         wiphyCipherSuites = static_cast<uint32_t *>(nla_data(wiphyAttributes[NL80211_ATTR_CIPHER_SUITES]));
-        cipherSuites = std::vector<uint32_t>(wiphyCipherSuites, wiphyCipherSuites + wiphyNumCipherSuites);
+        cipherSuites = std::vector<uint32_t>(wiphyCipherSuites, wiphyCipherSuites + wiphyNumCipherSuites); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
 
     // Process supported interface types.
     std::vector<nl80211_iftype> supportedInterfaceTypes{};
     if (wiphyAttributes[NL80211_ATTR_SUPPORTED_IFTYPES] != nullptr) {
-        int remainingSupportedInterfaceTypes;
-        struct nlattr *supportedInterfaceType;
+        int remainingSupportedInterfaceTypes = 0;
+        struct nlattr *supportedInterfaceType = nullptr;
         nla_for_each_nested(supportedInterfaceType, wiphyAttributes[NL80211_ATTR_SUPPORTED_IFTYPES], remainingSupportedInterfaceTypes)
         {
             auto interfaceType = static_cast<nl80211_iftype>(supportedInterfaceType->nla_type);

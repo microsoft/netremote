@@ -29,6 +29,8 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
+// NOLINTBEGIN(concurrency-mt-unsafe)
+
 Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
     Name(name),
     Type(type),
@@ -177,3 +179,5 @@ Nl80211Interface::IsAccessPoint() const noexcept
 {
     return (Type == nl80211_iftype::NL80211_IFTYPE_AP);
 }
+
+// NOLINTEND(concurrency-mt-unsafe)
