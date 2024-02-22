@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <stop_token>
 #include <string_view>
+#include <system_error>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -18,6 +19,7 @@
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/NetlinkErrorCategory.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
@@ -40,6 +42,7 @@
 #include <unistd.h>
 
 using namespace Microsoft::Net::Wifi;
+using namespace Microsoft::Net::Netlink;
 using namespace Microsoft::Net::Netlink::Nl80211;
 
 using Microsoft::Net::Netlink::NetlinkSocket;
@@ -103,9 +106,10 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
     const int nl80211MulticastGroupIdConfig = m_netlink80211ProtocolState.MulticastGroupId[Nl80211MulticastGroup::Configuration];
     const int ret = nl_socket_add_membership(nl80211Socket, nl80211MulticastGroupIdConfig);
     if (ret < 0) {
-        const auto err = errno;
-        LOGE << std::format("Failed to add netlink socket membership for '" NL80211_MULTICAST_GROUP_CONFIG "' group with error {} ({})", err, strerror(err));
-        return;
+        const auto errorCode = MakeNetlinkErrorCode(-ret);
+        const auto message = std::format("Failed to add netlink socket membership for '{}' group with error {}", NL80211_MULTICAST_GROUP_CONFIG, errorCode.value());
+        LOGE << message;
+        throw std::system_error(errorCode, message);
     }
 
     // Update the access point presence callback for the netlink message handler to use.
