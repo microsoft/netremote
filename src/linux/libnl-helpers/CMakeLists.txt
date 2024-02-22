@@ -11,14 +11,16 @@ target_sources(libnl-helpers
         Netlink80211Interface.cxx
         Netlink80211ProtocolState.cxx
         Netlink80211Wiphy.cxx
-        NetlinkMessage.cxx
-        NetlinkSocket.cxx
         Netlink80211WiphyBand.cxx
         Netlink80211WiphyBandFrequency.cxx
+        NetlinkErrorCategory.cxx
+        NetlinkMessage.cxx
+        NetlinkSocket.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${LIBNL_HELPERS_PUBLIC_INCLUDE}
     FILES
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkErrorCategory.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
