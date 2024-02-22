@@ -19,9 +19,10 @@ struct AccessPointTest;
  * @brief IAccessPointController implementation for testing purposes.
  *
  * This implementation takes an AccessPointTest object which it uses to implement the IAccessPointController interface.
- * The owner of this class must ensure that the passes AccessPointTest* remains valid for the lifetime of this object.
+ * The owner of this class must ensure that the passed AccessPointTest* remains valid for the lifetime of this object.
  */
-struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPointController
+struct AccessPointControllerTest final :
+    public Microsoft::Net::Wifi::IAccessPointController
 {
     AccessPointTest *AccessPoint{ nullptr };
 
@@ -72,6 +73,15 @@ struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPoi
     GetCapabilities() override;
 
     /**
+     * @brief Set the operational state of the access point.
+     *
+     * @param operationalState The desired operational state.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetOperationalState(AccessPointOperationalState operationalState) override;
+
+    /**
      * @brief Set the Ieee80211 protocol of the access point.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set
@@ -93,9 +103,9 @@ struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPoi
 
     /**
      * @brief Set the SSID of the access point.
-     * 
+     *
      * @param ssid The SSID to be set.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
     SetSssid(std::string_view ssid) override;

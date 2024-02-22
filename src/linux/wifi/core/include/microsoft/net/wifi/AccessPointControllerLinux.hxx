@@ -60,6 +60,15 @@ struct AccessPointControllerLinux :
     GetCapabilities() override;
 
     /**
+     * @brief Set the operational state of the access point.
+     *
+     * @param operationalState The desired operational state.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetOperationalState(AccessPointOperationalState operationalState) override;
+
+    /**
      * @brief Set the Ieee80211 protocol.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.

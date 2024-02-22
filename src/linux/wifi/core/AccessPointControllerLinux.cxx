@@ -190,6 +190,13 @@ AccessPointControllerLinux::GetIsEnabled()
     return isEnabled;
 }
 
+AccessPointOperationStatus
+AccessPointControllerLinux::SetOperationalState([[maybe_unused]] AccessPointOperationalState operationalState)
+{
+    // TODO: Implement this method.
+    return AccessPointOperationStatus(AccessPointOperationStatusCode::OperationNotSupported);
+}
+
 bool
 AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
 {

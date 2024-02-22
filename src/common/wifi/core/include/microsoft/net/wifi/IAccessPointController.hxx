@@ -77,6 +77,15 @@ struct IAccessPointController
     GetCapabilities() = 0;
 
     /**
+     * @brief Set the operational state of the access point.
+     * 
+     * @param operationalState The desired operational state.
+     * @return AccessPointOperationStatus
+     */
+    virtual AccessPointOperationStatus
+    SetOperationalState(AccessPointOperationalState operationalState) = 0;
+
+    /**
      * @brief Set the Ieee80211 protocol of the access point.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.

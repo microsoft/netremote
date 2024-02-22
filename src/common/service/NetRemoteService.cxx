@@ -269,8 +269,28 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
+
+    // Create an AP controller for the requested AP.
+    auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
+    if (accessPointController == nullptr) {
+        return grpc::Status::OK;
+    }
+
+
+    bool isEnabled{ false };
+    try {
+        isEnabled = accessPointController->GetIsEnabled();
+    } catch (const AccessPointControllerException& apce) {
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get enabled state for access point {} ({})", request->accesspointid(), apce.what()));
+    }
+
     WifiAccessPointOperationStatus status{};
-    // TODO: Disable the access point.
+    if (isEnabled) {
+        // TODO: Disable the access point.
+    } else {
+        LOGI << std::format("Access point {} is already disabled", request->accesspointid());
+    }
+
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     result->set_accesspointid(request->accesspointid());

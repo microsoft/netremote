@@ -7,6 +7,14 @@
 namespace Microsoft::Net::Wifi
 {
 /**
+ * @brief Operational state of an access point.
+ */
+enum class AccessPointOperationalState : bool {
+    Disabled = false,
+    Enabled = true,
+};
+
+/**
  * @brief High-level status reported by various access point operations.
  */
 enum class AccessPointOperationStatusCode {

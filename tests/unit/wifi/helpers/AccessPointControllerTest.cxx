@@ -54,6 +54,17 @@ AccessPointControllerTest::GetCapabilities()
     return AccessPoint->Capabilities;
 }
 
+AccessPointOperationStatus
+AccessPointControllerTest::SetOperationalState(AccessPointOperationalState operationalState)
+{
+    if (AccessPoint == nullptr) {
+        throw std::runtime_error("AccessPointControllerTest::SetOperationalState called with null AccessPoint");
+    }
+
+    AccessPoint->OperationalState = operationalState;
+    return AccessPointOperationStatus::MakeSucceeded();
+}
+
 bool
 AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
