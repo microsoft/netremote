@@ -17,6 +17,7 @@
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
@@ -61,6 +62,28 @@ HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatus
     *result->mutable_status() = std::move(status);
 
     return returnValue;
+}
+
+/**
+ * @brief Wrapper for HandleFailure that converts a Dot11AccessPointOperationStatusCode to a WifiAccessPointOperationStatusCode.
+ *
+ * @tparam RequestT The request type. This must contain an access point id (trait).
+ * @tparam ResultT The result type. This must contain an access point id and a status (traits).
+ * @return ReturnT The type of the return value. Defaults to grpc::Status with a value of grpc::OK.
+ * @param request A reference to the request.
+ * @param result A reference to the result.
+ * @param code The error code to set in the result message.
+ * @param message The error message to set in the result message.
+ * @param returnValue The value to return from the function.
+ */
+template <
+    typename RequestT,
+    typename ResultT,
+    typename ReturnT = grpc::Status>
+ReturnT
+HandleFailure(RequestT& request, ResultT& result, AccessPointOperationStatusCode code, std::string_view message, ReturnT returnValue = {})
+{
+    return HandleFailure(request, result, ToDot11AccessPointOperationStatusCode(code), message, returnValue);
 }
 
 /**
@@ -193,7 +216,7 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& ac
 
     auto accessPoint = accessPointWeak.lock();
     if (accessPoint != nullptr) {
-        item = IAccessPointToNetRemoteAccessPointResultItem(*accessPoint.get());
+        item = IAccessPointToNetRemoteAccessPointResultItem(*accessPoint);
     } else {
         item = detail::MakeInvalidAccessPointResultItem();
     }
@@ -269,13 +292,11 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-
     // Create an AP controller for the requested AP.
     auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
     if (accessPointController == nullptr) {
         return grpc::Status::OK;
     }
-
 
     bool isEnabled{ false };
     try {
@@ -284,13 +305,17 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
         return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get enabled state for access point {} ({})", request->accesspointid(), apce.what()));
     }
 
-    WifiAccessPointOperationStatus status{};
     if (isEnabled) {
-        // TODO: Disable the access point.
+        // Disable the access point.
+        auto statusSetOperationState = accessPointController->SetOperationalState(AccessPointOperationalState::Disabled);
+        if (statusSetOperationState.Code != AccessPointOperationStatusCode::Succeeded) {
+            return HandleFailure(request, result, statusSetOperationState.Code, std::format("Failed to disable access point {}", request->accesspointid()));
+        }
     } else {
         LOGI << std::format("Access point {} is already disabled", request->accesspointid());
     }
 
+    WifiAccessPointOperationStatus status{};
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     result->set_accesspointid(request->accesspointid());
