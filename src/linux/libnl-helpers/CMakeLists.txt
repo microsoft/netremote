@@ -9,6 +9,7 @@ target_sources(libnl-helpers
     PRIVATE
         Netlink80211.cxx
         Netlink80211Interface.cxx
+        NetlinkException.cxx
         Netlink80211ProtocolState.cxx
         Netlink80211Wiphy.cxx
         Netlink80211WiphyBand.cxx
@@ -23,6 +24,7 @@ target_sources(libnl-helpers
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkErrorCategory.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkException.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Interface.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211ProtocolState.hxx

@@ -1,4 +1,7 @@
 
+#include <string>
+#include <system_error>
+
 #include <microsoft/net/netlink/NetlinkErrorCategory.hxx>
 #include <netlink/errno.h>
 
