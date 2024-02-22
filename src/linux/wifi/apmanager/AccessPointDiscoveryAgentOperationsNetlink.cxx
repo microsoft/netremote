@@ -206,6 +206,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         genlMessageHeader->cmd != NL80211_CMD_DEL_INTERFACE &&
         genlMessageHeader->cmd != NL80211_CMD_SET_INTERFACE) {
         LOGD << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
+        return NL_SKIP;
     }
 
     LOGD << std::format("Received {} nl80211 command message", nl80211CommandName);
