@@ -191,10 +191,37 @@ AccessPointControllerLinux::GetIsEnabled()
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetOperationalState([[maybe_unused]] AccessPointOperationalState operationalState)
+AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState operationalState)
 {
-    // TODO: Implement this method.
-    return AccessPointOperationStatus(AccessPointOperationStatusCode::OperationNotSupported);
+    AccessPointOperationStatus status{};
+
+    switch (operationalState) {
+    case AccessPointOperationalState::Enabled: {
+        try {
+            m_hostapd.Enable();
+        } catch (const Wpa::HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = std::format("Failed to set operational state to 'enabled' for {} (unknown error)", GetInterfaceName());
+        }
+        break;
+    }
+    case AccessPointOperationalState::Disabled: {
+        try {
+            m_hostapd.Disable();
+        } catch (const Wpa::HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = std::format("Failed to set operational state to 'disabled' for {} (unknown error)", GetInterfaceName());
+        }
+        break;
+    }
+    default: {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Message = std::format("Invalid operational state value '{}' for {}", magic_enum::enum_name(operationalState), GetInterfaceName());
+        break;
+    }
+    }
+
+    return status;
 }
 
 bool
