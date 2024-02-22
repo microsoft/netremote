@@ -3,7 +3,6 @@
 #define NETLINK_82011_HXX
 
 #include <cstdint>
-#include <optional>
 #include <string_view>
 #include <unordered_map>
 
@@ -20,16 +19,18 @@ enum class Nl80211MulticastGroup {
     Nan,
 };
 
+// NOLINTBEGIN(cert-err58-cpp)
 /**
  * @brief Map of multicast group enum values to names.
  */
-static const std::unordered_map<Nl80211MulticastGroup, std::string_view> Nl80211MulticastGroupNames{ // NOLINT(cert-err58-cpp)
+static const std::unordered_map<Nl80211MulticastGroup, std::string_view> Nl80211MulticastGroupNames{
     { Nl80211MulticastGroup::Configuration, NL80211_MULTICAST_GROUP_CONFIG },
     { Nl80211MulticastGroup::Scan, NL80211_MULTICAST_GROUP_SCAN },
     { Nl80211MulticastGroup::Regulatory, NL80211_MULTICAST_GROUP_REG },
     { Nl80211MulticastGroup::Mlme, NL80211_MULTICAST_GROUP_MLME },
     { Nl80211MulticastGroup::Nan, NL80211_MULTICAST_GROUP_NAN },
 };
+// NOLINTEND(cert-err58-cpp)
 
 /**
  * @brief Convert an nl80211_commands enum value to a string.
@@ -62,9 +63,9 @@ Nl80211CipherSuiteToString(uint32_t cipherSuite) noexcept;
  *
  * This creates a netlink socket and connects it to the nl80211 generic netlink family.
  *
- * @return std::optional<Microsoft::Net::Netlink::NetlinkSocket>
+ * @return Microsoft::Net::Netlink::NetlinkSocket
  */
-std::optional<Microsoft::Net::Netlink::NetlinkSocket>
+Microsoft::Net::Netlink::NetlinkSocket
 CreateNl80211Socket();
 
 } // namespace Microsoft::Net::Netlink::Nl80211

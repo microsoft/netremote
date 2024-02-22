@@ -24,7 +24,7 @@ Nl80211WiphyBand::Nl80211WiphyBand(std::vector<WiphyBandFrequency> frequencies, 
     Bitrates(std::move(bitRates)),
     HtCapabilities(htCapabilities),
     VhtCapabilities(VhtCapabilities),
-    VhtMcsSet(std::move(vhtMcsSetOpt))
+    VhtMcsSet(vhtMcsSetOpt)
 {
 }
 
@@ -58,21 +58,21 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
 
     std::vector<WiphyBandFrequency> frequencies{};
     if (wiphyBandAttributes[NL80211_BAND_ATTR_FREQS] != nullptr) {
-        struct nlattr *wiphyBandFrequency;
-        int remainingBandFrequencies;
+        struct nlattr *wiphyBandFrequency = nullptr;
+        int remainingBandFrequencies = 0;
         nla_for_each_nested(wiphyBandFrequency, wiphyBandAttributes[NL80211_BAND_ATTR_FREQS], remainingBandFrequencies)
         {
             auto frequency = WiphyBandFrequency::Parse(wiphyBandFrequency);
             if (frequency.has_value()) {
-                frequencies.emplace_back(std::move(frequency.value()));
+                frequencies.emplace_back(frequency.value());
             }
         }
     }
 
     std::vector<uint32_t> bitRates{};
     if (wiphyBandAttributes[NL80211_BAND_ATTR_RATES] != nullptr) {
-        int remainingBitRates;
-        struct nlattr *bitRate;
+        int remainingBitRates = 0;
+        struct nlattr *bitRate = nullptr;
         nla_for_each_nested(bitRate, wiphyBandAttributes[NL80211_BAND_ATTR_RATES], remainingBitRates)
         {
             std::array<struct nlattr *, NL80211_BITRATE_ATTR_MAX + 1> bitRateAttributes{};
@@ -80,7 +80,8 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
             if (ret < 0) {
                 LOGW << std::format("Failed to parse wiphy band bit rate attributes with error {} ({})", ret, nl_geterror(ret));
                 return std::nullopt;
-            } else if (bitRateAttributes[NL80211_BITRATE_ATTR_RATE] == nullptr) {
+            } 
+            if (bitRateAttributes[NL80211_BITRATE_ATTR_RATE] == nullptr) {
                 continue;
             }
 
@@ -89,7 +90,7 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
         }
     }
 
-    return Nl80211WiphyBand(std::move(frequencies), std::move(bitRates), htCapabilities, vhtCapabilities, std::move(vhtMcsSetOpt));
+    return Nl80211WiphyBand(std::move(frequencies), std::move(bitRates), htCapabilities, vhtCapabilities, vhtMcsSetOpt);
 }
 
 std::string

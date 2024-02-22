@@ -18,6 +18,7 @@
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/NetlinkException.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
@@ -40,6 +41,7 @@
 #include <unistd.h>
 
 using namespace Microsoft::Net::Wifi;
+using namespace Microsoft::Net::Netlink;
 using namespace Microsoft::Net::Netlink::Nl80211;
 
 using Microsoft::Net::Netlink::NetlinkSocket;
@@ -96,24 +98,12 @@ AccessPointDiscoveryAgentOperationsNetlink::Start(AccessPointPresenceEventCallba
         Stop();
     }
 
-    // TODO: This function needs to signal errors either through its return type, or an exception.
-
-    // Allocate a new netlink socket for use with nl80211.
-    auto nl80211SocketOpt{ CreateNl80211Socket() };
-    if (nl80211SocketOpt == nullptr) {
-        LOGE << "Failed to allocate new netlink socket for nl control";
-        return;
-    }
-
-    auto nl80211Socket{ std::move(nl80211SocketOpt.value()) };
-
     // Subscribe to configuration messages.
+    auto nl80211Socket{ CreateNl80211Socket() };
     const int nl80211MulticastGroupIdConfig = m_netlink80211ProtocolState.MulticastGroupId[Nl80211MulticastGroup::Configuration];
     const int ret = nl_socket_add_membership(nl80211Socket, nl80211MulticastGroupIdConfig);
     if (ret < 0) {
-        const auto err = errno;
-        LOGE << std::format("Failed to add netlink socket membership for '" NL80211_MULTICAST_GROUP_CONFIG "' group with error {} ({})", err, strerror(err));
-        return;
+        throw NetlinkException::CreateLogged(-ret, "Failed to add netlink socket membership for 'NL80211_MULTICAST_GROUP_CONFIG'");
     }
 
     // Update the access point presence callback for the netlink message handler to use.
@@ -214,6 +204,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         genlMessageHeader->cmd != NL80211_CMD_DEL_INTERFACE &&
         genlMessageHeader->cmd != NL80211_CMD_SET_INTERFACE) {
         LOGD << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
+        return NL_SKIP;
     }
 
     LOGD << std::format("Received {} nl80211 command message", nl80211CommandName);

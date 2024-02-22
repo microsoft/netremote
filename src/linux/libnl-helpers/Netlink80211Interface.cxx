@@ -13,7 +13,6 @@
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
-#include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
@@ -108,7 +107,7 @@ HandleNl80211InterfaceDumpResponse(struct nl_msg *nl80211Message, void *context)
         LOGW << "Failed to parse nl80211 interface dump response";
         return NL_SKIP;
     }
-    
+
     LOGD << std::format("Parsed nl80211 interface dump response: {}", nl80211Interface->ToString());
     nl80211Interfaces.push_back(std::move(nl80211Interface.value()));
 
@@ -120,15 +119,7 @@ HandleNl80211InterfaceDumpResponse(struct nl_msg *nl80211Message, void *context)
 std::vector<Nl80211Interface>
 Nl80211Interface::Enumerate()
 {
-    // Allocate a new netlink socket.
-    auto nl80211SocketOpt{ CreateNl80211Socket() };
-    if (!nl80211SocketOpt.has_value()) {
-        LOGE << "Failed to create nl80211 socket";
-        return {};
-    }
-
     // Allocate a new nl80211 message for sending the dump request for all interfaces.
-    auto nl80211Socket{ std::move(nl80211SocketOpt.value()) };
     auto nl80211MessageGetInterfaces{ NetlinkMessage::Allocate() };
     if (nl80211MessageGetInterfaces == nullptr) {
         LOGE << "Failed to allocate nl80211 message for interface dump request";
@@ -144,6 +135,7 @@ Nl80211Interface::Enumerate()
     }
 
     // Modify the socket callback to handle the response, providing a pointer to the vector to populate with interfaces.
+    auto nl80211Socket{ CreateNl80211Socket() };
     std::vector<Nl80211Interface> nl80211Interfaces{};
     int ret = nl_socket_modify_cb(nl80211Socket, NL_CB_VALID, NL_CB_CUSTOM, detail::HandleNl80211InterfaceDumpResponse, &nl80211Interfaces);
     if (ret < 0) {

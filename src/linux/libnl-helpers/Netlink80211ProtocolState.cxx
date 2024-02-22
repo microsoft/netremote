@@ -1,17 +1,14 @@
 
-#include <cerrno>
-#include <cstring>
 #include <format>
 #include <iterator>
 
 #include <linux/nl80211.h>
+#include <microsoft/net/netlink/NetlinkException.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
-#include <netlink/errno.h>
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
-#include <plog/Log.h>
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
@@ -25,24 +22,20 @@ Nl80211ProtocolState::Nl80211ProtocolState()
     // Connect the socket to the generic netlink family.
     const int ret = genl_connect(netlinkSocket);
     if (ret < 0) {
-        const auto err = errno;
-        LOGE << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err)); // NOLINT(concurrency-mt-unsafe)
-        throw err;
+        throw NetlinkException::CreateLogged(-ret, "Failed to connect netlink socket for nl control");
     }
 
     // Look up the nl80211 driver id.
     DriverId = genl_ctrl_resolve(netlinkSocket, NL80211_GENL_NAME);
     if (DriverId < 0) {
-        LOGE << std::format("Failed to resolve nl80211 netlink id with error {} ({})", DriverId, nl_geterror(DriverId));
-        throw DriverId;
+        throw NetlinkException::CreateLogged(-DriverId, "Failed to resolve nl80211 netlink id");
     }
 
     // Lookup the ids for the nl80211 multicast groups.
     for (const auto& [multicastGroup, multicastGroupName] : Nl80211MulticastGroupNames) {
-        int multicastGroupId = genl_ctrl_resolve_grp(netlinkSocket, NL80211_GENL_NAME, std::data(multicastGroupName));
+        const int multicastGroupId = genl_ctrl_resolve_grp(netlinkSocket, NL80211_GENL_NAME, std::data(multicastGroupName));
         if (multicastGroupId < 0) {
-            LOGE << std::format("Failed to resolve nl80211 {} multicast group id with error {} ({})", multicastGroupName, multicastGroupId, nl_geterror(multicastGroupId));
-            throw multicastGroupId;
+            throw NetlinkException::CreateLogged(-multicastGroupId, std::format("Failed to resolve nl80211 {} multicast group id", multicastGroupName));
         }
         MulticastGroupId[multicastGroup] = multicastGroupId;
     }

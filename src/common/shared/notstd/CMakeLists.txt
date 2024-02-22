@@ -13,7 +13,6 @@ target_sources(notstd
         ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Exceptions.hxx
         ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Memory.hxx
         ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Scope.hxx
-        ${NOTSTD_PUBLIC_INCLUDE_PREFIX}/Utility.hxx
 )
 
 install(
