@@ -1,4 +1,5 @@
 
+#include <stdexcept>
 #include <string>
 #include <system_error>
 
@@ -36,6 +37,10 @@ make_netlink_error_code(int error)
 std::error_code
 MakeNetlinkErrorCode(int error)
 {
+    if (error < 0) {
+        throw std::runtime_error("Netlink error codes must be non-negative; this is a programming error");
+    }
+
     return make_netlink_error_code(error);
 }
 
