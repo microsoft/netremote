@@ -92,7 +92,7 @@ private:
      * @return std::optional<Nl80211Wiphy>
      */
     static std::optional<Nl80211Wiphy>
-    FromId(std::function<void(Microsoft::Net::Netlink::NetlinkMessage&)> addWiphyIdentifier);
+    FromId(const std::function<void(Microsoft::Net::Netlink::NetlinkMessage&)>& addWiphyIdentifier);
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211

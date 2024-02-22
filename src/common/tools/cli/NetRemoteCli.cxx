@@ -25,7 +25,7 @@ NetRemoteCli::NetRemoteCli(std::shared_ptr<NetRemoteCliData> cliData, std::share
 
 /* static */
 std::shared_ptr<NetRemoteCli>
-NetRemoteCli::Create(std::shared_ptr<NetRemoteCliData> cliData, std::shared_ptr<NetRemoteCliHandler> cliHandler)
+NetRemoteCli::Create(std::shared_ptr<NetRemoteCliData> cliData, const std::shared_ptr<NetRemoteCliHandler>& cliHandler)
 {
     auto instance = std::make_shared<notstd::enable_make_protected<NetRemoteCli>>(std::move(cliData), cliHandler);
     cliHandler->SetParent(instance->weak_from_this());

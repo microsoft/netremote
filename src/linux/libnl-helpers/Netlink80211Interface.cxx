@@ -29,6 +29,8 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
+// NOLINTBEGIN(concurrency-mt-unsafe)
+
 Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
     Name(name),
     Type(type),
@@ -67,7 +69,7 @@ Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
     std::array<struct nlattr *, NL80211_ATTR_MAX + 1> newInterfaceMessageAttributes{};
     int ret = nla_parse(std::data(newInterfaceMessageAttributes), std::size(newInterfaceMessageAttributes), genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
     if (ret < 0) {
-        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
         return std::nullopt;
     }
 
@@ -177,3 +179,5 @@ Nl80211Interface::IsAccessPoint() const noexcept
 {
     return (Type == nl80211_iftype::NL80211_IFTYPE_AP);
 }
+
+// NOLINTEND(concurrency-mt-unsafe)
