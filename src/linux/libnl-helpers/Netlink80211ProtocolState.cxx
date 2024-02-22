@@ -26,14 +26,14 @@ Nl80211ProtocolState::Nl80211ProtocolState()
     int ret = genl_connect(netlinkSocket);
     if (ret < 0) {
         const auto err = errno;
-        LOG_ERROR << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err));
+        LOGE << std::format("Failed to connect netlink socket for nl control with error {} ({})", err, strerror(err));
         throw err;
     }
 
     // Look up the nl80211 driver id.
     DriverId = genl_ctrl_resolve(netlinkSocket, NL80211_GENL_NAME);
     if (DriverId < 0) {
-        LOG_ERROR << std::format("Failed to resolve nl80211 netlink id with error {} ({})", DriverId, nl_geterror(DriverId));
+        LOGE << std::format("Failed to resolve nl80211 netlink id with error {} ({})", DriverId, nl_geterror(DriverId));
         throw DriverId;
     }
 
@@ -41,7 +41,7 @@ Nl80211ProtocolState::Nl80211ProtocolState()
     for (const auto& [multicastGroup, multicastGroupName] : Nl80211MulticastGroupNames) {
         int multicastGroupId = genl_ctrl_resolve_grp(netlinkSocket, NL80211_GENL_NAME, std::data(multicastGroupName));
         if (multicastGroupId < 0) {
-            LOG_ERROR << std::format("Failed to resolve nl80211 {} multicast group id with error {} ({})", multicastGroupName, multicastGroupId, nl_geterror(multicastGroupId));
+            LOGE << std::format("Failed to resolve nl80211 {} multicast group id with error {} ({})", multicastGroupName, multicastGroupId, nl_geterror(multicastGroupId));
             throw multicastGroupId;
         }
         MulticastGroupId[multicastGroup] = multicastGroupId;

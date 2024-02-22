@@ -28,7 +28,7 @@ struct NetRemoteCli :
      * @return std::shared_ptr<NetRemoteClie>
      */
     static std::shared_ptr<NetRemoteCli>
-    Create(std::shared_ptr<NetRemoteCliData> cliData, std::shared_ptr<NetRemoteCliHandler> cliHandler);
+    Create(std::shared_ptr<NetRemoteCliData> cliData, const std::shared_ptr<NetRemoteCliHandler>& cliHandler);
 
     /**
      * @brief Get a reference to the parser. The parser will be configured with all common command-line interface

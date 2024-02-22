@@ -33,7 +33,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         LOGI << std::format("{} -> {}", accessPointChanged->GetInterfaceName(), magic_enum::enum_name(presence));
     });
 
-    LOG_INFO << "starting access point discovery agent";
+    LOGI << "starting access point discovery agent";
     accessPointDiscoveryAgent->Start();
 
     // Mask SIGTERM and SIGINT so they can be explicitly waited on from the main thread.
@@ -44,7 +44,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     sigaddset(&mask, SIGINT);
 
     if (sigprocmask(SIG_BLOCK, &mask, nullptr) < 0) {
-        LOG_ERROR << "failed to block terminate signals";
+        LOGE << "failed to block terminate signals";
         return -1;
     }
 

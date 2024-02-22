@@ -178,7 +178,7 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     std::array<struct nlattr *, NL80211_ATTR_MAX + 1> wiphyAttributes{};
     int ret = nla_parse(std::data(wiphyAttributes), std::size(wiphyAttributes), genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
     if (ret < 0) {
-        LOG_ERROR << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
+        LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
         return std::nullopt;
     }
 
