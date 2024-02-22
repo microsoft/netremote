@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <stop_token>
 #include <string_view>
-#include <system_error>
 #include <thread>
 #include <utility>
 #include <vector>

@@ -19,7 +19,7 @@ NetlinkException::NetlinkException(int error, const std::string &what) :
 
 /* static */
 NetlinkException
-CreateLogged(int error, const char *what = "")
+NetlinkException::CreateLogged(int error, const char *what)
 {
     NetlinkException netlinkException(error, what);
     LOGE << std::format("Netlink error ({}): {} ({})", netlinkException.code().value(), netlinkException.what(), netlinkException.code().message());
@@ -28,7 +28,7 @@ CreateLogged(int error, const char *what = "")
 
 /* static */
 NetlinkException
-CreateLogged(int error, const std::string &what)
+NetlinkException::CreateLogged(int error, const std::string &what)
 {
     return CreateLogged(error, what.c_str());
 }
