@@ -29,7 +29,7 @@ struct Nl80211Interface
     Nl80211Interface() = default;
 
     auto
-    operator <=>(const Nl80211Interface&) const = default;
+    operator<=>(const Nl80211Interface&) const = default;
 
     /**
      * @brief Construct a new Nl80211Interface object with the specified attributes.
@@ -79,9 +79,9 @@ struct Nl80211Interface
 
     /**
      * @brief Indicates if the interface is an access point.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     bool
     IsAccessPoint() const noexcept;

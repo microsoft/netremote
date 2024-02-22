@@ -19,7 +19,6 @@
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
-#include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
@@ -76,17 +75,9 @@ HandleNl80211GetWiphyResponse(struct nl_msg *nl80211Message, void *context) noex
 
 /* static */
 std::optional<Nl80211Wiphy>
-Nl80211Wiphy::FromId(const std::function<void(Microsoft::Net::Netlink::NetlinkMessage &)> &addWiphyIdentifier)
+Nl80211Wiphy::FromId(const std::function<void(NetlinkMessage &)> &addWiphyIdentifier)
 {
-    // Allocate a new netlink socket.
-    auto nl80211SocketOpt{ CreateNl80211Socket() };
-    if (!nl80211SocketOpt.has_value()) {
-        LOGE << "Failed to create nl80211 socket";
-        return std::nullopt;
-    }
-
     // Allocate a new nl80211 message for sending the dump request for all interfaces.
-    auto nl80211Socket{ std::move(nl80211SocketOpt.value()) };
     auto nl80211MessageGetWiphy{ NetlinkMessage::Allocate() };
     if (nl80211MessageGetWiphy == nullptr) {
         LOGE << "Failed to allocate nl80211 message for wiphy request";
@@ -104,6 +95,7 @@ Nl80211Wiphy::FromId(const std::function<void(Microsoft::Net::Netlink::NetlinkMe
     // Add the identifier to the message so nl80211 knows what to lookup.
     addWiphyIdentifier(nl80211MessageGetWiphy);
 
+    auto nl80211Socket{ CreateNl80211Socket() };
     std::optional<Nl80211Wiphy> nl80211Wiphy{};
     int ret = nl_socket_modify_cb(nl80211Socket, NL_CB_VALID, NL_CB_CUSTOM, detail::HandleNl80211GetWiphyResponse, &nl80211Wiphy);
     if (ret < 0) {

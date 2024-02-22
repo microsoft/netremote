@@ -1,14 +1,13 @@
 
 #include <cstdint>
 #include <format>
-#include <optional>
 #include <string_view>
-#include <utility>
+#include <system_error>
 
 #include <linux/nl80211.h>
+#include <microsoft/net/netlink/NetlinkErrorCategory.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
-#include <netlink/errno.h>
 #include <netlink/genl/genl.h>
 #include <plog/Log.h>
 
@@ -506,24 +505,22 @@ Nl80211CipherSuiteToString(uint32_t cipherSuite) noexcept
 
 using Microsoft::Net::Netlink::NetlinkSocket;
 
-std::optional<NetlinkSocket>
+NetlinkSocket
 CreateNl80211Socket()
 {
     // Allocate a new netlink socket.
     auto netlinkSocket{ NetlinkSocket::Allocate() };
-    if (netlinkSocket == nullptr) {
-        LOGE << "Failed to allocate new netlink socket for nl control";
-        return std::nullopt;
-    }
 
     // Connect the socket to the generic netlink family.
-    int ret = genl_connect(netlinkSocket);
+    const int ret = genl_connect(netlinkSocket);
     if (ret < 0) {
-        LOGE << std::format("Failed to connect netlink socket for nl control with error {} ({})", ret, nl_geterror(ret));
-        return std::nullopt;
+        const auto errorCode = MakeNetlinkErrorCode(-ret);
+        const auto message = std::format("Failed to connect netlink socket for nl control with error {}", errorCode.value());
+        LOGE << message;
+        throw std::system_error(errorCode, message);
     }
 
-    return std::move(netlinkSocket);
+    return netlinkSocket;
 }
 
 } // namespace Microsoft::Net::Netlink::Nl80211

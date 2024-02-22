@@ -1,5 +1,9 @@
 
+#include <system_error>
+
+#include <microsoft/net/netlink/NetlinkErrorCategory.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
+#include <netlink/errno.h>
 #include <netlink/handlers.h>
 #include <netlink/socket.h>
 
@@ -10,6 +14,10 @@ NetlinkSocket
 NetlinkSocket::Allocate()
 {
     auto* socket = nl_socket_alloc();
+    if (socket == nullptr) {
+        throw std::system_error(MakeNetlinkErrorCode(NLE_NOMEM), "Failed to allocate netlink socket");
+    }
+
     return NetlinkSocket{ socket };
 }
 
