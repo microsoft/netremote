@@ -7,6 +7,14 @@
 namespace Microsoft::Net::Wifi
 {
 /**
+ * @brief Operational state of an access point.
+ */
+enum class AccessPointOperationalState : bool {
+    Disabled = false,
+    Enabled = true,
+};
+
+/**
  * @brief High-level status reported by various access point operations.
  */
 enum class AccessPointOperationStatusCode {
@@ -51,6 +59,24 @@ struct AccessPointOperationStatus
      */
     static AccessPointOperationStatus
     MakeSucceeded() noexcept;
+
+    /**
+     * @brief Determine whether the operation succeeded.
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool
+    Succeeded() const noexcept;
+
+   /**
+     * @brief Determine whether the operation failed.
+    * 
+    * @return true 
+    * @return false 
+    */
+    bool
+    Failed() const noexcept;
 
     /**
      * @brief Implicit bool operator allowing AccessPointOperationStatus to be used directly in condition statements

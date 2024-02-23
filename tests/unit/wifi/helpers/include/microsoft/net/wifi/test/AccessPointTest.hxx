@@ -25,10 +25,10 @@ struct AccessPointTest final :
 {
     std::string InterfaceName;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
-    bool IsEnabled{ false };
     Microsoft::Net::Wifi::Ieee80211Protocol Protocol;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::string Ssid;
+    AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.

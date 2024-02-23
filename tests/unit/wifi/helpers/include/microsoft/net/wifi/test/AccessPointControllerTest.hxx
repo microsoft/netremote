@@ -19,9 +19,10 @@ struct AccessPointTest;
  * @brief IAccessPointController implementation for testing purposes.
  *
  * This implementation takes an AccessPointTest object which it uses to implement the IAccessPointController interface.
- * The owner of this class must ensure that the passes AccessPointTest* remains valid for the lifetime of this object.
+ * The owner of this class must ensure that the passed AccessPointTest* remains valid for the lifetime of this object.
  */
-struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPointController
+struct AccessPointControllerTest final :
+    public Microsoft::Net::Wifi::IAccessPointController
 {
     AccessPointTest *AccessPoint{ nullptr };
 
@@ -55,13 +56,13 @@ struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPoi
     GetInterfaceName() const override;
 
     /**
-     * @brief Get whether the access point is enabled.
+     * @brief Get the access point operational state.
      *
-     * @return true
-     * @return false
+     * @param operationalState The value to store the operational state.
+     * @return AccessPointOperationStatus 
      */
-    bool
-    GetIsEnabled() override;
+    AccessPointOperationStatus
+    GetOperationalState(AccessPointOperationalState& operationalState) override;
 
     /**
      * @brief Get the capabilities of the access point.
@@ -70,6 +71,15 @@ struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPoi
      */
     Ieee80211AccessPointCapabilities
     GetCapabilities() override;
+
+    /**
+     * @brief Set the operational state of the access point.
+     *
+     * @param operationalState The desired operational state.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetOperationalState(AccessPointOperationalState operationalState) override;
 
     /**
      * @brief Set the Ieee80211 protocol of the access point.
@@ -93,9 +103,9 @@ struct AccessPointControllerTest final : public Microsoft::Net::Wifi::IAccessPoi
 
     /**
      * @brief Set the SSID of the access point.
-     * 
+     *
      * @param ssid The SSID to be set.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
     SetSssid(std::string_view ssid) override;

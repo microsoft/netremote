@@ -175,19 +175,57 @@ AccessPointControllerLinux::GetCapabilities()
     return capabilities;
 }
 
-bool
-AccessPointControllerLinux::GetIsEnabled()
+AccessPointOperationStatus
+AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& operationalState)
 {
-    bool isEnabled{ false };
+    AccessPointOperationStatus status{};
 
     try {
         auto hostapdStatus = m_hostapd.GetStatus();
-        isEnabled = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled);
+        operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled) 
+            ? AccessPointOperationalState::Enabled 
+            : AccessPointOperationalState::Disabled;
+        status = AccessPointOperationStatus::MakeSucceeded();
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to get status for interface {} ({})", GetInterfaceName(), ex.what()));
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format("Failed to get operational state for interface {} ({})", GetInterfaceName(), ex.what());
     }
 
-    return isEnabled;
+    return status;
+}
+
+AccessPointOperationStatus
+AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState operationalState)
+{
+    AccessPointOperationStatus status{};
+
+    switch (operationalState) {
+    case AccessPointOperationalState::Enabled: {
+        try {
+            m_hostapd.Enable();
+        } catch (const Wpa::HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = std::format("Failed to set operational state to 'enabled' for {} (unknown error)", GetInterfaceName());
+        }
+        break;
+    }
+    case AccessPointOperationalState::Disabled: {
+        try {
+            m_hostapd.Disable();
+        } catch (const Wpa::HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Message = std::format("Failed to set operational state to 'disabled' for {} (unknown error)", GetInterfaceName());
+        }
+        break;
+    }
+    default: {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Message = std::format("Invalid operational state value '{}' for {}", magic_enum::enum_name(operationalState), GetInterfaceName());
+        break;
+    }
+    }
+
+    return status;
 }
 
 bool

@@ -43,13 +43,13 @@ struct AccessPointControllerLinux :
     operator=(AccessPointControllerLinux&&) = delete;
 
     /**
-     * @brief Get whether the access point is enabled.
+     * @brief Get the access point operational state.
      *
-     * @return true
-     * @return false
+     * @param operationalState The value to store the operational state.
+     * @return AccessPointOperationStatus 
      */
-    bool
-    GetIsEnabled() override;
+    AccessPointOperationStatus
+    GetOperationalState(AccessPointOperationalState& operationalState) override;
 
     /**
      * @brief Get the Capabilities object
@@ -58,6 +58,15 @@ struct AccessPointControllerLinux :
      */
     Ieee80211AccessPointCapabilities
     GetCapabilities() override;
+
+    /**
+     * @brief Set the operational state of the access point.
+     *
+     * @param operationalState The desired operational state.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetOperationalState(AccessPointOperationalState operationalState) override;
 
     /**
      * @brief Set the Ieee80211 protocol.
