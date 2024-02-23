@@ -122,6 +122,107 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
     }
 }
 
+TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto InterfaceName1{ "TestWifiAccessPointDisable1" };
+    constexpr auto InterfaceName2{ "TestWifiAccessPointDisable2" };
+    constexpr auto InterfaceNameInvalid{ "TestWifiAccessPointDisableInvalid" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    Ieee80211AccessPointCapabilities apCapabilities{
+        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+    };
+
+    auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
+    auto apTest2 = std::make_shared<AccessPointTest>(InterfaceName2, apCapabilities);
+    apManagerTest->AddAccessPoint(apTest1);
+    apManagerTest->AddAccessPoint(apTest2);
+
+    NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = apManagerTest,
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointDisableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+
+        WifiAccessPointDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+    }
+
+    SECTION("Fails with invalid access point")
+    {
+        WifiAccessPointDisableRequest request{};
+        request.set_accesspointid(InterfaceNameInvalid);
+
+        WifiAccessPointDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+    }
+
+    SECTION("Succeeds with valid access point")
+    {
+        WifiAccessPointDisableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+
+        WifiAccessPointDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(apTest1->OperationalState == AccessPointOperationalState::Disabled);
+    }
+
+    SECTION("Succeeds with valid access point when already disabled")
+    {
+        for (auto i = 0; i < 2; ++i) {
+            WifiAccessPointDisableRequest request{};
+            request.set_accesspointid(InterfaceName1);
+
+            WifiAccessPointDisableResult result{};
+            grpc::ClientContext clientContext{};
+
+            grpc::Status status;
+            REQUIRE_NOTHROW(status = client->WifiAccessPointDisable(&clientContext, request, &result));
+            REQUIRE(status.ok());
+            REQUIRE(result.accesspointid() == request.accesspointid());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+            REQUIRE(apTest1->OperationalState == AccessPointOperationalState::Disabled);
+        }
+    }
+}
+
 TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
