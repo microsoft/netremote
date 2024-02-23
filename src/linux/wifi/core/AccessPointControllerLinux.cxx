@@ -1,12 +1,15 @@
+
 #include <algorithm>
 #include <cstdint>
 #include <format>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <Wpa/IHostapd.hxx>
@@ -182,8 +185,8 @@ AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& ope
 
     try {
         auto hostapdStatus = m_hostapd.GetStatus();
-        operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled) 
-            ? AccessPointOperationalState::Enabled 
+        operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled)
+            ? AccessPointOperationalState::Enabled
             : AccessPointOperationalState::Disabled;
         status = AccessPointOperationStatus::MakeSucceeded();
     } catch (const Wpa::HostapdException& ex) {
@@ -228,48 +231,75 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
     return status;
 }
 
-bool
-AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointOperationStatus
+AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
-    bool isOk = false;
-    const Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    // Populate a list of required properties to set.
+    std::vector<std::pair<std::string_view, std::string_view>> propertiesToSet{};
 
+    // Add the hw_mode property.
+    const auto hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    const auto hwModeValue = detail::HostapdHwModeToPropertyValue(hwMode);
+    propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameHwMode, hwModeValue);
+
+    // Additively set other hostapd properties based on the protocol.
+    switch (ieeeProtocol) {
+    case Ieee80211Protocol::AX:
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
+        [[fallthrough]];
+    case Ieee80211Protocol::AC:
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
+        [[fallthrough]];
+    case Ieee80211Protocol::N:
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);
+        break;
+    default:
+        break;
+    }
+
+    AccessPointOperationStatus status{};
+    std::optional<std::string> errorDetails;
+    bool hostapdOperationSucceeded{ false };
+
+    // Attempt to set all required properties.
     try {
-        // Set the hostapd hw_mode property.
-        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameHwMode, detail::HostapdHwModeToPropertyValue(hwMode));
-
-        // Additively set other hostapd properties based on the protocol.
-        switch (ieeeProtocol) {
-        case Ieee80211Protocol::AX:
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
-            [[fallthrough]];
-        case Ieee80211Protocol::AC:
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
-            [[fallthrough]];
-        case Ieee80211Protocol::N:
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);
-            break;
-        default:
-            break;
+        for (const auto& [propertyKeyToSet, propertyValueToSet] : propertiesToSet) {
+            hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
+            if (!hostapdOperationSucceeded) {
+                errorDetails = std::format("failed to set hostapd property '{}' to '{}'", propertyKeyToSet, propertyValueToSet);
+                break;
+            }
         }
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to set Ieee80211 protocol for interface {} ({})", GetInterfaceName(), ex.what()));
+        hostapdOperationSucceeded = false;
+        errorDetails = ex.what();
     }
 
-    if (isOk) {
-        // Reload hostapd configuration.
-        isOk = m_hostapd.Reload();
-        if (!isOk) {
-            LOGE << std::format("Failed to reload hostapd configuration for interface {}", GetInterfaceName());
-            return false;
+    // If the required properties were set, reload the hostapd configuration to pick up the changes.
+    if (hostapdOperationSucceeded) {
+        hostapdOperationSucceeded = m_hostapd.Reload();
+        if (!hostapdOperationSucceeded) {
+            errorDetails = "failed to reload hostapd configuration";
         }
     }
 
-    return isOk;
+    const auto ieeeProtocolName = std::format("802.11 {}", magic_enum::enum_name(ieeeProtocol));
+
+    // Finalize return status.
+    if (!hostapdOperationSucceeded) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format("Setting protocol {} for interface {} failed ({})", ieeeProtocolName, GetInterfaceName(), errorDetails.value_or("unspecified error"));
+        LOGE << status.Message;
+    } else {
+        status.Code = AccessPointOperationStatusCode::Succeeded;
+        LOGD << std::format("Set protocol {} for interface {}", ieeeProtocolName, GetInterfaceName());
+    }
+
+    return status;
 }
 
 bool
