@@ -92,11 +92,9 @@ struct IAccessPointController
      * @brief Set the Ieee80211 protocol of the access point.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.
-     * @return true
-     * @return false
-     *
+     * @return AccessPointOperationStatus 
      */
-    virtual bool
+    virtual AccessPointOperationStatus
     SetProtocol(Ieee80211Protocol ieeeProtocol) = 0;
 
     /**

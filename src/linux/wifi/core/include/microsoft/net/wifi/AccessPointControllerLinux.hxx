@@ -72,11 +72,10 @@ struct AccessPointControllerLinux :
      * @brief Set the Ieee80211 protocol.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus
      */
-    bool
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+    AccessPointOperationStatus
+    SetProtocol(Ieee80211Protocol ieeeProtocol) override;
 
     /**
      * @brief Set the frquency bands the access point should enable.
