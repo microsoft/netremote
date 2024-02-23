@@ -25,6 +25,9 @@ jobs:
       contents: read
       actions: read
       security-events: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     uses: ./.github/workflows/build.yml
     with:
       build-types: "[ 'Debug' ]"
