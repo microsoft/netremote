@@ -300,13 +300,38 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] grpc::ServerContext* co
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
+    // Create an AP controller for the requested AP.
+    auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
+    if (accessPointController == nullptr) {
+        return grpc::Status::OK;
+    }
+
+    // Obtain current operational state.
+    AccessPointOperationalState operationalState{};
+    auto operationStatus = accessPointController->GetOperationalState(operationalState);
+    if (!operationStatus) {
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get operational state for access point {}", request->accesspointid()));
+    }
+
     WifiAccessPointOperationStatus status{};
 
-    // Validate request is well-formed and has all required parameters.
-    if (ValidateWifiAccessPointEnableRequest(request, status)) {
-        // TODO: Enable the access point.
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    // Enable the access point if it's not already enabled.
+    if (operationalState != AccessPointOperationalState::Enabled) {
+        // Validate request is well-formed and has all required parameters.
+        if (ValidateWifiAccessPointEnableRequest(request, status)) {
+            // TODO: Enable the access point.
+
+            // Set the operational state to 'enabled' now that initial configuration has been set.
+            operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
+            if (!operationStatus) {
+                return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set operational state to 'enabled' for access point {}", request->accesspointid()));
+            }
+        }
+    } else {
+        LOGI << std::format("Access point {} is already enabled", request->accesspointid());
     }
+
+    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(status);
