@@ -65,7 +65,7 @@ HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatus
 }
 
 /**
- * @brief Wrapper for HandleFailure that converts a Dot11AccessPointOperationStatusCode to a WifiAccessPointOperationStatusCode.
+ * @brief Wrapper for HandleFailure that converts a AccessPointOperationStatusCode to a WifiAccessPointOperationStatusCode.
  *
  * @tparam RequestT The request type. This must contain an access point id (trait).
  * @tparam ResultT The result type. This must contain an access point id and a status (traits).
