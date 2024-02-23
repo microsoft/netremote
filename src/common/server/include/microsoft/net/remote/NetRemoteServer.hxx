@@ -29,12 +29,14 @@ struct NetRemoteServer
     explicit NetRemoteServer(const NetRemoteServerConfiguration& configuration);
 
     /**
-     * Prevent copying and moving of this object. 
+     * Prevent copying and moving of this object.
      */
     NetRemoteServer(const NetRemoteServer&) = delete;
-    NetRemoteServer& operator=(const NetRemoteServer&) = delete;
+    NetRemoteServer&
+    operator=(const NetRemoteServer&) = delete;
     NetRemoteServer(NetRemoteServer&&) = delete;
-    NetRemoteServer& operator=(NetRemoteServer&&) = delete;
+    NetRemoteServer&
+    operator=(NetRemoteServer&&) = delete;
 
     /**
      * @brief Get the GrpcServer object.
@@ -54,7 +56,7 @@ struct NetRemoteServer
 
     /**
      * @brief Get the NetRemoteDataStreamingService object instance.
-     * 
+     *
      * @return Service::NetRemoteDataStreamingService&
      */
     Service::NetRemoteDataStreamingService&
