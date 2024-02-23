@@ -1,16 +1,24 @@
 
-#include <format>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <catch2/catch_test_macros.hpp>
+#include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
+#include <grpcpp/impl/codegen/status.h>
+#include <grpcpp/security/credentials.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
+#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/test/AccessPointManagerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
@@ -23,7 +31,6 @@ constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee8021
 } // namespace Microsoft::Net::Remote::Test
 
 using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
-using Microsoft::Net::Wifi::Test::AccessPointFactoryTest;
 
 TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 {
@@ -34,7 +41,7 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-    NetRemoteServerConfiguration Configuration{
+    const NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
         .AccessPointManager = AccessPointManager::Create(),
     };
@@ -47,7 +54,7 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        WifiEnumerateAccessPointsRequest request{};
+        const WifiEnumerateAccessPointsRequest request{};
 
         WifiEnumerateAccessPointsResult result{};
         grpc::ClientContext clientContext{};
@@ -61,7 +68,7 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     SECTION("Initial enablement status is disabled")
     {
-        WifiEnumerateAccessPointsRequest request{};
+        const WifiEnumerateAccessPointsRequest request{};
 
         WifiEnumerateAccessPointsResult result{};
         grpc::ClientContext clientContext{};
@@ -84,7 +91,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     constexpr auto SsidName{ "TestWifiAccessPointEnable" };
 
-    NetRemoteServerConfiguration Configuration{
+    const NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
         .AccessPointManager = AccessPointManager::Create(),
     };
@@ -136,7 +143,7 @@ TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
     constexpr auto InterfaceNameInvalid{ "TestWifiAccessPointDisableInvalid" };
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
-    Ieee80211AccessPointCapabilities apCapabilities{
+    const Ieee80211AccessPointCapabilities apCapabilities{
         .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
     };
 
@@ -145,7 +152,7 @@ TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
     apManagerTest->AddAccessPoint(apTest1);
     apManagerTest->AddAccessPoint(apTest2);
 
-    NetRemoteServerConfiguration Configuration{
+    const NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
         .AccessPointManager = apManagerTest,
     };
@@ -235,13 +242,13 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     constexpr auto InterfaceName{ "TestWifiAccessPointSetPhyType" };
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
-    Ieee80211AccessPointCapabilities apCapabilities{
+    const Ieee80211AccessPointCapabilities apCapabilities{
         .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
     };
-    auto apTest = std::make_shared<AccessPointTest>(InterfaceName, std::move(apCapabilities));
+    auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);
 
-    NetRemoteServerConfiguration Configuration{
+    const NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
         .AccessPointManager = apManagerTest,
     };
@@ -287,30 +294,30 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
 
-    Ieee80211AccessPointCapabilities apCapabilitiesBandsAll{
+    const Ieee80211AccessPointCapabilities apCapabilitiesBandsAll{
         .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
     };
-    Ieee80211AccessPointCapabilities apCapabilitiesBands2_4{
+    const Ieee80211AccessPointCapabilities apCapabilitiesBands2_4{
         .FrequencyBands{ Ieee80211FrequencyBand::TwoPointFourGHz }
     };
-    Ieee80211AccessPointCapabilities apCapabilitiesBands5_0{
+    const Ieee80211AccessPointCapabilities apCapabilitiesBands5_0{
         .FrequencyBands{ Ieee80211FrequencyBand::FiveGHz }
     };
-    Ieee80211AccessPointCapabilities apCapabilitiesBands6_0{
+    const Ieee80211AccessPointCapabilities apCapabilitiesBands6_0{
         .FrequencyBands{ Ieee80211FrequencyBand::SixGHz }
     };
 
-    auto apTestBandsAll = std::make_shared<AccessPointTest>(InterfaceNameAllBands, std::move(apCapabilitiesBandsAll));
-    auto apTestBands2_4 = std::make_shared<AccessPointTest>(InterfaceNameBand2_4, std::move(apCapabilitiesBands2_4));
-    auto apTestBands5_0 = std::make_shared<AccessPointTest>(InterfaceNameBand5_0, std::move(apCapabilitiesBands5_0));
-    auto apTestBands6_0 = std::make_shared<AccessPointTest>(InterfaceNameBand6_0, std::move(apCapabilitiesBands6_0));
+    auto apTestBandsAll = std::make_shared<AccessPointTest>(InterfaceNameAllBands, apCapabilitiesBandsAll);
+    auto apTestBands2_4 = std::make_shared<AccessPointTest>(InterfaceNameBand2_4, apCapabilitiesBands2_4);
+    auto apTestBands5_0 = std::make_shared<AccessPointTest>(InterfaceNameBand5_0, apCapabilitiesBands5_0);
+    auto apTestBands6_0 = std::make_shared<AccessPointTest>(InterfaceNameBand6_0, apCapabilitiesBands6_0);
 
     apManagerTest->AddAccessPoint(apTestBandsAll);
     apManagerTest->AddAccessPoint(apTestBands2_4);
     apManagerTest->AddAccessPoint(apTestBands5_0);
     apManagerTest->AddAccessPoint(apTestBands6_0);
 
-    NetRemoteServerConfiguration Configuration{
+    const NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
         .AccessPointManager = apManagerTest,
     };

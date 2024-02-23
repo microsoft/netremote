@@ -22,10 +22,10 @@ main(int argc, char *argv[])
     plog::init(plog::verbose, &colorConsoleAppender);
 
     auto cliData = std::make_shared<NetRemoteCliData>();
-    auto cliHandler = std::make_shared<NetRemoteCliHandler>(std::make_unique<Microsoft::Net::Remote::NetRemoteCliHandlerOperationsFactory>());
+    auto cliHandler = std::make_shared<NetRemoteCliHandler>(std::make_unique<NetRemoteCliHandlerOperationsFactory>());
     auto cli{ NetRemoteCli::Create(cliData, cliHandler) };
 
-    int ret = cli->Parse(argc, argv);
+    const int ret = cli->Parse(argc, argv);
     if (ret != 0) {
         return ret;
     }
