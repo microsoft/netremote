@@ -40,6 +40,19 @@ message WifiAccessPointOperationStatus
     google.protobuf.Any Details = 3;
 }
 
+enum WifiDataStreamOperationStatusCode
+{
+    WifiDataStreamOperationStatusCodeUnknown = 0;
+    WifiDataStreamOperationStatusCodeSucceeded = 1;
+    WifiDataStreamOperationStatusCodeFailed = 2;
+}
+
+message WifiDataStreamOperationStatus
+{
+    WifiDataStreamOperationStatusCode Code = 1;
+    string Message = 2;
+}
+
 message WifiAccessPointEnableRequest
 {
     string AccessPointId = 1;
@@ -85,4 +98,15 @@ message WifiAccessPointSetFrequencyBandsResult
 {
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiDataStreamUploadData
+{
+    bytes Data = 1;
+}
+
+message WifiDataStreamUploadResult
+{
+    uint32 DataReceivedCount = 1;
+    WifiDataStreamOperationStatus Status = 2;
 }

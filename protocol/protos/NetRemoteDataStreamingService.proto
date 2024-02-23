@@ -8,4 +8,5 @@ import "NetRemoteWifi.proto";
 
 service NetRemoteDataStreaming
 {
+    rpc WifiDataStreamUpload (stream Microsoft.Net.Remote.Wifi.WifiDataStreamUploadData) returns (Microsoft.Net.Remote.Wifi.WifiDataStreamUploadResult);
 }
