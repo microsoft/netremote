@@ -46,7 +46,7 @@ struct AccessPointControllerLinux :
      * @brief Get the access point operational state.
      *
      * @param operationalState The value to store the operational state.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
     GetOperationalState(AccessPointOperationalState& operationalState) override;
@@ -86,7 +86,7 @@ struct AccessPointControllerLinux :
      * @return false
      */
     bool
-    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
+    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) override;
 
     /**
      * @brief Set the SSID of the access point.
@@ -115,9 +115,12 @@ struct AccessPointControllerLinuxFactory :
      * Prevent copying and moving of this object.
      */
     AccessPointControllerLinuxFactory(const AccessPointControllerLinuxFactory&) = delete;
+
+    AccessPointControllerLinuxFactory(AccessPointControllerLinuxFactory&&) = delete;
+
     AccessPointControllerLinuxFactory&
     operator=(const AccessPointControllerLinuxFactory&) = delete;
-    AccessPointControllerLinuxFactory(AccessPointControllerLinuxFactory&&) = delete;
+
     AccessPointControllerLinuxFactory&
     operator=(AccessPointControllerLinuxFactory&&) = delete;
 

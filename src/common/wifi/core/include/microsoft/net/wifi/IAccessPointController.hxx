@@ -45,9 +45,12 @@ struct IAccessPointController
      * Prevent copying and moving of IAccessPointController objects.
      */
     IAccessPointController(const IAccessPointController&) = delete;
+
+    IAccessPointController(IAccessPointController&&) = delete;
+
     IAccessPointController&
     operator=(const IAccessPointController&) = delete;
-    IAccessPointController(IAccessPointController&&) = delete;
+
     IAccessPointController&
     operator=(IAccessPointController&&) = delete;
 
@@ -63,7 +66,7 @@ struct IAccessPointController
      * @brief Get the access point operational state.
      *
      * @param operationalState The value to store the operational state.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
     GetOperationalState(AccessPointOperationalState& operationalState) = 0;
@@ -78,7 +81,7 @@ struct IAccessPointController
 
     /**
      * @brief Set the operational state of the access point.
-     * 
+     *
      * @param operationalState The desired operational state.
      * @return AccessPointOperationStatus
      */
@@ -94,7 +97,7 @@ struct IAccessPointController
      *
      */
     virtual bool
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
+    SetProtocol(Ieee80211Protocol ieeeProtocol) = 0;
 
     /**
      * @brief Set the frquency bands the access point should enable.
@@ -104,13 +107,13 @@ struct IAccessPointController
      * @return false
      */
     virtual bool
-    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) = 0;
+    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) = 0;
 
     /**
      * @brief Set the SSID of the access point.
-     * 
+     *
      * @param ssid The SSID to be set.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
     SetSssid(std::string_view ssid) = 0;
@@ -129,9 +132,12 @@ struct IAccessPointControllerFactory
      * Prevent copying and moving of IAccessPointControllerFactory objects.
      */
     IAccessPointControllerFactory(const IAccessPointControllerFactory&) = delete;
+
+    IAccessPointControllerFactory(IAccessPointControllerFactory&&) = delete;
+
     IAccessPointControllerFactory&
     operator=(const IAccessPointControllerFactory&) = delete;
-    IAccessPointControllerFactory(IAccessPointControllerFactory&&) = delete;
+
     IAccessPointControllerFactory&
     operator=(IAccessPointControllerFactory&&) = delete;
 
