@@ -150,32 +150,44 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
 }
 } // namespace detail
 
-Ieee80211AccessPointCapabilities
-AccessPointControllerLinux::GetCapabilities()
+AccessPointOperationStatus
+AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities)
 {
-    auto wiphy = Nl80211Wiphy::FromInterfaceName(GetInterfaceName());
+    AccessPointOperationStatus status{};
+
+    const auto wiphy = Nl80211Wiphy::FromInterfaceName(GetInterfaceName());
     if (!wiphy.has_value()) {
-        throw AccessPointControllerException(std::format("Failed to get wiphy for interface {}", GetInterfaceName()));
+        status.Code = AccessPointOperationStatusCode::AccessPointInvalid;
+        status.Message = std::format("Failed to get wiphy for interface {}", GetInterfaceName());
+    } else {
+        Ieee80211AccessPointCapabilities capabilities;
+
+        // Convert protocols.
+        capabilities.Protocols = detail::Nl80211WiphyToIeee80211Protocols(wiphy.value());
+
+        // Convert frequency bands.
+        capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
+        std::ranges::transform(std::views::keys(wiphy->Bands), std::begin(capabilities.FrequencyBands), detail::Nl80211BandToIeee80211FrequencyBand);
+
+        // Convert AKM suites.
+        capabilities.AkmSuites = std::vector<Ieee80211AkmSuite>(std::size(wiphy->AkmSuites));
+        std::ranges::transform(wiphy->AkmSuites, std::begin(capabilities.AkmSuites), detail::Nl80211AkmSuiteToIeee80211AkmSuite);
+
+        // Convert cipher suites.
+        capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
+        std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), detail::Nl80211CipherSuiteToIeee80211CipherSuite);
+
+        ieee80211AccessPointCapabilities = std::move(capabilities);
+        status = AccessPointOperationStatus::MakeSucceeded();
     }
 
-    Ieee80211AccessPointCapabilities capabilities;
+    if (status.Succeeded()) {
+        LOGD << std::format("Got capabilities for interface {}", GetInterfaceName());
+    } else {
+        LOGE << std::format("Failed to get capabilities for interface {} ({} - {})", GetInterfaceName(), magic_enum::enum_name(status.Code), status.Message);
+    }
 
-    // Convert protocols.
-    capabilities.Protocols = detail::Nl80211WiphyToIeee80211Protocols(wiphy.value());
-
-    // Convert frequency bands.
-    capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
-    std::ranges::transform(std::views::keys(wiphy->Bands), std::begin(capabilities.FrequencyBands), detail::Nl80211BandToIeee80211FrequencyBand);
-
-    // Convert AKM suites.
-    capabilities.AkmSuites = std::vector<Ieee80211AkmSuite>(std::size(wiphy->AkmSuites));
-    std::ranges::transform(wiphy->AkmSuites, std::begin(capabilities.AkmSuites), detail::Nl80211AkmSuiteToIeee80211AkmSuite);
-
-    // Convert cipher suites.
-    capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
-    std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), detail::Nl80211CipherSuiteToIeee80211CipherSuite);
-
-    return capabilities;
+    return status;
 }
 
 AccessPointOperationStatus

@@ -188,14 +188,16 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
         return MakeInvalidAccessPointResultItem();
     }
 
-    Dot11AccessPointCapabilities dot11AccessPointCapabilities{};
-    try {
-        auto ieee80211AccessPointCapabilities = accessPointController->GetCapabilities();
-        dot11AccessPointCapabilities = ToDot11AccessPointCapabilities(ieee80211AccessPointCapabilities);
-    } catch (const AccessPointControllerException& apce) {
-        LOGE << std::format("Failed to get capabilities for access point {} ({})", interfaceName, apce.what());
+    // Obtain capabilities of the access point.
+    Ieee80211AccessPointCapabilities ieee80211AccessPointCapabilities{};
+    operationStatus = accessPointController->GetCapabilities(ieee80211AccessPointCapabilities);
+    if (!operationStatus) {
+        LOGE << std::format("Failed to get capabilities for access point {}", interfaceName);
         return MakeInvalidAccessPointResultItem();
     }
+
+    Dot11AccessPointCapabilities dot11AccessPointCapabilities{};
+    dot11AccessPointCapabilities = ToDot11AccessPointCapabilities(ieee80211AccessPointCapabilities);
 
     const bool isEnabled{ operationalState == AccessPointOperationalState::Enabled };
 
@@ -346,14 +348,15 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext
     auto ieee80211Protocol = FromDot11PhyType(request->phytype());
 
     // Check if Ieee80211 protocol is supported by AP.
-    try {
-        auto accessPointCapabilities = accessPointController->GetCapabilities();
-        const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
-        if (std::ranges::find(supportedIeee80211Protocols, ieee80211Protocol) == std::cend(supportedIeee80211Protocols)) {
-            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
-        }
-    } catch (const AccessPointControllerException& apce) {
-        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what()));
+    Ieee80211AccessPointCapabilities accessPointCapabilities{};
+    auto operationStatus = accessPointController->GetCapabilities(accessPointCapabilities);
+    if (!operationStatus) {
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
+    }
+
+    const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
+    if (std::ranges::find(supportedIeee80211Protocols, ieee80211Protocol) == std::cend(supportedIeee80211Protocols)) {
+        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("PHY type not supported by access point {}", request->accesspointid()));
     }
 
     // Set the Ieee80211 protocol.
@@ -409,10 +412,9 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
 
     // Obtain capabilities of the access point.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};
-    try {
-        accessPointCapabilities = accessPointController->GetCapabilities();
-    } catch (const AccessPointControllerException& apce) {
-        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), apce.what()));
+    auto operationStatus = accessPointController->GetCapabilities(accessPointCapabilities);
+    if (!operationStatus) {
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
     }
 
     // Check if requested bands are supported by the AP.
