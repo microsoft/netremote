@@ -147,7 +147,7 @@ TEST_CASE("WifiDataStreamDownload API", "[basic][rpc][client][remote]")
             OnReadDone(bool ok) override
             {
                 if (ok) {
-                    REQUIRE(m_data.count() == ++m_dataReceivedCount);
+                    REQUIRE(m_data.sequencenumber() == ++m_dataReceivedCount);
                     StartRead(&m_data);
                 }
                 // If read fails, then there is likely no more data to be read, so do nothing.
@@ -246,7 +246,7 @@ TEST_CASE("WifiDataStreamBidirectional API", "[basic][rpc][client][remote]")
             OnReadDone(bool ok) override
             {
                 if (ok) {
-                    REQUIRE(m_readData.count() == ++m_dataReceivedCount);
+                    REQUIRE(m_readData.sequencenumber() == ++m_dataReceivedCount);
                     StartRead(&m_readData);
                 }
             }

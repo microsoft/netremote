@@ -126,7 +126,7 @@ NetRemoteCallbackService::WifiDataStreamDownload([[maybe_unused]] ::grpc::Callba
                 const auto data = std::format("Data #{}", ++m_dataSentCount);
                 LOGD << "Writing " << data;
                 m_data.set_data(data);
-                m_data.set_count(m_dataSentCount);
+                m_data.set_sequencenumber(m_dataSentCount);
                 *m_data.mutable_status() = m_writeStatus;
                 StartWrite(&m_data);
             } else {
@@ -227,7 +227,7 @@ NetRemoteCallbackService::WifiDataStreamBidirectional([[maybe_unused]] ::grpc::C
             const auto data = std::format("Data #{}", ++m_dataSentCount);
             LOGD << "Writing " << data;
             m_writeData.set_data(data);
-            m_writeData.set_count(m_dataSentCount);
+            m_writeData.set_sequencenumber(m_dataSentCount);
             *m_writeData.mutable_status() = m_status;
             StartWrite(&m_writeData);
         }

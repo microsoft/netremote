@@ -109,7 +109,7 @@ message WifiDataStreamUploadData
 message WifiDataStreamDownloadData
 {
     bytes Data = 1;
-    uint32 Count = 2;
+    uint32 SequenceNumber = 2;
     WifiDataStreamOperationStatus Status = 3;
 }
 
@@ -135,13 +135,20 @@ message WifiDataStreamContinuousTypeProperties
 
 }
 
+enum WifiDataStreamPattern
+{
+    Constant = 0;
+    // Other throughput patterns, e.g. large spikes
+}
+
 message WifiDataStreamProperties
 {
     WifiDataStreamType Type = 1;
+    WifiDataStreamPattern Pattern = 2;
     oneof Properties
     {
-        WifiDataStreamFixedTypeProperties FixedTypeProperties = 2;
-        WifiDataStreamContinuousTypeProperties ContinuousTypeProperties = 3;
+        WifiDataStreamFixedTypeProperties FixedTypeProperties = 3;
+        WifiDataStreamContinuousTypeProperties ContinuousTypeProperties = 4;
     }
 }
 
