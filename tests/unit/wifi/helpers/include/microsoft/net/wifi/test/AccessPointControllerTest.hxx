@@ -56,13 +56,13 @@ struct AccessPointControllerTest final :
     GetInterfaceName() const override;
 
     /**
-     * @brief Get whether the access point is enabled.
+     * @brief Get the access point operational state.
      *
-     * @return true
-     * @return false
+     * @param operationalState The value to store the operational state.
+     * @return AccessPointOperationStatus 
      */
-    bool
-    GetOperationalState() override;
+    AccessPointOperationStatus
+    GetOperationalState(AccessPointOperationalState& operationalState) override;
 
     /**
      * @brief Get the capabilities of the access point.

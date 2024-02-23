@@ -171,12 +171,7 @@ MakeInvalidAccessPointResultItem()
 WifiEnumerateAccessPointsResultItem
 IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 {
-    WifiEnumerateAccessPointsResultItem item{};
-
-    bool isEnabled{ false };
     std::string id{};
-    Dot11AccessPointCapabilities dot11AccessPointCapabilities{};
-
     auto interfaceName = accessPoint.GetInterfaceName();
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
 
@@ -186,13 +181,14 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
         return MakeInvalidAccessPointResultItem();
     }
 
-    try {
-        isEnabled = accessPointController->GetOperationalState();
-    } catch (const AccessPointControllerException& apce) {
-        LOGE << std::format("Failed to get enabled state for access point {} ({})", interfaceName, apce.what());
+    AccessPointOperationalState operationalState{};
+    auto operationStatus = accessPointController->GetOperationalState(operationalState);
+    if (!operationStatus) {
+        LOGE << std::format("Failed to get operational state for access point {} ({})", interfaceName, magic_enum::enum_name(operationStatus.Code));
         return MakeInvalidAccessPointResultItem();
     }
 
+    Dot11AccessPointCapabilities dot11AccessPointCapabilities{};
     try {
         auto ieee80211AccessPointCapabilities = accessPointController->GetCapabilities();
         dot11AccessPointCapabilities = ToDot11AccessPointCapabilities(ieee80211AccessPointCapabilities);
@@ -201,7 +197,10 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
         return MakeInvalidAccessPointResultItem();
     }
 
+    const bool isEnabled{ operationalState == AccessPointOperationalState::Enabled };
+
     // Populate the result item.
+    WifiEnumerateAccessPointsResultItem item{};
     item.set_accesspointid(std::move(id));
     item.set_isenabled(isEnabled);
     *item.mutable_capabilities() = std::move(dot11AccessPointCapabilities);
@@ -298,21 +297,22 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
         return grpc::Status::OK;
     }
 
-    bool isEnabled{ false };
-    try {
-        isEnabled = accessPointController->GetOperationalState();
-    } catch (const AccessPointControllerException& apce) {
-        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to get enabled state for access point {} ({})", request->accesspointid(), apce.what()));
+    // Obtain current operational state.
+    AccessPointOperationalState operationalState{};
+    auto operationStatus = accessPointController->GetOperationalState(operationalState);
+    if (!operationStatus) {
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get operational state for access point {}", request->accesspointid()));
     }
 
-    if (isEnabled) {
+    // Disable the access point if it's not already disabled.
+    if (operationalState != AccessPointOperationalState::Disabled) {
         // Disable the access point.
-        auto statusSetOperationState = accessPointController->SetOperationalState(AccessPointOperationalState::Disabled);
-        if (statusSetOperationState.Code != AccessPointOperationStatusCode::Succeeded) {
-            return HandleFailure(request, result, statusSetOperationState.Code, std::format("Failed to disable access point {}", request->accesspointid()));
+        operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Disabled);
+        if (!operationStatus) {
+            return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set operational state to 'disabled' for access point {}", request->accesspointid()));
         }
     } else {
-        LOGI << std::format("Access point {} is already disabled", request->accesspointid());
+        LOGI << std::format("Access point {} is in 'disabled' operational state", request->accesspointid());
     }
 
     WifiAccessPointOperationStatus status{};

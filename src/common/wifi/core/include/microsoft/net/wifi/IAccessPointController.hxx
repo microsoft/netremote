@@ -60,13 +60,13 @@ struct IAccessPointController
     GetInterfaceName() const = 0;
 
     /**
-     * @brief Get whether the access point is enabled.
+     * @brief Get the access point operational state.
      *
-     * @return true
-     * @return false
+     * @param operationalState The value to store the operational state.
+     * @return AccessPointOperationStatus 
      */
-    virtual bool
-    GetOperationalState() = 0;
+    virtual AccessPointOperationStatus
+    GetOperationalState(AccessPointOperationalState& operationalState) = 0;
 
     /**
      * @brief Get the capabilities of the access point.

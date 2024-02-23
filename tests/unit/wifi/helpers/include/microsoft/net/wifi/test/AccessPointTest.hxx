@@ -25,7 +25,6 @@ struct AccessPointTest final :
 {
     std::string InterfaceName;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
-    bool IsEnabled{ false };
     Microsoft::Net::Wifi::Ieee80211Protocol Protocol;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::string Ssid;

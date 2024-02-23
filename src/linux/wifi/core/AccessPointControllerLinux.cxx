@@ -175,19 +175,23 @@ AccessPointControllerLinux::GetCapabilities()
     return capabilities;
 }
 
-bool
-AccessPointControllerLinux::GetOperationalState()
+AccessPointOperationStatus
+AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& operationalState)
 {
-    bool isEnabled{ false };
+    AccessPointOperationStatus status{};
 
     try {
         auto hostapdStatus = m_hostapd.GetStatus();
-        isEnabled = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled);
+        operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled) 
+            ? AccessPointOperationalState::Enabled 
+            : AccessPointOperationalState::Disabled;
+        status = AccessPointOperationStatus::MakeSucceeded();
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to get status for interface {} ({})", GetInterfaceName(), ex.what()));
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format("Failed to get operational state for interface {} ({})", GetInterfaceName(), ex.what());
     }
 
-    return isEnabled;
+    return status;
 }
 
 AccessPointOperationStatus

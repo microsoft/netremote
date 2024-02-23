@@ -34,14 +34,15 @@ AccessPointControllerTest::GetInterfaceName() const
     return AccessPoint->InterfaceName;
 }
 
-bool
-AccessPointControllerTest::GetOperationalState()
+AccessPointOperationStatus
+AccessPointControllerTest::GetOperationalState(AccessPointOperationalState& operationalState)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::GetOperationalState called with null AccessPoint");
     }
 
-    return AccessPoint->IsEnabled;
+    operationalState = AccessPoint->OperationalState;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 Ieee80211AccessPointCapabilities
