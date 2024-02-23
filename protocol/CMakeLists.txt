@@ -7,6 +7,7 @@ set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos)
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 set(PROTO_FILES
     ${PROTO_DIR}/NetRemote.proto
+    ${PROTO_DIR}/NetRemoteDataStreamingService.proto
     ${PROTO_DIR}/NetRemoteService.proto
     ${PROTO_DIR}/NetRemoteWifi.proto
     ${PROTO_DIR}/WifiCore.proto
@@ -24,6 +25,7 @@ set(PROTO_FILES
 #
 set(PROTO_HEADERS_GENERATED
     ${PROTO_DIR_BINARY}/NetRemote.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.pb.h
     ${PROTO_DIR_BINARY}/WifiCore.pb.h
@@ -31,6 +33,7 @@ set(PROTO_HEADERS_GENERATED
 
 set(PROTO_HEADERS_GENERATED_GRPC
     ${PROTO_DIR_BINARY}/NetRemote.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.grpc.pb.h
     ${PROTO_DIR_BINARY}/WifiCore.grpc.pb.h
