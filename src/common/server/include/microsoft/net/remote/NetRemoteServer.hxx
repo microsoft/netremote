@@ -7,6 +7,7 @@
 
 #include <grpcpp/server.h>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/NetRemoteCallbackService.hxx>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 
 namespace Microsoft::Net::Remote
@@ -52,6 +53,14 @@ struct NetRemoteServer
     GetService() noexcept;
 
     /**
+     * @brief Get the NetRemoteCallbackService object instance.
+     * 
+     * @return Service::NetRemoteCallbackService&
+     */
+    Service::NetRemoteCallbackService&
+    GetCallbackService() noexcept;
+
+    /**
      * @brief Start the server if not already started.
      */
     void
@@ -67,6 +76,7 @@ private:
     std::string m_serverAddress;
     std::unique_ptr<grpc::Server> m_server;
     Service::NetRemoteService m_service;
+    Service::NetRemoteCallbackService m_callbackService;
 };
 } // namespace Microsoft::Net::Remote
 

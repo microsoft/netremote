@@ -40,6 +40,20 @@ message WifiAccessPointOperationStatus
     google.protobuf.Any Details = 3;
 }
 
+enum WifiDataStreamOperationStatusCode
+{
+    WifiDataStreamOperationStatusCodeUnknown = 0;
+    WifiDataStreamOperationStatusCodeSucceeded = 1;
+    WifiDataStreamOperationStatusCodeFailed = 2;
+}
+
+message WifiDataStreamOperationStatus
+{
+    WifiDataStreamOperationStatusCode Code = 1;
+    string Message = 2;
+    google.protobuf.Any Details = 3;
+}
+
 message WifiAccessPointEnableRequest
 {
     string AccessPointId = 1;
@@ -85,4 +99,60 @@ message WifiAccessPointSetFrequencyBandsResult
 {
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiDataStreamUploadData
+{
+    bytes Data = 1;
+}
+
+message WifiDataStreamDownloadData
+{
+    bytes Data = 1;
+    uint32 SequenceNumber = 2;
+    WifiDataStreamOperationStatus Status = 3;
+}
+
+message WifiDataStreamUploadResult
+{
+    uint32 DataReceivedCount = 1;
+    WifiDataStreamOperationStatus Status = 2;
+}
+
+enum WifiDataStreamType
+{
+    Fixed = 0;
+    Continuous = 1;
+}
+
+message WifiDataStreamFixedTypeProperties
+{
+    uint32 NumberOfDataBlocksToStream = 1;
+}
+
+message WifiDataStreamContinuousTypeProperties
+{
+
+}
+
+enum WifiDataStreamPattern
+{
+    Constant = 0;
+    // Other throughput patterns, e.g. large spikes
+}
+
+message WifiDataStreamProperties
+{
+    WifiDataStreamType Type = 1;
+    WifiDataStreamPattern Pattern = 2;
+    oneof Properties
+    {
+        WifiDataStreamFixedTypeProperties FixedTypeProperties = 3;
+        WifiDataStreamContinuousTypeProperties ContinuousTypeProperties = 4;
+    }
+}
+
+message WifiDataStreamDownloadRequest
+{
+    WifiDataStreamProperties Properties = 1;
 }

@@ -1,0 +1,14 @@
+
+syntax = "proto3";
+
+package Microsoft.Net.Remote.Service;
+
+import "NetRemote.proto";
+import "NetRemoteWifi.proto";
+
+service NetRemoteCallback
+{
+    rpc WifiDataStreamUpload (stream Microsoft.Net.Remote.Wifi.WifiDataStreamUploadData) returns (Microsoft.Net.Remote.Wifi.WifiDataStreamUploadResult);
+    rpc WifiDataStreamDownload (Microsoft.Net.Remote.Wifi.WifiDataStreamDownloadRequest) returns (stream Microsoft.Net.Remote.Wifi.WifiDataStreamDownloadData);
+    rpc WifiDataStreamBidirectional (stream Microsoft.Net.Remote.Wifi.WifiDataStreamUploadData) returns (stream Microsoft.Net.Remote.Wifi.WifiDataStreamDownloadData);
+}

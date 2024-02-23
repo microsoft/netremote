@@ -33,6 +33,12 @@ NetRemoteServer::GetService() noexcept
     return m_service;
 }
 
+Service::NetRemoteCallbackService&
+NetRemoteServer::GetCallbackService() noexcept
+{
+    return m_callbackService;
+}
+
 void
 NetRemoteServer::Run()
 {
@@ -43,6 +49,7 @@ NetRemoteServer::Run()
     grpc::ServerBuilder builder{};
     builder.AddListeningPort(m_serverAddress, grpc::InsecureServerCredentials());
     builder.RegisterService(&m_service);
+    builder.RegisterService(&m_callbackService);
 
     m_server = builder.BuildAndStart();
     LOGI << std::format("Netremote server started listening on {}", m_serverAddress);
