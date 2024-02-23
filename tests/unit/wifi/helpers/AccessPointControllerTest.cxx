@@ -45,14 +45,15 @@ AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &oper
     return AccessPointOperationStatus::MakeSucceeded();
 }
 
-Ieee80211AccessPointCapabilities
-AccessPointControllerTest::GetCapabilities()
+AccessPointOperationStatus
+AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::GetCapabilities called with null AccessPoint");
     }
 
-    return AccessPoint->Capabilities;
+    ieee80211AccessPointCapabilities = AccessPoint->Capabilities;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 AccessPointOperationStatus

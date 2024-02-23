@@ -52,12 +52,13 @@ struct AccessPointControllerLinux :
     GetOperationalState(AccessPointOperationalState& operationalState) override;
 
     /**
-     * @brief Get the Capabilities object
+     * @brief Get the capabilities of the access point.
      *
-     * @return Ieee80211AccessPointCapabilities
+     * @param ieee80211AccessPointCapabilities The value to store the capabilities.
+     * @return AccessPointOperationStatus
      */
-    Ieee80211AccessPointCapabilities
-    GetCapabilities() override;
+    AccessPointOperationStatus
+    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) override;
 
     /**
      * @brief Set the operational state of the access point.

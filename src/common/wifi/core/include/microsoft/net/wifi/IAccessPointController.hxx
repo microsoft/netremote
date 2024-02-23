@@ -74,10 +74,11 @@ struct IAccessPointController
     /**
      * @brief Get the capabilities of the access point.
      *
-     * @return Ieee80211AccessPointCapabilities
+     * @param ieee80211AccessPointCapabilities The value to store the capabilities.
+     * @return AccessPointOperationStatus
      */
-    virtual Ieee80211AccessPointCapabilities
-    GetCapabilities() = 0;
+    virtual AccessPointOperationStatus
+    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) = 0;
 
     /**
      * @brief Set the operational state of the access point.
@@ -92,7 +93,7 @@ struct IAccessPointController
      * @brief Set the Ieee80211 protocol of the access point.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
     SetProtocol(Ieee80211Protocol ieeeProtocol) = 0;
