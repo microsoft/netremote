@@ -41,9 +41,12 @@ struct AccessPointControllerTest final :
      * Prevent copying and moving of AccessPointControllerTest objects.
      */
     AccessPointControllerTest(const AccessPointControllerTest &) = delete;
+
+    AccessPointControllerTest(AccessPointControllerTest &&) = delete;
+
     AccessPointControllerTest &
     operator=(const AccessPointControllerTest &) = delete;
-    AccessPointControllerTest(AccessPointControllerTest &&) = delete;
+
     AccessPointControllerTest &
     operator=(AccessPointControllerTest &&) = delete;
 
@@ -95,10 +98,9 @@ struct AccessPointControllerTest final :
      * @brief Set the frquency bands the access point should enable.
      *
      * @param frequencyBands The frequency bands to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus
      */
-    bool
+    AccessPointOperationStatus
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
 
     /**
