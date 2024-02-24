@@ -107,6 +107,6 @@ message WifiDataStreamUploadData
 
 message WifiDataStreamUploadResult
 {
-    uint32 DataReceivedCount = 1;
+    uint32 NumberOfDataBlocksReceived = 1;
     WifiDataStreamOperationStatus Status = 2;
 }
