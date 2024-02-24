@@ -78,7 +78,7 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
     return AccessPointOperationStatus::MakeSucceeded();
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
     if (AccessPoint == nullptr) {
@@ -87,13 +87,15 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
 
     for (const auto &frequencyBandToSet : frequencyBands) {
         if (std::ranges::find(AccessPoint->Capabilities.FrequencyBands, frequencyBandToSet) == std::cend(AccessPoint->Capabilities.FrequencyBands)) {
-            LOGE << std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet));
-            return false;
+            return {
+                AccessPointOperationStatusCode::InvalidParameter,
+                std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet))
+            };
         }
     }
 
     AccessPoint->FrequencyBands = std::move(frequencyBands);
-    return true;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 AccessPointOperationStatus

@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -275,14 +276,16 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 
     AccessPointOperationStatus status{};
     std::optional<std::string> errorDetails;
+    std::string_view propertyKeyToSet;
+    std::string_view propertyValueToSet;
     bool hostapdOperationSucceeded{ false };
 
     // Attempt to set all required properties.
     try {
-        for (const auto& [propertyKeyToSet, propertyValueToSet] : propertiesToSet) {
+        for (const auto& propertyToSet : propertiesToSet) {
+            std::tie(propertyKeyToSet, propertyValueToSet) = std::move(propertyToSet);
             hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
             if (!hostapdOperationSucceeded) {
-                errorDetails = std::format("failed to set hostapd property '{}' to '{}'", propertyKeyToSet, propertyValueToSet);
                 break;
             }
         }
@@ -297,6 +300,8 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
         if (!hostapdOperationSucceeded) {
             errorDetails = "failed to reload hostapd configuration";
         }
+    } else {
+        errorDetails = std::format("failed to set hostapd property '{}' to '{}' for interface {} - {}", propertyKeyToSet, propertyValueToSet, GetInterfaceName(), errorDetails.value_or("unspecified error"));
     }
 
     const auto ieeeProtocolName = std::format("802.11 {}", magic_enum::enum_name(ieeeProtocol));
@@ -314,13 +319,17 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
     return status;
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
+    AccessPointOperationStatus status{};
+
     // Ensure at least one band is requested.
     if (std::empty(frequencyBands)) {
-        LOGW << std::format("No frequency bands specified for interface {}", GetInterfaceName());
-        return false;
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Message = std::format("No frequency bands specified for interface {}", GetInterfaceName());
+        LOGW << status.Message;
+        return status;
     }
 
     // Generate the argument for the hostapd "setband" command, which accepts a comma separated list of bands.
@@ -329,29 +338,49 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
         setBandArgumentBuilder << detail::IeeeFrequencyBandToHostapdBand(band) << ',';
     }
 
-    std::string setBandArgumentAll = setBandArgumentBuilder.str();
+    const std::string setBandArgumentAll = setBandArgumentBuilder.str();
     const std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
 
-    bool isOk = false;
+    bool hostapdOperationSucceeded{ false };
+    std::optional<std::string> errorDetails{};
+    std::string_view propertyKeyToSet{ Wpa::ProtocolHostapd::PropertyNameSetBand };
+    std::string_view propertyValueToSet{ setBandArgument };
+
     try {
         // Set the hostapd "setband" property.
-        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSetBand, setBandArgument);
-        if (!isOk) {
-            LOGE << std::format("Failed to set frequency bands for interface {}", GetInterfaceName());
-            return false;
-        }
-
-        // Reload hostapd configuration to pick up the changes.
-        isOk = m_hostapd.Reload();
-        if (!isOk) {
-            LOGE << std::format("Failed to reload hostapd configuration for interface {}", GetInterfaceName());
-            return false;
-        }
+        hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to set frequency bands for interface {} ({})", GetInterfaceName(), ex.what()));
+        hostapdOperationSucceeded = false;
+        errorDetails = ex.what();
     }
 
-    return true;
+    // Reload hostapd configuration to pick up the changes.
+    if (hostapdOperationSucceeded) {
+        try {
+            hostapdOperationSucceeded = m_hostapd.Reload();
+        } catch (const Wpa::HostapdException& ex) {
+            hostapdOperationSucceeded = false;
+            errorDetails = ex.what();
+        }
+
+        if (!hostapdOperationSucceeded) {
+            errorDetails = std::format("failed to reload hostapd configuration - {}", errorDetails.value_or("unspecified error"));
+        } else {
+            status.Code = AccessPointOperationStatusCode::Succeeded;
+        }
+    } else {
+        errorDetails = std::format("failed to set hostapd property '{}' to '{}' for interface {} - {}", propertyKeyToSet, propertyValueToSet, GetInterfaceName(), errorDetails.value_or("unspecified error"));
+    }
+
+    if (!status.Succeeded()) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format("Setting frequency bands for interface {} failed ({})", GetInterfaceName(), errorDetails.value_or("unspecified error"));
+        LOGE << status.Message;
+    } else {
+        LOGD << std::format("Set frequency bands for interface {}", GetInterfaceName());
+    }
+
+    return status;
 }
 
 AccessPointOperationStatus

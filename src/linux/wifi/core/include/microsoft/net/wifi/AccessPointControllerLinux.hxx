@@ -82,10 +82,9 @@ struct AccessPointControllerLinux :
      * @brief Set the frquency bands the access point should enable.
      *
      * @param frequencyBands The frequency bands to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus
      */
-    bool
+    AccessPointOperationStatus
     SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) override;
 
     /**
