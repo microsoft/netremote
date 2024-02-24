@@ -54,9 +54,12 @@ struct AccessPointOperationStatus
     {}
 
     AccessPointOperationStatus(const AccessPointOperationStatus &) = default;
+
     AccessPointOperationStatus(AccessPointOperationStatus &&) = default;
+
     AccessPointOperationStatus &
     operator=(const AccessPointOperationStatus &) = default;
+
     AccessPointOperationStatus &
     operator=(AccessPointOperationStatus &&) = default;
 
