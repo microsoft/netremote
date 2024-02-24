@@ -282,7 +282,7 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 
     // Attempt to set all required properties.
     try {
-        for (const auto& propertyToSet : propertiesToSet) {
+        for (auto& propertyToSet : propertiesToSet) {
             std::tie(propertyKeyToSet, propertyValueToSet) = std::move(propertyToSet);
             hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
             if (!hostapdOperationSucceeded) {
