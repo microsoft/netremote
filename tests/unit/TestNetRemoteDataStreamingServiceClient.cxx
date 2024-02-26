@@ -2,6 +2,8 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <thread>
+#include <vector>
 
 #include <catch2/catch_test_macros.hpp>
 #include <grpcpp/create_channel.h>
@@ -107,5 +109,24 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
         REQUIRE(status.ok());
         REQUIRE(result.numberofdatablocksreceived() == numberOfDataBlocksToWrite);
         REQUIRE(result.status().code() == WifiDataStreamOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Can be called with multiple parallel clients")
+    {
+        static constexpr auto numberOfDataBlocksToWrite = 10;
+        static constexpr auto numberOfClientThreads = 5;
+
+        std::vector<std::jthread> clientThreads;
+        for (std::size_t i = 0; i < numberOfClientThreads; i++) {
+            clientThreads.emplace_back([&]() {
+                auto dataStreamWriter = std::make_unique<DataStreamWriter>(client.get(), numberOfDataBlocksToWrite);
+
+                WifiDataStreamUploadResult result{};
+                grpc::Status status = dataStreamWriter->Await(&result);
+                REQUIRE(status.ok());
+                REQUIRE(result.numberofdatablocksreceived() == numberOfDataBlocksToWrite);
+                REQUIRE(result.status().code() == WifiDataStreamOperationStatusCodeSucceeded);
+            });
+        }
     }
 }
