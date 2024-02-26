@@ -9,6 +9,8 @@ target_sources(${PROJECT_NAME}-service
     PRIVATE
         NetRemoteService.cxx
         NetRemoteDataStreamingService.cxx
+        NetRemoteDataStreamingReactors.hxx
+        NetRemoteDataStreamingReactors.cxx
         NetRemoteApiTrace.hxx
         NetRemoteApiTrace.cxx 
         NetRemoteWifiApiTrace.hxx

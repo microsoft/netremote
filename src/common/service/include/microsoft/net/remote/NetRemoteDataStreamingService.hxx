@@ -17,6 +17,17 @@ public:
      * @brief Construct a new NetRemoteDataStreamingService object.
      */
     NetRemoteDataStreamingService() = default;
+
+private:
+    /**
+     * @brief Stream data from the client to the server.
+     *
+     * @param context
+     * @param result
+     * @return grpc::ServerReadReactor<Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>*
+     */
+    grpc::ServerReadReactor<Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>*
+    WifiDataStreamUpload(grpc::CallbackServerContext* context, Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* result) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 

@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME}-test-unit
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteCommon.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServiceClient.cxx
+        ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteDataStreamingServiceClient.cxx
 )
 
 target_link_libraries(${PROJECT_NAME}-test-unit
