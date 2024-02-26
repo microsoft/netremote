@@ -155,7 +155,7 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
 AccessPointOperationStatus
 AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities)
 {
-    AccessPointOperationStatus status{ GetInterfaceName(), "GetCapabilities" };
+    AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     const auto wiphy = Nl80211Wiphy::FromInterfaceName(GetInterfaceName());
@@ -192,7 +192,7 @@ AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ie
 AccessPointOperationStatus
 AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& operationalState)
 {
-    AccessPointOperationStatus status{ GetInterfaceName(), "GetOperationalState" };
+    AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     try {
@@ -212,7 +212,7 @@ AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& ope
 AccessPointOperationStatus
 AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState operationalState)
 {
-    AccessPointOperationStatus status{ GetInterfaceName(), "SetOperationalState" };
+    AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     switch (operationalState) {
@@ -321,7 +321,7 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 AccessPointOperationStatus
 AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
-    AccessPointOperationStatus status{ GetInterfaceName(), "SetFrequencyBands" };
+    AccessPointOperationStatus status{ GetInterfaceName() };
     AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     // Ensure at least one band is requested.
@@ -382,7 +382,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 AccessPointOperationStatus
 AccessPointControllerLinux::SetSssid(std::string_view ssid)
 {
-    AccessPointOperationStatus status{ GetInterfaceName(), "SetSsid" };
+    AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     // Ensure the ssid is not empty.
