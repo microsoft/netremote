@@ -232,7 +232,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             status.Code = AccessPointOperationStatusCode::Succeeded;
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
-            status.Details = "Failed to set operational state to 'disabled'";
+            status.Details = "failed to set operational state to 'disabled'";
         }
         break;
     }
