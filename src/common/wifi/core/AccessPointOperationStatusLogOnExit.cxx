@@ -1,4 +1,5 @@
 
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatusLogOnExit.hxx>
 #include <plog/Log.h>
 #include <plog/Severity.h>
