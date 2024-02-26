@@ -179,7 +179,7 @@ AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ie
         std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), detail::Nl80211CipherSuiteToIeee80211CipherSuite);
 
         ieee80211AccessPointCapabilities = std::move(capabilities);
-        status = AccessPointOperationStatus::MakeSucceeded();
+        status = AccessPointOperationStatus::MakeSucceeded(GetInterfaceName());
     }
 
     if (status.Succeeded()) {
@@ -201,7 +201,7 @@ AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& ope
         operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled)
             ? AccessPointOperationalState::Enabled
             : AccessPointOperationalState::Disabled;
-        status = AccessPointOperationStatus::MakeSucceeded();
+        status = AccessPointOperationStatus::MakeSucceeded(GetInterfaceName());
     } catch (const Wpa::HostapdException& ex) {
         status.Code = AccessPointOperationStatusCode::InternalError;
         status.Message = std::format("Failed to get operational state for interface {} ({})", GetInterfaceName(), ex.what());
@@ -431,7 +431,7 @@ AccessPointControllerLinux::SetSssid(std::string_view ssid)
         return status;
     }
 
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(GetInterfaceName());
 }
 
 std::unique_ptr<IAccessPointController>

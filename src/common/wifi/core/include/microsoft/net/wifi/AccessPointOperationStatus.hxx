@@ -2,7 +2,9 @@
 #ifndef ACCESS_POINT_OPERATION_STATUS_HXX
 #define ACCESS_POINT_OPERATION_STATUS_HXX
 
+#include <source_location>
 #include <string>
+#include <string_view>
 
 namespace Microsoft::Net::Wifi
 {
@@ -32,25 +34,37 @@ enum class AccessPointOperationStatusCode {
  */
 struct AccessPointOperationStatus
 {
+    std::string AccessPointId;
+    std::string OperationName;
     AccessPointOperationStatusCode Code{ AccessPointOperationStatusCode::Unknown };
-    std::string Message;
+    std::string Details;
+    std::string Message; // TODO: remove this
 
-    AccessPointOperationStatus() = default;
+    AccessPointOperationStatus() = default; // TODO: remove this
     virtual ~AccessPointOperationStatus() = default;
 
     /**
-     * @brief Create an AccessPointOperationStatus with the given status code.
+     * @brief Create an AccessPointOperationStatus with the given access point id and operation name.
      */
-    constexpr explicit AccessPointOperationStatus(AccessPointOperationStatusCode code) noexcept :
-        Code{ code }
+    constexpr AccessPointOperationStatus(std::string_view accessPointId, const char *operationName = std::source_location::current().function_name()) noexcept :
+        AccessPointOperationStatus(accessPointId, AccessPointOperationStatusCode::Unknown, operationName)
     {}
 
     /**
-     * @brief Create an AccessPointOperationStatus with the given status code and message.
+     * @brief Create an AccessPointOperationStatus with the given access point id, operation name, and status code.
      */
-    constexpr AccessPointOperationStatus(AccessPointOperationStatusCode code, std::string_view message) noexcept :
+    constexpr AccessPointOperationStatus(std::string_view accessPointId, AccessPointOperationStatusCode code, const char *operationName = std::source_location::current().function_name()) noexcept :
+        AccessPointOperationStatus(accessPointId, code, "", operationName)
+    {}
+
+    /**
+     * @brief Create an AccessPointOperationStatus with the given access point id, operation name, status code, and details.
+     */
+    constexpr AccessPointOperationStatus(std::string_view accessPointId, AccessPointOperationStatusCode code, std::string_view details, const char *operationName = std::source_location::current().function_name()) noexcept :
+        AccessPointId{ accessPointId },
+        OperationName{ operationName },
         Code{ code },
-        Message{ message }
+        Details{ details }
     {}
 
     AccessPointOperationStatus(const AccessPointOperationStatus &) = default;
@@ -64,12 +78,20 @@ struct AccessPointOperationStatus
     operator=(AccessPointOperationStatus &&) = default;
 
     /**
+     * @brief Return a string representation of the status.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
+
+    /**
      * @brief Create an AccessPointOperationStatus describing an operation that succeeded.
      *
      * @return AccessPointOperationStatus
      */
     static AccessPointOperationStatus
-    MakeSucceeded() noexcept;
+    MakeSucceeded(std::string_view accessPointId) noexcept;
 
     /**
      * @brief Determine whether the operation succeeded.

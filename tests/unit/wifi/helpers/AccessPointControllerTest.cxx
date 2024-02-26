@@ -42,7 +42,7 @@ AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &oper
     }
 
     operationalState = AccessPoint->OperationalState;
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
 AccessPointOperationStatus
@@ -53,7 +53,7 @@ AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &iee
     }
 
     ieee80211AccessPointCapabilities = AccessPoint->Capabilities;
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
 AccessPointOperationStatus
@@ -64,7 +64,7 @@ AccessPointControllerTest::SetOperationalState(AccessPointOperationalState opera
     }
 
     AccessPoint->OperationalState = operationalState;
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
 AccessPointOperationStatus
@@ -75,7 +75,7 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
     }
 
     AccessPoint->Protocol = ieeeProtocol;
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
 AccessPointOperationStatus
@@ -88,6 +88,7 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
     for (const auto &frequencyBandToSet : frequencyBands) {
         if (std::ranges::find(AccessPoint->Capabilities.FrequencyBands, frequencyBandToSet) == std::cend(AccessPoint->Capabilities.FrequencyBands)) {
             return {
+                AccessPoint->InterfaceName,
                 AccessPointOperationStatusCode::InvalidParameter,
                 std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet))
             };
@@ -95,7 +96,7 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
     }
 
     AccessPoint->FrequencyBands = std::move(frequencyBands);
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
 AccessPointOperationStatus
@@ -106,7 +107,7 @@ AccessPointControllerTest::SetSssid(std::string_view ssid)
     }
 
     AccessPoint->Ssid = ssid;
-    return AccessPointOperationStatus::MakeSucceeded();
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
