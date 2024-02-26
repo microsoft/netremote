@@ -23,7 +23,7 @@ struct AccessPointOperationStatusLogOnExit final
      * @param severityOnError The severity to log on error.
      * @param severityOnSuccess The severity to log on success.
      */
-    AccessPointOperationStatusLogOnExit(AccessPointOperationStatus* operationStatus, plog::Severity severityOnError = plog::Severity::error, plog::Severity severityOnSuccess = plog::Severity::info) noexcept;
+    explicit AccessPointOperationStatusLogOnExit(AccessPointOperationStatus* operationStatus, plog::Severity severityOnError = plog::Severity::error, plog::Severity severityOnSuccess = plog::Severity::info) noexcept;
 
     /**
      * @brief Destroy the object and log the stored AccessPointOperationStatus.
