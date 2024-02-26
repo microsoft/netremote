@@ -1,5 +1,7 @@
 
 #include <format>
+#include <optional>
+#include <source_location>
 #include <string>
 #include <string_view>
 
@@ -10,11 +12,14 @@ using namespace Microsoft::Net::Wifi;
 
 /* static */
 AccessPointOperationStatus
-AccessPointOperationStatus::MakeSucceeded(std::string_view accessPointId) noexcept
+AccessPointOperationStatus::MakeSucceeded(std::string_view accessPointId, std::source_location sourceLocation) noexcept
 {
     return AccessPointOperationStatus{
         accessPointId,
+        {},
         AccessPointOperationStatusCode::Succeeded,
+        {},
+        sourceLocation
     };
 }
 
@@ -33,16 +38,19 @@ AccessPointOperationStatus::Failed() const noexcept
 std::string
 AccessPointOperationStatus::ToString() const
 {
-    static constexpr auto Format{ "AP '{}' operation {} {}" };
+    static constexpr auto Format{ "AP '{}' operation {} {} {} {}" };
 
+    std::optional<std::string> caller{};
     const auto result = std::format("{}", Succeeded() ? "succeeded" : std::format("failed with code '{}'", magic_enum::enum_name(Code)));
-    const auto details = std::format("{}", std::empty(Details) ? "" : std::format("({})", Details));
+    const auto details = std::format("{}", std::empty(Details) ? "" : std::format("- {}", Details));
+#ifdef DEBUG
+    caller = std::format("[{}({}:{}) {}]", SourceLocation.file_name(), SourceLocation.line(), SourceLocation.column(), SourceLocation.function_name());
+#endif
 
-    return std::format(Format, AccessPointId, OperationName, result, details);
+    return std::format(Format, AccessPointId, OperationName, result, details, caller.value_or(""));
 }
 
 AccessPointOperationStatus::operator bool() const noexcept
 {
     return Succeeded();
-    return (Code == AccessPointOperationStatusCode::Succeeded);
 }

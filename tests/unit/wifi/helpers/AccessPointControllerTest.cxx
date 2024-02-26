@@ -89,6 +89,7 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
         if (std::ranges::find(AccessPoint->Capabilities.FrequencyBands, frequencyBandToSet) == std::cend(AccessPoint->Capabilities.FrequencyBands)) {
             return {
                 AccessPoint->InterfaceName,
+                {},
                 AccessPointOperationStatusCode::InvalidParameter,
                 std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet))
             };

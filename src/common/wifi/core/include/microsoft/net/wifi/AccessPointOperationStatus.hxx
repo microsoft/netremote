@@ -34,36 +34,30 @@ enum class AccessPointOperationStatusCode {
  */
 struct AccessPointOperationStatus
 {
+    std::source_location SourceLocation;
     std::string AccessPointId;
     std::string OperationName;
-    AccessPointOperationStatusCode Code{ AccessPointOperationStatusCode::Unknown };
     std::string Details;
+    AccessPointOperationStatusCode Code{ AccessPointOperationStatusCode::Unknown };
 
     virtual ~AccessPointOperationStatus() = default;
 
     /**
-     * @brief Create an AccessPointOperationStatus with the given access point id and operation name.
-     */
-    constexpr AccessPointOperationStatus(std::string_view accessPointId, const char *operationName = std::source_location::current().function_name()) noexcept :
-        AccessPointOperationStatus(accessPointId, AccessPointOperationStatusCode::Unknown, operationName)
-    {}
-
-    /**
-     * @brief Create an AccessPointOperationStatus with the given access point id, operation name, and status code.
-     */
-    constexpr AccessPointOperationStatus(std::string_view accessPointId, AccessPointOperationStatusCode code, const char *operationName = std::source_location::current().function_name()) noexcept :
-        AccessPointOperationStatus(accessPointId, code, "", operationName)
-    {}
-
-    /**
      * @brief Create an AccessPointOperationStatus with the given access point id, operation name, status code, and details.
      */
-    constexpr AccessPointOperationStatus(std::string_view accessPointId, AccessPointOperationStatusCode code, std::string_view details, const char *operationName = std::source_location::current().function_name()) noexcept :
-        AccessPointId{ accessPointId },
+    constexpr AccessPointOperationStatus(std::string_view accessPointId, std::string_view operationName = {}, AccessPointOperationStatusCode code = AccessPointOperationStatusCode::Unknown, std::string_view details = {}, std::source_location sourceLocation = std::source_location::current()) noexcept :
+        SourceLocation{ sourceLocation },
+        AccessPointId{ std::move(accessPointId) },
         OperationName{ operationName },
-        Code{ code },
-        Details{ details }
-    {}
+        Details{ details },
+        Code{ code }
+    {
+        if (std::empty(OperationName)) {
+            OperationName = SourceLocation.function_name();
+            OperationName.erase(OperationName.find_first_of('('));
+            OperationName.erase(0, OperationName.find_last_of(':'));
+        }
+    }
 
     AccessPointOperationStatus(const AccessPointOperationStatus &) = default;
 
@@ -86,10 +80,12 @@ struct AccessPointOperationStatus
     /**
      * @brief Create an AccessPointOperationStatus describing an operation that succeeded.
      *
+     * @param accessPointId The ID of the access point.
+     * @param sourceLocation The source location of the operation.
      * @return AccessPointOperationStatus
      */
     static AccessPointOperationStatus
-    MakeSucceeded(std::string_view accessPointId) noexcept;
+    MakeSucceeded(std::string_view accessPointId, std::source_location sourceLocation = std::source_location::current()) noexcept;
 
     /**
      * @brief Determine whether the operation succeeded.
