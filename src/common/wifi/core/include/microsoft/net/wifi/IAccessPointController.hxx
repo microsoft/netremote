@@ -45,9 +45,12 @@ struct IAccessPointController
      * Prevent copying and moving of IAccessPointController objects.
      */
     IAccessPointController(const IAccessPointController&) = delete;
+
+    IAccessPointController(IAccessPointController&&) = delete;
+
     IAccessPointController&
     operator=(const IAccessPointController&) = delete;
-    IAccessPointController(IAccessPointController&&) = delete;
+
     IAccessPointController&
     operator=(IAccessPointController&&) = delete;
 
@@ -63,7 +66,7 @@ struct IAccessPointController
      * @brief Get the access point operational state.
      *
      * @param operationalState The value to store the operational state.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
     GetOperationalState(AccessPointOperationalState& operationalState) = 0;
@@ -71,14 +74,15 @@ struct IAccessPointController
     /**
      * @brief Get the capabilities of the access point.
      *
-     * @return Ieee80211AccessPointCapabilities
+     * @param ieee80211AccessPointCapabilities The value to store the capabilities.
+     * @return AccessPointOperationStatus
      */
-    virtual Ieee80211AccessPointCapabilities
-    GetCapabilities() = 0;
+    virtual AccessPointOperationStatus
+    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) = 0;
 
     /**
      * @brief Set the operational state of the access point.
-     * 
+     *
      * @param operationalState The desired operational state.
      * @return AccessPointOperationStatus
      */
@@ -89,28 +93,25 @@ struct IAccessPointController
      * @brief Set the Ieee80211 protocol of the access point.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.
-     * @return true
-     * @return false
-     *
+     * @return AccessPointOperationStatus
      */
-    virtual bool
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) = 0;
+    virtual AccessPointOperationStatus
+    SetProtocol(Ieee80211Protocol ieeeProtocol) = 0;
 
     /**
      * @brief Set the frquency bands the access point should enable.
      *
      * @param frequencyBands The frequency bands to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus
      */
-    virtual bool
-    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) = 0;
+    virtual AccessPointOperationStatus
+    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) = 0;
 
     /**
      * @brief Set the SSID of the access point.
-     * 
+     *
      * @param ssid The SSID to be set.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
     SetSssid(std::string_view ssid) = 0;
@@ -129,9 +130,12 @@ struct IAccessPointControllerFactory
      * Prevent copying and moving of IAccessPointControllerFactory objects.
      */
     IAccessPointControllerFactory(const IAccessPointControllerFactory&) = delete;
+
+    IAccessPointControllerFactory(IAccessPointControllerFactory&&) = delete;
+
     IAccessPointControllerFactory&
     operator=(const IAccessPointControllerFactory&) = delete;
-    IAccessPointControllerFactory(IAccessPointControllerFactory&&) = delete;
+
     IAccessPointControllerFactory&
     operator=(IAccessPointControllerFactory&&) = delete;
 

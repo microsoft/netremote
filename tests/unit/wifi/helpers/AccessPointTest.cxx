@@ -1,5 +1,6 @@
 #include <memory>
 #include <string_view>
+#include <utility>
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
@@ -14,9 +15,9 @@ AccessPointTest::AccessPointTest(std::string_view interfaceName) :
     AccessPointTest(interfaceName, Ieee80211AccessPointCapabilities{})
 {}
 
-AccessPointTest::AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities) :
+AccessPointTest::AccessPointTest(std::string_view interfaceName, Ieee80211AccessPointCapabilities capabilities) :
     InterfaceName(interfaceName),
-    Capabilities(capabilities)
+    Capabilities(std::move(capabilities))
 {}
 
 std::string_view

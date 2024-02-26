@@ -46,18 +46,19 @@ struct AccessPointControllerLinux :
      * @brief Get the access point operational state.
      *
      * @param operationalState The value to store the operational state.
-     * @return AccessPointOperationStatus 
+     * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
     GetOperationalState(AccessPointOperationalState& operationalState) override;
 
     /**
-     * @brief Get the Capabilities object
+     * @brief Get the capabilities of the access point.
      *
-     * @return Ieee80211AccessPointCapabilities
+     * @param ieee80211AccessPointCapabilities The value to store the capabilities.
+     * @return AccessPointOperationStatus
      */
-    Ieee80211AccessPointCapabilities
-    GetCapabilities() override;
+    AccessPointOperationStatus
+    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) override;
 
     /**
      * @brief Set the operational state of the access point.
@@ -72,21 +73,19 @@ struct AccessPointControllerLinux :
      * @brief Set the Ieee80211 protocol.
      *
      * @param ieeeProtocol The Ieee80211 protocol to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus
      */
-    bool
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+    AccessPointOperationStatus
+    SetProtocol(Ieee80211Protocol ieeeProtocol) override;
 
     /**
      * @brief Set the frquency bands the access point should enable.
      *
      * @param frequencyBands The frequency bands to be set.
-     * @return true
-     * @return false
+     * @return AccessPointOperationStatus
      */
-    bool
-    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
+    AccessPointOperationStatus
+    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) override;
 
     /**
      * @brief Set the SSID of the access point.
@@ -115,9 +114,12 @@ struct AccessPointControllerLinuxFactory :
      * Prevent copying and moving of this object.
      */
     AccessPointControllerLinuxFactory(const AccessPointControllerLinuxFactory&) = delete;
+
+    AccessPointControllerLinuxFactory(AccessPointControllerLinuxFactory&&) = delete;
+
     AccessPointControllerLinuxFactory&
     operator=(const AccessPointControllerLinuxFactory&) = delete;
-    AccessPointControllerLinuxFactory(AccessPointControllerLinuxFactory&&) = delete;
+
     AccessPointControllerLinuxFactory&
     operator=(AccessPointControllerLinuxFactory&&) = delete;
 

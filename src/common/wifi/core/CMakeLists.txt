@@ -11,6 +11,7 @@ target_sources(wifi-core
         AccessPointController.cxx
         AccessPointControllerException.cxx
         AccessPointOperationStatus.cxx
+        Ieee80211AccessPointCapabilities.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_PUBLIC_INCLUDE}
@@ -25,6 +26,8 @@ target_sources(wifi-core
 )
 
 target_link_libraries(wifi-core
+    PRIVATE
+        magic_enum::magic_enum
     PUBLIC
         notstd
 )
