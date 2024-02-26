@@ -1,12 +1,16 @@
+
 #include <algorithm>
 #include <cstdint>
 #include <format>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #include <Wpa/IHostapd.hxx>
@@ -147,32 +151,44 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
 }
 } // namespace detail
 
-Ieee80211AccessPointCapabilities
-AccessPointControllerLinux::GetCapabilities()
+AccessPointOperationStatus
+AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities)
 {
-    auto wiphy = Nl80211Wiphy::FromInterfaceName(GetInterfaceName());
+    AccessPointOperationStatus status{};
+
+    const auto wiphy = Nl80211Wiphy::FromInterfaceName(GetInterfaceName());
     if (!wiphy.has_value()) {
-        throw AccessPointControllerException(std::format("Failed to get wiphy for interface {}", GetInterfaceName()));
+        status.Code = AccessPointOperationStatusCode::AccessPointInvalid;
+        status.Message = std::format("Failed to get wiphy for interface {}", GetInterfaceName());
+    } else {
+        Ieee80211AccessPointCapabilities capabilities;
+
+        // Convert protocols.
+        capabilities.Protocols = detail::Nl80211WiphyToIeee80211Protocols(wiphy.value());
+
+        // Convert frequency bands.
+        capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
+        std::ranges::transform(std::views::keys(wiphy->Bands), std::begin(capabilities.FrequencyBands), detail::Nl80211BandToIeee80211FrequencyBand);
+
+        // Convert AKM suites.
+        capabilities.AkmSuites = std::vector<Ieee80211AkmSuite>(std::size(wiphy->AkmSuites));
+        std::ranges::transform(wiphy->AkmSuites, std::begin(capabilities.AkmSuites), detail::Nl80211AkmSuiteToIeee80211AkmSuite);
+
+        // Convert cipher suites.
+        capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
+        std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), detail::Nl80211CipherSuiteToIeee80211CipherSuite);
+
+        ieee80211AccessPointCapabilities = std::move(capabilities);
+        status = AccessPointOperationStatus::MakeSucceeded();
     }
 
-    Ieee80211AccessPointCapabilities capabilities;
+    if (status.Succeeded()) {
+        LOGD << std::format("Got capabilities for interface {}", GetInterfaceName());
+    } else {
+        LOGE << std::format("Failed to get capabilities for interface {} ({} - {})", GetInterfaceName(), magic_enum::enum_name(status.Code), status.Message);
+    }
 
-    // Convert protocols.
-    capabilities.Protocols = detail::Nl80211WiphyToIeee80211Protocols(wiphy.value());
-
-    // Convert frequency bands.
-    capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
-    std::ranges::transform(std::views::keys(wiphy->Bands), std::begin(capabilities.FrequencyBands), detail::Nl80211BandToIeee80211FrequencyBand);
-
-    // Convert AKM suites.
-    capabilities.AkmSuites = std::vector<Ieee80211AkmSuite>(std::size(wiphy->AkmSuites));
-    std::ranges::transform(wiphy->AkmSuites, std::begin(capabilities.AkmSuites), detail::Nl80211AkmSuiteToIeee80211AkmSuite);
-
-    // Convert cipher suites.
-    capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
-    std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), detail::Nl80211CipherSuiteToIeee80211CipherSuite);
-
-    return capabilities;
+    return status;
 }
 
 AccessPointOperationStatus
@@ -182,8 +198,8 @@ AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& ope
 
     try {
         auto hostapdStatus = m_hostapd.GetStatus();
-        operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled) 
-            ? AccessPointOperationalState::Enabled 
+        operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled)
+            ? AccessPointOperationalState::Enabled
             : AccessPointOperationalState::Disabled;
         status = AccessPointOperationStatus::MakeSucceeded();
     } catch (const Wpa::HostapdException& ex) {
@@ -228,57 +244,94 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
     return status;
 }
 
-bool
-AccessPointControllerLinux::SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol)
+AccessPointOperationStatus
+AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
-    bool isOk = false;
-    const Wpa::HostapdHwMode hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    // Populate a list of required properties to set.
+    std::vector<std::pair<std::string_view, std::string_view>> propertiesToSet{};
 
+    // Add the hw_mode property.
+    const auto hwMode = detail::IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    const auto hwModeValue = detail::HostapdHwModeToPropertyValue(hwMode);
+    propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameHwMode, hwModeValue);
+
+    // Additively set other hostapd properties based on the protocol.
+    switch (ieeeProtocol) {
+    case Ieee80211Protocol::AX:
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
+        [[fallthrough]];
+    case Ieee80211Protocol::AC:
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
+        [[fallthrough]];
+    case Ieee80211Protocol::N:
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
+        propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);
+        break;
+    default:
+        break;
+    }
+
+    AccessPointOperationStatus status{};
+    std::optional<std::string> errorDetails;
+    std::string_view propertyKeyToSet;
+    std::string_view propertyValueToSet;
+    bool hostapdOperationSucceeded{ false };
+
+    // Attempt to set all required properties.
     try {
-        // Set the hostapd hw_mode property.
-        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameHwMode, detail::HostapdHwModeToPropertyValue(hwMode));
-
-        // Additively set other hostapd properties based on the protocol.
-        switch (ieeeProtocol) {
-        case Ieee80211Protocol::AX:
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
-            [[fallthrough]];
-        case Ieee80211Protocol::AC:
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
-            [[fallthrough]];
-        case Ieee80211Protocol::N:
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
-            isOk = isOk && m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);
-            break;
-        default:
-            break;
+        for (auto& propertyToSet : propertiesToSet) {
+            std::tie(propertyKeyToSet, propertyValueToSet) = std::move(propertyToSet);
+            hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
+            if (!hostapdOperationSucceeded) {
+                break;
+            }
         }
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to set Ieee80211 protocol for interface {} ({})", GetInterfaceName(), ex.what()));
+        hostapdOperationSucceeded = false;
+        errorDetails = ex.what();
     }
 
-    if (isOk) {
-        // Reload hostapd configuration.
-        isOk = m_hostapd.Reload();
-        if (!isOk) {
-            LOGE << std::format("Failed to reload hostapd configuration for interface {}", GetInterfaceName());
-            return false;
+    // If the required properties were set, reload the hostapd configuration to pick up the changes.
+    if (hostapdOperationSucceeded) {
+        hostapdOperationSucceeded = m_hostapd.Reload();
+        if (!hostapdOperationSucceeded) {
+            errorDetails = "failed to reload hostapd configuration";
         }
+    } else {
+        errorDetails = std::format("failed to set hostapd property '{}' to '{}' for interface {} - {}", propertyKeyToSet, propertyValueToSet, GetInterfaceName(), errorDetails.value_or("unspecified error"));
     }
 
-    return isOk;
+    const auto ieeeProtocolName = std::format("802.11 {}", magic_enum::enum_name(ieeeProtocol));
+
+    // Finalize return status.
+    if (!hostapdOperationSucceeded) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format("Setting protocol {} for interface {} failed ({})", ieeeProtocolName, GetInterfaceName(), errorDetails.value_or("unspecified error"));
+        LOGE << status.Message;
+    } else {
+        status.Code = AccessPointOperationStatusCode::Succeeded;
+        LOGD << std::format("Set protocol {} for interface {}", ieeeProtocolName, GetInterfaceName());
+    }
+
+    return status;
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
+    static constexpr auto FailureFormat = "Setting frequency bands for interface {} failed ({})";
+
+    AccessPointOperationStatus status{};
+
     // Ensure at least one band is requested.
     if (std::empty(frequencyBands)) {
-        LOGW << std::format("No frequency bands specified for interface {}", GetInterfaceName());
-        return false;
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Message = std::format(FailureFormat, GetInterfaceName(), "No frequency bands specified");
+        LOGW << status.Message;
+        return status;
     }
 
     // Generate the argument for the hostapd "setband" command, which accepts a comma separated list of bands.
@@ -287,29 +340,50 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
         setBandArgumentBuilder << detail::IeeeFrequencyBandToHostapdBand(band) << ',';
     }
 
-    std::string setBandArgumentAll = setBandArgumentBuilder.str();
+    const std::string setBandArgumentAll = setBandArgumentBuilder.str();
     const std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
 
-    bool isOk = false;
-    try {
-        // Set the hostapd "setband" property.
-        isOk = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSetBand, setBandArgument);
-        if (!isOk) {
-            LOGE << std::format("Failed to set frequency bands for interface {}", GetInterfaceName());
-            return false;
-        }
+    bool hostapdOperationSucceeded{ false };
+    std::optional<std::string> errorDetails{};
+    std::string_view propertyKeyToSet{ Wpa::ProtocolHostapd::PropertyNameSetBand };
+    std::string_view propertyValueToSet{ setBandArgument };
 
-        // Reload hostapd configuration to pick up the changes.
-        isOk = m_hostapd.Reload();
-        if (!isOk) {
-            LOGE << std::format("Failed to reload hostapd configuration for interface {}", GetInterfaceName());
-            return false;
-        }
+    // Set the hostapd "setband" property.
+    try {
+        hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
     } catch (const Wpa::HostapdException& ex) {
-        throw AccessPointControllerException(std::format("Failed to set frequency bands for interface {} ({})", GetInterfaceName(), ex.what()));
+        hostapdOperationSucceeded = false;
+        errorDetails = ex.what();
     }
 
-    return true;
+    if (!hostapdOperationSucceeded) {
+        errorDetails = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, errorDetails.value_or("unspecified error"));
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format(FailureFormat, GetInterfaceName(), errorDetails.value());
+        LOGE << status.Message;
+        return status;
+    }
+
+    // Reload hostapd configuration to pick up the changes.
+    try {
+        hostapdOperationSucceeded = m_hostapd.Reload();
+    } catch (const Wpa::HostapdException& ex) {
+        hostapdOperationSucceeded = false;
+        errorDetails = ex.what();
+    }
+
+    if (!hostapdOperationSucceeded) {
+        errorDetails = std::format("failed to reload hostapd configuration - {}", errorDetails.value_or("unspecified error"));
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Message = std::format(FailureFormat, GetInterfaceName(), errorDetails.value());
+        LOGE << status.Message;
+        return status;
+    }
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
+    LOGD << std::format("Set frequency bands for interface {}", GetInterfaceName());
+
+    return status;
 }
 
 AccessPointOperationStatus

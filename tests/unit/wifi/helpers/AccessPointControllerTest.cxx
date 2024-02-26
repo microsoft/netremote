@@ -35,7 +35,7 @@ AccessPointControllerTest::GetInterfaceName() const
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::GetOperationalState(AccessPointOperationalState& operationalState)
+AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &operationalState)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::GetOperationalState called with null AccessPoint");
@@ -45,14 +45,15 @@ AccessPointControllerTest::GetOperationalState(AccessPointOperationalState& oper
     return AccessPointOperationStatus::MakeSucceeded();
 }
 
-Ieee80211AccessPointCapabilities
-AccessPointControllerTest::GetCapabilities()
+AccessPointOperationStatus
+AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities)
 {
     if (AccessPoint == nullptr) {
         throw std::runtime_error("AccessPointControllerTest::GetCapabilities called with null AccessPoint");
     }
 
-    return AccessPoint->Capabilities;
+    ieee80211AccessPointCapabilities = AccessPoint->Capabilities;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 AccessPointOperationStatus
@@ -66,7 +67,7 @@ AccessPointControllerTest::SetOperationalState(AccessPointOperationalState opera
     return AccessPointOperationStatus::MakeSucceeded();
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
 {
     if (AccessPoint == nullptr) {
@@ -74,10 +75,10 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
     }
 
     AccessPoint->Protocol = ieeeProtocol;
-    return true;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
-bool
+AccessPointOperationStatus
 AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
 {
     if (AccessPoint == nullptr) {
@@ -86,13 +87,15 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
 
     for (const auto &frequencyBandToSet : frequencyBands) {
         if (std::ranges::find(AccessPoint->Capabilities.FrequencyBands, frequencyBandToSet) == std::cend(AccessPoint->Capabilities.FrequencyBands)) {
-            LOGE << std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet));
-            return false;
+            return {
+                AccessPointOperationStatusCode::InvalidParameter,
+                std::format("AccessPointControllerTest::SetFrequencyBands called with unsupported frequency band {}", magic_enum::enum_name(frequencyBandToSet))
+            };
         }
     }
 
     AccessPoint->FrequencyBands = std::move(frequencyBands);
-    return true;
+    return AccessPointOperationStatus::MakeSucceeded();
 }
 
 AccessPointOperationStatus

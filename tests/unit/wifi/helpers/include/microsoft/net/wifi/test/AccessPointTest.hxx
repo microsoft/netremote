@@ -23,11 +23,11 @@ namespace Microsoft::Net::Wifi::Test
 struct AccessPointTest final :
     public IAccessPoint
 {
+    std::string Ssid;
     std::string InterfaceName;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
-    Microsoft::Net::Wifi::Ieee80211Protocol Protocol;
+    Microsoft::Net::Wifi::Ieee80211Protocol Protocol{ Microsoft::Net::Wifi::Ieee80211Protocol::Unknown };
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
-    std::string Ssid;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
 
     /**

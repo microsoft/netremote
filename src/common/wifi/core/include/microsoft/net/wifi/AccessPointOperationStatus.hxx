@@ -45,10 +45,21 @@ struct AccessPointOperationStatus
         Code{ code }
     {}
 
+    /**
+     * @brief Create an AccessPointOperationStatus with the given status code and message.
+     */
+    constexpr AccessPointOperationStatus(AccessPointOperationStatusCode code, std::string_view message) noexcept :
+        Code{ code },
+        Message{ message }
+    {}
+
     AccessPointOperationStatus(const AccessPointOperationStatus &) = default;
+
     AccessPointOperationStatus(AccessPointOperationStatus &&) = default;
+
     AccessPointOperationStatus &
     operator=(const AccessPointOperationStatus &) = default;
+
     AccessPointOperationStatus &
     operator=(AccessPointOperationStatus &&) = default;
 
@@ -62,19 +73,19 @@ struct AccessPointOperationStatus
 
     /**
      * @brief Determine whether the operation succeeded.
-     * 
-     * @return true 
-     * @return false 
+     *
+     * @return true
+     * @return false
      */
     bool
     Succeeded() const noexcept;
 
-   /**
+    /**
      * @brief Determine whether the operation failed.
-    * 
-    * @return true 
-    * @return false 
-    */
+     *
+     * @return true
+     * @return false
+     */
     bool
     Failed() const noexcept;
 
