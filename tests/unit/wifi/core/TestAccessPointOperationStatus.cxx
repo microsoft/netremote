@@ -1,8 +1,6 @@
 
 #include <optional>
-#include <source_location>
 
-#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
@@ -90,13 +88,13 @@ TEST_CASE("AccessPointOperationStatus instance reflects function name on empty o
     SECTION("OperationName reflects the function name when empty")
     {
         const AccessPointOperationStatus status{ AccessPointId };
-        REQUIRE(status.OperationName.contains(__func__));
+        REQUIRE(status.OperationName.contains(__func__)); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
     }
 
     SECTION("OperationName does not reflect the function name when non-empty")
     {
         const AccessPointOperationStatus status{ AccessPointId, OperationName };
-        REQUIRE_FALSE(status.OperationName.contains(__func__));
+        REQUIRE_FALSE(status.OperationName.contains(__func__)); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
     }
 }
 
@@ -109,6 +107,25 @@ TEST_CASE("AccessPointOperationStatus::MakeSucceeded returns a status with the c
     {
         const auto status = AccessPointOperationStatus::MakeSucceeded(AccessPointId);
         REQUIRE(status.Code == AccessPointOperationStatusCode::Succeeded);
+    }
+}
+
+TEST_CASE("AccessPointOperationStatus::MakeSucceeded returns a status with the correct operation name", "[wifi][core][ap][log]")
+{
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    SECTION("Returns a status with the calling function name when operation name is not specified")
+    {
+        const auto status = AccessPointOperationStatus::MakeSucceeded(AccessPointId);
+        REQUIRE(status.OperationName.contains(__func__)); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+    }
+
+    SECTION("Returns a status wihout the calling function name when operation name is specified")
+    {
+        const auto status = AccessPointOperationStatus::MakeSucceeded(AccessPointId, OperationName);
+        REQUIRE(status.OperationName == OperationName);
+        REQUIRE_FALSE(status.OperationName.contains(__func__)); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
     }
 }
 
@@ -161,7 +178,7 @@ TEST_CASE("AccessPointOperationStatus::ToString() includes all properties", "[wi
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
 
-    SECTION("Returns a string with all properties")
+    SECTION("Returns a string with all properties when created with constructor")
     {
         for (const auto statusCode : magic_enum::enum_values<AccessPointOperationStatusCode>()) {
             const auto status = AccessPointOperationStatus{ AccessPointId, OperationName, statusCode, Details };
@@ -171,6 +188,34 @@ TEST_CASE("AccessPointOperationStatus::ToString() includes all properties", "[wi
             REQUIRE(statusMessage.contains(Details));
             if (statusCode != AccessPointOperationStatusCode::Succeeded) {
                 REQUIRE(statusMessage.contains(magic_enum::enum_name(statusCode)));
+            }
+        }
+    }
+
+    SECTION("Returns a string with all properties when created with MakeSucceeded with explicit operation name")
+    {
+        const auto status = AccessPointOperationStatus::MakeSucceeded(AccessPointId, OperationName);
+        const auto statusMessage = status.ToString();
+        REQUIRE(statusMessage.contains(AccessPointId));
+        REQUIRE(statusMessage.contains(OperationName));
+
+        for (const auto statusCode : magic_enum::enum_values<AccessPointOperationStatusCode>()) {
+            if (statusCode != AccessPointOperationStatusCode::Succeeded) {
+                REQUIRE_FALSE(statusMessage.contains(magic_enum::enum_name(statusCode)));
+            }
+        }
+    }
+
+    SECTION("Returns a string with all properties when created with MakeSucceeded without explicit operation name")
+    {
+        const auto status = AccessPointOperationStatus::MakeSucceeded(AccessPointId);
+        const auto statusMessage = status.ToString();
+        REQUIRE(statusMessage.contains(AccessPointId));
+        REQUIRE(statusMessage.contains(__func__)); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay,hicpp-no-array-decay)
+
+        for (const auto statusCode : magic_enum::enum_values<AccessPointOperationStatusCode>()) {
+            if (statusCode != AccessPointOperationStatusCode::Succeeded) {
+                REQUIRE_FALSE(statusMessage.contains(magic_enum::enum_name(statusCode)));
             }
         }
     }

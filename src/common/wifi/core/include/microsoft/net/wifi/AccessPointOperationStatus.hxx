@@ -87,11 +87,13 @@ struct AccessPointOperationStatus
      * @brief Create an AccessPointOperationStatus describing an operation that succeeded.
      *
      * @param accessPointId The ID of the access point.
+     * @param operationName The name of the operation.
+     * @param details Additional details about the operation.
      * @param sourceLocation The source location of the operation.
      * @return AccessPointOperationStatus
      */
     static AccessPointOperationStatus
-    MakeSucceeded(std::string_view accessPointId, std::source_location sourceLocation = std::source_location::current()) noexcept;
+    MakeSucceeded(std::string_view accessPointId, std::string_view operationName = {}, std::string_view details = {}, std::source_location sourceLocation = std::source_location::current()) noexcept;
 
     /**
      * @brief Determine whether the operation succeeded.

@@ -12,13 +12,13 @@ using namespace Microsoft::Net::Wifi;
 
 /* static */
 AccessPointOperationStatus
-AccessPointOperationStatus::MakeSucceeded(std::string_view accessPointId, std::source_location sourceLocation) noexcept
+AccessPointOperationStatus::MakeSucceeded(std::string_view accessPointId, std::string_view operationName, std::string_view details, std::source_location sourceLocation) noexcept
 {
     return AccessPointOperationStatus{
         accessPointId,
-        {},
+        operationName,
         AccessPointOperationStatusCode::Succeeded,
-        {},
+        details,
         sourceLocation
     };
 }
@@ -40,7 +40,7 @@ AccessPointOperationStatus::ToString() const
 {
     static constexpr auto Format{ "AP '{}' operation {} {} {} {}" };
 
-    std::optional<std::string> caller{};
+    std::optional<std::string> caller{}; // NOLINT(misc-const-correctness)
     const auto result = std::format("{}", Succeeded() ? "succeeded" : std::format("failed with code '{}'", magic_enum::enum_name(Code)));
     const auto details = std::format("{}", std::empty(Details) ? "" : std::format("- {}", Details));
 #ifdef DEBUG
