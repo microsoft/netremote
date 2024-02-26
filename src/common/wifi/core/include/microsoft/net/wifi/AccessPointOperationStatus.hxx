@@ -38,9 +38,7 @@ struct AccessPointOperationStatus
     std::string OperationName;
     AccessPointOperationStatusCode Code{ AccessPointOperationStatusCode::Unknown };
     std::string Details;
-    std::string Message; // TODO: remove this
 
-    AccessPointOperationStatus() = default; // TODO: remove this
     virtual ~AccessPointOperationStatus() = default;
 
     /**
