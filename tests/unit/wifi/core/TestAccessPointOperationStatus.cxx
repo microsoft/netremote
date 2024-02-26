@@ -1,5 +1,6 @@
 
 #include <optional>
+#include <source_location>
 
 #include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -78,6 +79,24 @@ TEST_CASE("AccessPointOperationStatus instance reflects basic properties", "[wif
     {
         AccessPointOperationStatus status{ AccessPointId, OperationName, AccessPointOperationStatusCode::Succeeded, Details };
         REQUIRE(status.Details == Details);
+    }
+}
+
+TEST_CASE("AccessPointOperationStatus instance reflects function name on empty operation name", "[wifi][core][ap][log]")
+{
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    SECTION("OperationName reflects the function name when empty")
+    {
+        const AccessPointOperationStatus status{ AccessPointId };
+        REQUIRE(status.OperationName.contains(__func__));
+    }
+
+    SECTION("OperationName does not reflect the function name when non-empty")
+    {
+        const AccessPointOperationStatus status{ AccessPointId, OperationName };
+        REQUIRE_FALSE(status.OperationName.contains(__func__));
     }
 }
 

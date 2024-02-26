@@ -54,8 +54,14 @@ struct AccessPointOperationStatus
     {
         if (std::empty(OperationName)) {
             OperationName = SourceLocation.function_name();
-            OperationName.erase(OperationName.find_first_of('('));
-            OperationName.erase(0, OperationName.find_last_of(':'));
+            auto pos = OperationName.find_first_of('('); 
+            if (pos != std::string::npos) {
+                OperationName.erase(pos);
+            }
+            pos = OperationName.find_last_of(':');
+            if (pos != std::string::npos) {
+                OperationName.erase(0, pos);
+            }
         }
     }
 
