@@ -11,6 +11,7 @@ target_sources(wifi-core
         AccessPointController.cxx
         AccessPointControllerException.cxx
         AccessPointOperationStatus.cxx
+        AccessPointOperationStatusLogOnExit.cxx
         Ieee80211AccessPointCapabilities.cxx
     PUBLIC
     FILE_SET HEADERS
@@ -19,6 +20,7 @@ target_sources(wifi-core
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointOperationStatus.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointOperationStatusLogOnExit.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211.hxx
@@ -28,8 +30,9 @@ target_sources(wifi-core
 target_link_libraries(wifi-core
     PRIVATE
         magic_enum::magic_enum
-    PUBLIC
         notstd
+    PUBLIC
+        plog::plog
 )
 
 install(
