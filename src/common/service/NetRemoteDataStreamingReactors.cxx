@@ -31,6 +31,8 @@ void
 DataStreamReader::OnCancel()
 {
     m_result->set_numberofdatablocksreceived(m_numberOfDataBlocksReceived);
+    m_readStatus.set_code(WifiDataStreamOperationStatusCode::WifiDataStreamOperationStatusCodeCancelled);
+    m_readStatus.set_message("RPC cancelled");
     *m_result->mutable_status() = std::move(m_readStatus);
     Finish(grpc::Status::CANCELLED);
 }
