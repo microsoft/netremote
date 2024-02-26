@@ -114,15 +114,19 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
     SECTION("Can be called with multiple parallel clients")
     {
         static constexpr auto numberOfDataBlocksToWrite = 10;
-        static constexpr auto numberOfClientThreads = 5;
+        static constexpr auto numberOfClients = 5;
 
+        std::vector<std::unique_ptr<NetRemoteDataStreaming::Stub>> dataStreamingClients;
+        std::vector<std::unique_ptr<DataStreamWriter>> dataStreamWriters;
         std::vector<std::jthread> clientThreads;
-        for (std::size_t i = 0; i < numberOfClientThreads; i++) {
-            clientThreads.emplace_back([&]() {
-                auto dataStreamWriter = std::make_unique<DataStreamWriter>(client.get(), numberOfDataBlocksToWrite);
 
+        for (std::size_t i = 0; i < numberOfClients; i++) {
+            dataStreamingClients.push_back(NetRemoteDataStreaming::NewStub(channel));
+            dataStreamWriters.push_back(std::make_unique<DataStreamWriter>(dataStreamingClients.back().get(), numberOfDataBlocksToWrite));
+
+            clientThreads.emplace_back([&, i]() {
                 WifiDataStreamUploadResult result{};
-                grpc::Status status = dataStreamWriter->Await(&result);
+                grpc::Status status = dataStreamWriters[i]->Await(&result);
                 REQUIRE(status.ok());
                 REQUIRE(result.numberofdatablocksreceived() == numberOfDataBlocksToWrite);
                 REQUIRE(result.status().code() == WifiDataStreamOperationStatusCodeSucceeded);
