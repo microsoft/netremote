@@ -37,11 +37,18 @@ grpc::Status
 DataStreamWriter::Await(DataStreamUploadResult* result)
 {
     std::unique_lock lock(m_writeStatusGate);
-    static constexpr auto timeoutValue = std::chrono::seconds(10);
+    static constexpr auto timeoutValue = 10s;
 
-    m_writesDone.wait_for(lock, timeoutValue, [this] {
+    const auto isDone = m_writesDone.wait_for(lock, timeoutValue, [this] {
         return m_done;
     });
+
+    if (!isDone) {
+        DataStreamOperationStatus status{};
+        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
+        status.set_message("Timeout occurred while waiting for all writes to be completed");
+        *m_result.mutable_status() = std::move(status);
+    }
     *result = m_result;
 
     return m_status;
