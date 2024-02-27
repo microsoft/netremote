@@ -13,11 +13,11 @@
 #include "TestNetRemoteCommon.hxx"
 #include "TestNetRemoteDataStreamingReactors.hxx"
 
-TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
+TEST_CASE("DataStreamUpload API", "[basic][rpc][client][remote][stream]")
 {
     using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::DataStream;
     using namespace Microsoft::Net::Remote::Service;
-    using namespace Microsoft::Net::Remote::Wifi;
 
     using Microsoft::Net::Remote::Test::DataStreamWriter;
     using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
@@ -38,11 +38,11 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
     {
         auto dataStreamWriter = std::make_unique<DataStreamWriter>(client.get(), numberOfDataBlocksToWrite);
 
-        WifiDataStreamUploadResult result{};
+        DataStreamUploadResult result{};
         grpc::Status status = dataStreamWriter->Await(&result);
         REQUIRE(status.ok());
         REQUIRE(result.numberofdatablocksreceived() == numberOfDataBlocksToWrite);
-        REQUIRE(result.status().code() == WifiDataStreamOperationStatusCodeSucceeded);
+        REQUIRE(result.status().code() == DataStreamOperationStatusCodeSucceeded);
     }
 
     SECTION("Can be called with multiple parallel clients")
@@ -57,11 +57,11 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
             auto dataStreamWriter = std::make_unique<DataStreamWriter>(dataStreamingClients.back().get(), numberOfDataBlocksToWrite);
 
             clientThreads.emplace_back([dataStreamWriter = std::move(dataStreamWriter)]() {
-                WifiDataStreamUploadResult result{};
+                DataStreamUploadResult result{};
                 grpc::Status status = dataStreamWriter->Await(&result);
                 REQUIRE(status.ok());
                 REQUIRE(result.numberofdatablocksreceived() == numberOfDataBlocksToWrite);
-                REQUIRE(result.status().code() == WifiDataStreamOperationStatusCodeSucceeded);
+                REQUIRE(result.status().code() == DataStreamOperationStatusCodeSucceeded);
             });
         }
     }

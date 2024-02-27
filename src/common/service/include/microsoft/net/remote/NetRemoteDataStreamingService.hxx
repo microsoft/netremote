@@ -24,10 +24,10 @@ private:
      *
      * @param context
      * @param result
-     * @return grpc::ServerReadReactor<Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>*
+     * @return grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>*
      */
-    grpc::ServerReadReactor<Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>*
-    WifiDataStreamUpload(grpc::CallbackServerContext* context, Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* result) override;
+    grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>*
+    DataStreamUpload(grpc::CallbackServerContext* context, Microsoft::Net::Remote::DataStream::DataStreamUploadResult* result) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 

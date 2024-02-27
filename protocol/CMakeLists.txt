@@ -7,6 +7,7 @@ set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos)
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 set(PROTO_FILES
     ${PROTO_DIR}/NetRemote.proto
+    ${PROTO_DIR}/NetRemoteDataStream.proto
     ${PROTO_DIR}/NetRemoteDataStreamingService.proto
     ${PROTO_DIR}/NetRemoteService.proto
     ${PROTO_DIR}/NetRemoteWifi.proto

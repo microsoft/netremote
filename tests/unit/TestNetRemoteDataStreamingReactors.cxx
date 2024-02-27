@@ -1,14 +1,14 @@
 
 #include "TestNetRemoteDataStreamingReactors.hxx"
 
+using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Test;
-using namespace Microsoft::Net::Remote::Wifi;
 
 DataStreamWriter::DataStreamWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
     m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)
 {
-    client->async()->WifiDataStreamUpload(&m_clientContext, &m_result, this);
+    client->async()->DataStreamUpload(&m_clientContext, &m_result, this);
     StartCall();
     NextWrite();
 }
@@ -34,7 +34,7 @@ DataStreamWriter::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamWriter::Await(WifiDataStreamUploadResult* result)
+DataStreamWriter::Await(DataStreamUploadResult* result)
 {
     std::unique_lock lock(m_writeStatusGate);
     static constexpr auto timeoutValue = std::chrono::seconds(10);

@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
  * @brief Implementation of the gRPC ClientWriteReactor for client-side data stream writing.
  */
 class DataStreamWriter :
-    public grpc::ClientWriteReactor<Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>
+    public grpc::ClientWriteReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>
 {
 public:
     /**
@@ -49,7 +49,7 @@ public:
      * @return grpc::Status
      */
     grpc::Status
-    Await(Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* result);
+    Await(Microsoft::Net::Remote::DataStream::DataStreamUploadResult* result);
 
 private:
     /**
@@ -60,8 +60,8 @@ private:
 
 private:
     grpc::ClientContext m_clientContext{};
-    Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData m_data{};
-    Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult m_result{};
+    Microsoft::Net::Remote::DataStream::DataStreamUploadData m_data{};
+    Microsoft::Net::Remote::DataStream::DataStreamUploadResult m_result{};
     uint32_t m_numberOfDataBlocksToWrite{};
     uint32_t m_numberOfDataBlocksWritten{};
     grpc::Status m_status{};

@@ -4,9 +4,9 @@ syntax = "proto3";
 package Microsoft.Net.Remote.Service;
 
 import "NetRemote.proto";
-import "NetRemoteWifi.proto";
+import "NetRemoteDataStream.proto";
 
 service NetRemoteDataStreaming
 {
-    rpc WifiDataStreamUpload (stream Microsoft.Net.Remote.Wifi.WifiDataStreamUploadData) returns (Microsoft.Net.Remote.Wifi.WifiDataStreamUploadResult);
+    rpc DataStreamUpload (stream Microsoft.Net.Remote.DataStream.DataStreamUploadData) returns (Microsoft.Net.Remote.DataStream.DataStreamUploadResult);
 }
