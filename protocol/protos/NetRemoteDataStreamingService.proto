@@ -1,0 +1,12 @@
+
+syntax = "proto3";
+
+package Microsoft.Net.Remote.Service;
+
+import "NetRemote.proto";
+import "NetRemoteDataStream.proto";
+
+service NetRemoteDataStreaming
+{
+    rpc DataStreamUpload (stream Microsoft.Net.Remote.DataStream.DataStreamUploadData) returns (Microsoft.Net.Remote.DataStream.DataStreamUploadResult);
+}

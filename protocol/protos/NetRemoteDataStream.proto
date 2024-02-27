@@ -1,0 +1,30 @@
+
+syntax = "proto3";
+
+package Microsoft.Net.Remote.DataStream;
+
+enum DataStreamOperationStatusCode
+{
+    DataStreamOperationStatusCodeUnknown = 0;
+    DataStreamOperationStatusCodeSucceeded = 1;
+    DataStreamOperationStatusCodeFailed = 2;
+    DataStreamOperationStatusCodeCancelled = 3;
+    DataStreamOperationStatusCodeTimedOut = 4;
+}
+
+message DataStreamOperationStatus
+{
+    DataStreamOperationStatusCode Code = 1;
+    string Message = 2;
+}
+
+message DataStreamUploadData
+{
+    bytes Data = 1;
+}
+
+message DataStreamUploadResult
+{
+    uint32 NumberOfDataBlocksReceived = 1;
+    DataStreamOperationStatus Status = 2;
+}
