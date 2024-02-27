@@ -1,9 +1,13 @@
 
+#include <chrono>
+
 #include "TestNetRemoteDataStreamingReactors.hxx"
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Test;
+
+using namespace std::chrono_literals;
 
 DataStreamWriter::DataStreamWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
     m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)

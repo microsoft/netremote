@@ -9,8 +9,6 @@
 
 namespace Microsoft::Net::Remote::Test
 {
-using namespace std::chrono_literals;
-
 /**
  * @brief Implementation of the gRPC ClientWriteReactor for client-side data stream writing.
  */
