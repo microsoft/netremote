@@ -54,19 +54,20 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
         void
         OnDone(const grpc::Status& status) override
         {
-            std::unique_lock lock(m_mutex);
+            std::unique_lock lock(m_writeStatusGate);
 
             m_status = status;
             m_done = true;
-            m_cv.notify_one();
+            m_writesDone.notify_one();
         }
 
         grpc::Status
         Await(WifiDataStreamUploadResult* result)
         {
-            std::unique_lock lock(m_mutex);
+            std::unique_lock lock(m_writeStatusGate);
+            static constexpr auto timeoutValue = std::chrono::seconds(10);
 
-            m_cv.wait(lock, [this] {
+            m_writesDone.wait_for(lock, timeoutValue, [this] {
                 return m_done;
             });
             *result = m_result;
@@ -94,8 +95,8 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
         uint32_t m_numberOfDataBlocksToWrite{};
         uint32_t m_numberOfDataBlocksWritten{};
         grpc::Status m_status{};
-        std::mutex m_mutex{};
-        std::condition_variable m_cv{};
+        std::mutex m_writeStatusGate{};
+        std::condition_variable m_writesDone{};
         bool m_done{ false };
     };
 
