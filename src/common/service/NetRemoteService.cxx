@@ -351,7 +351,7 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext
     Ieee80211AccessPointCapabilities accessPointCapabilities{};
     auto operationStatus = accessPointController->GetCapabilities(accessPointCapabilities);
     if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get capabilities for access point {} ({})", request->accesspointid(), operationStatus.ToString()));
     }
 
     const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
@@ -360,12 +360,9 @@ NetRemoteService::WifiAccessPointSetPhyType([[maybe_unused]] grpc::ServerContext
     }
 
     // Set the Ieee80211 protocol.
-    try {
-        if (!accessPointController->SetProtocol(ieee80211Protocol)) {
-            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set PHY type for access point {}", request->accesspointid()));
-        }
-    } catch (const AccessPointControllerException& apce) {
-        return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInternalError, std::format("Failed to set PHY type for access point {} ({})", request->accesspointid(), apce.what()));
+    operationStatus = accessPointController->SetProtocol(ieee80211Protocol);
+    if (!operationStatus) {
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set PHY type for access point {} ({})", request->accesspointid(), operationStatus.ToString()));
     }
 
     status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
@@ -427,7 +424,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     // Attempt to set the frequency bands.
     operationStatus = accessPointController->SetFrequencyBands(std::move(ieee80211FrequencyBands));
     if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), operationStatus.Details)); // FIXME
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), operationStatus.ToString()));
     }
 
     // Prepare result with success indication.
