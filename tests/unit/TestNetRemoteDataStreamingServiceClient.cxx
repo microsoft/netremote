@@ -3,6 +3,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>

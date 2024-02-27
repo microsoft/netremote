@@ -2,6 +2,9 @@
 #ifndef NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 #define NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
+#include <cstdint>
+
+#include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 
 namespace Microsoft::Net::Remote::Service::Reactors

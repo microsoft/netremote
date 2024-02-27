@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 #define NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 
+#include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 
 namespace Microsoft::Net::Remote::Service

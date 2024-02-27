@@ -1,9 +1,14 @@
 
+#include <chrono>
+#include <format>
+
 #include "TestNetRemoteDataStreamingReactors.hxx"
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Test;
+
+using namespace std::chrono_literals;
 
 DataStreamWriter::DataStreamWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
     m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)
@@ -45,7 +50,7 @@ DataStreamWriter::Await(DataStreamUploadResult* result)
 
     if (!isDone) {
         DataStreamOperationStatus status{};
-        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
+        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeTimedOut);
         status.set_message("Timeout occurred while waiting for all writes to be completed");
         *m_result.mutable_status() = std::move(status);
     }
