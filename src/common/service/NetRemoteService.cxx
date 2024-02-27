@@ -427,7 +427,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     // Attempt to set the frequency bands.
     operationStatus = accessPointController->SetFrequencyBands(std::move(ieee80211FrequencyBands));
     if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), operationStatus.Message));
+        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), operationStatus.Details)); // FIXME
     }
 
     // Prepare result with success indication.
