@@ -45,7 +45,7 @@ DataStreamWriter::Await(DataStreamUploadResult* result)
 
     if (!isDone) {
         DataStreamOperationStatus status{};
-        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
+        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeTimedOut);
         status.set_message("Timeout occurred while waiting for all writes to be completed");
         *m_result.mutable_status() = std::move(status);
     }
