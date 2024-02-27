@@ -11,6 +11,7 @@
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 
 #include "TestNetRemoteCommon.hxx"
+#include "TestNetRemoteDataStreamingReactors.hxx"
 
 TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
 {
@@ -18,6 +19,7 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Remote::Wifi;
 
+    using Microsoft::Net::Remote::Test::DataStreamWriter;
     using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
     NetRemoteServerConfiguration Configuration{
@@ -29,76 +31,6 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemoteDataStreaming::NewStub(channel);
-
-    class DataStreamWriter : public grpc::ClientWriteReactor<WifiDataStreamUploadData>
-    {
-    public:
-        DataStreamWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
-            m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)
-        {
-            client->async()->WifiDataStreamUpload(&m_clientContext, &m_result, this);
-            StartCall();
-            NextWrite();
-        }
-
-        void
-        OnWriteDone(bool isOk) override
-        {
-            if (isOk) {
-                NextWrite();
-            } else {
-                StartWritesDone();
-            }
-        }
-
-        void
-        OnDone(const grpc::Status& status) override
-        {
-            std::unique_lock lock(m_writeStatusGate);
-
-            m_status = status;
-            m_done = true;
-            m_writesDone.notify_one();
-        }
-
-        grpc::Status
-        Await(WifiDataStreamUploadResult* result)
-        {
-            std::unique_lock lock(m_writeStatusGate);
-            static constexpr auto timeoutValue = std::chrono::seconds(10);
-
-            m_writesDone.wait_for(lock, timeoutValue, [this] {
-                return m_done;
-            });
-            *result = m_result;
-
-            return m_status;
-        }
-
-    private:
-        void
-        NextWrite()
-        {
-            if (m_numberOfDataBlocksToWrite > 0) {
-                m_data.set_data(std::format("Data #{}", ++m_numberOfDataBlocksWritten));
-                StartWrite(&m_data);
-                m_numberOfDataBlocksToWrite--;
-            } else {
-                StartWritesDone();
-            }
-        }
-
-    private:
-        grpc::ClientContext m_clientContext{};
-        WifiDataStreamUploadData m_data{};
-        WifiDataStreamUploadResult m_result{};
-        uint32_t m_numberOfDataBlocksToWrite{};
-        uint32_t m_numberOfDataBlocksWritten{};
-        grpc::Status m_status{};
-        std::mutex m_writeStatusGate{};
-        std::condition_variable m_writesDone{};
-        bool m_done{ false };
-    };
 
     static constexpr auto numberOfDataBlocksToWrite = 10;
 
