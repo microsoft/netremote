@@ -99,9 +99,10 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
         bool m_done{ false };
     };
 
+    static constexpr auto numberOfDataBlocksToWrite = 10;
+
     SECTION("Can be called with one client")
     {
-        static constexpr auto numberOfDataBlocksToWrite = 10;
         auto dataStreamWriter = std::make_unique<DataStreamWriter>(client.get(), numberOfDataBlocksToWrite);
 
         WifiDataStreamUploadResult result{};
@@ -113,7 +114,6 @@ TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called with multiple parallel clients")
     {
-        static constexpr auto numberOfDataBlocksToWrite = 10;
         static constexpr auto numberOfClients = 5;
 
         std::vector<std::unique_ptr<NetRemoteDataStreaming::Stub>> dataStreamingClients;
