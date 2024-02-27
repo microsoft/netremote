@@ -64,5 +64,9 @@ TEST_CASE("DataStreamUpload API", "[basic][rpc][client][remote][stream]")
                 REQUIRE(result.status().code() == DataStreamOperationStatusCodeSucceeded);
             });
         }
+
+        for (auto& clientThread : clientThreads) {
+            REQUIRE_NOTHROW(clientThread.join());
+        }
     }
 }
