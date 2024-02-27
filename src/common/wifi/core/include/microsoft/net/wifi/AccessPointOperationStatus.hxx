@@ -2,7 +2,9 @@
 #ifndef ACCESS_POINT_OPERATION_STATUS_HXX
 #define ACCESS_POINT_OPERATION_STATUS_HXX
 
+#include <source_location>
 #include <string>
+#include <string_view>
 
 namespace Microsoft::Net::Wifi
 {
@@ -32,26 +34,36 @@ enum class AccessPointOperationStatusCode {
  */
 struct AccessPointOperationStatus
 {
+    std::source_location SourceLocation;
+    std::string AccessPointId;
+    std::string OperationName;
+    std::string Details;
     AccessPointOperationStatusCode Code{ AccessPointOperationStatusCode::Unknown };
-    std::string Message;
 
-    AccessPointOperationStatus() = default;
     virtual ~AccessPointOperationStatus() = default;
 
     /**
-     * @brief Create an AccessPointOperationStatus with the given status code.
+     * @brief Create an AccessPointOperationStatus with the given access point id, operation name, status code, and details.
      */
-    constexpr explicit AccessPointOperationStatus(AccessPointOperationStatusCode code) noexcept :
+    constexpr AccessPointOperationStatus(std::string_view accessPointId, std::string_view operationName = {}, AccessPointOperationStatusCode code = AccessPointOperationStatusCode::Unknown, std::string_view details = {}, std::source_location sourceLocation = std::source_location::current()) noexcept :
+        SourceLocation{ sourceLocation },
+        AccessPointId{ std::move(accessPointId) },
+        OperationName{ operationName },
+        Details{ details },
         Code{ code }
-    {}
-
-    /**
-     * @brief Create an AccessPointOperationStatus with the given status code and message.
-     */
-    constexpr AccessPointOperationStatus(AccessPointOperationStatusCode code, std::string_view message) noexcept :
-        Code{ code },
-        Message{ message }
-    {}
+    {
+        if (std::empty(OperationName)) {
+            OperationName = SourceLocation.function_name();
+            auto pos = OperationName.find_first_of('('); 
+            if (pos != std::string::npos) {
+                OperationName.erase(pos);
+            }
+            pos = OperationName.find_last_of(':');
+            if (pos != std::string::npos) {
+                OperationName.erase(0, pos);
+            }
+        }
+    }
 
     AccessPointOperationStatus(const AccessPointOperationStatus &) = default;
 
@@ -64,12 +76,24 @@ struct AccessPointOperationStatus
     operator=(AccessPointOperationStatus &&) = default;
 
     /**
+     * @brief Return a string representation of the status.
+     *
+     * @return std::string
+     */
+    std::string
+    ToString() const;
+
+    /**
      * @brief Create an AccessPointOperationStatus describing an operation that succeeded.
      *
+     * @param accessPointId The ID of the access point.
+     * @param operationName The name of the operation.
+     * @param details Additional details about the operation.
+     * @param sourceLocation The source location of the operation.
      * @return AccessPointOperationStatus
      */
     static AccessPointOperationStatus
-    MakeSucceeded() noexcept;
+    MakeSucceeded(std::string_view accessPointId, std::string_view operationName = {}, std::string_view details = {}, std::source_location sourceLocation = std::source_location::current()) noexcept;
 
     /**
      * @brief Determine whether the operation succeeded.
