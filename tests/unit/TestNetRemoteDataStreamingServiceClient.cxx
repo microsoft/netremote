@@ -12,7 +12,7 @@
 
 #include "TestNetRemoteCommon.hxx"
 
-TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote]")
+TEST_CASE("WifiDataStreamUpload API", "[basic][rpc][client][remote][stream]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
