@@ -3,8 +3,10 @@
 #define TEST_NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
 #include <condition_variable>
+#include <cstdint>
 #include <mutex>
 
+#include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 
 namespace Microsoft::Net::Remote::Test
