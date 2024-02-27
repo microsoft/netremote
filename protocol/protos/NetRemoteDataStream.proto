@@ -3,8 +3,6 @@ syntax = "proto3";
 
 package Microsoft.Net.Remote.DataStream;
 
-import "google/protobuf/any.proto";
-
 enum DataStreamOperationStatusCode
 {
     DataStreamOperationStatusCodeUnknown = 0;
