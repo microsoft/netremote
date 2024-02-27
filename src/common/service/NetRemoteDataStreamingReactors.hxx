@@ -10,7 +10,7 @@ namespace Microsoft::Net::Remote::Service::Reactors
  * @brief Implementation of the gRPC ServerReadReactor for server-side data stream reading.
  */
 class DataStreamReader :
-    public grpc::ServerReadReactor<Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData>
+    public grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>
 {
 public:
     /**
@@ -18,7 +18,7 @@ public:
      *
      * @param result The result of the data stream read operation.
      */
-    explicit DataStreamReader(Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* result);
+    explicit DataStreamReader(Microsoft::Net::Remote::DataStream::DataStreamUploadResult* result);
 
     /**
      * @brief Callback that is executed when a read operation is completed.
@@ -41,10 +41,10 @@ public:
     OnDone() override;
 
 private:
-    Microsoft::Net::Remote::Wifi::WifiDataStreamUploadData m_data{};
-    Microsoft::Net::Remote::Wifi::WifiDataStreamUploadResult* m_result{};
+    Microsoft::Net::Remote::DataStream::DataStreamUploadData m_data{};
+    Microsoft::Net::Remote::DataStream::DataStreamUploadResult* m_result{};
     uint32_t m_numberOfDataBlocksReceived{};
-    Microsoft::Net::Remote::Wifi::WifiDataStreamOperationStatus m_readStatus{};
+    Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_readStatus{};
 };
 } // namespace Microsoft::Net::Remote::Service::Reactors
 
