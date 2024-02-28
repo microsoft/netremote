@@ -19,10 +19,10 @@ LABEL org.label-schema.schema-version = "1.0"
 #############################
 #
 # 1. Update package cache.
-# sudo apt-get update
+# sudo apt -y update && sudo apt -y upgrade
 #
 # 2. Install core build tools and dependencies:
-# sudo apt-get install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+# sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
 #
 # 3. Install complete LLVM 17  + clang 17 toolchain:
 # sudo apt install -y --no-install-recommends libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
@@ -31,12 +31,13 @@ LABEL org.label-schema.schema-version = "1.0"
 # sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
 #
 # 5. Install hostapd development dependencies:
-# sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
+# sudo apt install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
 #
 
 # Install packages.
-RUN apt-get update && \
-    apt-get install -qq -y --no-install-recommends \
+RUN apt -y update && \
+    apt -y upgrade && \
+    apt install -qq -y --no-install-recommends \
         # Core project build dependencies.
         # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
         build-essential \
@@ -103,7 +104,7 @@ RUN apt-get update && \
         libnl-route-3-dev
 
 # Reduce image size by removing package cache
-RUN apt-get clean && \
+RUN apt clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for external vcpkg to support binary caching
@@ -132,8 +133,8 @@ ENTRYPOINT [ "/bin/entrypoint-build.sh" ]
 FROM netremote-build as netremote-dev
 
 # Install packages.
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apt update && \
+    apt install -y --no-install-recommends \
         # WSL2 kernel development dependencies.
         # build-essential flex bison dwarves libssl-dev libelf-dev bc
         bc \
@@ -163,7 +164,7 @@ RUN apt-get update && \
         vim \
         && \
     # Reduce image size by removing package cache.
-    apt-get clean && \
+    apt clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy outside content into container.

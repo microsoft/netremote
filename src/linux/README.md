@@ -57,10 +57,10 @@ You should now be logged on as `mycoolusername`.
 
 Execute the following commands in a shell to install all the tools required to compile, lint, and debug the project:
 
-1. Update the package cache:
+1. Update the package cache and upgrade to latest packages:
 
     ```bash
-    sudo apt update
+    sudo apt update && sudo apt upgrade
     ```
 
 2. Install core build tools and dependencies:
@@ -84,7 +84,7 @@ Execute the following commands in a shell to install all the tools required to c
 5. Install [hostapd](git://w1.fi/hostap.git) development dependencies:
 
     ```bash
-    sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
+    sudo apt install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
     ```
 
 > [!NOTE]
