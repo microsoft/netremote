@@ -38,13 +38,15 @@ message DataStreamUploadResult
 
 enum DataStreamType
 {
-    Fixed = 0;
-    Continuous = 1;
+    DataStreamTypeUnknown = 0;
+    DataStreamTypeFixed = 1;
+    DataStreamTypeContinuous = 2;
 }
 
 enum DataStreamPattern
 {
-    Constant = 0;
+    DataStreamPatternUnknown = 0;
+    DataStreamPatternConstant = 1;
 }
 
 message DataStreamFixedTypeProperties

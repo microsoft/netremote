@@ -45,7 +45,7 @@ DataStreamReader::OnDone()
 DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 {
     m_dataStreamProperties = request->properties();
-    if (m_dataStreamProperties.type() == DataStreamType::Fixed) {
+    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed) {
         // TODO: Ensure that m_dataStreamProperties.Value_case() == WifiDataStreamProperties.kFixedTypeProperties
         m_numberOfDataBlocksToStream = m_dataStreamProperties.fixedtypeproperties().numberofdatablockstostream();
     }
@@ -64,7 +64,7 @@ DataStreamWriter::OnWriteDone(bool ok)
     }
 
     if (ok) {
-        if (m_dataStreamProperties.type() == DataStreamType::Fixed) {
+        if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed) {
             m_numberOfDataBlocksToStream--;
         }
         m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeSucceeded);
@@ -88,7 +88,7 @@ DataStreamWriter::OnDone()
 void
 DataStreamWriter::NextWrite()
 {
-    if (m_dataStreamProperties.type() == DataStreamType::Continuous || m_numberOfDataBlocksToStream > 0) {
+    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous || m_numberOfDataBlocksToStream > 0) {
         const auto data = std::format("Data #{}", ++m_numberOfDataBlocksWritten);
         m_data.set_data(data);
         m_data.set_sequencenumber(m_numberOfDataBlocksWritten);
