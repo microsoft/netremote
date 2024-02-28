@@ -12,9 +12,7 @@ NetRemoteDataStreamingService::DataStreamUpload([[maybe_unused]] grpc::CallbackS
 {
     const NetRemoteApiTrace traceMe{};
 
-    m_dataStreamReaders.push_back(std::make_unique<Reactors::DataStreamReader>(result));
-
-    return m_dataStreamReaders.back().get();
+    return new Reactors::DataStreamReader(result);
 }
 
 grpc::ServerWriteReactor<DataStreamDownloadData>*
@@ -22,7 +20,5 @@ NetRemoteDataStreamingService::DataStreamDownload([[maybe_unused]] grpc::Callbac
 {
     const NetRemoteApiTrace traceMe{};
 
-    m_dataStreamWriter = std::make_unique<Reactors::DataStreamWriter>(request);
-
-    return m_dataStreamWriter.get();
+    return new Reactors::DataStreamWriter(request);
 }
