@@ -35,9 +35,9 @@ LABEL org.label-schema.schema-version = "1.0"
 #
 
 # Install packages.
-RUN apt $APT_ARGS_COMMON update && \
-    apt $APT_ARGS_COMMON upgrade && \
-    apt $APT_ARGS_COMMON install  \
+RUN apt-get $APT_ARGS_COMMON update && \
+    apt-get $APT_ARGS_COMMON upgrade && \
+    apt-get $APT_ARGS_COMMON install  \
         # Core project build dependencies.
         # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
         build-essential \
@@ -105,7 +105,7 @@ RUN apt $APT_ARGS_COMMON update && \
         libnl-route-3-dev
 
 # Reduce image size by removing package cache
-RUN apt -yqq clean && \
+RUN apt-get -yqq clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for external vcpkg to support binary caching
@@ -137,8 +137,8 @@ LABEL org.label-schema.name = "Microsoft NetRemote development environment"
 LABEL org.label-schema.description = "Development environment for the NetRemote project"
 
 # Install packages.
-RUN apt $APT_ARGS_COMMON update && \
-    apt $APT_ARGS_COMMON install \
+RUN apt-get $APT_ARGS_COMMON update && \
+    apt-get $APT_ARGS_COMMON install \
         # WSL2 kernel development dependencies.
         # build-essential flex bison dwarves libssl-dev libelf-dev bc
         bc \
@@ -168,7 +168,7 @@ RUN apt $APT_ARGS_COMMON update && \
         vim \
         && \
     # Reduce image size by removing package cache.
-    apt -yqq clean && \
+    apt-get -yqq clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy outside content into container.
