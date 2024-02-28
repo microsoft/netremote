@@ -58,6 +58,8 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
             HandleFailure("Invalid properties for this streaming type. Expected FixedTypeProperties for DataStreamTypeFixed");
             return;
         }
+
+        break;
     }
     case DataStreamType::DataStreamTypeContinuous: {
         if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kContinuousTypeProperties) {
@@ -66,6 +68,8 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
             HandleFailure("Invalid properties for this streaming type. Expected ContinuousTypeProperties for DataStreamTypeContinuous");
             return;
         }
+
+        break;
     }
     default: {
         HandleFailure(std::format("Invalid streaming type: {}", magic_enum::enum_name(m_dataStreamProperties.type())));
