@@ -102,6 +102,8 @@ DataStreamWriter::OnWriteDone(bool isOk)
 void
 DataStreamWriter::OnCancel()
 {
+    // The RPC is cancelled, so call Finish to complete it.
+    Finish(grpc::Status::CANCELLED);
 }
 
 void
