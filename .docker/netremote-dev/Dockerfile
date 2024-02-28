@@ -24,18 +24,14 @@ LABEL org.label-schema.schema-version = "1.0"
 # 2. Install core build tools and dependencies:
 # sudo apt-get install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
 #
-# 3. Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
-# sudo apt-get remove -y --purge clang-16* lldb-16* llvm-16*
+# 3. Install complete LLVM 17  + clang 17 toolchain:
+# sudo apt install -y --no-install-recommends libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
 # 
-# 4. Install complete llvm toolchain using automatic installation script:
-# sudo apt-get install -y --no-install-recommends lsb-release software-properties-common wget
-# wget https://apt.llvm.org/llvm.sh
-# chmod +x llvm.sh
-# sudo ./llvm.sh 17 all
-# rm llvm.sh
+# 4. Install other development dependencies and helpful tools:
+# sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
 #
-# 5. Install development dependency packages:
-# sudo apt-get install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
+# 5. Install hostapd development dependencies:
+# sudo apt-get install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
 #
 
 # Install packages.
@@ -56,6 +52,45 @@ RUN apt-get update && \
         tar \
         unzip \
         zip \
+        # LLVM + Clang toolchain.
+        libllvm-17-ocaml-dev \
+        libllvm17 \
+        llvm-17 \
+        llvm-17-dev \
+        llvm-17-doc \
+        llvm-17-examples \
+        llvm-17-runtime \
+        clang-17 \
+        clang-tools-17 \
+        clang-17-doc \
+        libclang-common-17-dev \
+        libclang-17-dev \
+        libclang1-17 \
+        clang-format-17 \
+        python3-clang-17 \
+        clangd-17 \
+        clang-tidy-17 \
+        libclang-rt-17-dev \
+        libpolly-17-dev \
+        libfuzzer-17-dev \
+        lldb-17 \
+        lld-17 \
+        libc++-17-dev \
+        libc++abi-17-dev \
+        libomp-17-dev \
+        libclc-17-dev \
+        libunwind-17-dev \
+        libmlir-17-dev \
+        mlir-17-tools \
+        libbolt-17-dev \
+        bolt-17 \
+        flang-17 \
+        libclang-rt-17-dev-wasm32 \
+        libclang-rt-17-dev-wasm64 \
+        libc++-17-dev-wasm32 \
+        libc++abi-17-dev-wasm32 \
+        libclang-rt-17-dev-wasm32 \
+        libclang-rt-17-dev-wasm64 \
         # hostapd build dependencies.
         # libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev
         libnl-3-200-dbg \
@@ -66,21 +101,6 @@ RUN apt-get update && \
         # libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
         libdbus-c++-dev \
         libnl-route-3-dev
-
-# Install complete llvm toolchain using automatic installation script.
-# lsb-release, software-properties-common, and wget are required by the script.
-RUN apt-get install -qq -y --no-install-recommends \
-        lsb-release \
-        software-properties-common \
-        wget && \
-    # Remove llvm 16 toolchain packages to avoid conflicts with llvm 17 toolchain.
-    apt-get remove -y --purge clang-16* lldb-16* llvm-16* && \
-    # Use automatic installation script to install llvm 17 toolchain.
-    wget https://apt.llvm.org/llvm.sh && \
-    chmod +x llvm.sh && \
-    ./llvm.sh ${LLVM_VERSION} all && \
-    # Delete the script.
-    rm llvm.sh
 
 # Reduce image size by removing package cache
 RUN apt-get clean && \
