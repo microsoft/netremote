@@ -6,6 +6,7 @@
 #include <string>
 
 #include <grpcpp/server.h>
+#include <microsoft/net/remote/NetRemoteDataStreamingService.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/NetRemoteService.hxx>
 
@@ -28,12 +29,14 @@ struct NetRemoteServer
     explicit NetRemoteServer(const NetRemoteServerConfiguration& configuration);
 
     /**
-     * Prevent copying and moving of this object. 
+     * Prevent copying and moving of this object.
      */
     NetRemoteServer(const NetRemoteServer&) = delete;
-    NetRemoteServer& operator=(const NetRemoteServer&) = delete;
+    NetRemoteServer&
+    operator=(const NetRemoteServer&) = delete;
     NetRemoteServer(NetRemoteServer&&) = delete;
-    NetRemoteServer& operator=(NetRemoteServer&&) = delete;
+    NetRemoteServer&
+    operator=(NetRemoteServer&&) = delete;
 
     /**
      * @brief Get the GrpcServer object.
@@ -52,6 +55,14 @@ struct NetRemoteServer
     GetService() noexcept;
 
     /**
+     * @brief Get the NetRemoteDataStreamingService object instance.
+     *
+     * @return Service::NetRemoteDataStreamingService&
+     */
+    Service::NetRemoteDataStreamingService&
+    GetDataStreamingService() noexcept;
+
+    /**
      * @brief Start the server if not already started.
      */
     void
@@ -67,6 +78,7 @@ private:
     std::string m_serverAddress;
     std::unique_ptr<grpc::Server> m_server;
     Service::NetRemoteService m_service;
+    Service::NetRemoteDataStreamingService m_dataStreamingService;
 };
 } // namespace Microsoft::Net::Remote
 
