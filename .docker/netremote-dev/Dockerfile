@@ -2,14 +2,14 @@
 FROM ubuntu:mantic as netremote-build
 
 # Set arguments used only in this Dockerfile.
-ARG build_date="2023-11-09T19:51:18Z"
+ARG BUILD_DATE="2024-02-28T21:09:49+00:00"
 ARG DEBIAN_FRONTEND=noninteractive
-ARG LLVM_VERSION=17
+ARG APT_ARGS_COMMON="-yqq --no-install-recommends"
 
 LABEL maintainer="Andrew Beltrano (anbeltra@microsoft.com)"
-LABEL org.label-schema.build-date = "${build_date}"
+LABEL org.label-schema.build-date = "${BUILD_DATE}"
 LABEL org.label-schema.name = "Microsoft NetRemote build environment"
-LABEL org.label-schema.description = "Build environment for development of the NetRemote project"
+LABEL org.label-schema.description = "Build environment for the NetRemote project"
 LABEL org.label-schema.vendor = "Microsoft"
 LABEL org.label-schema.version = "1.0.0"
 LABEL org.label-schema.schema-version = "1.0"
@@ -22,7 +22,7 @@ LABEL org.label-schema.schema-version = "1.0"
 # sudo apt -y update && sudo apt -y upgrade
 #
 # 2. Install core build tools and dependencies:
-# sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+# sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
 #
 # 3. Install complete LLVM 17  + clang 17 toolchain:
 # sudo apt install -y --no-install-recommends libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
@@ -35,9 +35,9 @@ LABEL org.label-schema.schema-version = "1.0"
 #
 
 # Install packages.
-RUN apt -y update && \
-    apt -y upgrade && \
-    apt install -qq -y --no-install-recommends \
+RUN apt $APT_ARGS_COMMON update && \
+    apt $APT_ARGS_COMMON upgrade && \
+    apt $APT_ARGS_COMMON install  \
         # Core project build dependencies.
         # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
         build-essential \
@@ -54,44 +54,45 @@ RUN apt -y update && \
         unzip \
         zip \
         # LLVM + Clang toolchain.
+        # libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
+        bolt-17 \
+        clang-17 \
+        clang-17-doc \
+        clang-format-17 \
+        clang-tidy-17 \
+        clang-tools-17 \
+        clangd-17 \
+        flang-17 \
+        libbolt-17-dev \
+        libc++-17-dev \
+        libc++-17-dev-wasm32 \
+        libc++abi-17-dev \
+        libc++abi-17-dev-wasm32 \
+        libclang-17-dev \
+        libclang-common-17-dev \
+        libclang-rt-17-dev \
+        libclang-rt-17-dev-wasm32 \
+        libclang-rt-17-dev-wasm32 \
+        libclang-rt-17-dev-wasm64 \
+        libclang-rt-17-dev-wasm64 \
+        libclang1-17 \
+        libclc-17-dev \
+        libfuzzer-17-dev \
         libllvm-17-ocaml-dev \
         libllvm17 \
+        libmlir-17-dev \
+        libomp-17-dev \
+        libpolly-17-dev \
+        libunwind-17-dev \
+        lld-17 \
+        lldb-17 \
         llvm-17 \
         llvm-17-dev \
         llvm-17-doc \
         llvm-17-examples \
         llvm-17-runtime \
-        clang-17 \
-        clang-tools-17 \
-        clang-17-doc \
-        libclang-common-17-dev \
-        libclang-17-dev \
-        libclang1-17 \
-        clang-format-17 \
-        python3-clang-17 \
-        clangd-17 \
-        clang-tidy-17 \
-        libclang-rt-17-dev \
-        libpolly-17-dev \
-        libfuzzer-17-dev \
-        lldb-17 \
-        lld-17 \
-        libc++-17-dev \
-        libc++abi-17-dev \
-        libomp-17-dev \
-        libclc-17-dev \
-        libunwind-17-dev \
-        libmlir-17-dev \
         mlir-17-tools \
-        libbolt-17-dev \
-        bolt-17 \
-        flang-17 \
-        libclang-rt-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm64 \
-        libc++-17-dev-wasm32 \
-        libc++abi-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm64 \
+        python3-clang-17 \
         # hostapd build dependencies.
         # libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev
         libnl-3-200-dbg \
@@ -104,7 +105,7 @@ RUN apt -y update && \
         libnl-route-3-dev
 
 # Reduce image size by removing package cache
-RUN apt clean && \
+RUN apt -yqq clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for external vcpkg to support binary caching
@@ -132,9 +133,12 @@ ENTRYPOINT [ "/bin/entrypoint-build.sh" ]
 
 FROM netremote-build as netremote-dev
 
+LABEL org.label-schema.name = "Microsoft NetRemote development environment"
+LABEL org.label-schema.description = "Development environment for the NetRemote project"
+
 # Install packages.
-RUN apt update && \
-    apt install -y --no-install-recommends \
+RUN apt $APT_ARGS_COMMON update && \
+    apt $APT_ARGS_COMMON install \
         # WSL2 kernel development dependencies.
         # build-essential flex bison dwarves libssl-dev libelf-dev bc
         bc \
@@ -164,7 +168,7 @@ RUN apt update && \
         vim \
         && \
     # Reduce image size by removing package cache.
-    apt clean && \
+    apt -yqq clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy outside content into container.
