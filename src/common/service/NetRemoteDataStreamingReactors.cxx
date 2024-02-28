@@ -43,6 +43,7 @@ DataStreamReader::OnCancel()
 void
 DataStreamReader::OnDone()
 {
+    delete this;
 }
 
 DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
@@ -109,6 +110,7 @@ DataStreamWriter::OnCancel()
 void
 DataStreamWriter::OnDone()
 {
+    delete this;
 }
 
 void
