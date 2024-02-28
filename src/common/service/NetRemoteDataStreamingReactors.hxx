@@ -49,6 +49,61 @@ private:
     uint32_t m_numberOfDataBlocksReceived{};
     Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_readStatus{};
 };
+
+/**
+ * @brief Implementation of the gRPC ServerWriteReactor for server-side data stream writing.
+ */
+class DataStreamWriter :
+    public grpc::ServerWriteReactor<Microsoft::Net::Remote::DataStream::DataStreamDownloadData>
+{
+public:
+    /**
+     * @brief Construct a new DataStreamWriter object with the specified download request.
+     *
+     * @param request The download request from the client.
+     */
+    explicit DataStreamWriter(const Microsoft::Net::Remote::DataStream::DataStreamDownloadRequest* request);
+
+    /**
+     * @brief Callback that is executed when a write operation is completed.
+     *
+     * @param isOk Indicates whether a write was successfully sent.
+     */
+    void
+    OnWriteDone(bool isOk) override;
+
+    /**
+     * @brief Callback that is executed when an RPC is cancelled before successfully sending a status to the client.
+     */
+    void
+    OnCancel() override;
+
+    /**
+     * @brief Callback that is executed when all RPC operations are completed for a given RPC.
+     */
+    void
+    OnDone() override;
+
+private:
+    /**
+     * @brief Facilitate the next write operation.
+     */
+    void
+    NextWrite();
+
+    /**
+     * @brief Handle a failed write operation.
+     */
+    void
+    HandleWriteFailure();
+
+private:
+    Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_data{};
+    Microsoft::Net::Remote::DataStream::DataStreamProperties m_dataStreamProperties{};
+    uint32_t m_numberOfDataBlocksToStream{};
+    uint32_t m_numberOfDataBlocksWritten{};
+    Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_writeStatus{};
+};
 } // namespace Microsoft::Net::Remote::Service::Reactors
 
 #endif // NET_REMOTE_DATA_STREAMING_REACTORS_HXX

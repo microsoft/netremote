@@ -16,3 +16,13 @@ NetRemoteDataStreamingService::DataStreamUpload([[maybe_unused]] grpc::CallbackS
 
     return m_dataStreamReaders.back().get();
 }
+
+grpc::ServerWriteReactor<DataStreamDownloadData>*
+NetRemoteDataStreamingService::DataStreamDownload([[maybe_unused]] grpc::CallbackServerContext* context, const DataStreamDownloadRequest* request)
+{
+    const NetRemoteApiTrace traceMe{};
+
+    m_dataStreamWriter = std::make_unique<Reactors::DataStreamWriter>(request);
+
+    return m_dataStreamWriter.get();
+}

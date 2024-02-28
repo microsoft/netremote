@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 #define NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 
+#include <memory>
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
@@ -32,8 +33,19 @@ private:
     grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>*
     DataStreamUpload(grpc::CallbackServerContext* context, Microsoft::Net::Remote::DataStream::DataStreamUploadResult* result) override;
 
+    /**
+     * @brief Stream data from the server to the client.
+     *
+     * @param context
+     * @param request
+     * @return grpc::ServerWriteReactor<Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
+     */
+    grpc::ServerWriteReactor<Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
+    DataStreamDownload(grpc::CallbackServerContext* context, const Microsoft::Net::Remote::DataStream::DataStreamDownloadRequest* request) override;
+
 private:
     std::vector<std::unique_ptr<grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>>> m_dataStreamReaders{};
+    std::unique_ptr<grpc::ServerWriteReactor<Microsoft::Net::Remote::DataStream::DataStreamDownloadData>> m_dataStreamWriter{};
 };
 } // namespace Microsoft::Net::Remote::Service
 
