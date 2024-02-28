@@ -40,5 +40,4 @@ DataStreamReader::OnCancel()
 void
 DataStreamReader::OnDone()
 {
-    delete this;
 }

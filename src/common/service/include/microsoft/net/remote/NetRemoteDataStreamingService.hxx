@@ -2,6 +2,8 @@
 #ifndef NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 #define NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 
+#include <vector>
+
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 
@@ -29,6 +31,9 @@ private:
      */
     grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>*
     DataStreamUpload(grpc::CallbackServerContext* context, Microsoft::Net::Remote::DataStream::DataStreamUploadResult* result) override;
+
+private:
+    std::vector<std::unique_ptr<grpc::ServerReadReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData>>> m_dataStreamReaders{};
 };
 } // namespace Microsoft::Net::Remote::Service
 
