@@ -70,3 +70,62 @@ DataStreamWriter::NextWrite()
         StartWritesDone();
     }
 }
+
+DataStreamReader::DataStreamReader(NetRemoteDataStreaming::Stub* client, DataStreamDownloadRequest* request)
+{
+    client->async()->DataStreamDownload(&m_clientContext, request, this);
+    StartCall();
+    StartRead(&m_data);
+}
+
+void
+DataStreamReader::OnReadDone(bool isOk)
+{
+    if (isOk) {
+        m_numberOfDataBlocksReceived++;
+        StartRead(&m_data);
+    }
+    // If read fails, then there is likely no more data to be read, so do nothing.
+}
+
+void
+DataStreamReader::OnDone(const grpc::Status& status)
+{
+    std::unique_lock lock(m_readStatusGate);
+
+    m_status = status;
+    m_done = true;
+    m_readsDone.notify_one();
+}
+
+grpc::Status
+DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus)
+{
+    std::unique_lock lock(m_readStatusGate);
+    static constexpr auto timeoutValue = 10s;
+
+    const auto isDone = m_readsDone.wait_for(lock, timeoutValue, [this] {
+        return m_done;
+    });
+
+    // Handle timeout from waiting for reads to be completed.
+    if (!isDone) {
+        DataStreamOperationStatus status{};
+        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeTimedOut);
+        status.set_message("Timeout occurred while waiting for all reads to be completed");
+        *m_data.mutable_status() = std::move(status);
+    }
+
+    // Handle mismatched sequence number and number of data blocks received.
+    if (m_data.sequencenumber() != m_numberOfDataBlocksReceived) {
+        DataStreamOperationStatus status{};
+        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
+        status.set_message(std::format("Sequence number {} does not match the number of data blocks received {}", m_data.sequencenumber(), m_numberOfDataBlocksReceived));
+        *m_data.mutable_status() = std::move(status);
+    }
+
+    *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
+    *operationStatus = m_data.status();
+
+    return m_status;
+}

@@ -23,8 +23,54 @@ message DataStreamUploadData
     bytes Data = 1;
 }
 
+message DataStreamDownloadData
+{
+    bytes Data = 1;
+    uint32 SequenceNumber = 2;
+    DataStreamOperationStatus Status = 3;
+}
+
 message DataStreamUploadResult
 {
     uint32 NumberOfDataBlocksReceived = 1;
     DataStreamOperationStatus Status = 2;
+}
+
+enum DataStreamType
+{
+    DataStreamTypeUnknown = 0;
+    DataStreamTypeFixed = 1;
+    DataStreamTypeContinuous = 2;
+}
+
+enum DataStreamPattern
+{
+    DataStreamPatternUnknown = 0;
+    DataStreamPatternConstant = 1;
+}
+
+message DataStreamFixedTypeProperties
+{
+    uint32 NumberOfDataBlocksToStream = 1;
+}
+
+message DataStreamContinuousTypeProperties
+{
+
+}
+
+message DataStreamProperties
+{
+    DataStreamType Type = 1;
+    DataStreamPattern Pattern = 2;
+    oneof Properties
+    {
+        DataStreamFixedTypeProperties FixedTypeProperties = 3;
+        DataStreamContinuousTypeProperties ContinuousTypeProperties = 4;
+    }
+}
+
+message DataStreamDownloadRequest
+{
+    DataStreamProperties Properties = 1;
 }

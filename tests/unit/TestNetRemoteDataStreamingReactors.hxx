@@ -70,6 +70,57 @@ private:
     bool m_done{ false };
 };
 
+/**
+ * @brief Implementation of the gRPC ClientReadReactor for client-side data stream reading.
+ */
+class DataStreamReader :
+    public grpc::ClientReadReactor<Microsoft::Net::Remote::DataStream::DataStreamDownloadData>
+{
+public:
+    /**
+     * @brief Construct a new DataStreamReader object with the client stub and specified number of data blocks to write.
+     *
+     * @param client The data streaming client stub.
+     * @param request The download request to be sent to the server.
+     */
+    explicit DataStreamReader(Microsoft::Net::Remote::Service::NetRemoteDataStreaming::Stub* client, Microsoft::Net::Remote::DataStream::DataStreamDownloadRequest* request);
+
+    /**
+     * @brief Callback that is executed when a read operation is completed.
+     *
+     * @param isOk Indicates whether a message was read as expected.
+     */
+    void
+    OnReadDone(bool isOk) override;
+
+    /**
+     * @brief Callback that is executed when all RPC operations are completed for a given RPC.
+     *
+     * @param status The status of the RPC sent by the server or provided by the library to indicate a failure.
+     */
+    void
+    OnDone(const grpc::Status& status) override;
+
+    /**
+     * @brief Wait for all operations to complete and transfer the resulting information to the output parameters.
+     *
+     * @param numberOfDataBlocksReceived The number of data blocks received by the client.
+     * @param operationStatus The status of the data stream read operation.
+     * @return grpc::Status
+     */
+    grpc::Status
+    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
+
+private:
+    grpc::ClientContext m_clientContext{};
+    Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_data{};
+    uint32_t m_numberOfDataBlocksReceived{};
+    grpc::Status m_status{};
+    std::mutex m_readStatusGate{};
+    std::condition_variable m_readsDone{};
+    bool m_done{ false };
+};
+
 } // namespace Microsoft::Net::Remote::Test
 
 #endif // TEST_NET_REMOTE_DATA_STREAMING_REACTORS_HXX
