@@ -94,7 +94,7 @@ private:
 
     /**
      * @brief Handle a failed operation.
-     * 
+     *
      * @param errorMessage The error message associated with the failed operation.
      */
     void
