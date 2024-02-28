@@ -3,6 +3,7 @@
 #define NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
 #include <cstdint>
+#include <string>
 
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
@@ -92,10 +93,12 @@ private:
     NextWrite();
 
     /**
-     * @brief Handle a failed write operation.
+     * @brief Handle a failed operation.
+     * 
+     * @param errorMessage The error message associated with the failed operation.
      */
     void
-    HandleWriteFailure();
+    HandleFailure(const std::string errorMessage);
 
 private:
     Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_data{};

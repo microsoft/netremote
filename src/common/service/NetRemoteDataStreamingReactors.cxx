@@ -1,5 +1,8 @@
 
+#include <format>
+
 #include "NetRemoteDataStreamingReactors.hxx"
+#include <magic_enum.hpp>
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service::Reactors;
@@ -45,17 +48,37 @@ DataStreamReader::OnDone()
 DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 {
     m_dataStreamProperties = request->properties();
-    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed) {
-        // TODO: Ensure that m_dataStreamProperties.Value_case() == WifiDataStreamProperties.kFixedTypeProperties
-        m_numberOfDataBlocksToStream = m_dataStreamProperties.fixedtypeproperties().numberofdatablockstostream();
+
+    switch (m_dataStreamProperties.type()) {
+    case DataStreamType::DataStreamTypeFixed: {
+        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kFixedTypeProperties) {
+            m_numberOfDataBlocksToStream = m_dataStreamProperties.fixedtypeproperties().numberofdatablockstostream();
+        } else {
+            HandleFailure("Invalid properties for this streaming type. Expected FixedTypeProperties for DataStreamTypeFixed");
+            return;
+        }
     }
+    case DataStreamType::DataStreamTypeContinuous: {
+        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kContinuousTypeProperties) {
+            m_numberOfDataBlocksToStream = 0;
+        } else {
+            HandleFailure("Invalid properties for this streaming type. Expected ContinuousTypeProperties for DataStreamTypeContinuous");
+            return;
+        }
+    }
+    default: {
+        HandleFailure(std::format("Invalid streaming type: {}", magic_enum::enum_name(m_dataStreamProperties.type())));
+        return;
+    }
+    };
+
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeUnknown);
     m_writeStatus.set_message("No data sent yet");
     NextWrite();
 }
 
 void
-DataStreamWriter::OnWriteDone(bool ok)
+DataStreamWriter::OnWriteDone(bool isOk)
 {
     // Check for a failed status code from HandleWriteFailure since that invoked a final write, thus causing this callback to be invoked.
     if (m_writeStatus.code() == DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed) {
@@ -63,7 +86,8 @@ DataStreamWriter::OnWriteDone(bool ok)
         return;
     }
 
-    if (ok) {
+    // Continue writing if previous write was successful, otherwise handle the failure.
+    if (isOk) {
         if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed) {
             m_numberOfDataBlocksToStream--;
         }
@@ -71,7 +95,7 @@ DataStreamWriter::OnWriteDone(bool ok)
         m_writeStatus.set_message("Data write successful");
         NextWrite();
     } else {
-        HandleWriteFailure();
+        HandleFailure("Data write failed");
     }
 }
 
@@ -88,22 +112,30 @@ DataStreamWriter::OnDone()
 void
 DataStreamWriter::NextWrite()
 {
-    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous || m_numberOfDataBlocksToStream > 0) {
+    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous ||
+        (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed && m_numberOfDataBlocksToStream > 0)) {
+        // Create data to write to the client.
         const auto data = std::format("Data #{}", ++m_numberOfDataBlocksWritten);
+
+        // Write data to the client.
         m_data.set_data(data);
         m_data.set_sequencenumber(m_numberOfDataBlocksWritten);
         *m_data.mutable_status() = m_writeStatus;
         StartWrite(&m_data);
     } else {
-        // No more data to write
+        // No more data to write.
         Finish(::grpc::Status::OK);
     }
 }
 
 void
-DataStreamWriter::HandleWriteFailure()
+DataStreamWriter::HandleFailure(const std::string errorMessage)
 {
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
-    m_writeStatus.set_message("Data write failed");
+    m_writeStatus.set_message(errorMessage);
+    *m_data.mutable_status() = m_writeStatus;
+
+    // Write a final message to the client. The OnWriteDone() callback will check for the
+    // DataStreamOperationStatusCodeFailed status code set here to know to complete the RPC.
     StartWrite(&m_data);
 }
