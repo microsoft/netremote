@@ -68,6 +68,15 @@ struct FunctionTracer
     SetFailed() noexcept;
 
     /**
+     * @brief Manually set the log severity for the enter log message. This only has an effect if the object was created
+     * with deferEnter = true.
+     * 
+     * @param logSeverityEnter The log severity to use when printing the entrance log message.
+     */
+    void
+    SetEnterLogSeverity(plog::Severity logSeverityEnter) noexcept;
+
+    /**
      * @brief Manually set the log severity for the exit log message. This overrides the SetSucceeded and SetFailed methods.
      *
      * @param severity The log severity to use when printing the exit log message.

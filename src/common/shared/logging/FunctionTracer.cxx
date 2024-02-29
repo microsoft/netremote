@@ -39,7 +39,8 @@ BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, s
 }
 } // namespace detail
 
-FunctionTracer::FunctionTracer(std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
+FunctionTracer::FunctionTracer(plog::Severity logSeverityEnter, std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
+    m_logSeverityEnter(logSeverityEnter),
     m_logPrefix(std::move(logPrefix)),
     m_location(location),
     m_functionName(m_location.function_name()),
@@ -117,7 +118,21 @@ FunctionTracer::SetFailed() noexcept
 }
 
 void
-FunctionTracer::SetExitLogSeverity(plog::Severity severity) noexcept
+FunctionTracer::SetEnterLogSeverity(plog::Severity logSeverityEnter) noexcept
 {
-    m_LogSeverityExit = severity;
+    if (m_entered) {
+        LOGW << "warning: calling SetEnterLogSeverity after entered log has already been printed; this will have no effect.";
+    }
+
+    m_logSeverityEnter = logSeverityEnter;
+}
+
+void
+FunctionTracer::SetExitLogSeverity(plog::Severity logSeverityExit) noexcept
+{
+    if (m_exited) {
+        LOGW << "warning: calling SetExitLogSeverity after exited log has already been printed; this will have no effect.";
+    }
+
+    m_LogSeverityExit = logSeverityExit;
 }
