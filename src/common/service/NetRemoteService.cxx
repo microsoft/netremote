@@ -478,3 +478,60 @@ NetRemoteService::ValidateWifiAccessPointEnableRequest(const WifiAccessPointEnab
 
     return true;
 }
+
+AccessPointOperationStatus
+NetRemoteService::TryGetAccessPoint(std::string_view accessPointId, std::shared_ptr<IAccessPoint>& accessPoint)
+{
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Find the requested AP.
+    auto accessPointOpt = m_accessPointManager->GetAccessPoint(accessPointId);
+    if (!accessPointOpt.has_value()) {
+        operationStatus.Code = AccessPointOperationStatusCode::AccessPointInvalid;
+        operationStatus.Details = "access point not found";
+        return operationStatus;
+    }
+
+    // Attempt to promote the weak reference to a strong reference.
+    auto accessPointWeak{ accessPointOpt.value() };
+    accessPoint = accessPointWeak.lock();
+    if (accessPoint == nullptr) {
+        operationStatus.Code = AccessPointOperationStatusCode::AccessPointInvalid;
+        operationStatus.Details = "access point no longer valid";
+        return operationStatus;
+    }
+
+    operationStatus.Code = AccessPointOperationStatusCode::Succeeded;
+
+    return operationStatus;
+}
+
+AccessPointOperationStatus
+NetRemoteService::TryGetAccessPointController(std::shared_ptr<IAccessPoint> accessPoint, std::shared_ptr<IAccessPointController>& accessPointController)
+{
+    AccessPointOperationStatus operationStatus{ accessPoint->GetInterfaceName() };
+
+    accessPointController = accessPoint->CreateController();
+    if (accessPointController == nullptr) {
+        operationStatus.Code = AccessPointOperationStatusCode::InternalError;
+        operationStatus.Details = "failed to create access point controller";
+        return operationStatus;
+    }
+
+    operationStatus.Code = AccessPointOperationStatusCode::Succeeded;
+
+    return operationStatus;
+}
+
+AccessPointOperationStatus
+NetRemoteService::TryGetAccessPointController(std::string_view accessPointId, std::shared_ptr<IAccessPointController>& accessPointController)
+{
+    std::shared_ptr<IAccessPoint> accessPoint{};
+    auto operationStatus = TryGetAccessPoint(accessPointId, accessPoint);
+    if (!operationStatus.Succeeded()) {
+        return operationStatus;
+    }
+
+    return TryGetAccessPointController(accessPoint, accessPointController);
+}
+

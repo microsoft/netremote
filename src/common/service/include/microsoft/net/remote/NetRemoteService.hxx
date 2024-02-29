@@ -3,12 +3,16 @@
 #define NET_REMOTE_SERVICE_HXX
 
 #include <memory>
+#include <string_view>
 
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/status.h>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
 
 namespace Microsoft::Net::Remote::Service
 {
@@ -91,6 +95,37 @@ private:
      */
     grpc::Status
     WifiAccessPointSetFrequencyBands(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result) override;
+
+protected:
+    /**
+     * @brief Attempt to obtain an IAccessPoint instance for the specified access point identifier.
+     * 
+     * @param accessPointId The access point identifier.
+     * @param accessPoint Output variable to receive the access point instance.
+     * @return Microsoft::Net::Wifi::AccessPointOperationStatus 
+     */
+    Microsoft::Net::Wifi::AccessPointOperationStatus
+    TryGetAccessPoint(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint>& accessPoint);
+
+    /**
+     * @brief Attempt to obtain an IAccessPointController instance for the access point with the specified identifier.
+     * 
+     * @param accessPointId The access point identifier.
+     * @param accessPointController Output variable to receive the access point controller instance.
+     * @return Microsoft::Net::Wifi::AccessPointOperationStatus 
+     */
+    Microsoft::Net::Wifi::AccessPointOperationStatus
+    TryGetAccessPointController(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController>& accessPointController);
+
+    /**
+     * @brief Attempt to obtain an IAccessPointController instance for the specified access point.
+     * 
+     * @param accessPoint The access point to obtain a controller for.
+     * @param accessPointController 
+     * @return Microsoft::Net::Wifi::AccessPointOperationStatus 
+     */
+    Microsoft::Net::Wifi::AccessPointOperationStatus
+    TryGetAccessPointController(std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint> accessPoint, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController>& accessPointController);
 
 protected:
     /**
