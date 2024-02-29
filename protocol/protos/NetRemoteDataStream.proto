@@ -25,15 +25,15 @@ message DataStreamUploadData
 
 message DataStreamDownloadData
 {
-    bytes Data = 1;
-    uint32 SequenceNumber = 2;
-    DataStreamOperationStatus Status = 3;
+    DataStreamOperationStatus Status = 1;
+    bytes Data = 2;
+    uint32 SequenceNumber = 3;
 }
 
 message DataStreamUploadResult
 {
-    uint32 NumberOfDataBlocksReceived = 1;
-    DataStreamOperationStatus Status = 2;
+    DataStreamOperationStatus Status = 1;
+    uint32 NumberOfDataBlocksReceived = 2;
 }
 
 enum DataStreamType
