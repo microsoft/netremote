@@ -127,8 +127,8 @@ DataStreamWriter::OnCancel()
     LOGD << "Enter OnCancel";
 
     // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
-    if (!m_isCanceled.load(std::memory_order_relaxed)) {
-        m_isCanceled.store(true, std::memory_order_relaxed);
+    bool isCanceledExpected{ false };
+    if (m_isCanceled.compare_exchange_strong(isCanceledExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
         Finish(grpc::Status::CANCELLED);
     }
 }
