@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <format>
 #include <ranges>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>

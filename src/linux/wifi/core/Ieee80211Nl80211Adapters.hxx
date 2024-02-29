@@ -3,6 +3,8 @@
 #define IEEE_80211_NL80211_ADAPTERS_HXX
 
 #include <cstdint>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>

@@ -1,6 +1,5 @@
 
 #include <algorithm>
-#include <cstdint>
 #include <format>
 #include <iterator>
 #include <memory>
@@ -15,7 +14,6 @@
 
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
-#include <linux/nl80211.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
@@ -137,7 +135,7 @@ AccessPointOperationStatus
 AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
 {
     const auto ieeeProtocolName = std::format("802.11 {}", magic_enum::enum_name(ieeeProtocol));
-    AccessPointOperationStatus status{ GetInterfaceName(), std::format("SetProtocol {}", ieeeProtocolName).c_str() };
+    AccessPointOperationStatus status{ GetInterfaceName(), std::format("SetProtocol {}", ieeeProtocolName) };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     // Populate a list of required properties to set.
