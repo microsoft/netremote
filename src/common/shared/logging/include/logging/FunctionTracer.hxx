@@ -79,6 +79,7 @@ private:
     std::vector<std::pair<std::string, std::string>> m_returnValues;
     bool m_entered{ false };
     bool m_exited{ false };
+    plog::Severity m_logSeverityEnter{ plog:: Severity::info };
     plog::Severity m_exitLogSeverity{ plog::Severity::info };
 };
 } // namespace logging

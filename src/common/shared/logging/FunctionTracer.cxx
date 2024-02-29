@@ -74,8 +74,8 @@ FunctionTracer::Enter()
     }
 
     m_entered = true;
-    auto arguments = detail::BuildValueList(m_arguments, " with arguments ");
-    LOGI << std::format("{} +{}{}", m_logPrefix, m_functionName, arguments);
+    const auto arguments = detail::BuildValueList(m_arguments, " with arguments ");
+    PLOG(m_logSeverityEnter) << std::format("{} +{}{}", m_logPrefix, m_functionName, arguments);
 }
 
 void
