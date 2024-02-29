@@ -66,7 +66,7 @@ Execute the following commands in a shell to install all the tools required to c
 2. Install core build tools and dependencies:
 
     ```bash
-    sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev clang-17 clang-tools-17 clang-format-17 clangd-17 clang-tidy-17 lldb-17 lld-17 libbolt-17-dev bolt-17 libunwind-17-dev
+    sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
     ```
 
 3. Install LLVM compiler dependencies:
@@ -84,7 +84,7 @@ Execute the following commands in a shell to install all the tools required to c
 5. Install [hostapd](git://w1.fi/hostap.git) development dependencies:
 
     ```bash
-    sudo apt install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
+    sudo apt install -y --no-install-recommends libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
     ```
 
 > [!NOTE]
