@@ -98,7 +98,7 @@ private:
      * @param errorMessage The error message associated with the failed operation.
      */
     void
-    HandleFailure(const std::string errorMessage);
+    HandleFailure(const std::string& errorMessage);
 
 private:
     Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_data{};

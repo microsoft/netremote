@@ -137,7 +137,7 @@ DataStreamWriter::NextWrite()
 }
 
 void
-DataStreamWriter::HandleFailure(const std::string errorMessage)
+DataStreamWriter::HandleFailure(const std::string& errorMessage)
 {
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
     m_writeStatus.set_message(errorMessage);
