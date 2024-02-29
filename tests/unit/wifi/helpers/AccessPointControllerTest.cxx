@@ -28,6 +28,7 @@ std::string_view
 AccessPointControllerTest::GetInterfaceName() const noexcept
 {
     assert(AccessPoint != nullptr);
+
     return AccessPoint->InterfaceName;
 }
 
@@ -35,6 +36,7 @@ AccessPointOperationStatus
 AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &operationalState) noexcept
 {
     assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
         return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
@@ -47,6 +49,7 @@ AccessPointOperationStatus
 AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities) noexcept
 {
     assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
         return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
