@@ -25,12 +25,13 @@ struct FunctionTracer
      * @brief Construct a new FunctionTracer object.
      * 
      * @param logSeverityEnter The severity to log entrance with.
+     * @param logSeverityExit The severity to log exit with.
      * @param logPrefix The prefix to use for both log messages.
      * @param arguments The arguments the function was called with.
      * @param deferEnter Whether to defer the call to Enter().
      * @param location The source location information of the caller.
      */
-    FunctionTracer(plog::Severity logSeverityEnter = LogSeverityEnterDefault, std::string logPrefix = {}, std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current());
+    FunctionTracer(plog::Severity logSeverityEnter = LogSeverityEnterDefault, plog::Severity logSeverityExit = LogSeverityExitDefault, std::string logPrefix = {},  std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current());
 
     /**
      * @brief Destroy the FunctionTracer object.
@@ -102,7 +103,7 @@ protected:
 
 private:
     plog::Severity m_logSeverityEnter{ LogSeverityEnterDefault };
-    plog::Severity m_LogSeverityExit{ LogSeverityExitDefault };
+    plog::Severity m_logSeverityExit{ LogSeverityExitDefault };
     std::string m_logPrefix;
     std::source_location m_location;
     std::string_view m_functionName;

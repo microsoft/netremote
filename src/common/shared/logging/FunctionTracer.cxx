@@ -39,8 +39,9 @@ BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, s
 }
 } // namespace detail
 
-FunctionTracer::FunctionTracer(plog::Severity logSeverityEnter, std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
+FunctionTracer::FunctionTracer(plog::Severity logSeverityEnter, plog::Severity logSeverityExit, std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
     m_logSeverityEnter(logSeverityEnter),
+    m_logSeverityExit(logSeverityExit),
     m_logPrefix(std::move(logPrefix)),
     m_location(location),
     m_functionName(m_location.function_name()),
@@ -89,7 +90,7 @@ FunctionTracer::Exit()
     }
 
     auto returnValues = detail::BuildValueList(m_returnValues, " returning ");
-    PLOG(m_LogSeverityExit) << std::format("{} -{}{}", m_logPrefix, m_functionName, returnValues);
+    PLOG(m_logSeverityExit) << std::format("{} -{}{}", m_logPrefix, m_functionName, returnValues);
     m_exited = true;
 }
 
@@ -108,13 +109,13 @@ FunctionTracer::AddReturnValue(std::string name, std::string value)
 void
 FunctionTracer::SetSucceeded() noexcept
 {
-    m_LogSeverityExit = plog::Severity::info;
+    m_logSeverityExit = plog::Severity::info;
 }
 
 void
 FunctionTracer::SetFailed() noexcept
 {
-    m_LogSeverityExit = plog::Severity::error;
+    m_logSeverityExit = plog::Severity::error;
 }
 
 void
@@ -134,5 +135,5 @@ FunctionTracer::SetExitLogSeverity(plog::Severity logSeverityExit) noexcept
         LOGW << "warning: calling SetExitLogSeverity after exited log has already been printed; this will have no effect.";
     }
 
-    m_LogSeverityExit = logSeverityExit;
+    m_logSeverityExit = logSeverityExit;
 }

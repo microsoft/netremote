@@ -8,6 +8,6 @@
 
 using namespace Microsoft::Net::Remote::Service::Tracing;
 
-NetRemoteApiTrace::NetRemoteApiTrace(bool deferEnter, plog::Severity logSeverityEnter, std::source_location location) :
-    logging::FunctionTracer(logSeverityEnter, LogTracePrefix, {}, deferEnter, location)
+NetRemoteApiTrace::NetRemoteApiTrace(bool deferEnter, plog::Severity logSeverityEnter, plog::Severity logSeverityExit, std::source_location location) :
+    logging::FunctionTracer(logSeverityEnter, logSeverityExit, LogTracePrefix, {}, deferEnter, location)
 {}
