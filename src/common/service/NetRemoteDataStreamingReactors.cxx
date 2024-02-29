@@ -3,6 +3,7 @@
 
 #include "NetRemoteDataStreamingReactors.hxx"
 #include <magic_enum.hpp>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service::Reactors;
@@ -48,6 +49,7 @@ DataStreamReader::OnDone()
 
 DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 {
+    LOGD << "Enter constructor";
     m_dataStreamProperties = request->properties();
 
     switch (m_dataStreamProperties.type()) {
@@ -85,6 +87,7 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 void
 DataStreamWriter::OnWriteDone(bool isOk)
 {
+    LOGD << "Enter OnWriteDone";
     // Check for a failed status code from HandleWriteFailure since that invoked a final write, thus causing this callback to be invoked.
     if (m_writeStatus.code() == DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed) {
         Finish(::grpc::Status::OK);
@@ -107,6 +110,7 @@ DataStreamWriter::OnWriteDone(bool isOk)
 void
 DataStreamWriter::OnCancel()
 {
+    LOGD << "Enter OnCancel";
     // The RPC is cancelled by the client, so call Finish to complete it from the server perspective.
     Finish(grpc::Status::CANCELLED);
 }
@@ -114,12 +118,14 @@ DataStreamWriter::OnCancel()
 void
 DataStreamWriter::OnDone()
 {
+    LOGD << "Enter OnDone";
     delete this;
 }
 
 void
 DataStreamWriter::NextWrite()
 {
+    LOGD << "Enter NextWrite";
     if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous ||
         (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed && m_numberOfDataBlocksToStream > 0)) {
         // Create data to write to the client.
@@ -139,6 +145,7 @@ DataStreamWriter::NextWrite()
 void
 DataStreamWriter::HandleFailure(const std::string& errorMessage)
 {
+    LOGD << "Enter HandleFailure";
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
     m_writeStatus.set_message(errorMessage);
     *m_data.mutable_status() = m_writeStatus;

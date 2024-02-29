@@ -125,3 +125,9 @@ DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperatio
 
     return m_status;
 }
+
+void
+DataStreamReader::Cancel()
+{
+    m_clientContext.TryCancel();
+}
