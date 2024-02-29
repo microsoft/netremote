@@ -6,8 +6,11 @@
 #include <source_location>
 #include <string>
 
-#include "NetRemoteApiTrace.hxx"
+#include <logging/FunctionTracer.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <plog/Severity.h>
+
+#include "NetRemoteApiTrace.hxx"
 
 namespace Microsoft::Net::Remote::Service::Tracing
 {
@@ -25,7 +28,7 @@ struct NetRemoteWifiApiTrace :
      * @param operationStatus The result status of the operation, if present.
      * @param location The source code location of the function call.
      */
-    NetRemoteWifiApiTrace(std::optional<std::string> accessPointId = std::nullopt, const Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus* operationStatus = nullptr, std::source_location location = std::source_location::current());
+    NetRemoteWifiApiTrace(std::optional<std::string> accessPointId = std::nullopt, const Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus* operationStatus = nullptr, plog::Severity logSeverityEnter = LogSeverityEnterDefault, std::source_location location = std::source_location::current());
 
     /**
      * @brief Destroy the NetRemoteWifiApiTrace object.

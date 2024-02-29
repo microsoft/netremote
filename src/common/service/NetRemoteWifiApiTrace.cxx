@@ -14,8 +14,8 @@ using namespace Microsoft::Net::Remote::Service::Tracing;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus;
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
 
-NetRemoteWifiApiTrace::NetRemoteWifiApiTrace(std::optional<std::string> accessPointId, const WifiAccessPointOperationStatus* operationStatus, std::source_location location) :
-    NetRemoteApiTrace(/* deferEnter= */ true, location),
+NetRemoteWifiApiTrace::NetRemoteWifiApiTrace(std::optional<std::string> accessPointId, const WifiAccessPointOperationStatus* operationStatus, plog::Severity logSeverityEnter, std::source_location location) :
+    NetRemoteApiTrace(/* deferEnter= */ true, logSeverityEnter, location),
     m_accessPointId(std::move(accessPointId)),
     m_operationStatus(operationStatus)
 {
