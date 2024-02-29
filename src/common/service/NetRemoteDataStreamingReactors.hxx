@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 #define NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 
@@ -106,6 +107,7 @@ private:
     uint32_t m_numberOfDataBlocksToStream{};
     uint32_t m_numberOfDataBlocksWritten{};
     Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_writeStatus{};
+    std::atomic<bool> m_isCancelled{};
 };
 } // namespace Microsoft::Net::Remote::Service::Reactors
 
