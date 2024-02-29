@@ -75,6 +75,7 @@ HandleFailure(RequestT& request, ResultT& result, WifiAccessPointOperationStatus
  * @param code The error code to set in the result message.
  * @param message The error message to set in the result message.
  * @param returnValue The value to return from the function.
+ * @return ReturnT 
  */
 template <
     typename RequestT,
@@ -84,6 +85,28 @@ ReturnT
 HandleFailure(RequestT& request, ResultT& result, AccessPointOperationStatusCode code, std::string_view message, ReturnT returnValue = {})
 {
     return HandleFailure(request, result, ToDot11AccessPointOperationStatusCode(code), message, returnValue);
+}
+
+/**
+ * @brief Wrapper for HandleFailure that converts a AccessPointOperationStatus to a WifiAccessPointOperationStatus and error details message.
+ * 
+ * @tparam RequestT The request type. This must contain an access point id (trait).
+ * @tparam ResultT The result type. This must contain an access point id and a status (traits).
+ * @return ReturnT The type of the return value. Defaults to grpc::Status with a value of grpc::OK.
+ * @param request A reference to the request.
+ * @param result A reference to the result.
+ * @param operationStatus The AccessPointOperationStatus to derive the failure code and details message from.
+ * @param returnValue The value to return from the function.
+ * @return ReturnT 
+ */
+template <
+    typename RequestT,
+    typename ResultT,
+    typename ReturnT = grpc::Status>
+ReturnT
+HandleFailure(RequestT& request, ResultT& result, const AccessPointOperationStatus& operationStatus, ReturnT returnValue = {})
+{
+    return HandleFailure(request, result, operationStatus.Code, operationStatus.ToString(), returnValue);
 }
 
 /**
