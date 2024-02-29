@@ -102,7 +102,7 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         DataStreamProperties properties{};
         properties.set_type(DataStreamType::DataStreamTypeFixed);
         properties.set_pattern(DataStreamPattern::DataStreamPatternConstant);
-        *properties.mutable_fixedtypeproperties() = std::move(fixedTypeProperties);
+        *properties.mutable_fixed() = std::move(fixedTypeProperties);
 
         DataStreamDownloadRequest request{};
         *request.mutable_properties() = std::move(properties);

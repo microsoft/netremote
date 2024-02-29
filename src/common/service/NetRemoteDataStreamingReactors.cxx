@@ -52,20 +52,20 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 
     switch (m_dataStreamProperties.type()) {
     case DataStreamType::DataStreamTypeFixed: {
-        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kFixedTypeProperties) {
-            m_numberOfDataBlocksToStream = m_dataStreamProperties.fixedtypeproperties().numberofdatablockstostream();
+        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kFixed) {
+            m_numberOfDataBlocksToStream = m_dataStreamProperties.fixed().numberofdatablockstostream();
         } else {
-            HandleFailure("Invalid properties for this streaming type. Expected FixedTypeProperties for DataStreamTypeFixed");
+            HandleFailure("Invalid properties for this streaming type. Expected Fixed for DataStreamTypeFixed");
             return;
         }
 
         break;
     }
     case DataStreamType::DataStreamTypeContinuous: {
-        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kContinuousTypeProperties) {
+        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kContinuous) {
             m_numberOfDataBlocksToStream = 0;
         } else {
-            HandleFailure("Invalid properties for this streaming type. Expected ContinuousTypeProperties for DataStreamTypeContinuous");
+            HandleFailure("Invalid properties for this streaming type. Expected Continuous for DataStreamTypeContinuous");
             return;
         }
 

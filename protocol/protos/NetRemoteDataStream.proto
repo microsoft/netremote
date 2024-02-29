@@ -65,8 +65,8 @@ message DataStreamProperties
     DataStreamPattern Pattern = 2;
     oneof Properties
     {
-        DataStreamFixedTypeProperties FixedTypeProperties = 3;
-        DataStreamContinuousTypeProperties ContinuousTypeProperties = 4;
+        DataStreamFixedTypeProperties Fixed = 3;
+        DataStreamContinuousTypeProperties Continuous = 4;
     }
 }
 
