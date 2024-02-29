@@ -86,7 +86,7 @@ FunctionTracer::Exit()
     }
 
     auto returnValues = detail::BuildValueList(m_returnValues, " returning ");
-    PLOG(m_exitLogSeverity) << std::format("{} -{}{}", m_logPrefix, m_functionName, returnValues);
+    PLOG(m_LogSeverityExit) << std::format("{} -{}{}", m_logPrefix, m_functionName, returnValues);
     m_exited = true;
 }
 

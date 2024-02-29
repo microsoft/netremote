@@ -80,7 +80,7 @@ private:
     bool m_entered{ false };
     bool m_exited{ false };
     plog::Severity m_logSeverityEnter{ plog:: Severity::info };
-    plog::Severity m_exitLogSeverity{ plog::Severity::info };
+    plog::Severity m_LogSeverityExit{ plog::Severity::info };
 };
 } // namespace logging
 
