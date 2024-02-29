@@ -2,6 +2,7 @@
 #ifndef TEST_NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 #define TEST_NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
+#include <chrono>
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
