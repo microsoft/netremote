@@ -23,6 +23,19 @@ AccessPointOperationStatus::MakeSucceeded(std::string_view accessPointId, std::s
     };
 }
 
+/* static */
+AccessPointOperationStatus
+AccessPointOperationStatus::InvalidAccessPoint(std::string_view operationName, std::string_view details, std::source_location sourceLocation) noexcept
+{
+    return AccessPointOperationStatus{
+        {},
+        operationName,
+        AccessPointOperationStatusCode::AccessPointInvalid,
+        details,
+        sourceLocation
+    };
+}
+
 bool
 AccessPointOperationStatus::Succeeded() const noexcept
 {

@@ -36,9 +36,12 @@ struct AccessPointControllerLinux :
      * Prevent copying and moving of this object.
      */
     AccessPointControllerLinux(const AccessPointControllerLinux&) = delete;
+
+    AccessPointControllerLinux(AccessPointControllerLinux&&) = delete;
+
     AccessPointControllerLinux&
     operator=(const AccessPointControllerLinux&) = delete;
-    AccessPointControllerLinux(AccessPointControllerLinux&&) = delete;
+
     AccessPointControllerLinux&
     operator=(AccessPointControllerLinux&&) = delete;
 
@@ -49,7 +52,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    GetOperationalState(AccessPointOperationalState& operationalState) override;
+    GetOperationalState(AccessPointOperationalState& operationalState) noexcept override;
 
     /**
      * @brief Get the capabilities of the access point.
@@ -58,7 +61,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) override;
+    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept override;
 
     /**
      * @brief Set the operational state of the access point.
@@ -67,7 +70,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetOperationalState(AccessPointOperationalState operationalState) override;
+    SetOperationalState(AccessPointOperationalState operationalState) noexcept override;
 
     /**
      * @brief Set the Ieee80211 protocol.
@@ -76,7 +79,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetProtocol(Ieee80211Protocol ieeeProtocol) override;
+    SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept override;
 
     /**
      * @brief Set the frquency bands the access point should enable.
@@ -85,7 +88,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) override;
+    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) noexcept override;
 
     /**
      * @brief Set the SSID of the access point.
@@ -94,7 +97,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetSssid(std::string_view ssid) override;
+    SetSssid(std::string_view ssid) noexcept override;
 
 private:
     Wpa::Hostapd m_hostapd;

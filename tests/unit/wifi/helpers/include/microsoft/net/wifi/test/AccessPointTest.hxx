@@ -52,9 +52,12 @@ struct AccessPointTest final :
      * Prevent copying and moving of this object.
      */
     AccessPointTest(const AccessPointTest&) = delete;
+
+    AccessPointTest(AccessPointTest&&) = delete;
+
     AccessPointTest&
     operator=(const AccessPointTest&) = delete;
-    AccessPointTest(AccessPointTest&&) = delete;
+
     AccessPointTest&
     operator=(AccessPointTest&&) = delete;
 
@@ -64,7 +67,7 @@ struct AccessPointTest final :
      * @return std::string_view
      */
     std::string_view
-    GetInterfaceName() const override;
+    GetInterfaceName() const noexcept override;
 
     /**
      * @brief Create a new instance that can control the access point.

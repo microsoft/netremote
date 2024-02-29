@@ -20,8 +20,8 @@ struct AccessPointController :
 
     /**
      * @brief Construct a new AccessPointController object to control the specified interface.
-     * 
-     * @param interfaceName 
+     *
+     * @param interfaceName
      */
     AccessPointController(std::string_view interfaceName);
 
@@ -31,7 +31,7 @@ struct AccessPointController :
      * @return std::string_view
      */
     std::string_view
-    GetInterfaceName() const override;
+    GetInterfaceName() const noexcept override;
 
 private:
     std::string m_interfaceName;

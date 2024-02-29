@@ -153,7 +153,7 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
 } // namespace detail
 
 AccessPointOperationStatus
-AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities)
+AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
@@ -190,7 +190,7 @@ AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ie
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& operationalState)
+AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& operationalState) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
@@ -210,7 +210,7 @@ AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& ope
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState operationalState)
+AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState operationalState) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
@@ -247,7 +247,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
+AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
 {
     const auto ieeeProtocolName = std::format("802.11 {}", magic_enum::enum_name(ieeeProtocol));
     AccessPointOperationStatus status{ GetInterfaceName(), std::format("SetProtocol {}", ieeeProtocolName).c_str() };
@@ -319,7 +319,7 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol)
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
+AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
@@ -380,7 +380,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetSssid(std::string_view ssid)
+AccessPointControllerLinux::SetSssid(std::string_view ssid) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
