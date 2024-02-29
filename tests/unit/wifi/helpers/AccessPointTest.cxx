@@ -21,7 +21,7 @@ AccessPointTest::AccessPointTest(std::string_view interfaceName, Ieee80211Access
 {}
 
 std::string_view
-AccessPointTest::GetInterfaceName() const
+AccessPointTest::GetInterfaceName() const noexcept
 {
     return InterfaceName;
 }

@@ -54,7 +54,7 @@ struct AccessPointOperationStatus
     {
         if (std::empty(OperationName)) {
             OperationName = SourceLocation.function_name();
-            auto pos = OperationName.find_first_of('('); 
+            auto pos = OperationName.find_first_of('(');
             if (pos != std::string::npos) {
                 OperationName.erase(pos);
             }
@@ -94,6 +94,17 @@ struct AccessPointOperationStatus
      */
     static AccessPointOperationStatus
     MakeSucceeded(std::string_view accessPointId, std::string_view operationName = {}, std::string_view details = {}, std::source_location sourceLocation = std::source_location::current()) noexcept;
+
+    /**
+     * @brief Create an AccessPointOperationStatus description an operation that referred to an invalid access point.
+     *
+     * @param operationName The name of the operation.
+     * @param details Additional details about the operation.
+     * @param sourceLocation The source location of the operation.
+     * @return AccessPointOperationStatus
+     */
+    static AccessPointOperationStatus
+    InvalidAccessPoint(std::string_view operationName = {}, std::string_view details = {}, std::source_location sourceLocation = std::source_location::current()) noexcept;
 
     /**
      * @brief Determine whether the operation succeeded.

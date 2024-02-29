@@ -25,9 +25,14 @@ struct IAccessPoint
      * Prevent copying and moving of IAccessPoint objects.
      */
     IAccessPoint(const IAccessPoint&) = delete;
-    IAccessPoint& operator=(const IAccessPoint&) = delete;
+
     IAccessPoint(IAccessPoint&&) = delete;
-    IAccessPoint& operator=(IAccessPoint&&) = delete;
+
+    IAccessPoint&
+    operator=(const IAccessPoint&) = delete;
+
+    IAccessPoint&
+    operator=(IAccessPoint&&) = delete;
 
     /**
      * @brief Get the network interface name representing the access point.
@@ -35,7 +40,7 @@ struct IAccessPoint
      * @return std::string_view
      */
     virtual std::string_view
-    GetInterfaceName() const = 0;
+    GetInterfaceName() const noexcept = 0;
 
     /**
      * @brief Create a new instance that can control the access point.
@@ -49,7 +54,7 @@ struct IAccessPoint
 /**
  * @brief Arguments to be passed to the Create method of IAccessPointFactory.
  */
-struct IAccessPointCreateArgs 
+struct IAccessPointCreateArgs
 {
     IAccessPointCreateArgs() = default;
 
@@ -59,9 +64,14 @@ struct IAccessPointCreateArgs
      * Prevent copying and moving of IAccessPointCreateArgs objects.
      */
     IAccessPointCreateArgs(const IAccessPointCreateArgs&) = delete;
-    IAccessPointCreateArgs& operator=(const IAccessPointCreateArgs&) = delete;
+
     IAccessPointCreateArgs(IAccessPointCreateArgs&&) = delete;
-    IAccessPointCreateArgs& operator=(IAccessPointCreateArgs&&) = delete;
+
+    IAccessPointCreateArgs&
+    operator=(const IAccessPointCreateArgs&) = delete;
+
+    IAccessPointCreateArgs&
+    operator=(IAccessPointCreateArgs&&) = delete;
 };
 
 /**
@@ -77,28 +87,33 @@ struct IAccessPointFactory
     virtual ~IAccessPointFactory() = default;
 
     /**
-     * Prevent copying and moving of IAccessPointFactory objects. 
+     * Prevent copying and moving of IAccessPointFactory objects.
      */
     IAccessPointFactory(const IAccessPointFactory&) = delete;
-    IAccessPointFactory& operator=(const IAccessPointFactory&) = delete;
+
     IAccessPointFactory(IAccessPointFactory&&) = delete;
-    IAccessPointFactory& operator=(IAccessPointFactory&&) = delete;
+
+    IAccessPointFactory&
+    operator=(const IAccessPointFactory&) = delete;
+
+    IAccessPointFactory&
+    operator=(IAccessPointFactory&&) = delete;
 
     /**
      * @brief Create a new access point object for the given network interface.
-     * 
+     *
      * @param interfaceName The name of the interface.
-     * @return std::shared_ptr<IAccessPoint> 
+     * @return std::shared_ptr<IAccessPoint>
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName) = 0;
 
     /**
      * @brief Create a new access point object for the given network interface with the specified creation arguments.
-     * 
+     *
      * @param interfaceName The name of the interface.
      * @param createArgs Arguments to be passed to the access point during creation.
-     * @return std::shared_ptr<IAccessPoint> 
+     * @return std::shared_ptr<IAccessPoint>
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) = 0;
