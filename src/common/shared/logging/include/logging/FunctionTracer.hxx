@@ -14,6 +14,10 @@ namespace logging
 {
 /**
  * @brief Traces a function's entry and exit, logging the arguments and return values.
+ *
+ * Note that this does not behave in a thread-safe manner. It is unexpected that Enter() and Exit() calls would occur
+ * concurrently since it's expected that this is used as stack-allocated objects which will follow typical stack-based
+ * lifetime control, which is inherently single-threaded.  /
  */
 struct FunctionTracer
 {
@@ -79,7 +83,7 @@ private:
     std::vector<std::pair<std::string, std::string>> m_returnValues;
     bool m_entered{ false };
     bool m_exited{ false };
-    plog::Severity m_logSeverityEnter{ plog:: Severity::info };
+    plog::Severity m_logSeverityEnter{ plog::Severity::info };
     plog::Severity m_LogSeverityExit{ plog::Severity::info };
 };
 } // namespace logging

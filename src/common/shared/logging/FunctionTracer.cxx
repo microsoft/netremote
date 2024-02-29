@@ -69,6 +69,7 @@ FunctionTracer::~FunctionTracer()
 void
 FunctionTracer::Enter()
 {
+    // Note: this is not thread-safe.
     if (m_entered) {
         return;
     }
@@ -81,6 +82,7 @@ FunctionTracer::Enter()
 void
 FunctionTracer::Exit()
 {
+    // Note: this is not thread-safe.
     if (m_exited) {
         return;
     }
@@ -105,17 +107,17 @@ FunctionTracer::AddReturnValue(std::string name, std::string value)
 void
 FunctionTracer::SetSucceeded() noexcept
 {
-    m_exitLogSeverity = plog::Severity::info;
+    m_LogSeverityExit = plog::Severity::info;
 }
 
 void
 FunctionTracer::SetFailed() noexcept
 {
-    m_exitLogSeverity = plog::Severity::error;
+    m_LogSeverityExit = plog::Severity::error;
 }
 
 void
 FunctionTracer::SetExitLogSeverity(plog::Severity severity) noexcept
 {
-    m_exitLogSeverity = severity;
+    m_LogSeverityExit = severity;
 }
