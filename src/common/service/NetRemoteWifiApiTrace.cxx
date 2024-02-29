@@ -1,13 +1,15 @@
 
 #include <optional>
-#include <string>
 #include <source_location>
+#include <string>
 #include <utility>
+
+#include <magic_enum.hpp>
+#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <plog/Severity.h>
 
 #include "NetRemoteApiTrace.hxx"
 #include "NetRemoteWifiApiTrace.hxx"
-#include <magic_enum.hpp>
-#include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 
 using namespace Microsoft::Net::Remote::Service::Tracing;
 
