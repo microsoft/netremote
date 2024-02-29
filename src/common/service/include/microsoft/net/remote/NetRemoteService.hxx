@@ -99,33 +99,44 @@ private:
 protected:
     /**
      * @brief Attempt to obtain an IAccessPoint instance for the specified access point identifier.
-     * 
+     *
      * @param accessPointId The access point identifier.
      * @param accessPoint Output variable to receive the access point instance.
-     * @return Microsoft::Net::Wifi::AccessPointOperationStatus 
+     * @return Microsoft::Net::Wifi::AccessPointOperationStatus
      */
     Microsoft::Net::Wifi::AccessPointOperationStatus
     TryGetAccessPoint(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint>& accessPoint);
 
     /**
      * @brief Attempt to obtain an IAccessPointController instance for the access point with the specified identifier.
-     * 
+     *
      * @param accessPointId The access point identifier.
      * @param accessPointController Output variable to receive the access point controller instance.
-     * @return Microsoft::Net::Wifi::AccessPointOperationStatus 
+     * @return Microsoft::Net::Wifi::AccessPointOperationStatus
      */
     Microsoft::Net::Wifi::AccessPointOperationStatus
     TryGetAccessPointController(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController>& accessPointController);
 
     /**
      * @brief Attempt to obtain an IAccessPointController instance for the specified access point.
-     * 
+     *
      * @param accessPoint The access point to obtain a controller for.
-     * @param accessPointController 
-     * @return Microsoft::Net::Wifi::AccessPointOperationStatus 
+     * @param accessPointController
+     * @return Microsoft::Net::Wifi::AccessPointOperationStatus
      */
     Microsoft::Net::Wifi::AccessPointOperationStatus
     TryGetAccessPointController(std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint> accessPoint, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController>& accessPointController);
+
+    /**
+     * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause
+     * the access point to temporarily go offline while the change is being applied.
+     *
+     * @param accessPointId The access point identifier.
+     * @param dot11PhyType The new PHY type to set.
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Microsoft::Net::Wifi::Dot11PhyType dot11PhyType);
 
 protected:
     /**
