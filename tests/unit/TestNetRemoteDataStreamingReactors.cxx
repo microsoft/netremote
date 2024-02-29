@@ -8,8 +8,6 @@ using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Test;
 
-using namespace std::chrono_literals;
-
 DataStreamWriter::DataStreamWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
     m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)
 {
@@ -42,9 +40,8 @@ grpc::Status
 DataStreamWriter::Await(DataStreamUploadResult* result)
 {
     std::unique_lock lock(m_writeStatusGate);
-    static constexpr auto timeoutValue = 10s;
 
-    const auto isDone = m_writesDone.wait_for(lock, timeoutValue, [this] {
+    const auto isDone = m_writesDone.wait_for(lock, m_writesDoneTimeoutValue, [this] {
         return m_done;
     });
 
@@ -102,9 +99,8 @@ grpc::Status
 DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus)
 {
     std::unique_lock lock(m_readStatusGate);
-    static constexpr auto timeoutValue = 10s;
 
-    const auto isDone = m_readsDone.wait_for(lock, timeoutValue, [this] {
+    const auto isDone = m_readsDone.wait_for(lock, m_readsDoneTimeoutValue, [this] {
         return m_done;
     });
 

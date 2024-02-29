@@ -2,12 +2,15 @@
 #ifndef TEST_NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 #define TEST_NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
+#include <chrono>
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
 
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
+
+using namespace std::chrono_literals;
 
 namespace Microsoft::Net::Remote::Test
 {
@@ -59,6 +62,8 @@ private:
     NextWrite();
 
 private:
+    static inline constexpr auto c_defaultTimeoutValue{ 10s };
+
     grpc::ClientContext m_clientContext{};
     Microsoft::Net::Remote::DataStream::DataStreamUploadData m_data{};
     Microsoft::Net::Remote::DataStream::DataStreamUploadResult m_result{};
@@ -68,6 +73,7 @@ private:
     std::mutex m_writeStatusGate{};
     std::condition_variable m_writesDone{};
     bool m_done{ false };
+    std::chrono::duration<uint32_t> m_writesDoneTimeoutValue{ c_defaultTimeoutValue };
 };
 
 /**
@@ -112,6 +118,8 @@ public:
     Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
 
 private:
+    static inline constexpr auto c_defaultTimeoutValue{ 10s };
+
     grpc::ClientContext m_clientContext{};
     Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_data{};
     uint32_t m_numberOfDataBlocksReceived{};
@@ -119,6 +127,7 @@ private:
     std::mutex m_readStatusGate{};
     std::condition_variable m_readsDone{};
     bool m_done{ false };
+    std::chrono::duration<uint32_t> m_readsDoneTimeoutValue{ c_defaultTimeoutValue };
 };
 
 } // namespace Microsoft::Net::Remote::Test
