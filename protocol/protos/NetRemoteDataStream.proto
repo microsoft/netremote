@@ -8,7 +8,7 @@ enum DataStreamOperationStatusCode
     DataStreamOperationStatusCodeUnknown = 0;
     DataStreamOperationStatusCodeSucceeded = 1;
     DataStreamOperationStatusCodeFailed = 2;
-    DataStreamOperationStatusCodeCancelled = 3;
+    DataStreamOperationStatusCodeCanceled = 3;
     DataStreamOperationStatusCodeTimedOut = 4;
 }
 

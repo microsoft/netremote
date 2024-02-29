@@ -40,8 +40,8 @@ DataStreamReader::OnCancel()
     LOGD << "Enter OnCancel";
 
     m_result->set_numberofdatablocksreceived(m_numberOfDataBlocksReceived);
-    m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeCancelled);
-    m_readStatus.set_message("RPC cancelled");
+    m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeCanceled);
+    m_readStatus.set_message("RPC canceled");
     *m_result->mutable_status() = std::move(m_readStatus);
     Finish(grpc::Status::CANCELLED);
 }
@@ -95,9 +95,10 @@ DataStreamWriter::OnWriteDone(bool isOk)
 {
     LOGD << "Enter OnWriteDone";
 
-    // Client may have cancelled the RPC, so check for cancellation to prevent writing more data
+    // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
-    if (m_isCancelled.load(std::memory_order_relaxed)) {
+    if (m_isCanceled.load(std::memory_order_relaxed)) {
+        LOGD << "RPC canceled, returning early";
         return;
     }
 
@@ -125,9 +126,9 @@ DataStreamWriter::OnCancel()
 {
     LOGD << "Enter OnCancel";
 
-    // The RPC is cancelled by the client, so call Finish to complete it from the server perspective.
-    if (!m_isCancelled.load(std::memory_order_relaxed)) {
-        m_isCancelled.store(true, std::memory_order_relaxed);
+    // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
+    if (!m_isCanceled.load(std::memory_order_relaxed)) {
+        m_isCanceled.store(true, std::memory_order_relaxed);
         Finish(grpc::Status::CANCELLED);
     }
 }
@@ -144,9 +145,10 @@ DataStreamWriter::NextWrite()
 {
     LOGD << "Enter NextWrite";
 
-    // Client may have cancelled the RPC, so check for cancellation to prevent writing more data
+    // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
-    if (m_isCancelled.load(std::memory_order_relaxed)) {
+    if (m_isCanceled.load(std::memory_order_relaxed)) {
+        LOGD << "RPC canceled, aborting write";
         return;
     }
 
