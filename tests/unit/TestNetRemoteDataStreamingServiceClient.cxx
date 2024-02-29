@@ -107,11 +107,11 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         DataStreamDownloadRequest request{};
         *request.mutable_properties() = std::move(properties);
 
-        auto dataStreamReader = std::make_unique<DataStreamReader>(client.get(), &request);
+        DataStreamReader dataStreamReader{ client.get(), &request };
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        grpc::Status status = dataStreamReader->Await(&numberOfDataBlocksReceived, &operationStatus);
+        grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived == fixedNumberOfDataBlocksToStream);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
