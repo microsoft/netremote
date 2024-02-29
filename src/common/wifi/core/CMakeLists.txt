@@ -9,7 +9,6 @@ target_sources(wifi-core
     PRIVATE
         AccessPoint.cxx
         AccessPointController.cxx
-        AccessPointControllerException.cxx
         AccessPointOperationStatus.cxx
         AccessPointOperationStatusLogOnExit.cxx
         Ieee80211AccessPointCapabilities.cxx
