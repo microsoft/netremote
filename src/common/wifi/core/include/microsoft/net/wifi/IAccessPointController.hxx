@@ -15,21 +15,6 @@
 namespace Microsoft::Net::Wifi
 {
 /**
- * @brief Top-level exception type that may ber thrown by IAccessPointController operations.
- */
-struct AccessPointControllerException :
-    public std::exception
-{
-    explicit AccessPointControllerException(std::string_view what);
-
-    const char*
-    what() const noexcept override;
-
-private:
-    std::string m_what;
-};
-
-/**
  * @brief Class allowing control of an access point.
  */
 struct IAccessPointController

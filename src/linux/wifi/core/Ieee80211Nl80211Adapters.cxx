@@ -13,6 +13,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <plog/Log.h>
 
 #include "Ieee80211Nl80211Adapters.hxx"
 
@@ -113,7 +114,8 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode)
     case Wpa::HostapdHwMode::Ieee80211any:
         return Wpa::ProtocolHostapd::PropertyHwModeValueAny;
     default: // case Wpa::HostapdHwMode::Unknown
-        throw AccessPointControllerException(std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode)));
+        LOGE << std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode));
+        return "invalid";
     }
 }
 
@@ -128,7 +130,8 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
     case Ieee80211FrequencyBand::SixGHz:
         return Wpa::ProtocolHostapd::PropertySetBandValue6G;
     default:
-        throw AccessPointControllerException(std::format("Invalid ieee80211 frequency band value {}", magic_enum::enum_name(ieeeFrequencyBand)));
+        LOGE << std::format("Invalid ieee80211 frequency band value {}", magic_enum::enum_name(ieeeFrequencyBand));
+        return "invalid";
     }
 }
 } // namespace Microsoft::Net::Wifi
