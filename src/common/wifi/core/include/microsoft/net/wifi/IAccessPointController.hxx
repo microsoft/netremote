@@ -15,21 +15,6 @@
 namespace Microsoft::Net::Wifi
 {
 /**
- * @brief Top-level exception type that may ber thrown by IAccessPointController operations.
- */
-struct AccessPointControllerException :
-    public std::exception
-{
-    explicit AccessPointControllerException(std::string_view what);
-
-    const char*
-    what() const noexcept override;
-
-private:
-    std::string m_what;
-};
-
-/**
  * @brief Class allowing control of an access point.
  */
 struct IAccessPointController
@@ -60,7 +45,7 @@ struct IAccessPointController
      * @return std::string_view
      */
     virtual std::string_view
-    GetInterfaceName() const = 0;
+    GetInterfaceName() const noexcept = 0;
 
     /**
      * @brief Get the access point operational state.
@@ -69,7 +54,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    GetOperationalState(AccessPointOperationalState& operationalState) = 0;
+    GetOperationalState(AccessPointOperationalState& operationalState) noexcept = 0;
 
     /**
      * @brief Get the capabilities of the access point.
@@ -78,7 +63,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) = 0;
+    GetCapabilities(Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept = 0;
 
     /**
      * @brief Set the operational state of the access point.
@@ -87,7 +72,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    SetOperationalState(AccessPointOperationalState operationalState) = 0;
+    SetOperationalState(AccessPointOperationalState operationalState) noexcept = 0;
 
     /**
      * @brief Set the Ieee80211 protocol of the access point.
@@ -96,7 +81,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    SetProtocol(Ieee80211Protocol ieeeProtocol) = 0;
+    SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept = 0;
 
     /**
      * @brief Set the frquency bands the access point should enable.
@@ -105,7 +90,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) = 0;
+    SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) noexcept = 0;
 
     /**
      * @brief Set the SSID of the access point.
@@ -114,7 +99,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    SetSssid(std::string_view ssid) = 0;
+    SetSssid(std::string_view ssid) noexcept = 0;
 };
 
 /**
