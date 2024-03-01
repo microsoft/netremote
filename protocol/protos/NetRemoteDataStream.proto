@@ -8,7 +8,7 @@ enum DataStreamOperationStatusCode
     DataStreamOperationStatusCodeUnknown = 0;
     DataStreamOperationStatusCodeSucceeded = 1;
     DataStreamOperationStatusCodeFailed = 2;
-    DataStreamOperationStatusCodeCancelled = 3;
+    DataStreamOperationStatusCodeCanceled = 3;
     DataStreamOperationStatusCodeTimedOut = 4;
 }
 
@@ -23,8 +23,54 @@ message DataStreamUploadData
     bytes Data = 1;
 }
 
+message DataStreamDownloadData
+{
+    DataStreamOperationStatus Status = 1;
+    bytes Data = 2;
+    uint32 SequenceNumber = 3;
+}
+
 message DataStreamUploadResult
 {
-    uint32 NumberOfDataBlocksReceived = 1;
-    DataStreamOperationStatus Status = 2;
+    DataStreamOperationStatus Status = 1;
+    uint32 NumberOfDataBlocksReceived = 2;
+}
+
+enum DataStreamType
+{
+    DataStreamTypeUnknown = 0;
+    DataStreamTypeFixed = 1;
+    DataStreamTypeContinuous = 2;
+}
+
+enum DataStreamPattern
+{
+    DataStreamPatternUnknown = 0;
+    DataStreamPatternConstant = 1;
+}
+
+message DataStreamFixedTypeProperties
+{
+    uint32 NumberOfDataBlocksToStream = 1;
+}
+
+message DataStreamContinuousTypeProperties
+{
+
+}
+
+message DataStreamProperties
+{
+    DataStreamType Type = 1;
+    DataStreamPattern Pattern = 2;
+    oneof Properties
+    {
+        DataStreamFixedTypeProperties Fixed = 3;
+        DataStreamContinuousTypeProperties Continuous = 4;
+    }
+}
+
+message DataStreamDownloadRequest
+{
+    DataStreamProperties Properties = 1;
 }
