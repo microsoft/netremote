@@ -10,4 +10,5 @@ service NetRemoteDataStreaming
 {
     rpc DataStreamUpload (stream Microsoft.Net.Remote.DataStream.DataStreamUploadData) returns (Microsoft.Net.Remote.DataStream.DataStreamUploadResult);
     rpc DataStreamDownload (Microsoft.Net.Remote.DataStream.DataStreamDownloadRequest) returns (stream Microsoft.Net.Remote.DataStream.DataStreamDownloadData);
+    rpc DataStreamBidirectional (stream Microsoft.Net.Remote.DataStream.DataStreamUploadData) returns (stream Microsoft.Net.Remote.DataStream.DataStreamDownloadData);
 }
