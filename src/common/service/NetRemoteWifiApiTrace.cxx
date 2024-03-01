@@ -30,13 +30,16 @@ NetRemoteWifiApiTrace::NetRemoteWifiApiTrace(std::optional<std::string> accessPo
 
 NetRemoteWifiApiTrace::~NetRemoteWifiApiTrace()
 {
-    if (m_operationStatus != nullptr) {
-        AddReturnValue(ArgNameStatus, std::string(magic_enum::enum_name(m_operationStatus->code())));
-        if (m_operationStatus->code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-            AddReturnValue(ArgNameErrorMessage, m_operationStatus->message());
-            SetFailed();
-        } else {
-            SetSucceeded();
-        }
+    if (m_operationStatus == nullptr) {
+        return;
+    }
+
+    AddReturnValue(ArgNameStatus, std::string(magic_enum::enum_name(m_operationStatus->code())));
+
+    if (m_operationStatus->code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+        AddReturnValue(ArgNameErrorMessage, m_operationStatus->message());
+        SetFailed();
+    } else {
+        SetSucceeded();
     }
 }
