@@ -112,9 +112,6 @@ HandleFailure(RequestT& request, ResultT& result, const AccessPointOperationStat
     return HandleFailure(request, result, operationStatus.Code, operationStatus.ToString(), returnValue);
 }
 
-std::shared_ptr<IAccessPoint>
-TryGetAccessPoint(std::string_view accessPointId);
-
 /**
  * @brief Attempt to obtain an IAccessPoint instance for the access point in the specified request message.
  *
@@ -397,46 +394,11 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    // // Validate basic parameters in the request.
-    // if (!ValidateWifiSetFrequencyBandsRequest(request, result)) {
-    //     return grpc::Status::OK;
-    // }
+    auto dot11FrequencyBands = ToDot11FrequencyBands(*request);
 
-    // Create an AP controller for the requested AP.
-    auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
-    if (accessPointController == nullptr) {
-        return grpc::Status::OK;
-    }
-
-    // Convert dot11 bands to ieee80211 bands.
-    auto ieee80211FrequencyBands = FromDot11SetFrequencyBandsRequest(*request);
-
-    // Obtain capabilities of the access point.
-    Ieee80211AccessPointCapabilities accessPointCapabilities{};
-    auto operationStatus = accessPointController->GetCapabilities(accessPointCapabilities);
-    if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get capabilities for access point {}", request->accesspointid()));
-    }
-
-    // Check if requested bands are supported by the AP.
-    for (const auto& requestedFrequencyBand : ieee80211FrequencyBands) {
-        if (std::ranges::find(accessPointCapabilities.FrequencyBands, requestedFrequencyBand) == std::cend(accessPointCapabilities.FrequencyBands)) {
-            return HandleFailure(request, result, WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported, std::format("Frequency band {} not supported by access point {}", magic_enum::enum_name(requestedFrequencyBand), request->accesspointid()));
-        }
-    }
-
-    // Attempt to set the frequency bands.
-    operationStatus = accessPointController->SetFrequencyBands(std::move(ieee80211FrequencyBands));
-    if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set frequency bands for access point {} ({})", request->accesspointid(), operationStatus.ToString()));
-    }
-
-    // Prepare result with success indication.
-    WifiAccessPointOperationStatus status{};
-    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-
+    auto wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(request->accesspointid(), dot11FrequencyBands);
     result->set_accesspointid(request->accesspointid());
-    *result->mutable_status() = std::move(status);
+    *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
 }
