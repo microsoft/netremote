@@ -183,15 +183,27 @@ DataStreamWriter::NextWrite()
 
     if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous ||
         (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed && m_numberOfDataBlocksToStream > 0)) {
-        // Create data to write to the client.
-        const auto data = m_dataGenerator.GenerateRandomData();
-        m_numberOfDataBlocksWritten++;
+        // Check the requested data streaming pattern.
+        const auto pattern = m_dataStreamProperties.pattern();
 
-        // Write data to the client.
-        m_data.set_data(data);
-        m_data.set_sequencenumber(m_numberOfDataBlocksWritten);
-        *m_data.mutable_status() = m_writeStatus;
-        StartWrite(&m_data);
+        switch (pattern) {
+        // Generate data with the constant default size and write to the client at a constant speed.
+        case DataStreamPattern::DataStreamPatternConstant: {
+            // Create data to write to the client.
+            const auto data = m_dataGenerator.GenerateRandomData();
+            m_numberOfDataBlocksWritten++;
+
+            // Write data to the client.
+            m_data.set_data(data);
+            m_data.set_sequencenumber(m_numberOfDataBlocksWritten);
+            *m_data.mutable_status() = m_writeStatus;
+            StartWrite(&m_data);
+
+            break;
+        }
+        default:
+            HandleFailure(std::format("Unexpected data stream pattern {}", magic_enum::enum_name(pattern)));
+        };
     } else {
         // No more data to write.
         Finish(::grpc::Status::OK);
