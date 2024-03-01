@@ -16,6 +16,8 @@
 
 #include "NetRemoteDataStreamingReactors.hxx"
 
+using logging::FunctionTracer;
+
 namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 {
 DataGenerator::DataGenerator()
@@ -50,14 +52,14 @@ using namespace Microsoft::Net::Remote::Service::Reactors;
 DataStreamReader::DataStreamReader(DataStreamUploadResult* result) :
     m_result(result)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
     StartRead(&m_data);
 }
 
 void
 DataStreamReader::OnReadDone(bool isOk)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
 
     if (isOk) {
         m_numberOfDataBlocksReceived++;
@@ -76,7 +78,7 @@ DataStreamReader::OnReadDone(bool isOk)
 void
 DataStreamReader::OnCancel()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
 
     m_result->set_numberofdatablocksreceived(m_numberOfDataBlocksReceived);
     m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeCanceled);
@@ -88,13 +90,13 @@ DataStreamReader::OnCancel()
 void
 DataStreamReader::OnDone()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
     delete this;
 }
 
 DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
     m_dataStreamProperties = request->properties();
 
     switch (m_dataStreamProperties.type()) {
@@ -132,7 +134,7 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 void
 DataStreamWriter::OnWriteDone(bool isOk)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -163,7 +165,7 @@ DataStreamWriter::OnWriteDone(bool isOk)
 void
 DataStreamWriter::OnCancel()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
 
     // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
     bool isCanceledExpected{ false };
@@ -175,14 +177,14 @@ DataStreamWriter::OnCancel()
 void
 DataStreamWriter::OnDone()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
     delete this;
 }
 
 void
 DataStreamWriter::NextWrite()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -223,7 +225,7 @@ DataStreamWriter::NextWrite()
 void
 DataStreamWriter::HandleFailure(const std::string& errorMessage)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    FunctionTracer traceMe{};
 
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
     m_writeStatus.set_message(errorMessage);
