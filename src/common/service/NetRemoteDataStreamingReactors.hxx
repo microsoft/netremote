@@ -4,10 +4,50 @@
 
 #include <atomic>
 #include <cstdint>
+#include <random>
 #include <string>
 
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
+
+namespace Microsoft::Net::Remote::Service::Reactors::Helpers
+{
+/**
+ * @brief A simple random data generator.
+ */
+class DataGenerator
+{
+public:
+    static constexpr std::size_t c_defaultDataLength{ 8 };
+
+    /**
+     * @brief Construct a DataGenerator object.
+     *
+     */
+    explicit DataGenerator();
+
+    /**
+     * @brief Generate a random data string of the specified length.
+     *
+     * @param length The length of the random data string.
+     * @return std::string
+     */
+    std::string
+    GenerateRandomData(const std::size_t length = c_defaultDataLength);
+
+private:
+    /**
+     * @brief Generate a random byte of data.
+     *
+     * @return uint8_t
+     */
+    uint8_t
+    GetRandomByte();
+
+private:
+    std::mt19937 m_generator{};
+};
+} // namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 
 namespace Microsoft::Net::Remote::Service::Reactors
 {
@@ -108,6 +148,7 @@ private:
     uint32_t m_numberOfDataBlocksWritten{};
     Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_writeStatus{};
     std::atomic<bool> m_isCanceled{};
+    Microsoft::Net::Remote::Service::Reactors::Helpers::DataGenerator m_dataGenerator{};
 };
 } // namespace Microsoft::Net::Remote::Service::Reactors
 

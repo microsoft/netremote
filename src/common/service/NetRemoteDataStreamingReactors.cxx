@@ -5,6 +5,34 @@
 #include <magic_enum.hpp>
 #include <plog/Log.h>
 
+namespace Microsoft::Net::Remote::Service::Reactors::Helpers
+{
+DataGenerator::DataGenerator()
+{
+    m_generator.seed(std::random_device{}());
+}
+
+std::string
+DataGenerator::GenerateRandomData(const std::size_t length)
+{
+    std::string result;
+    result.reserve(length);
+
+    for (std::size_t i = 0; i < length; i++) {
+        result.push_back(static_cast<char>(GetRandomByte()));
+    }
+
+    return result;
+}
+
+uint8_t
+DataGenerator::GetRandomByte()
+{
+    std::uniform_int_distribution<uint8_t> distribution(0, std::numeric_limits<uint8_t>::max());
+    return distribution(m_generator);
+}
+} // namespace Microsoft::Net::Remote::Service::Reactors::Helpers
+
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service::Reactors;
 
@@ -154,14 +182,27 @@ DataStreamWriter::NextWrite()
 
     if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous ||
         (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed && m_numberOfDataBlocksToStream > 0)) {
-        // Create data to write to the client.
-        const auto data = std::format("Data #{}", ++m_numberOfDataBlocksWritten);
+        // Check the requested data streaming pattern.
+        const auto pattern = m_dataStreamProperties.pattern();
 
-        // Write data to the client.
-        m_data.set_data(data);
-        m_data.set_sequencenumber(m_numberOfDataBlocksWritten);
-        *m_data.mutable_status() = m_writeStatus;
-        StartWrite(&m_data);
+        switch (pattern) {
+        // Generate data with the constant default size and write to the client at a constant speed.
+        case DataStreamPattern::DataStreamPatternConstant: {
+            // Create data to write to the client.
+            const auto data = m_dataGenerator.GenerateRandomData();
+            m_numberOfDataBlocksWritten++;
+
+            // Write data to the client.
+            m_data.set_data(data);
+            m_data.set_sequencenumber(m_numberOfDataBlocksWritten);
+            *m_data.mutable_status() = m_writeStatus;
+            StartWrite(&m_data);
+
+            break;
+        }
+        default:
+            HandleFailure(std::format("Unexpected data stream pattern {}", magic_enum::enum_name(pattern)));
+        };
     } else {
         // No more data to write.
         Finish(::grpc::Status::OK);
