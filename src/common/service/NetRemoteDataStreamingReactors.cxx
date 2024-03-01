@@ -235,3 +235,45 @@ DataStreamWriter::HandleFailure(const std::string& errorMessage)
     // DataStreamOperationStatusCodeFailed status code set here to know to complete the RPC.
     StartWrite(&m_data);
 }
+
+DataStreamReaderWriter::DataStreamReaderWriter()
+{
+    const FunctionTracer traceMe{};
+}
+
+void
+DataStreamReaderWriter::OnReadDone(bool isOk)
+{
+    const FunctionTracer traceMe{};
+}
+
+void
+DataStreamReaderWriter::OnWriteDone(bool isOk)
+{
+    const FunctionTracer traceMe{};
+}
+
+void
+DataStreamReaderWriter::OnCancel()
+{
+    const FunctionTracer traceMe{};
+}
+
+void
+DataStreamReaderWriter::OnDone()
+{
+    const FunctionTracer traceMe{};
+    delete this;
+}
+
+void
+DataStreamReaderWriter::NextWrite()
+{
+    const FunctionTracer traceMe{};
+}
+
+void
+DataStreamReaderWriter::HandleFailure(const std::string& errorMessage)
+{
+    const FunctionTracer traceMe{};
+}

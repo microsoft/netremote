@@ -34,5 +34,5 @@ NetRemoteDataStreamingService::DataStreamBidirectional([[maybe_unused]] grpc::Ca
 {
     const NetRemoteApiTrace traceMe{};
 
-    return nullptr;
+    return std::make_unique<Reactors::DataStreamReaderWriter>().release();
 }
