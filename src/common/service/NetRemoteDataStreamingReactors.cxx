@@ -30,8 +30,8 @@ DataGenerator::GenerateRandomData(const std::size_t length)
 uint8_t
 DataGenerator::GetRandomByte()
 {
-    std::uniform_int_distribution<uint8_t> distribution(0, std::numeric_limits<uint8_t>::max());
-    return distribution(m_generator);
+    std::uniform_int_distribution<uint32_t> distribution(0, std::numeric_limits<uint8_t>::max());
+    return static_cast<uint8_t>(distribution(m_generator));
 }
 } // namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 
