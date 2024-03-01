@@ -33,7 +33,7 @@ public:
      * @return std::string
      */
     std::string
-    GenerateRandomData(std::size_t length = c_defaultDataLength);
+    GenerateRandomData(const std::size_t length = c_defaultDataLength);
 
 private:
     /**
@@ -45,7 +45,7 @@ private:
     GetRandomByte();
 
 private:
-    std::mt19937_64 m_generator{};
+    std::mt19937 m_generator{};
 };
 } // namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 

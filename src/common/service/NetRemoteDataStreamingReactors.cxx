@@ -9,12 +9,11 @@ namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 {
 DataGenerator::DataGenerator()
 {
-    std::random_device randomDevice;
-    m_generator.seed(randomDevice());
+    m_generator.seed(std::random_device{}());
 }
 
 std::string
-DataGenerator::GenerateRandomData(std::size_t length)
+DataGenerator::GenerateRandomData(const std::size_t length)
 {
     std::string result;
     result.reserve(length);
@@ -29,7 +28,7 @@ DataGenerator::GenerateRandomData(std::size_t length)
 uint8_t
 DataGenerator::GetRandomByte()
 {
-    std::uniform_int_distribution<uint8_t> distribution(0, 255);
+    std::uniform_int_distribution<uint8_t> distribution(0, std::numeric_limits<uint8_t>::max());
     return distribution(m_generator);
 }
 } // namespace Microsoft::Net::Remote::Service::Reactors::Helpers
