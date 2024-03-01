@@ -41,6 +41,15 @@ private:
      */
     grpc::ServerWriteReactor<Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
     DataStreamDownload(grpc::CallbackServerContext* context, const Microsoft::Net::Remote::DataStream::DataStreamDownloadRequest* request) override;
+
+    /**
+     * @brief Stream data from the client to the server and from the server to the client.
+     * 
+     * @param context
+     * @return grpc::ServerBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
+     */
+    grpc::ServerBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
+    DataStreamBidirectional(grpc::CallbackServerContext* context) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 

@@ -28,3 +28,11 @@ NetRemoteDataStreamingService::DataStreamDownload([[maybe_unused]] grpc::Callbac
 
     return std::make_unique<Reactors::DataStreamWriter>(request).release();
 }
+
+grpc::ServerBidiReactor<DataStreamUploadData, DataStreamDownloadData>*
+NetRemoteDataStreamingService::DataStreamBidirectional([[maybe_unused]] grpc::CallbackServerContext* context)
+{
+    const NetRemoteApiTrace traceMe{};
+
+    return nullptr;
+}
