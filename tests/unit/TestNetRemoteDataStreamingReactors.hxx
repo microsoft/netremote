@@ -84,7 +84,7 @@ class DataStreamReader :
 {
 public:
     /**
-     * @brief Construct a new DataStreamReader object with the client stub and specified number of data blocks to write.
+     * @brief Construct a new DataStreamReader object with the client stub and specified download request.
      *
      * @param client The data streaming client stub.
      * @param request The download request to be sent to the server.
@@ -134,6 +134,75 @@ private:
     std::condition_variable m_readsDone{};
     bool m_done{ false };
     std::chrono::duration<uint32_t> m_readsDoneTimeoutValue{ DefaultTimeoutValue };
+};
+
+/**
+ * @brief Implementation of the gRPC ClientBidiReactor for client-side data stream reading and writing.
+ */
+class DataStreamReaderWriter : public grpc::ClientBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>
+{
+public:
+    /**
+     * @brief Construct a new DataStreamReaderWriter object with the client stub and specified number of data blocks to write.
+     *
+     * @param client The data streaming client stub.
+     * @param numberOfDataBlocksToWrite The number of data blocks to write to the server.
+     */
+    explicit DataStreamReaderWriter(Microsoft::Net::Remote::Service::NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite);
+
+    /**
+     * @brief Callback that is executed when a read operation is completed.
+     *
+     * @param isOk Indicates whether a message was read as expected.
+     */
+    void
+    OnReadDone(bool isOk) override;
+
+    /**
+     * @brief Callback that is executed when a write operation is completed.
+     *
+     * @param isOk Indicates whether a write was successfully sent.
+     */
+    void
+    OnWriteDone(bool isOk) override;
+
+    /**
+     * @brief Callback that is executed when all RPC operations are completed for a given RPC.
+     *
+     * @param status The status of the RPC sent by the server or provided by the library to indicate a failure.
+     */
+    void
+    OnDone(const grpc::Status& status) override;
+
+    /**
+     * @brief Wait for all operations to complete and transfer the status to the status output parameter.
+     *
+     * @param operationStatus The status of the read/write data operations.
+     * @return grpc::Status
+     */
+    grpc::Status
+    Await(Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
+
+private:
+    /**
+     * @brief Facilitate the next write operation.
+     */
+    void
+    NextWrite();
+
+private:
+    static inline constexpr auto DefaultTimeoutValue{ 10s };
+
+    grpc::ClientContext m_clientContext{};
+    Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_readData{};
+    Microsoft::Net::Remote::DataStream::DataStreamUploadData m_writeData{};
+    uint32_t m_numberOfDataBlocksToWrite{};
+    uint32_t m_numberOfDataBlocksWritten{};
+    uint32_t m_numberOfDataBlocksReceived{};
+    grpc::Status m_operationStatus{};
+    std::mutex m_operationStatusGate{};
+    std::condition_variable m_operationsDone{};
+    bool m_done{ false };
 };
 
 } // namespace Microsoft::Net::Remote::Test
