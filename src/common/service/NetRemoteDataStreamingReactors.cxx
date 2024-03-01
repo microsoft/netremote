@@ -1,11 +1,22 @@
 
+#include <atomic>
+#include <cstdint>
+#include <cstdlib>
 #include <format>
+#include <limits>
+#include <random>
+#include <string>
+#include <utility>
 
-#include "NetRemoteDataStreamingReactors.hxx"
+#include <grpcpp/impl/codegen/status.h>
 #include <logging/FunctionTracer.hxx>
 #include <magic_enum.hpp>
+#include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <plog/Log.h>
-#include <plog/Severity.h>
+
+#include "NetRemoteDataStreamingReactors.hxx"
+
+using logging::FunctionTracer;
 
 namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 {
@@ -41,14 +52,14 @@ using namespace Microsoft::Net::Remote::Service::Reactors;
 DataStreamReader::DataStreamReader(DataStreamUploadResult* result) :
     m_result(result)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
     StartRead(&m_data);
 }
 
 void
 DataStreamReader::OnReadDone(bool isOk)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
 
     if (isOk) {
         m_numberOfDataBlocksReceived++;
@@ -67,7 +78,7 @@ DataStreamReader::OnReadDone(bool isOk)
 void
 DataStreamReader::OnCancel()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
 
     m_result->set_numberofdatablocksreceived(m_numberOfDataBlocksReceived);
     m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeCanceled);
@@ -79,14 +90,14 @@ DataStreamReader::OnCancel()
 void
 DataStreamReader::OnDone()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
     delete this;
 }
 
-DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
+DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request) :
+    m_dataStreamProperties(request->properties())
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
-    m_dataStreamProperties = request->properties();
+    const FunctionTracer traceMe{};
 
     switch (m_dataStreamProperties.type()) {
     case DataStreamType::DataStreamTypeFixed: {
@@ -123,7 +134,7 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 void
 DataStreamWriter::OnWriteDone(bool isOk)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -154,7 +165,7 @@ DataStreamWriter::OnWriteDone(bool isOk)
 void
 DataStreamWriter::OnCancel()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
 
     // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
     bool isCanceledExpected{ false };
@@ -166,14 +177,14 @@ DataStreamWriter::OnCancel()
 void
 DataStreamWriter::OnDone()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
     delete this;
 }
 
 void
 DataStreamWriter::NextWrite()
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -214,7 +225,7 @@ DataStreamWriter::NextWrite()
 void
 DataStreamWriter::HandleFailure(const std::string& errorMessage)
 {
-    logging::FunctionTracer traceMe(plog::Severity::debug);
+    const FunctionTracer traceMe{};
 
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
     m_writeStatus.set_message(errorMessage);

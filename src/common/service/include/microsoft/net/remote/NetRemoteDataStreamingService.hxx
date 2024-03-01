@@ -2,6 +2,8 @@
 #ifndef NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 #define NET_REMOTE_DATA_STREAMING_SERVICE_HXX
 
+#include <grpcpp/server_context.h>
+#include <grpcpp/support/server_callback.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 

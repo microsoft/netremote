@@ -18,7 +18,7 @@ namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 class DataGenerator
 {
 public:
-    static constexpr std::size_t c_defaultDataLength{ 8 };
+    static constexpr std::size_t DefaultDataLength{ 8 };
 
     /**
      * @brief Construct a DataGenerator object.
@@ -33,7 +33,7 @@ public:
      * @return std::string
      */
     std::string
-    GenerateRandomData(const std::size_t length = c_defaultDataLength);
+    GenerateRandomData(const std::size_t length = DefaultDataLength);
 
 private:
     /**
