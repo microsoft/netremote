@@ -3,6 +3,7 @@
 
 #include "NetRemoteDataStreamingReactors.hxx"
 #include <magic_enum.hpp>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service::Reactors;
@@ -10,12 +11,15 @@ using namespace Microsoft::Net::Remote::Service::Reactors;
 DataStreamReader::DataStreamReader(DataStreamUploadResult* result) :
     m_result(result)
 {
+    LOGD << "Enter constructor";
     StartRead(&m_data);
 }
 
 void
 DataStreamReader::OnReadDone(bool isOk)
 {
+    LOGD << "Enter OnReadDone";
+
     if (isOk) {
         m_numberOfDataBlocksReceived++;
         m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeSucceeded);
@@ -33,9 +37,11 @@ DataStreamReader::OnReadDone(bool isOk)
 void
 DataStreamReader::OnCancel()
 {
+    LOGD << "Enter OnCancel";
+
     m_result->set_numberofdatablocksreceived(m_numberOfDataBlocksReceived);
-    m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeCancelled);
-    m_readStatus.set_message("RPC cancelled");
+    m_readStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeCanceled);
+    m_readStatus.set_message("RPC canceled");
     *m_result->mutable_status() = std::move(m_readStatus);
     Finish(grpc::Status::CANCELLED);
 }
@@ -43,11 +49,13 @@ DataStreamReader::OnCancel()
 void
 DataStreamReader::OnDone()
 {
+    LOGD << "Enter OnDone";
     delete this;
 }
 
 DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 {
+    LOGD << "Enter constructor";
     m_dataStreamProperties = request->properties();
 
     switch (m_dataStreamProperties.type()) {
@@ -85,6 +93,15 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
 void
 DataStreamWriter::OnWriteDone(bool isOk)
 {
+    LOGD << "Enter OnWriteDone";
+
+    // Client may have canceled the RPC, so check for cancelation to prevent writing more data
+    // when we shouldn't.
+    if (m_isCanceled.load(std::memory_order_relaxed)) {
+        LOGD << "RPC canceled, returning early";
+        return;
+    }
+
     // Check for a failed status code from HandleWriteFailure since that invoked a final write, thus causing this callback to be invoked.
     if (m_writeStatus.code() == DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed) {
         Finish(::grpc::Status::OK);
@@ -107,19 +124,34 @@ DataStreamWriter::OnWriteDone(bool isOk)
 void
 DataStreamWriter::OnCancel()
 {
-    // The RPC is cancelled by the client, so call Finish to complete it from the server perspective.
-    Finish(grpc::Status::CANCELLED);
+    LOGD << "Enter OnCancel";
+
+    // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
+    bool isCanceledExpected{ false };
+    if (m_isCanceled.compare_exchange_strong(isCanceledExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
+        Finish(grpc::Status::CANCELLED);
+    }
 }
 
 void
 DataStreamWriter::OnDone()
 {
+    LOGD << "Enter OnDone";
     delete this;
 }
 
 void
 DataStreamWriter::NextWrite()
 {
+    LOGD << "Enter NextWrite";
+
+    // Client may have canceled the RPC, so check for cancelation to prevent writing more data
+    // when we shouldn't.
+    if (m_isCanceled.load(std::memory_order_relaxed)) {
+        LOGD << "RPC canceled, aborting write";
+        return;
+    }
+
     if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous ||
         (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed && m_numberOfDataBlocksToStream > 0)) {
         // Create data to write to the client.
@@ -139,6 +171,8 @@ DataStreamWriter::NextWrite()
 void
 DataStreamWriter::HandleFailure(const std::string& errorMessage)
 {
+    LOGD << "Enter HandleFailure";
+
     m_writeStatus.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
     m_writeStatus.set_message(errorMessage);
     *m_data.mutable_status() = m_writeStatus;

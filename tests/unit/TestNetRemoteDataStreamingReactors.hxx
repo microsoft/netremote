@@ -117,6 +117,12 @@ public:
     grpc::Status
     Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
 
+    /**
+     * @brief Cancel the ongoing RPC.
+     */
+    void
+    Cancel();
+
 private:
     static inline constexpr auto c_defaultTimeoutValue{ 10s };
 

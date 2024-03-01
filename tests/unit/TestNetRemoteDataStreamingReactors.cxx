@@ -3,6 +3,7 @@
 #include <format>
 
 #include "TestNetRemoteDataStreamingReactors.hxx"
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service;
@@ -124,4 +125,11 @@ DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperatio
     *operationStatus = m_data.status();
 
     return m_status;
+}
+
+void
+DataStreamReader::Cancel()
+{
+    LOGD << "Attempting to cancel RPC";
+    m_clientContext.TryCancel();
 }

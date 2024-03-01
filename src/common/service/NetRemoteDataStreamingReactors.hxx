@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 #define NET_REMOTE_DATA_STREAMING_REACTORS_HXX
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 
@@ -33,7 +34,7 @@ public:
     OnReadDone(bool isOk) override;
 
     /**
-     * @brief Callback that is executed when an RPC is cancelled before successfully sending a status to the client.
+     * @brief Callback that is executed when an RPC is canceled before successfully sending a status to the client.
      */
     void
     OnCancel() override;
@@ -74,7 +75,7 @@ public:
     OnWriteDone(bool isOk) override;
 
     /**
-     * @brief Callback that is executed when an RPC is cancelled before successfully sending a status to the client.
+     * @brief Callback that is executed when an RPC is canceled before successfully sending a status to the client.
      */
     void
     OnCancel() override;
@@ -106,6 +107,7 @@ private:
     uint32_t m_numberOfDataBlocksToStream{};
     uint32_t m_numberOfDataBlocksWritten{};
     Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_writeStatus{};
+    std::atomic<bool> m_isCanceled{};
 };
 } // namespace Microsoft::Net::Remote::Service::Reactors
 

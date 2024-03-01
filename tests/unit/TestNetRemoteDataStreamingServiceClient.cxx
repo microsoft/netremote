@@ -116,4 +116,29 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         REQUIRE(numberOfDataBlocksReceived == fixedNumberOfDataBlocksToStream);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
     }
+
+    SECTION("Can be called with DataStreamTypeContinuous and DataStreamPatternConstant")
+    {
+        DataStreamContinuousTypeProperties continuousTypeProperties{};
+
+        DataStreamProperties properties{};
+        properties.set_type(DataStreamType::DataStreamTypeContinuous);
+        properties.set_pattern(DataStreamPattern::DataStreamPatternConstant);
+        *properties.mutable_continuous() = std::move(continuousTypeProperties);
+
+        DataStreamDownloadRequest request{};
+        *request.mutable_properties() = std::move(properties);
+
+        DataStreamReader dataStreamReader{ client.get(), &request };
+
+        // Allow some time of continuous streaming by the server, then cancel the RPC.
+        std::this_thread::sleep_for(5s);
+        dataStreamReader.Cancel();
+
+        uint32_t numberOfDataBlocksReceived{};
+        DataStreamOperationStatus operationStatus{};
+        grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
+        REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
+        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+    }
 }
