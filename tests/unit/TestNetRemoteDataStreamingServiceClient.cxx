@@ -148,3 +148,35 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
     }
 }
+
+TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::DataStream;
+    using namespace Microsoft::Net::Remote::Service;
+
+    using Microsoft::Net::Remote::Test::DataStreamReaderWriter;
+    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+
+    const NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemoteDataStreaming::NewStub(channel);
+
+    static constexpr auto numberOfDataBlocksToStream = 10;
+
+    SECTION("Can be called")
+    {
+        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), numberOfDataBlocksToStream };
+
+        DataStreamOperationStatus operationStatus{};
+        const grpc::Status status = dataStreamReaderWriter.Await(&operationStatus);
+        REQUIRE(status.ok());
+        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+    }
+}
