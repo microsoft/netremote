@@ -14,11 +14,28 @@ namespace logging
 {
 /**
  * @brief Traces a function's entry and exit, logging the arguments and return values.
+ *
+ * Note that this does not behave in a thread-safe manner. It is unexpected that Enter() and Exit() calls would occur
+ * concurrently since it's expected that this is used as stack-allocated objects which will follow typical stack-based
+ * lifetime control, which is inherently single-threaded.
  */
 struct FunctionTracer
 {
-    FunctionTracer(std::string logPrefix = {}, std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current());
+    /**
+     * @brief Construct a new FunctionTracer object.
+     *
+     * @param logSeverityEnter The severity to log entrance with.
+     * @param logSeverityExit The severity to log exit with.
+     * @param logPrefix The prefix to use for both log messages.
+     * @param arguments The arguments the function was called with.
+     * @param deferEnter Whether to defer the call to Enter().
+     * @param location The source location information of the caller.
+     */
+    FunctionTracer(plog::Severity logSeverityEnter = LogSeverityEnterDefault, plog::Severity logSeverityExit = LogSeverityExitDefault, std::string logPrefix = {}, std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current());
 
+    /**
+     * @brief Destroy the FunctionTracer object.
+     */
     virtual ~FunctionTracer();
 
     /**
@@ -64,14 +81,29 @@ struct FunctionTracer
     SetFailed() noexcept;
 
     /**
-     * @brief Manually set the log severity for the exit log message. This overrides the SetSucceeded and SetFailed methods.
+     * @brief Manually set the log severity for the enter log message. This only has an effect if the object was created
+     * with deferEnter = true.
      *
-     * @param severity The log severity to use when printing the exit log message.
+     * @param logSeverityEnter The log severity to use when printing the entrance log message.
      */
     void
-    SetExitLogSeverity(plog::Severity severity) noexcept;
+    SetEnterLogSeverity(plog::Severity logSeverityEnter) noexcept;
+
+    /**
+     * @brief Manually set the log severity for the exit log message. This overrides the SetSucceeded and SetFailed methods.
+     *
+     * @param logSeverityExit The log severity to use when printing the exit log message.
+     */
+    void
+    SetExitLogSeverity(plog::Severity logSeverityExit) noexcept;
+
+protected:
+    static constexpr auto LogSeverityEnterDefault{ plog::Severity::debug };
+    static constexpr auto LogSeverityExitDefault{ plog::Severity::debug };
 
 private:
+    plog::Severity m_logSeverityEnter{ LogSeverityEnterDefault };
+    plog::Severity m_logSeverityExit{ LogSeverityExitDefault };
     std::string m_logPrefix;
     std::source_location m_location;
     std::string_view m_functionName;
@@ -79,7 +111,6 @@ private:
     std::vector<std::pair<std::string, std::string>> m_returnValues;
     bool m_entered{ false };
     bool m_exited{ false };
-    plog::Severity m_exitLogSeverity{ plog::Severity::info };
 };
 } // namespace logging
 

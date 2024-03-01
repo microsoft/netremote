@@ -19,7 +19,7 @@ struct AccessPoint :
 {
     /**
      * @brief Construct a new AccessPoint object with the given network interface name.
-     * 
+     *
      * @param interfaceName The network interface name representing the access point.
      * @param accessPointControllerFactory The factory used to create controller objects.
      */
@@ -31,7 +31,7 @@ struct AccessPoint :
      * @return std::string_view
      */
     std::string_view
-    GetInterfaceName() const override;
+    GetInterfaceName() const noexcept override;
 
     /**
      * @brief Create a controller object.
@@ -54,26 +54,26 @@ struct AccessPointFactory :
 {
     /**
      * @brief Construct a new Access Point Factory object
-     * 
-     * @param accessPointControllerFactory 
+     *
+     * @param accessPointControllerFactory
      */
     AccessPointFactory(std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory);
 
-     /**
+    /**
      * @brief Create a new access point object for the given network interface.
-     * 
-     * @param interfaceName 
-     * @return std::shared_ptr<IAccessPoint> 
+     *
+     * @param interfaceName
+     * @return std::shared_ptr<IAccessPoint>
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName) override;
 
     /**
      * @brief Create a new access point object for the given network interface with the specified creation arguments.
-     * 
+     *
      * @param interfaceName The name of the interface.
      * @param createArgs Arguments to be passed to the access point during creation.
-     * @return std::shared_ptr<IAccessPoint> 
+     * @return std::shared_ptr<IAccessPoint>
      */
     virtual std::shared_ptr<IAccessPoint>
     Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
@@ -81,8 +81,8 @@ struct AccessPointFactory :
 protected:
     /**
      * @brief Get the ControllerFactory object.
-     * 
-     * @return std::shared_ptr<IAccessPointControllerFactory> 
+     *
+     * @return std::shared_ptr<IAccessPointControllerFactory>
      */
     std::shared_ptr<IAccessPointControllerFactory>
     GetControllerFactory() const noexcept;

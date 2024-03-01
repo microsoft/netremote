@@ -56,7 +56,7 @@ struct AccessPointControllerTest final :
      * @return std::string_view
      */
     std::string_view
-    GetInterfaceName() const override;
+    GetInterfaceName() const noexcept override;
 
     /**
      * @brief Get the access point operational state.
@@ -65,7 +65,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    GetOperationalState(AccessPointOperationalState &operationalState) override;
+    GetOperationalState(AccessPointOperationalState &operationalState) noexcept override;
 
     /**
      * @brief Get the capabilities of the access point.
@@ -74,7 +74,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities) override;
+    GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities) noexcept override;
 
     /**
      * @brief Set the operational state of the access point.
@@ -83,7 +83,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetOperationalState(AccessPointOperationalState operationalState) override;
+    SetOperationalState(AccessPointOperationalState operationalState) noexcept override;
 
     /**
      * @brief Set the Ieee80211 protocol of the access point.
@@ -92,7 +92,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) override;
+    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) noexcept override;
 
     /**
      * @brief Set the frquency bands the access point should enable.
@@ -101,7 +101,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) override;
+    SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) noexcept override;
 
     /**
      * @brief Set the SSID of the access point.
@@ -110,7 +110,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetSssid(std::string_view ssid) override;
+    SetSssid(std::string_view ssid) noexcept override;
 };
 
 /**

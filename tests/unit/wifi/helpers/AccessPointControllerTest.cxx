@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <cassert>
 #include <format>
 #include <iterator>
 #include <memory>
@@ -24,20 +25,20 @@ AccessPointControllerTest::AccessPointControllerTest(AccessPointTest *accessPoin
 {}
 
 std::string_view
-AccessPointControllerTest::GetInterfaceName() const
+AccessPointControllerTest::GetInterfaceName() const noexcept
 {
-    if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::GetInterfaceName called with null AccessPoint");
-    }
+    assert(AccessPoint != nullptr);
 
     return AccessPoint->InterfaceName;
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &operationalState)
+AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &operationalState) noexcept
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::GetOperationalState called with null AccessPoint");
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
     operationalState = AccessPoint->OperationalState;
@@ -45,10 +46,12 @@ AccessPointControllerTest::GetOperationalState(AccessPointOperationalState &oper
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities)
+AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &ieee80211AccessPointCapabilities) noexcept
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::GetCapabilities called with null AccessPoint");
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
     ieee80211AccessPointCapabilities = AccessPoint->Capabilities;
@@ -56,10 +59,12 @@ AccessPointControllerTest::GetCapabilities(Ieee80211AccessPointCapabilities &iee
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetOperationalState(AccessPointOperationalState operationalState)
+AccessPointControllerTest::SetOperationalState(AccessPointOperationalState operationalState) noexcept
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::SetOperationalState called with null AccessPoint");
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
     AccessPoint->OperationalState = operationalState;
@@ -67,10 +72,12 @@ AccessPointControllerTest::SetOperationalState(AccessPointOperationalState opera
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
+AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
     AccessPoint->Protocol = ieeeProtocol;
@@ -78,10 +85,12 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol)
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands)
+AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) noexcept
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::SetIeeeProtocol called with null AccessPoint");
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
     for (const auto &frequencyBandToSet : frequencyBands) {
@@ -100,10 +109,12 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetSssid(std::string_view ssid)
+AccessPointControllerTest::SetSssid(std::string_view ssid) noexcept
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint == nullptr) {
-        throw std::runtime_error("AccessPointControllerTest::SetSssid called with null AccessPoint");
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
     AccessPoint->Ssid = ssid;
@@ -117,6 +128,8 @@ AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTe
 std::unique_ptr<IAccessPointController>
 AccessPointControllerFactoryTest::Create(std::string_view interfaceName)
 {
+    assert(AccessPoint != nullptr);
+
     if (AccessPoint != nullptr && interfaceName != AccessPoint->InterfaceName) {
         throw std::runtime_error("AccessPointControllerFactoryTest::Create called with unexpected interface name");
     }
