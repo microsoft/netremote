@@ -1,9 +1,15 @@
 
-#include <chrono>
+#include <cstdint>
 #include <format>
+#include <mutex>
+#include <utility>
+
+#include <grpcpp/impl/codegen/status.h>
+#include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
+#include <plog/Log.h>
 
 #include "TestNetRemoteDataStreamingReactors.hxx"
-#include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::DataStream;
 using namespace Microsoft::Net::Remote::Service;
@@ -30,7 +36,7 @@ DataStreamWriter::OnWriteDone(bool isOk)
 void
 DataStreamWriter::OnDone(const grpc::Status& status)
 {
-    std::unique_lock lock(m_writeStatusGate);
+    const std::unique_lock lock(m_writeStatusGate);
 
     m_status = status;
     m_done = true;
@@ -89,7 +95,7 @@ DataStreamReader::OnReadDone(bool isOk)
 void
 DataStreamReader::OnDone(const grpc::Status& status)
 {
-    std::unique_lock lock(m_readStatusGate);
+    const std::unique_lock lock(m_readStatusGate);
 
     m_status = status;
     m_done = true;

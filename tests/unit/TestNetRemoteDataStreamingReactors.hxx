@@ -62,7 +62,7 @@ private:
     NextWrite();
 
 private:
-    static inline constexpr auto c_defaultTimeoutValue{ 10s };
+    static inline constexpr auto DefaultTimeoutValue{ 10s };
 
     grpc::ClientContext m_clientContext{};
     Microsoft::Net::Remote::DataStream::DataStreamUploadData m_data{};
@@ -73,7 +73,7 @@ private:
     std::mutex m_writeStatusGate{};
     std::condition_variable m_writesDone{};
     bool m_done{ false };
-    std::chrono::duration<uint32_t> m_writesDoneTimeoutValue{ c_defaultTimeoutValue };
+    std::chrono::duration<uint32_t> m_writesDoneTimeoutValue{ DefaultTimeoutValue };
 };
 
 /**
@@ -124,7 +124,7 @@ public:
     Cancel();
 
 private:
-    static inline constexpr auto c_defaultTimeoutValue{ 10s };
+    static inline constexpr auto DefaultTimeoutValue{ 10s };
 
     grpc::ClientContext m_clientContext{};
     Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_data{};
@@ -133,7 +133,7 @@ private:
     std::mutex m_readStatusGate{};
     std::condition_variable m_readsDone{};
     bool m_done{ false };
-    std::chrono::duration<uint32_t> m_readsDoneTimeoutValue{ c_defaultTimeoutValue };
+    std::chrono::duration<uint32_t> m_readsDoneTimeoutValue{ DefaultTimeoutValue };
 };
 
 } // namespace Microsoft::Net::Remote::Test

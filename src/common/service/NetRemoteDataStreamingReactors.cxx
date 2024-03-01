@@ -6,6 +6,7 @@
 #include <limits>
 #include <random>
 #include <string>
+#include <utility>
 
 #include <grpcpp/impl/codegen/status.h>
 #include <logging/FunctionTracer.hxx>
@@ -93,10 +94,10 @@ DataStreamReader::OnDone()
     delete this;
 }
 
-DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request)
+DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request) :
+    m_dataStreamProperties(request->properties())
 {
     const FunctionTracer traceMe{};
-    m_dataStreamProperties = request->properties();
 
     switch (m_dataStreamProperties.type()) {
     case DataStreamType::DataStreamTypeFixed: {
