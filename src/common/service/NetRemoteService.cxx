@@ -4,6 +4,7 @@
 #include <format>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -500,6 +501,15 @@ NetRemoteService::TryGetAccessPointController(std::string_view accessPointId, st
     }
 
     return TryGetAccessPointController(accessPoint, accessPointController);
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointEnableImpl([[maybe_unused]] std::string_view accessPointId, [[maybe_unused]] const std::optional<Dot11AccessPointConfiguration>& dot11AccessPointConfiguration)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+    // TODO
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+    return wifiOperationStatus;
 }
 
 WifiAccessPointOperationStatus

@@ -3,12 +3,14 @@
 #define NET_REMOTE_SERVICE_HXX
 
 #include <memory>
+#include <optional>
 #include <string_view>
 
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/status.h>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -121,11 +123,21 @@ protected:
      * @brief Attempt to obtain an IAccessPointController instance for the specified access point.
      *
      * @param accessPoint The access point to obtain a controller for.
-     * @param accessPointController
+     * @param accessPointController Optional configuration to apply to the access point prior to enablement.
      * @return Microsoft::Net::Wifi::AccessPointOperationStatus
      */
     static Microsoft::Net::Wifi::AccessPointOperationStatus
     TryGetAccessPointController(const std::shared_ptr<Microsoft::Net::Wifi::IAccessPoint>& accessPoint, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController>& accessPointController);
+
+    /**
+     * @brief Enable an access point. This brings the access point online, making it available for use by clients.
+     *
+     * @param accessPointId The access point identifier.
+     * @param dot11AccessPointConfiguration
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointEnableImpl(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Dot11AccessPointConfiguration>& dot11AccessPointConfiguration);
 
     /**
      * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause
