@@ -171,7 +171,7 @@ DataStreamReaderWriter::OnWriteDone(bool isOk)
 void
 DataStreamReaderWriter::OnDone(const grpc::Status& status)
 {
-    std::unique_lock lock(m_operationStatusGate);
+    const std::unique_lock lock(m_operationStatusGate);
 
     m_operationStatus = status;
     m_done = true;

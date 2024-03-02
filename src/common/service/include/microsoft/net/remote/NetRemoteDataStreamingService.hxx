@@ -44,7 +44,7 @@ private:
 
     /**
      * @brief Stream data from the client to the server and from the server to the client.
-     * 
+     *
      * @param context
      * @return grpc::ServerBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
      */
