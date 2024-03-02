@@ -214,6 +214,7 @@ private:
     uint32_t m_numberOfDataBlocksWritten{};
     Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_status{};
     std::atomic<bool> m_isCanceled{};
+    std::atomic<bool> m_readsDone{};
     Microsoft::Net::Remote::Service::Reactors::Helpers::DataGenerator m_dataGenerator{};
 };
 } // namespace Microsoft::Net::Remote::Service::Reactors

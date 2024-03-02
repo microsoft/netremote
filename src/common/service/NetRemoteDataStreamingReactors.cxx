@@ -259,7 +259,10 @@ DataStreamReaderWriter::OnReadDone(bool isOk)
     } else {
         // A false "isOk" value could either mean a failed RPC or that no more data is available.
         // Unfortunately, there is no clear way to tell which situation occurred.
-        Finish(grpc::Status::OK);
+        bool readsDoneExpected{ false };
+        if (m_readsDone.compare_exchange_strong(readsDoneExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
+            Finish(grpc::Status::OK);
+        }
     }
 }
 
@@ -287,7 +290,11 @@ DataStreamReaderWriter::OnWriteDone(bool isOk)
         m_status.set_message("Data write successful");
         NextWrite();
     } else {
-        //HandleFailure("Data write failed");
+        // If OnReadDone() failed (due to no more data sent from the client), then Finish() was called and this write will fail.
+        // In that case, do not call HandleFailure() because that triggers another write. Otherwise, this is a true write failure.
+        if (!m_readsDone.load(std::memory_order_relaxed)) {
+            HandleFailure("Data write failed");
+        }
     }
 }
 
