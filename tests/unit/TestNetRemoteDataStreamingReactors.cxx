@@ -139,3 +139,75 @@ DataStreamReader::Cancel()
     LOGD << "Attempting to cancel RPC";
     m_clientContext.TryCancel();
 }
+
+DataStreamReaderWriter::DataStreamReaderWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
+    m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)
+{
+    client->async()->DataStreamBidirectional(&m_clientContext, this);
+    StartCall();
+    StartRead(&m_readData);
+    NextWrite();
+}
+
+void
+DataStreamReaderWriter::OnReadDone(bool isOk)
+{
+    if (isOk) {
+        m_numberOfDataBlocksReceived++;
+        StartRead(&m_readData);
+    }
+}
+
+void
+DataStreamReaderWriter::OnWriteDone(bool isOk)
+{
+    if (isOk) {
+        NextWrite();
+    } else {
+        StartWritesDone();
+    }
+}
+
+void
+DataStreamReaderWriter::OnDone(const grpc::Status& status)
+{
+    const std::unique_lock lock(m_operationStatusGate);
+
+    m_operationStatus = status;
+    m_done = true;
+    m_operationsDone.notify_one();
+}
+
+grpc::Status
+DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus)
+{
+    std::unique_lock lock(m_operationStatusGate);
+
+    const auto isDone = m_operationsDone.wait_for(lock, DefaultTimeoutValue, [this] {
+        return m_done;
+    });
+
+    // Handle timeout from waiting for reads to be completed.
+    if (!isDone) {
+        DataStreamOperationStatus status{};
+        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeTimedOut);
+        status.set_message("Timeout occurred while waiting for all operations to be completed");
+        *m_readData.mutable_status() = std::move(status);
+    }
+    *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
+    *operationStatus = m_readData.status();
+
+    return m_operationStatus;
+}
+
+void
+DataStreamReaderWriter::NextWrite()
+{
+    if (m_numberOfDataBlocksToWrite > 0) {
+        m_writeData.set_data(std::format("Data #{}", ++m_numberOfDataBlocksWritten));
+        StartWrite(&m_writeData);
+        m_numberOfDataBlocksToWrite--;
+    } else {
+        StartWritesDone();
+    }
+}

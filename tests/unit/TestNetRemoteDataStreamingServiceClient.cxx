@@ -1,4 +1,5 @@
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -145,6 +146,40 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         DataStreamOperationStatus operationStatus{};
         const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
         REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
+        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+    }
+}
+
+TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::DataStream;
+    using namespace Microsoft::Net::Remote::Service;
+
+    using Microsoft::Net::Remote::Test::DataStreamReaderWriter;
+    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+
+    const NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemoteDataStreaming::NewStub(channel);
+
+    static constexpr auto numberOfDataBlocksToStream = 10;
+
+    SECTION("Can be called")
+    {
+        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), numberOfDataBlocksToStream };
+
+        uint32_t numberOfDataBlocksReceived{};
+        DataStreamOperationStatus operationStatus{};
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus);
+        REQUIRE(status.ok());
+        REQUIRE(numberOfDataBlocksReceived > 0);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
     }
 }

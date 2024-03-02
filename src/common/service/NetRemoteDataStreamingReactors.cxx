@@ -235,3 +235,121 @@ DataStreamWriter::HandleFailure(const std::string& errorMessage)
     // DataStreamOperationStatusCodeFailed status code set here to know to complete the RPC.
     StartWrite(&m_data);
 }
+
+DataStreamReaderWriter::DataStreamReaderWriter()
+{
+    const FunctionTracer traceMe{};
+
+    m_status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeUnknown);
+    m_status.set_message("No data sent yet");
+    StartRead(&m_readData);
+    NextWrite();
+}
+
+void
+DataStreamReaderWriter::OnReadDone(bool isOk)
+{
+    const FunctionTracer traceMe{};
+
+    if (isOk) {
+        m_numberOfDataBlocksReceived++;
+        m_status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeSucceeded);
+        m_status.set_message("Data read successful");
+        StartRead(&m_readData);
+    } else {
+        // A false "isOk" value could either mean a failed RPC or that no more data is available.
+        // Unfortunately, there is no clear way to tell which situation occurred.
+        bool readsDoneExpected{ false };
+        if (m_readsDone.compare_exchange_strong(readsDoneExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
+            Finish(grpc::Status::OK);
+        }
+    }
+}
+
+void
+DataStreamReaderWriter::OnWriteDone(bool isOk)
+{
+    const FunctionTracer traceMe{};
+
+    // Client may have canceled the RPC, so check for cancelation to prevent writing more data
+    // when we shouldn't.
+    if (m_isCanceled.load(std::memory_order_relaxed)) {
+        LOGD << "RPC canceled, returning early";
+        return;
+    }
+
+    // Check for a failed status code from HandleWriteFailure since that invoked a final write, thus causing this callback to be invoked.
+    if (m_status.code() == DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed) {
+        Finish(::grpc::Status::OK);
+        return;
+    }
+
+    // Continue writing if previous write was successful, otherwise handle the failure.
+    if (isOk) {
+        m_status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeSucceeded);
+        m_status.set_message("Data write successful");
+        NextWrite();
+    } else {
+        // If OnReadDone() failed (due to no more data sent from the client), then Finish() was called and this write will fail.
+        // In that case, do not call HandleFailure() because that triggers another write. Otherwise, this is a true write failure.
+        if (!m_readsDone.load(std::memory_order_relaxed)) {
+            HandleFailure("Data write failed");
+        }
+    }
+}
+
+void
+DataStreamReaderWriter::OnCancel()
+{
+    const FunctionTracer traceMe{};
+
+    // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
+    bool isCanceledExpected{ false };
+    if (m_isCanceled.compare_exchange_strong(isCanceledExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
+        Finish(grpc::Status::CANCELLED);
+    }
+}
+
+void
+DataStreamReaderWriter::OnDone()
+{
+    const FunctionTracer traceMe{};
+    delete this;
+}
+
+void
+DataStreamReaderWriter::NextWrite()
+{
+    const FunctionTracer traceMe{};
+
+    // Client may have canceled the RPC, so check for cancelation to prevent writing more data
+    // when we shouldn't.
+    if (m_isCanceled.load(std::memory_order_relaxed)) {
+        LOGD << "RPC canceled, aborting write";
+        return;
+    }
+
+    // Create data to write to the client.
+    const auto data = m_dataGenerator.GenerateRandomData();
+    m_numberOfDataBlocksWritten++;
+
+    // Write data to the client.
+    m_writeData.set_data(data);
+    m_writeData.set_sequencenumber(m_numberOfDataBlocksWritten);
+    *m_writeData.mutable_status() = m_status;
+    StartWrite(&m_writeData);
+}
+
+void
+DataStreamReaderWriter::HandleFailure(const std::string& errorMessage)
+{
+    const FunctionTracer traceMe{};
+
+    m_status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
+    m_status.set_message(errorMessage);
+    *m_writeData.mutable_status() = m_status;
+
+    // Write a final message to the client. The OnWriteDone() callback will check for the
+    // DataStreamOperationStatusCodeFailed status code set here to know to complete the RPC.
+    StartWrite(&m_writeData);
+}
