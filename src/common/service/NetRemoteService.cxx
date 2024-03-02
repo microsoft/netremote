@@ -504,11 +504,69 @@ NetRemoteService::TryGetAccessPointController(std::string_view accessPointId, st
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointEnableImpl([[maybe_unused]] std::string_view accessPointId, [[maybe_unused]] const std::optional<Dot11AccessPointConfiguration>& dot11AccessPointConfiguration)
+NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, const std::optional<Dot11AccessPointConfiguration>& dot11AccessPointConfiguration)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
-    // TODO
-    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+
+    // Create an AP controller for the requested AP.
+    std::shared_ptr<IAccessPointController> accessPointController{};
+    auto operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+    if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    // Obtain current operational state.
+    AccessPointOperationalState operationalState{};
+    operationStatus = accessPointController->GetOperationalState(operationalState);
+    if (!operationStatus) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to get operational state for access point {}", accessPointId));
+        return wifiOperationStatus;
+    }
+
+    // Enable the access point if it's not already enabled.
+    if (operationalState != AccessPointOperationalState::Enabled) {
+        // Validate request is well-formed and has all required parameters.
+        if (dot11AccessPointConfiguration.has_value()) {
+            if (dot11AccessPointConfiguration->phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
+                // status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                // status.set_message("No PHY type provided");
+                // return false;
+            }
+            if (dot11AccessPointConfiguration->authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message("No authentication algorithm provided");
+                return wifiOperationStatus;
+            }
+            if (dot11AccessPointConfiguration->ciphersuite() == Dot11CipherSuite::Dot11CipherSuiteUnknown) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message("No cipher suite provided");
+                return wifiOperationStatus;
+            }
+
+            if (dot11AccessPointConfiguration->has_ssid()) {
+                // TODO: set SSID
+            }
+            if (!std::empty(dot11AccessPointConfiguration->bands())) {
+                // TODO: set bands
+            }
+
+            // Set the operational state to 'enabled' now that initial configuration has been set.
+            operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
+            if (!operationStatus) {
+                wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+                wifiOperationStatus.set_message(std::format("Failed to set operational state to 'enabled' for access point {}", accessPointId));
+                return wifiOperationStatus;
+            }
+        }
+    } else {
+        LOGI << std::format("Access point {} is already enabled", accessPointId);
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
     return wifiOperationStatus;
 }
 
