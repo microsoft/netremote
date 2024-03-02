@@ -3,7 +3,6 @@
 #define NET_REMOTE_SERVICE_HXX
 
 #include <memory>
-#include <optional>
 #include <string_view>
 
 #include <grpcpp/server_context.h>
@@ -133,11 +132,11 @@ protected:
      * @brief Enable an access point. This brings the access point online, making it available for use by clients.
      *
      * @param accessPointId The access point identifier.
-     * @param dot11AccessPointConfiguration
+     * @param dot11AccessPointConfiguration (optional) The access point configuration to enforce prior to enablement. 
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointEnableImpl(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Dot11AccessPointConfiguration>& dot11AccessPointConfiguration);
+    WifiAccessPointEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration);
 
     /**
      * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause
