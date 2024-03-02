@@ -161,18 +161,6 @@ protected:
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>& dot11FrequencyBands);
 
-protected:
-    /**
-     * @brief Validate the basic input parameters for the WifiAccessPointEnable request.
-     *
-     * @param request The request to validate.
-     * @param status The status to populate with failure information.
-     * @return true
-     * @return false
-     */
-    static bool
-    ValidateWifiAccessPointEnableRequest(const Microsoft::Net::Remote::Wifi::WifiAccessPointEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus& status);
-
 private:
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
 };

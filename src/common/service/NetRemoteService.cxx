@@ -301,41 +301,14 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] grpc::ServerContext* co
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    // Create an AP controller for the requested AP.
-    auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
-    if (accessPointController == nullptr) {
-        return grpc::Status::OK;
+    std::optional<Dot11AccessPointConfiguration> dot11AccessPointConfiguration{};
+    if (request->has_configuration()) {
+        dot11AccessPointConfiguration = ToDot11AccessPointConfiguration(request->configuration());
     }
 
-    // Obtain current operational state.
-    AccessPointOperationalState operationalState{};
-    auto operationStatus = accessPointController->GetOperationalState(operationalState);
-    if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get operational state for access point {}", request->accesspointid()));
-    }
-
-    WifiAccessPointOperationStatus status{};
-
-    // Enable the access point if it's not already enabled.
-    if (operationalState != AccessPointOperationalState::Enabled) {
-        // Validate request is well-formed and has all required parameters.
-        if (ValidateWifiAccessPointEnableRequest(request, status)) {
-            // TODO: Enable the access point.
-
-            // Set the operational state to 'enabled' now that initial configuration has been set.
-            operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
-            if (!operationStatus) {
-                return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set operational state to 'enabled' for access point {}", request->accesspointid()));
-            }
-        }
-    } else {
-        LOGI << std::format("Access point {} is already enabled", request->accesspointid());
-    }
-
-    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-
+    auto wifiOperationStatus = WifiAccessPointEnableImpl(request->accesspointid(), dot11AccessPointConfiguration);
     result->set_accesspointid(request->accesspointid());
-    *result->mutable_status() = std::move(status);
+    *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
 }
@@ -402,48 +375,6 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
-}
-
-/* static */
-bool
-NetRemoteService::ValidateWifiAccessPointEnableRequest(const WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
-{
-    // Validate required arguments are present. Detailed argument validation is left to the implementation.
-
-    if (!request->has_configuration()) {
-        // Configuration isn't required, so exit early.
-        return true;
-    }
-
-    // Configuration isn't required, but if it's present, it must be valid.
-    const auto& configuration = request->configuration();
-    if (!configuration.has_ssid()) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No SSID provided");
-        return false;
-    }
-    if (configuration.phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No PHY type provided");
-        return false;
-    }
-    if (configuration.authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No authentication algorithm provided");
-        return false;
-    }
-    if (configuration.ciphersuite() == Dot11CipherSuite::Dot11CipherSuiteUnknown) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No cipher suite provided");
-        return false;
-    }
-    if (std::empty(configuration.bands())) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No radio bands provided");
-        return false;
-    }
-
-    return true;
 }
 
 AccessPointOperationStatus
