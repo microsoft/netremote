@@ -86,14 +86,29 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
 
     constexpr auto SsidName{ "TestWifiAccessPointEnable" };
+    constexpr auto InterfaceName1{ "TestWifiAccessPointEnable1" };
+    constexpr auto InterfaceName2{ "TestWifiAccessPointEnable2" };
+    constexpr auto InterfaceNameInvalid{ "TestWifiAccessPointEnableInvalid" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+    };
+
+    auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
+    auto apTest2 = std::make_shared<AccessPointTest>(InterfaceName2, apCapabilities);
+    apManagerTest->AddAccessPoint(apTest1);
+    apManagerTest->AddAccessPoint(apTest2);
 
     const NetRemoteServerConfiguration Configuration{
         .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
+        .AccessPointManager = apManagerTest,
     };
 
     NetRemoteServer server{ Configuration };
@@ -113,7 +128,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
 
         WifiAccessPointEnableRequest request{};
-        request.set_accesspointid("TestWifiAccessPointEnable");
+        request.set_accesspointid(InterfaceName1);
         *request.mutable_configuration() = std::move(apConfiguration);
 
         WifiAccessPointEnableResult result{};
@@ -126,6 +141,70 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
         REQUIRE(result.status().message().empty());
         REQUIRE(result.status().has_details() == false);
+    }
+
+    SECTION("Fails with invalid access point")
+    {
+        WifiAccessPointEnableRequest request{};
+        *request.mutable_configuration() = {}; 
+        request.set_accesspointid(InterfaceNameInvalid);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointEnable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
+    }
+
+    SECTION("Succeeds without access point configuration if already configured")
+    {
+        // Perform initial enable with configuration.
+        Dot11AccessPointConfiguration apConfiguration{};
+        apConfiguration.mutable_ssid()->set_name(SsidName);
+        apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
+        apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
+        apConfiguration.set_ciphersuite(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+        apConfiguration.mutable_bands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+        // Disable.
+        {
+            WifiAccessPointDisableRequest disableRequest{};
+            disableRequest.set_accesspointid(InterfaceName1);
+            WifiAccessPointDisableResult disableResult{};
+            grpc::ClientContext disableClientContext{};
+
+            grpc::Status disableStatus;
+            REQUIRE_NOTHROW(disableStatus = client->WifiAccessPointDisable(&disableClientContext, disableRequest, &disableResult));
+
+            REQUIRE(disableResult.has_status());
+            REQUIRE(disableResult.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        }
+
+        // Perform second enable without configuration.
+        request.clear_configuration();
+        result.Clear();
+        grpc::ClientContext clientContextReenable{};
+        status = client->WifiAccessPointEnable(&clientContextReenable, request, &result);
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 }
 

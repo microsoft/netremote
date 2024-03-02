@@ -58,6 +58,15 @@ Microsoft::Net::Wifi::Dot11FrequencyBand
 ToDot11FrequencyBand(Microsoft::Net::Wifi::Ieee80211FrequencyBand ieee80211FrequencyBand) noexcept;
 
 /**
+ * @brief Obtain a vector of Dot11FrequencyBands from the specified WifiAccessPointSetFrequencyBandsRequest.
+ * 
+ * @param request The request to extract the Dot11FrequencyBands from.
+ * @return std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand> 
+ */
+std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>
+ToDot11FrequencyBands(const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest& request) noexcept;
+
+/**
  * @brief Convert the specified Dot11FrequencyBand to the equivalent IEEE 802.11 frequency band.
  *
  * @param dot11FrequencyBand The Dot11FrequencyBand to convert.
@@ -73,6 +82,9 @@ FromDot11FrequencyBand(Microsoft::Net::Wifi::Dot11FrequencyBand dot11FrequencyBa
  * @param request
  * @return std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand>
  */
+std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand>
+FromDot11SetFrequencyBandsRequest(const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest& request);
+
 std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand>
 FromDot11SetFrequencyBandsRequest(const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest& request);
 
