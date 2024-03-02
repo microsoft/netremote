@@ -139,7 +139,8 @@ private:
 /**
  * @brief Implementation of the gRPC ClientBidiReactor for client-side data stream reading and writing.
  */
-class DataStreamReaderWriter : public grpc::ClientBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>
+class DataStreamReaderWriter :
+    public grpc::ClientBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>
 {
 public:
     /**
