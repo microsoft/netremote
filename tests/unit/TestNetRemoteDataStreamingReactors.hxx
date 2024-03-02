@@ -177,11 +177,12 @@ public:
     /**
      * @brief Wait for all operations to complete and transfer the status to the status output parameter.
      *
+     * @param numberOfDataBlocksReceived The number of data blocks received by the client.
      * @param operationStatus The status of the read/write data operations.
      * @return grpc::Status
      */
     grpc::Status
-    Await(Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
+    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
 
 private:
     /**

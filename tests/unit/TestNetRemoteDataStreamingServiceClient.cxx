@@ -174,9 +174,11 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
     {
         DataStreamReaderWriter dataStreamReaderWriter{ client.get(), numberOfDataBlocksToStream };
 
+        uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        const grpc::Status status = dataStreamReaderWriter.Await(&operationStatus);
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus);
         REQUIRE(status.ok());
+        REQUIRE(numberOfDataBlocksReceived > 0);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
     }
 }

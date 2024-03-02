@@ -179,7 +179,7 @@ DataStreamReaderWriter::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReaderWriter::Await(Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus)
+DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus)
 {
     std::unique_lock lock(m_operationStatusGate);
 
@@ -194,6 +194,7 @@ DataStreamReaderWriter::Await(Microsoft::Net::Remote::DataStream::DataStreamOper
         status.set_message("Timeout occurred while waiting for all operations to be completed");
         *m_readData.mutable_status() = std::move(status);
     }
+    *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_readData.status();
 
     return m_operationStatus;
