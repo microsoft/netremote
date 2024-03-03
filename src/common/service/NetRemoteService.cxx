@@ -508,7 +508,7 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Dot11PhyType dot11PhyType)
+NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Dot11PhyType dot11PhyType, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
@@ -519,13 +519,16 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
         return wifiOperationStatus;
     }
 
-    // Create an AP controller for the requested AP.
-    std::shared_ptr<IAccessPointController> accessPointController{};
-    auto operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
-    if (!operationStatus.Succeeded() || accessPointController == nullptr) {
-        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-        wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
-        return wifiOperationStatus;
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
     }
 
     // Convert PHY type to Ieee80211 protocol.

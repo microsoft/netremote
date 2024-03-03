@@ -145,10 +145,11 @@ protected:
      *
      * @param accessPointId The access point identifier.
      * @param dot11PhyType The new PHY type to set.
+     * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Microsoft::Net::Wifi::Dot11PhyType dot11PhyType);
+    WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Microsoft::Net::Wifi::Dot11PhyType dot11PhyType, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
      * @brief Set the active frequency bands of the access point. The access point must be enabled. This will cause the
