@@ -444,6 +444,40 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
         }
     }
 
+    // Set all configuration items that are present.
+    if (dot11AccessPointConfiguration != nullptr) {
+        if (dot11AccessPointConfiguration->phytype() != Dot11PhyType::Dot11PhyTypeUnknown) {
+            wifiOperationStatus = WifiAccessPointSetPhyTypeImpl(accessPointId, dot11AccessPointConfiguration->phytype(), accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
+        if (dot11AccessPointConfiguration->authenticationalgorithm() != Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
+            // TODO: set authentication algorithm.
+        }
+
+        if (dot11AccessPointConfiguration->ciphersuite() != Dot11CipherSuite::Dot11CipherSuiteUnknown) {
+            // TODO: set cipher suite.
+        }
+
+        if (dot11AccessPointConfiguration->has_ssid()) {
+            const auto& ssid = dot11AccessPointConfiguration->ssid();
+            wifiOperationStatus = WifiAccessPointSetSsidImpl(accessPointId, ssid, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
+        if (!std::empty(dot11AccessPointConfiguration->bands())) {
+            auto dot11FrequencyBands = ToDot11FrequencyBands(*dot11AccessPointConfiguration);
+            wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(accessPointId, dot11FrequencyBands, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+    }
+
     // Obtain current operational state.
     AccessPointOperationalState operationalState{};
     operationStatus = accessPointController->GetOperationalState(operationalState);
@@ -455,46 +489,12 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
 
     // Enable the access point if it's not already enabled.
     if (operationalState != AccessPointOperationalState::Enabled) {
-        if (dot11AccessPointConfiguration != nullptr) {
-            // Set all configuration items that are present.
-            if (dot11AccessPointConfiguration->phytype() != Dot11PhyType::Dot11PhyTypeUnknown) {
-                wifiOperationStatus = WifiAccessPointSetPhyTypeImpl(accessPointId, dot11AccessPointConfiguration->phytype(), accessPointController);
-                if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-                    return wifiOperationStatus;
-                }
-            }
-
-            if (dot11AccessPointConfiguration->authenticationalgorithm() != Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
-                // TODO: set authentication algorithm.
-            }
-
-            if (dot11AccessPointConfiguration->ciphersuite() != Dot11CipherSuite::Dot11CipherSuiteUnknown) {
-                // TODO: set cipher suite.
-            }
-
-            if (dot11AccessPointConfiguration->has_ssid()) {
-                const auto& ssid = dot11AccessPointConfiguration->ssid();
-                wifiOperationStatus = WifiAccessPointSetSsidImpl(accessPointId, ssid, accessPointController);
-                if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-                    return wifiOperationStatus;
-                }
-            }
-
-            if (!std::empty(dot11AccessPointConfiguration->bands())) {
-                auto dot11FrequencyBands = ToDot11FrequencyBands(*dot11AccessPointConfiguration);
-                wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(accessPointId, dot11FrequencyBands, accessPointController);
-                if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-                    return wifiOperationStatus;
-                }
-            }
-
-            // Set the operational state to 'enabled' now that any initial configuration has been set.
-            operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
-            if (!operationStatus) {
-                wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-                wifiOperationStatus.set_message(std::format("Failed to set operational state to 'enabled' for access point {}", accessPointId));
-                return wifiOperationStatus;
-            }
+        // Set the operational state to 'enabled' now that any initial configuration has been set.
+        operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
+        if (!operationStatus) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to set operational state to 'enabled' for access point {}", accessPointId));
+            return wifiOperationStatus;
         }
     } else {
         LOGI << std::format("Access point {} is already enabled", accessPointId);
