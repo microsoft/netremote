@@ -109,7 +109,7 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetSssid(std::string_view ssid) noexcept
+AccessPointControllerTest::SetSsid(std::string_view ssid) noexcept
 {
     assert(AccessPoint != nullptr);
 

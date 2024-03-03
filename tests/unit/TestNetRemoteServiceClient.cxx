@@ -98,7 +98,8 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) },
+        .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
     };
 
     auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
