@@ -458,10 +458,8 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
         if (dot11AccessPointConfiguration != nullptr) {
             // Set all configuration items that are present.
             if (dot11AccessPointConfiguration->phytype() != Dot11PhyType::Dot11PhyTypeUnknown) {
-                operationStatus = accessPointController->SetProtocol(FromDot11PhyType(dot11AccessPointConfiguration->phytype()));
-                if (!operationStatus.Succeeded()) {
-                    wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-                    wifiOperationStatus.set_message(std::format("Failed to set PHY type for access point {} - {}", accessPointId, operationStatus.ToString()));
+                wifiOperationStatus = WifiAccessPointSetPhyTypeImpl(accessPointId, dot11AccessPointConfiguration->phytype(), accessPointController);
+                if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
                     return wifiOperationStatus;
                 }
             }
@@ -476,7 +474,7 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
 
             if (dot11AccessPointConfiguration->has_ssid()) {
                 const auto& ssid = dot11AccessPointConfiguration->ssid();
-                wifiOperationStatus = WifiAccessPointSetSsidImpl(accessPointId, ssid);
+                wifiOperationStatus = WifiAccessPointSetSsidImpl(accessPointId, ssid, accessPointController);
                 if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
                     return wifiOperationStatus;
                 }
@@ -484,7 +482,7 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
 
             if (!std::empty(dot11AccessPointConfiguration->bands())) {
                 auto dot11FrequencyBands = ToDot11FrequencyBands(*dot11AccessPointConfiguration);
-                wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(accessPointId, dot11FrequencyBands);
+                wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(accessPointId, dot11FrequencyBands, accessPointController);
                 if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
                     return wifiOperationStatus;
                 }
