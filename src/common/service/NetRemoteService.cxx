@@ -469,7 +469,7 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        if (!std::empty(dot11AccessPointConfiguration->bands())) {
+        if (!std::empty(dot11AccessPointConfiguration->frequencybands())) {
             auto dot11FrequencyBands = ToDot11FrequencyBands(*dot11AccessPointConfiguration);
             wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(accessPointId, dot11FrequencyBands, accessPointController);
             if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {

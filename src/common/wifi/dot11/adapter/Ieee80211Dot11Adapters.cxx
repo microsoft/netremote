@@ -176,8 +176,8 @@ ToDot11FrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request) no
 std::vector<Dot11FrequencyBand>
 ToDot11FrequencyBands(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept
 {
-    std::vector<Dot11FrequencyBand> dot11FrequencyBands(static_cast<std::size_t>(std::size(dot11AccessPointConfiguration.bands())));
-    std::ranges::transform(dot11AccessPointConfiguration.bands(), std::begin(dot11FrequencyBands), detail::toDot11FrequencyBand);
+    std::vector<Dot11FrequencyBand> dot11FrequencyBands(static_cast<std::size_t>(std::size(dot11AccessPointConfiguration.frequencybands())));
+    std::ranges::transform(dot11AccessPointConfiguration.frequencybands(), std::begin(dot11FrequencyBands), detail::toDot11FrequencyBand);
 
     return dot11FrequencyBands;
 }
@@ -444,7 +444,7 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211
     std::vector<Dot11FrequencyBand> bands(std::size(ieee80211AccessPointCapabilities.FrequencyBands));
     std::ranges::transform(ieee80211AccessPointCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
 
-    *dot11Capabilities.mutable_bands() = {
+    *dot11Capabilities.mutable_frequencybands() = {
         std::make_move_iterator(std::begin(bands)),
         std::make_move_iterator(std::end(bands))
     };
