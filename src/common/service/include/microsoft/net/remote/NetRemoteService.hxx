@@ -133,10 +133,11 @@ protected:
      *
      * @param accessPointId The access point identifier.
      * @param dot11AccessPointConfiguration (optional) The access point configuration to enforce prior to enablement. 
+     * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration);
+    WifiAccessPointEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
      * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause

@@ -429,17 +429,19 @@ NetRemoteService::TryGetAccessPointController(std::string_view accessPointId, st
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, const Dot11AccessPointConfiguration* dot11AccessPointConfiguration)
+NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, const Dot11AccessPointConfiguration* dot11AccessPointConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
+    AccessPointOperationStatus operationStatus{ accessPointId };
 
-    // Create an AP controller for the requested AP.
-    std::shared_ptr<IAccessPointController> accessPointController{};
-    auto operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
-    if (!operationStatus.Succeeded() || accessPointController == nullptr) {
-        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-        wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
-        return wifiOperationStatus;
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
     }
 
     // Obtain current operational state.
