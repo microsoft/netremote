@@ -168,10 +168,11 @@ protected:
      * 
      * @param accessPointId The access point identifier.
      * @param dot11Ssid The new SSID to set.
+     * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid);
+    WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
 private:
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
