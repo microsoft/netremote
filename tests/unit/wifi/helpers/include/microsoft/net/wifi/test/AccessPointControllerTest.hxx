@@ -110,7 +110,7 @@ struct AccessPointControllerTest final :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetSssid(std::string_view ssid) noexcept override;
+    SetSsid(std::string_view ssid) noexcept override;
 };
 
 /**

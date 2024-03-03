@@ -97,7 +97,7 @@ struct AccessPointControllerLinux :
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetSssid(std::string_view ssid) noexcept override;
+    SetSsid(std::string_view ssid) noexcept override;
 
 private:
     Wpa::Hostapd m_hostapd;
