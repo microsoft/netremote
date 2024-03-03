@@ -160,6 +160,16 @@ protected:
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>& dot11FrequencyBands);
 
+    /**
+     * @brief Set the SSID of the access point.
+     * 
+     * @param accessPointId The access point identifier.
+     * @param dot11Ssid The new SSID to set.
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid);
+
 private:
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
 };

@@ -473,7 +473,11 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
 
             if (dot11AccessPointConfiguration->has_ssid()) {
-                // TODO: set SSID
+                const auto& ssid = dot11AccessPointConfiguration->ssid();
+                wifiOperationStatus = WifiAccessPointSetSsidImpl(accessPointId, ssid);
+                if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                    return wifiOperationStatus;
+                }
             }
 
             if (!std::empty(dot11AccessPointConfiguration->bands())) {
@@ -607,6 +611,56 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set frequency bands for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Dot11Ssid& dot11Ssid)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    if (dot11Ssid.Value_case() == Dot11Ssid::ValueCase::VALUE_NOT_SET) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No SSID provided");
+        return wifiOperationStatus;
+    }
+
+    // Create an AP controller for the requested AP.
+    std::shared_ptr<IAccessPointController> accessPointController{};
+    auto operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+    if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    // Set the SSID.
+    switch (dot11Ssid.Value_case()) {
+    case Dot11Ssid::ValueCase::kName:
+        operationStatus = accessPointController->SetSsid(dot11Ssid.name());
+        break;
+    case Dot11Ssid::ValueCase::kHex:
+        operationStatus = accessPointController->SetSsid(dot11Ssid.hex());
+        break;
+    case Dot11Ssid::ValueCase::kData:
+        operationStatus = accessPointController->SetSsid(dot11Ssid.data());
+        break;
+    case Dot11Ssid::ValueCase::VALUE_NOT_SET: 
+        [[fallthrough]];
+    default:
+        operationStatus.Code = AccessPointOperationStatusCode::InvalidParameter;
+        operationStatus.Details = "No SSID provided";
+        break;
+    }
+    
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set SSID for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
 
