@@ -190,6 +190,12 @@ public:
     grpc::Status
     Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers);
 
+    /**
+     * @brief Cancel the ongoing RPC.
+     */
+    void
+    Cancel();
+
 private:
     /**
      * @brief Facilitate the next write operation.

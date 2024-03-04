@@ -214,6 +214,13 @@ DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOp
 }
 
 void
+DataStreamReaderWriter::Cancel()
+{
+    LOGD << "Attempting to cancel RPC";
+    m_clientContext.TryCancel();
+}
+
+void
 DataStreamReaderWriter::NextWrite()
 {
     if (m_numberOfDataBlocksToWrite > 0) {
