@@ -191,10 +191,10 @@ public:
     Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers);
 
     /**
-     * @brief Cancel the ongoing RPC.
+     * @brief Stops writing data to the client. Should only be called with DataStreamTypeContinuous.
      */
     void
-    Cancel();
+    StopWrites();
 
 private:
     /**
@@ -218,6 +218,7 @@ private:
     std::condition_variable m_operationsDone{};
     bool m_done{ false };
     std::vector<uint32_t> m_lostDataBlockSequenceNumbers{};
+    std::atomic<bool> m_writesStopped{};
 };
 
 } // namespace Microsoft::Net::Remote::Test

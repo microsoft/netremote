@@ -206,7 +206,11 @@ DataStreamReaderWriter::OnWriteDone(bool isOk)
         }
         NextWrite();
     } else {
-        StartWritesDone();
+        // If StopWrites() was called and continuous data streaming is used, then StartWritesDone()
+        // was already called.
+        if (!m_writesStopped.load(std::memory_order_relaxed)) {
+            StartWritesDone();
+        }
     }
 }
 
@@ -245,10 +249,15 @@ DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOp
 }
 
 void
-DataStreamReaderWriter::Cancel()
+DataStreamReaderWriter::StopWrites()
 {
-    LOGD << "Attempting to cancel RPC";
-    m_clientContext.TryCancel();
+    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous) {
+        bool writesStoppedExpected{ false };
+        if (m_writesStopped.compare_exchange_strong(writesStoppedExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
+            LOGD << "Stopping all write operations";
+            StartWritesDone();
+        }
+    }
 }
 
 void
