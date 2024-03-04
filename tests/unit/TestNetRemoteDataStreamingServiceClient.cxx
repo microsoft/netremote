@@ -173,11 +173,45 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
     auto client = NetRemoteDataStreaming::NewStub(channel);
 
-    static constexpr auto numberOfDataBlocksToStream = 10;
+    static constexpr auto fixedNumberOfDataBlocksToStream = 10;
 
-    SECTION("Can be called")
+    SECTION("Can be called with DataStreamTypeFixed")
     {
-        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), numberOfDataBlocksToStream };
+        DataStreamFixedTypeProperties fixedTypeProperties{};
+        fixedTypeProperties.set_numberofdatablockstostream(fixedNumberOfDataBlocksToStream);
+
+        DataStreamProperties properties{};
+        properties.set_type(DataStreamType::DataStreamTypeFixed);
+        *properties.mutable_fixed() = std::move(fixedTypeProperties);
+
+        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), std::move(properties) };
+
+        uint32_t numberOfDataBlocksReceived{};
+        DataStreamOperationStatus operationStatus{};
+        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
+        REQUIRE(status.ok());
+        REQUIRE(numberOfDataBlocksReceived > 0);
+        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
+    }
+
+    SECTION("Can be called with DataStreamTypeContinuous")
+    {
+        static constexpr auto StreamingDelayTime = 5s;
+
+        DataStreamContinuousTypeProperties continuousTypeProperties{};
+
+        DataStreamProperties properties{};
+        properties.set_type(DataStreamType::DataStreamTypeContinuous);
+        *properties.mutable_continuous() = std::move(continuousTypeProperties);
+
+        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), std::move(properties) };
+
+        // Allow some time of continuous streaming, then stop writing data. This will prompt the
+        // server to stop writing too, eliminating the need to cancel the RPC.
+        std::this_thread::sleep_for(StreamingDelayTime);
+        dataStreamReaderWriter.StopWrites();
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};

@@ -303,11 +303,10 @@ DataStreamReaderWriter::OnCancel()
 {
     const FunctionTracer traceMe{};
 
-    // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
+    // Because the RPC is canceled by the client, there will be no more data to read. Thus, OnReadDone will fail and will
+    // call Finish(), so don't call Finish() here.
     bool isCanceledExpected{ false };
-    if (m_isCanceled.compare_exchange_strong(isCanceledExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
-        Finish(grpc::Status::CANCELLED);
-    }
+    m_isCanceled.compare_exchange_strong(isCanceledExpected, true, std::memory_order_relaxed, std::memory_order_relaxed);
 }
 
 void
