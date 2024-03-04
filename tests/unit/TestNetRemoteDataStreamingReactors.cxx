@@ -70,8 +70,8 @@ DataStreamWriter::NextWrite()
 {
     if (m_numberOfDataBlocksToWrite > 0) {
         m_data.set_data(std::format("Data #{}", ++m_numberOfDataBlocksWritten));
-        StartWrite(&m_data);
         m_numberOfDataBlocksToWrite--;
+        StartWrite(&m_data);
     } else {
         StartWritesDone();
     }
@@ -218,8 +218,8 @@ DataStreamReaderWriter::NextWrite()
 {
     if (m_numberOfDataBlocksToWrite > 0) {
         m_writeData.set_data(std::format("Data #{}", ++m_numberOfDataBlocksWritten));
-        StartWrite(&m_writeData);
         m_numberOfDataBlocksToWrite--;
+        StartWrite(&m_writeData);
     } else {
         StartWritesDone();
     }
