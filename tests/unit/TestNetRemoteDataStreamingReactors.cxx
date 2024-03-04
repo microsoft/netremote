@@ -1,7 +1,9 @@
 
+#include <cstddef>
 #include <cstdint>
 #include <format>
 #include <mutex>
+#include <span>
 #include <utility>
 
 #include <grpcpp/impl/codegen/status.h>
