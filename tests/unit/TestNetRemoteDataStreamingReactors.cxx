@@ -131,10 +131,7 @@ DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperatio
 
     *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_data.status();
-
-    for (std::size_t i = 0; i < std::size(m_lostDataBlockSequenceNumbers); i++) {
-        lostDataBlockSequenceNumbers[i] = m_lostDataBlockSequenceNumbers[i];
-    }
+    lostDataBlockSequenceNumbers = std::span<uint32_t>(std::data(m_lostDataBlockSequenceNumbers), std::size(m_lostDataBlockSequenceNumbers));
 
     return m_status;
 }
@@ -211,10 +208,7 @@ DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOp
 
     *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_readData.status();
-
-    for (std::size_t i = 0; i < std::size(m_lostDataBlockSequenceNumbers); i++) {
-        lostDataBlockSequenceNumbers[i] = m_lostDataBlockSequenceNumbers[i];
-    }
+    lostDataBlockSequenceNumbers = std::span<uint32_t>(std::data(m_lostDataBlockSequenceNumbers), std::size(m_lostDataBlockSequenceNumbers));
 
     return m_operationStatus;
 }
