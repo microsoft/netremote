@@ -183,10 +183,11 @@ public:
      *
      * @param numberOfDataBlocksReceived The number of data blocks received by the client.
      * @param operationStatus The status of the read/write data operations.
+     * @param lostDataBlockSequenceNumbers The list of sequence numbers associated with data blocks sent by the server that were not received by the client.
      * @return grpc::Status
      */
     grpc::Status
-    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
+    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers);
 
 private:
     /**
@@ -208,6 +209,7 @@ private:
     std::mutex m_operationStatusGate{};
     std::condition_variable m_operationsDone{};
     bool m_done{ false };
+    std::vector<uint32_t> m_lostDataBlockSequenceNumbers{};
 };
 
 } // namespace Microsoft::Net::Remote::Test

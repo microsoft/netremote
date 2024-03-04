@@ -181,9 +181,11 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus);
+        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, &lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived > 0);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
     }
 }

@@ -155,6 +155,14 @@ DataStreamReaderWriter::OnReadDone(bool isOk)
 {
     if (isOk) {
         m_numberOfDataBlocksReceived++;
+
+        // Keep track of the sequence numbers of data blocks that were not received.
+        if (m_readData.sequencenumber() != m_numberOfDataBlocksReceived) {
+            auto numberOfLostDataBlocks = m_readData.sequencenumber() - m_numberOfDataBlocksReceived;
+            for (uint32_t i = numberOfLostDataBlocks; i > 0; i--) {
+                m_lostDataBlockSequenceNumbers.push_back(m_readData.sequencenumber() - i);
+            }
+        }
         StartRead(&m_readData);
     }
 }
@@ -180,7 +188,7 @@ DataStreamReaderWriter::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus)
+DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers)
 {
     std::unique_lock lock(m_operationStatusGate);
 
@@ -195,8 +203,10 @@ DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, Microsoft::N
         status.set_message("Timeout occurred while waiting for all operations to be completed");
         *m_readData.mutable_status() = std::move(status);
     }
+
     *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_readData.status();
+    *lostDataBlockSequenceNumbers = m_lostDataBlockSequenceNumbers;
 
     return m_operationStatus;
 }
