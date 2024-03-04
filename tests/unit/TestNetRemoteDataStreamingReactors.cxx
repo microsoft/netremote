@@ -7,6 +7,7 @@
 #include <utility>
 
 #include <grpcpp/impl/codegen/status.h>
+#include <magic_enum.hpp>
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
 #include <plog/Log.h>
@@ -143,9 +144,36 @@ DataStreamReader::Cancel()
     m_clientContext.TryCancel();
 }
 
-DataStreamReaderWriter::DataStreamReaderWriter(NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite) :
-    m_numberOfDataBlocksToWrite(numberOfDataBlocksToWrite)
+DataStreamReaderWriter::DataStreamReaderWriter(NetRemoteDataStreaming::Stub* client, DataStreamProperties dataStreamProperties) :
+    m_dataStreamProperties(dataStreamProperties)
 {
+    switch (m_dataStreamProperties.type()) {
+    case DataStreamType::DataStreamTypeFixed: {
+        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kFixed) {
+            m_numberOfDataBlocksToWrite = m_dataStreamProperties.fixed().numberofdatablockstostream();
+        } else {
+            LOGE << "Invalid properties for this streaming type. Expected Fixed for DataStreamTypeFixed";
+            return;
+        }
+
+        break;
+    }
+    case DataStreamType::DataStreamTypeContinuous: {
+        if (m_dataStreamProperties.Properties_case() == DataStreamProperties::kContinuous) {
+            m_numberOfDataBlocksToWrite = 0;
+        } else {
+            LOGE << "Invalid properties for this streaming type. Expected Continuous for DataStreamTypeContinuous";
+            return;
+        }
+
+        break;
+    }
+    default: {
+        LOGE << std::format("Invalid streaming type: {}", magic_enum::enum_name(m_dataStreamProperties.type()));
+        return;
+    }
+    };
+
     client->async()->DataStreamBidirectional(&m_clientContext, this);
     StartCall();
     StartRead(&m_readData);
@@ -173,6 +201,9 @@ void
 DataStreamReaderWriter::OnWriteDone(bool isOk)
 {
     if (isOk) {
+        if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed) {
+            m_numberOfDataBlocksToWrite--;
+        }
         NextWrite();
     } else {
         StartWritesDone();
@@ -223,9 +254,9 @@ DataStreamReaderWriter::Cancel()
 void
 DataStreamReaderWriter::NextWrite()
 {
-    if (m_numberOfDataBlocksToWrite > 0) {
+    if (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeContinuous ||
+        (m_dataStreamProperties.type() == DataStreamType::DataStreamTypeFixed && m_numberOfDataBlocksToWrite > 0)) {
         m_writeData.set_data(std::format("Data #{}", ++m_numberOfDataBlocksWritten));
-        m_numberOfDataBlocksToWrite--;
         StartWrite(&m_writeData);
     } else {
         StartWritesDone();

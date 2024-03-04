@@ -151,9 +151,9 @@ public:
      * @brief Construct a new DataStreamReaderWriter object with the client stub and specified number of data blocks to write.
      *
      * @param client The data streaming client stub.
-     * @param numberOfDataBlocksToWrite The number of data blocks to write to the server.
+     * @param dataStreamProperties The properties associated with the type of data streaming.
      */
-    explicit DataStreamReaderWriter(Microsoft::Net::Remote::Service::NetRemoteDataStreaming::Stub* client, uint32_t numberOfDataBlocksToWrite);
+    explicit DataStreamReaderWriter(Microsoft::Net::Remote::Service::NetRemoteDataStreaming::Stub* client, Microsoft::Net::Remote::DataStream::DataStreamProperties dataStreamProperties);
 
     /**
      * @brief Callback that is executed when a read operation is completed.
@@ -209,6 +209,7 @@ private:
     grpc::ClientContext m_clientContext{};
     Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_readData{};
     Microsoft::Net::Remote::DataStream::DataStreamUploadData m_writeData{};
+    Microsoft::Net::Remote::DataStream::DataStreamProperties m_dataStreamProperties{};
     uint32_t m_numberOfDataBlocksToWrite{};
     uint32_t m_numberOfDataBlocksWritten{};
     uint32_t m_numberOfDataBlocksReceived{};
