@@ -1,5 +1,5 @@
 
-#include <cstddef>
+#include <atomic>
 #include <cstdint>
 #include <format>
 #include <mutex>
@@ -145,7 +145,7 @@ DataStreamReader::Cancel()
 }
 
 DataStreamReaderWriter::DataStreamReaderWriter(NetRemoteDataStreaming::Stub* client, DataStreamProperties dataStreamProperties) :
-    m_dataStreamProperties(dataStreamProperties)
+    m_dataStreamProperties(std::move(dataStreamProperties))
 {
     switch (m_dataStreamProperties.type()) {
     case DataStreamType::DataStreamTypeFixed: {
