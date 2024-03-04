@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
+#include <span>
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
@@ -117,7 +118,7 @@ public:
      * @return grpc::Status
      */
     grpc::Status
-    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers);
+    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers);
 
     /**
      * @brief Cancel the ongoing RPC.
@@ -187,7 +188,7 @@ public:
      * @return grpc::Status
      */
     grpc::Status
-    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers);
+    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers);
 
 private:
     /**

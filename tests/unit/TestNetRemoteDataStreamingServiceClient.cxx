@@ -117,7 +117,7 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
         std::vector<uint32_t> lostDataBlockSequenceNumbers{};
-        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, &lostDataBlockSequenceNumbers);
+        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived == fixedNumberOfDataBlocksToStream);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
@@ -147,7 +147,7 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
         std::vector<uint32_t> lostDataBlockSequenceNumbers{};
-        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, &lostDataBlockSequenceNumbers);
+        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
         REQUIRE(lostDataBlockSequenceNumbers.empty());
@@ -182,7 +182,7 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
         std::vector<uint32_t> lostDataBlockSequenceNumbers{};
-        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, &lostDataBlockSequenceNumbers);
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived > 0);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);

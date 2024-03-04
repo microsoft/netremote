@@ -111,7 +111,7 @@ DataStreamReader::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers)
+DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers)
 {
     std::unique_lock lock(m_readStatusGate);
 
@@ -129,7 +129,10 @@ DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperatio
 
     *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_data.status();
-    *lostDataBlockSequenceNumbers = m_lostDataBlockSequenceNumbers;
+
+    for (std::size_t i = 0; i < std::size(m_lostDataBlockSequenceNumbers); i++) {
+        lostDataBlockSequenceNumbers[i] = m_lostDataBlockSequenceNumbers[i];
+    }
 
     return m_status;
 }
@@ -188,7 +191,7 @@ DataStreamReaderWriter::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers)
+DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers)
 {
     std::unique_lock lock(m_operationStatusGate);
 
@@ -206,7 +209,10 @@ DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOp
 
     *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_readData.status();
-    *lostDataBlockSequenceNumbers = m_lostDataBlockSequenceNumbers;
+
+    for (std::size_t i = 0; i < std::size(m_lostDataBlockSequenceNumbers); i++) {
+        lostDataBlockSequenceNumbers[i] = m_lostDataBlockSequenceNumbers[i];
+    }
 
     return m_operationStatus;
 }
