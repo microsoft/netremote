@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <cstdint>
 #include <mutex>
+#include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteDataStreamingService.grpc.pb.h>
@@ -112,10 +113,11 @@ public:
      *
      * @param numberOfDataBlocksReceived The number of data blocks received by the client.
      * @param operationStatus The status of the data stream read operation.
+     * @param lostDataBlockSequenceNumbers The list of sequence numbers associated with data blocks sent by the server that were not received by the client.
      * @return grpc::Status
      */
     grpc::Status
-    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus);
+    Await(uint32_t* numberOfDataBlocksReceived, Microsoft::Net::Remote::DataStream::DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers);
 
     /**
      * @brief Cancel the ongoing RPC.
@@ -134,6 +136,7 @@ private:
     std::condition_variable m_readsDone{};
     bool m_done{ false };
     std::chrono::duration<uint32_t> m_readsDoneTimeoutValue{ DefaultTimeoutValue };
+    std::vector<uint32_t> m_lostDataBlockSequenceNumbers{};
 };
 
 /**

@@ -87,6 +87,14 @@ DataStreamReader::OnReadDone(bool isOk)
 {
     if (isOk) {
         m_numberOfDataBlocksReceived++;
+
+        // Keep track of the sequence numbers of data blocks that were not received.
+        if (m_data.sequencenumber() != m_numberOfDataBlocksReceived) {
+            auto numberOfLostDataBlocks = m_data.sequencenumber() - m_numberOfDataBlocksReceived;
+            for (uint32_t i = numberOfLostDataBlocks; i > 0; i--) {
+                m_lostDataBlockSequenceNumbers.push_back(m_data.sequencenumber() - i);
+            }
+        }
         StartRead(&m_data);
     }
     // If read fails, then there is likely no more data to be read, so do nothing.
@@ -103,7 +111,7 @@ DataStreamReader::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus)
+DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::vector<uint32_t>* lostDataBlockSequenceNumbers)
 {
     std::unique_lock lock(m_readStatusGate);
 
@@ -119,16 +127,9 @@ DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperatio
         *m_data.mutable_status() = std::move(status);
     }
 
-    // Handle mismatched sequence number and number of data blocks received.
-    if (m_data.sequencenumber() != m_numberOfDataBlocksReceived) {
-        DataStreamOperationStatus status{};
-        status.set_code(DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed);
-        status.set_message(std::format("Sequence number {} does not match the number of data blocks received {}", m_data.sequencenumber(), m_numberOfDataBlocksReceived));
-        *m_data.mutable_status() = std::move(status);
-    }
-
     *numberOfDataBlocksReceived = m_numberOfDataBlocksReceived;
     *operationStatus = m_data.status();
+    *lostDataBlockSequenceNumbers = m_lostDataBlockSequenceNumbers;
 
     return m_status;
 }

@@ -116,10 +116,12 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
+        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, &lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived == fixedNumberOfDataBlocksToStream);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
     }
 
     SECTION("Can be called with DataStreamTypeContinuous and DataStreamPatternConstant")
@@ -144,9 +146,11 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
+        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, &lostDataBlockSequenceNumbers);
         REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
     }
 }
 
