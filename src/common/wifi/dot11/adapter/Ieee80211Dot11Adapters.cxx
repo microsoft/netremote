@@ -153,34 +153,40 @@ FromDot11FrequencyBand(const Dot11FrequencyBand dot11FrequencyBand) noexcept
 
 using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest;
 
+namespace detail
+{
+// protobuf encodes enums in repeated fields as 'int' instead of the enum type itself. So, the below is a simple
+// function to convert the repeated field of int to the enum type.
+constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
+    return static_cast<Dot11FrequencyBand>(frequencyBand);
+};
+} // details
+
 std::vector<Dot11FrequencyBand>
 ToDot11FrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request) noexcept
 {
-    // protobuf encodes enums in repeated fields as 'int' instead of the enum type itself. So, the below is a simple
-    // function to convert the repeated field of int to the enum type.
-    constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
-        return static_cast<Dot11FrequencyBand>(frequencyBand);
-    };
-
     std::vector<Dot11FrequencyBand> dot11FrequencyBands(static_cast<std::size_t>(std::size(request.frequencybands())));
-    std::ranges::transform(request.frequencybands(), std::begin(dot11FrequencyBands), toDot11FrequencyBand);
+    std::ranges::transform(request.frequencybands(), std::begin(dot11FrequencyBands), detail::toDot11FrequencyBand);
 
     return dot11FrequencyBands;
     // TODO: for some reason, std::ranges::to is not being found for clang. Once resolved, update to the following:
     // return request.frequencybands() | std::views::transform(toDot11FrequencyBand) | std::ranges::to<std::vector>();
 }
 
+std::vector<Dot11FrequencyBand>
+ToDot11FrequencyBands(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept
+{
+    std::vector<Dot11FrequencyBand> dot11FrequencyBands(static_cast<std::size_t>(std::size(dot11AccessPointConfiguration.frequencybands())));
+    std::ranges::transform(dot11AccessPointConfiguration.frequencybands(), std::begin(dot11FrequencyBands), detail::toDot11FrequencyBand);
+
+    return dot11FrequencyBands;
+}
+
 std::vector<Ieee80211FrequencyBand>
 FromDot11SetFrequencyBandsRequest(const WifiAccessPointSetFrequencyBandsRequest& request)
 {
-    // protobuf encodes enums in repeated fields as 'int' instead of the enum type itself. So, the below is a simple
-    // function to convert the repeated field of int to the enum type.
-    constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
-        return static_cast<Dot11FrequencyBand>(frequencyBand);
-    };
-
     std::vector<Ieee80211FrequencyBand> ieee80211FrequencyBands(static_cast<std::size_t>(std::size(request.frequencybands())));
-    std::ranges::transform(request.frequencybands() | std::views::transform(toDot11FrequencyBand), std::begin(ieee80211FrequencyBands), FromDot11FrequencyBand);
+    std::ranges::transform(request.frequencybands() | std::views::transform(detail::toDot11FrequencyBand), std::begin(ieee80211FrequencyBands), FromDot11FrequencyBand);
 
     return ieee80211FrequencyBands;
 }
@@ -438,7 +444,7 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211
     std::vector<Dot11FrequencyBand> bands(std::size(ieee80211AccessPointCapabilities.FrequencyBands));
     std::ranges::transform(ieee80211AccessPointCapabilities.FrequencyBands, std::begin(bands), ToDot11FrequencyBand);
 
-    *dot11Capabilities.mutable_bands() = {
+    *dot11Capabilities.mutable_frequencybands() = {
         std::make_move_iterator(std::begin(bands)),
         std::make_move_iterator(std::end(bands))
     };

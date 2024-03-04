@@ -300,41 +300,10 @@ NetRemoteService::WifiAccessPointEnable([[maybe_unused]] grpc::ServerContext* co
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    // Create an AP controller for the requested AP.
-    auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
-    if (accessPointController == nullptr) {
-        return grpc::Status::OK;
-    }
-
-    // Obtain current operational state.
-    AccessPointOperationalState operationalState{};
-    auto operationStatus = accessPointController->GetOperationalState(operationalState);
-    if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get operational state for access point {}", request->accesspointid()));
-    }
-
-    WifiAccessPointOperationStatus status{};
-
-    // Enable the access point if it's not already enabled.
-    if (operationalState != AccessPointOperationalState::Enabled) {
-        // Validate request is well-formed and has all required parameters.
-        if (ValidateWifiAccessPointEnableRequest(request, status)) {
-            // TODO: Enable the access point.
-
-            // Set the operational state to 'enabled' now that initial configuration has been set.
-            operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
-            if (!operationStatus) {
-                return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set operational state to 'enabled' for access point {}", request->accesspointid()));
-            }
-        }
-    } else {
-        LOGI << std::format("Access point {} is already enabled", request->accesspointid());
-    }
-
-    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-
+    const auto* dot11AccessPointConfiguration{ request->has_configuration() ? &request->configuration() : nullptr };
+    auto wifiOperationStatus = WifiAccessPointEnableImpl(request->accesspointid(), dot11AccessPointConfiguration);
     result->set_accesspointid(request->accesspointid());
-    *result->mutable_status() = std::move(status);
+    *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
 }
@@ -395,54 +364,11 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     auto dot11FrequencyBands = ToDot11FrequencyBands(*request);
-
     auto wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(request->accesspointid(), dot11FrequencyBands);
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
-}
-
-/* static */
-bool
-NetRemoteService::ValidateWifiAccessPointEnableRequest(const WifiAccessPointEnableRequest* request, WifiAccessPointOperationStatus& status)
-{
-    // Validate required arguments are present. Detailed argument validation is left to the implementation.
-
-    if (!request->has_configuration()) {
-        // Configuration isn't required, so exit early.
-        return true;
-    }
-
-    // Configuration isn't required, but if it's present, it must be valid.
-    const auto& configuration = request->configuration();
-    if (!configuration.has_ssid()) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No SSID provided");
-        return false;
-    }
-    if (configuration.phytype() == Dot11PhyType::Dot11PhyTypeUnknown) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No PHY type provided");
-        return false;
-    }
-    if (configuration.authenticationalgorithm() == Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No authentication algorithm provided");
-        return false;
-    }
-    if (configuration.ciphersuite() == Dot11CipherSuite::Dot11CipherSuiteUnknown) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No cipher suite provided");
-        return false;
-    }
-    if (std::empty(configuration.bands())) {
-        status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        status.set_message("No radio bands provided");
-        return false;
-    }
-
-    return true;
 }
 
 AccessPointOperationStatus
@@ -503,7 +429,84 @@ NetRemoteService::TryGetAccessPointController(std::string_view accessPointId, st
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Dot11PhyType dot11PhyType)
+NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, const Dot11AccessPointConfiguration* dot11AccessPointConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Set all configuration items that are present.
+    if (dot11AccessPointConfiguration != nullptr) {
+        if (dot11AccessPointConfiguration->phytype() != Dot11PhyType::Dot11PhyTypeUnknown) {
+            wifiOperationStatus = WifiAccessPointSetPhyTypeImpl(accessPointId, dot11AccessPointConfiguration->phytype(), accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
+        if (dot11AccessPointConfiguration->authenticationalgorithm() != Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
+            // TODO: set authentication algorithm.
+        }
+
+        if (dot11AccessPointConfiguration->ciphersuite() != Dot11CipherSuite::Dot11CipherSuiteUnknown) {
+            // TODO: set cipher suite.
+        }
+
+        if (dot11AccessPointConfiguration->has_ssid()) {
+            const auto& ssid = dot11AccessPointConfiguration->ssid();
+            wifiOperationStatus = WifiAccessPointSetSsidImpl(accessPointId, ssid, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
+        if (!std::empty(dot11AccessPointConfiguration->frequencybands())) {
+            auto dot11FrequencyBands = ToDot11FrequencyBands(*dot11AccessPointConfiguration);
+            wifiOperationStatus = WifiAccessPointSetFrequencyBandsImpl(accessPointId, dot11FrequencyBands, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+    }
+
+    // Obtain current operational state.
+    AccessPointOperationalState operationalState{};
+    operationStatus = accessPointController->GetOperationalState(operationalState);
+    if (!operationStatus) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to get operational state for access point {}", accessPointId));
+        return wifiOperationStatus;
+    }
+
+    // Enable the access point if it's not already enabled.
+    if (operationalState != AccessPointOperationalState::Enabled) {
+        // Set the operational state to 'enabled' now that any initial configuration has been set.
+        operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Enabled);
+        if (!operationStatus) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to set operational state to 'enabled' for access point {}", accessPointId));
+            return wifiOperationStatus;
+        }
+    } else {
+        LOGI << std::format("Access point {} is already enabled", accessPointId);
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, Dot11PhyType dot11PhyType, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
@@ -514,13 +517,16 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
         return wifiOperationStatus;
     }
 
-    // Create an AP controller for the requested AP.
-    std::shared_ptr<IAccessPointController> accessPointController{};
-    auto operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
-    if (!operationStatus.Succeeded() || accessPointController == nullptr) {
-        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-        wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
-        return wifiOperationStatus;
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
     }
 
     // Convert PHY type to Ieee80211 protocol.
@@ -556,7 +562,7 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPointId, std::vector<Dot11FrequencyBand>& dot11FrequencyBands)
+NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPointId, std::vector<Dot11FrequencyBand>& dot11FrequencyBands, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
@@ -572,13 +578,16 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
         return wifiOperationStatus;
     }
 
-    // Create an AP controller for the requested AP.
-    std::shared_ptr<IAccessPointController> accessPointController{};
-    auto operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
-    if (!operationStatus.Succeeded() || accessPointController == nullptr) {
-        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-        wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point - {}", accessPointId, operationStatus.ToString()));
-        return wifiOperationStatus;
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
     }
 
     // Convert dot11 bands to ieee80211 bands.
@@ -608,6 +617,59 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set frequency bands for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Dot11Ssid& dot11Ssid, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    if (dot11Ssid.Value_case() == Dot11Ssid::ValueCase::VALUE_NOT_SET) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No SSID provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Set the SSID.
+    switch (dot11Ssid.Value_case()) {
+    case Dot11Ssid::ValueCase::kName:
+        operationStatus = accessPointController->SetSsid(dot11Ssid.name());
+        break;
+    case Dot11Ssid::ValueCase::kHex:
+        operationStatus = accessPointController->SetSsid(dot11Ssid.hex());
+        break;
+    case Dot11Ssid::ValueCase::kData:
+        operationStatus = accessPointController->SetSsid(dot11Ssid.data());
+        break;
+    case Dot11Ssid::ValueCase::VALUE_NOT_SET: 
+        [[fallthrough]];
+    default:
+        operationStatus.Code = AccessPointOperationStatusCode::InvalidParameter;
+        operationStatus.Details = "No SSID provided";
+        break;
+    }
+    
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set SSID for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
 

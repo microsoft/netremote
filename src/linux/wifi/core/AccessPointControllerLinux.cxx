@@ -265,7 +265,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetSssid(std::string_view ssid) noexcept
+AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);

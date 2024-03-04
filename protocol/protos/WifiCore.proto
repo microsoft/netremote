@@ -142,12 +142,12 @@ message Dot11AccessPointConfiguration
     Dot11PhyType PhyType = 3;
     Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 4;
     Dot11CipherSuite CipherSuite = 5;
-    repeated Dot11FrequencyBand Bands = 6;
+    repeated Dot11FrequencyBand FrequencyBands = 6;
 }
 
 message Dot11AccessPointCapabilities
 {
-    repeated Microsoft.Net.Wifi.Dot11FrequencyBand Bands = 1;
+    repeated Microsoft.Net.Wifi.Dot11FrequencyBand FrequencyBands = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
     repeated Microsoft.Net.Wifi.Dot11AkmSuite AkmSuites = 3;
     repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;

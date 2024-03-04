@@ -99,7 +99,7 @@ struct IAccessPointController
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    SetSssid(std::string_view ssid) noexcept = 0;
+    SetSsid(std::string_view ssid) noexcept = 0;
 };
 
 /**
