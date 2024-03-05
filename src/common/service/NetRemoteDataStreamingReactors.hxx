@@ -150,6 +150,73 @@ private:
     std::atomic<bool> m_isCanceled{};
     Microsoft::Net::Remote::Service::Reactors::Helpers::DataGenerator m_dataGenerator{};
 };
+
+/**
+ * @brief Implementation of the gRPC ServerBidiReactor for server-side data stream reading and writing.
+ */
+class DataStreamReaderWriter :
+    public grpc::ServerBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>
+{
+public:
+    /**
+     * @brief Construct a new DataStreamReaderWriter object.
+     *
+     */
+    explicit DataStreamReaderWriter();
+
+    /**
+     * @brief Callback that is executed when a read operation is completed.
+     *
+     * @param isOk Indicates whether a message was read as expected.
+     */
+    void
+    OnReadDone(bool isOk) override;
+
+    /**
+     * @brief Callback that is executed when a write operation is completed.
+     *
+     * @param isOk Indicates whether a write was successfully sent.
+     */
+    void
+    OnWriteDone(bool isOk) override;
+
+    /**
+     * @brief Callback that is executed when an RPC is canceled before successfully sending a status to the client.
+     */
+    void
+    OnCancel() override;
+
+    /**
+     * @brief Callback that is executed when all RPC operations are completed for a given RPC.
+     */
+    void
+    OnDone() override;
+
+private:
+    /**
+     * @brief Facilitate the next write operation.
+     */
+    void
+    NextWrite();
+
+    /**
+     * @brief Handle a failed operation.
+     *
+     * @param errorMessage The error message associated with the failed operation.
+     */
+    void
+    HandleFailure(const std::string& errorMessage);
+
+private:
+    Microsoft::Net::Remote::DataStream::DataStreamUploadData m_readData{};
+    Microsoft::Net::Remote::DataStream::DataStreamDownloadData m_writeData{};
+    uint32_t m_numberOfDataBlocksReceived{};
+    uint32_t m_numberOfDataBlocksWritten{};
+    Microsoft::Net::Remote::DataStream::DataStreamOperationStatus m_status{};
+    std::atomic<bool> m_isCanceled{};
+    std::atomic<bool> m_readsDone{};
+    Microsoft::Net::Remote::Service::Reactors::Helpers::DataGenerator m_dataGenerator{};
+};
 } // namespace Microsoft::Net::Remote::Service::Reactors
 
 #endif // NET_REMOTE_DATA_STREAMING_REACTORS_HXX

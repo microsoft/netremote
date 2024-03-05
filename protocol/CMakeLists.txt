@@ -26,6 +26,7 @@ set(PROTO_FILES
 #
 set(PROTO_HEADERS_GENERATED
     ${PROTO_DIR_BINARY}/NetRemote.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteDataStream.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.pb.h
@@ -34,6 +35,7 @@ set(PROTO_HEADERS_GENERATED
 
 set(PROTO_HEADERS_GENERATED_GRPC
     ${PROTO_DIR_BINARY}/NetRemote.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteDataStream.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.grpc.pb.h

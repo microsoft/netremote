@@ -1,7 +1,9 @@
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -115,10 +117,12 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived == fixedNumberOfDataBlocksToStream);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
     }
 
     SECTION("Can be called with DataStreamTypeContinuous and DataStreamPatternConstant")
@@ -143,8 +147,80 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus);
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
+    }
+}
+
+TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::DataStream;
+    using namespace Microsoft::Net::Remote::Service;
+
+    using Microsoft::Net::Remote::Test::DataStreamReaderWriter;
+    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+
+    const NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemoteDataStreaming::NewStub(channel);
+
+    static constexpr auto fixedNumberOfDataBlocksToStream = 10;
+
+    SECTION("Can be called with DataStreamTypeFixed")
+    {
+        DataStreamFixedTypeProperties fixedTypeProperties{};
+        fixedTypeProperties.set_numberofdatablockstostream(fixedNumberOfDataBlocksToStream);
+
+        DataStreamProperties properties{};
+        properties.set_type(DataStreamType::DataStreamTypeFixed);
+        *properties.mutable_fixed() = std::move(fixedTypeProperties);
+
+        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), std::move(properties) };
+
+        uint32_t numberOfDataBlocksReceived{};
+        DataStreamOperationStatus operationStatus{};
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
+        REQUIRE(status.ok());
+        REQUIRE(numberOfDataBlocksReceived > 0);
+        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
+    }
+
+    SECTION("Can be called with DataStreamTypeContinuous")
+    {
+        static constexpr auto StreamingDelayTime = 5s;
+
+        DataStreamContinuousTypeProperties continuousTypeProperties{};
+
+        DataStreamProperties properties{};
+        properties.set_type(DataStreamType::DataStreamTypeContinuous);
+        *properties.mutable_continuous() = std::move(continuousTypeProperties);
+
+        DataStreamReaderWriter dataStreamReaderWriter{ client.get(), std::move(properties) };
+
+        // Allow some time of continuous streaming, then stop writing data. This will prompt the
+        // server to stop writing too, eliminating the need to cancel the RPC.
+        std::this_thread::sleep_for(StreamingDelayTime);
+        dataStreamReaderWriter.StopWrites();
+
+        uint32_t numberOfDataBlocksReceived{};
+        DataStreamOperationStatus operationStatus{};
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
+        const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
+        REQUIRE(status.ok());
+        REQUIRE(numberOfDataBlocksReceived > 0);
+        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+        REQUIRE(lostDataBlockSequenceNumbers.empty());
     }
 }
