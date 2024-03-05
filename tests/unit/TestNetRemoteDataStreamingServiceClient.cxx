@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -116,7 +117,7 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
         const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived == fixedNumberOfDataBlocksToStream);
@@ -146,7 +147,7 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
         const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
@@ -188,7 +189,7 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
         const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived > 0);
@@ -215,7 +216,7 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
 
         uint32_t numberOfDataBlocksReceived{};
         DataStreamOperationStatus operationStatus{};
-        std::vector<uint32_t> lostDataBlockSequenceNumbers{};
+        std::span<uint32_t> lostDataBlockSequenceNumbers{};
         const grpc::Status status = dataStreamReaderWriter.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
         REQUIRE(status.ok());
         REQUIRE(numberOfDataBlocksReceived > 0);

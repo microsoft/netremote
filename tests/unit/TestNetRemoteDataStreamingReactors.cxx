@@ -114,7 +114,7 @@ DataStreamReader::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers)
+DataStreamReader::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::span<uint32_t>& lostDataBlockSequenceNumbers)
 {
     std::unique_lock lock(m_readStatusGate);
 
@@ -225,7 +225,7 @@ DataStreamReaderWriter::OnDone(const grpc::Status& status)
 }
 
 grpc::Status
-DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::span<uint32_t> lostDataBlockSequenceNumbers)
+DataStreamReaderWriter::Await(uint32_t* numberOfDataBlocksReceived, DataStreamOperationStatus* operationStatus, std::span<uint32_t>& lostDataBlockSequenceNumbers)
 {
     std::unique_lock lock(m_operationStatusGate);
 
