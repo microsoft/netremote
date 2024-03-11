@@ -57,14 +57,12 @@ TEST_CASE("DataStreamUpload API", "[basic][rpc][client][remote][stream]")
     {
         static constexpr auto numberOfClients = 5;
 
-        std::vector<std::unique_ptr<NetRemoteDataStreaming::Stub>> dataStreamingClients;
         std::vector<std::jthread> clientThreads;
-
         for (std::size_t i = 0; i < numberOfClients; i++) {
-            dataStreamingClients.push_back(NetRemoteDataStreaming::NewStub(channel));
-            auto dataStreamWriter = std::make_unique<DataStreamWriter>(dataStreamingClients.back().get(), numberOfDataBlocksToWrite);
+            clientThreads.emplace_back([&]() {
+                auto dataStreamingClient = NetRemoteDataStreaming::NewStub(channel);
+                auto dataStreamWriter = std::make_unique<DataStreamWriter>(dataStreamingClient.get(), numberOfDataBlocksToWrite);
 
-            clientThreads.emplace_back([dataStreamWriter = std::move(dataStreamWriter)]() {
                 DataStreamUploadResult result{};
                 const grpc::Status status = dataStreamWriter->Await(&result);
                 REQUIRE(status.ok());
