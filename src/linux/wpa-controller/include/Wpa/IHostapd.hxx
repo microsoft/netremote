@@ -57,11 +57,8 @@ struct IHostapd
 
     /**
      * @brief Disables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Disable() = 0;
 
     /**

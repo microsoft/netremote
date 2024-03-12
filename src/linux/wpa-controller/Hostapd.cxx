@@ -103,7 +103,7 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
     }
 
     if (!response->IsOk()) {
-        LOGV << std::format("Invalid response received when setting hostapd property '{}' to '{}' (payload={})", propertyName, propertyValue, response->Payload());
+        LOGV << std::format("Invalid response received when setting hostapd property '{}' to '{}'\nResponse payload={}", propertyName, propertyValue, response->Payload());
         throw HostapdException(std::format("Failed to set hostapd property '{}' to '{}'", propertyName, propertyValue));
     }
 
@@ -131,8 +131,7 @@ Hostapd::Enable()
     }
 
     if (response->IsOk()) {
-        LOGV << std::format("Invalid response received when enabling hostapd interface (payload={})", response->Payload());
-        throw HostapdException("Failed to enable hostapd interface (invalid response)");
+        return;
     }
 
     // The response will indicate failure if the interface is already enabled.
@@ -145,7 +144,7 @@ Hostapd::Enable()
     }
 }
 
-bool
+void
 Hostapd::Disable()
 {
     static constexpr WpaCommand DisableCommand(ProtocolHostapd::CommandPayloadDisable);
@@ -156,7 +155,7 @@ Hostapd::Disable()
     }
 
     if (response->IsOk()) {
-        return true;
+        return;
     }
 
     // The response will indicate failure if the interface is already disabled.
@@ -164,7 +163,9 @@ Hostapd::Disable()
     // This is only done if the 'disable' command fails since the GetStatus()
     // command is fairly heavy-weight in terms of its payload.
     const auto status = GetStatus();
-    return !IsHostapdStateOperational(status.State);
+    if (IsHostapdStateOperational(status.State)) {
+        throw HostapdException(std::format("Failed to disable hostapd interface (invalid state {})", magic_enum::enum_name(status.State)));
+    }
 }
 
 bool

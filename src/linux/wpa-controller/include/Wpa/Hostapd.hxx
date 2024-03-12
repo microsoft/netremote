@@ -33,11 +33,8 @@ struct Hostapd :
 
     /**
      * @brief Disables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    bool
+    void
     Disable() override;
 
     /**

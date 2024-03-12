@@ -94,7 +94,7 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
 
     SECTION("GetStatus() reflects changes in interface state (disabled -> not disabled)")
     {
-        REQUIRE(hostapd.Disable());
+        REQUIRE_NOTHROW(hostapd.Disable());
         const auto statusInitial = hostapd.GetStatus();
         REQUIRE(statusInitial.State == HostapdInterfaceState::Disabled);
         REQUIRE_NOTHROW(hostapd.Enable());
@@ -106,7 +106,7 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
     {
         const auto statusInitial = hostapd.GetStatus();
         REQUIRE(IsHostapdStateOperational(statusInitial.State));
-        REQUIRE(hostapd.Disable());
+        REQUIRE_NOTHROW(hostapd.Disable());
         const auto statusDisabled = hostapd.GetStatus();
         REQUIRE(!IsHostapdStateOperational(statusDisabled.State));
     }
@@ -271,7 +271,7 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
 
     SECTION("Enable() enables the interface")
     {
-        CHECK(hostapd.Disable());
+        CHECK_NOTHROW(hostapd.Disable());
         auto hostapdStatus = hostapd.GetStatus();
         REQUIRE(hostapdStatus.State != HostapdInterfaceState::Enabled);
         REQUIRE_NOTHROW(hostapd.Enable());
@@ -281,7 +281,7 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
 
     SECTION("Enable() preserves further communication")
     {
-        CHECK(hostapd.Disable());
+        CHECK_NOTHROW(hostapd.Disable());
         CHECK_NOTHROW(hostapd.Enable());
         REQUIRE(hostapd.Ping());
     }
@@ -293,14 +293,14 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
 
     SECTION("Disable() disables the interface")
     {
-        CHECK(hostapd.Disable());
+        CHECK_NOTHROW(hostapd.Disable());
         const auto hostapdStatus = hostapd.GetStatus();
         REQUIRE(hostapdStatus.State == HostapdInterfaceState::Disabled);
     }
 
     SECTION("Disable() doesn't prevent further communication")
     {
-        CHECK(hostapd.Disable());
+        CHECK_NOTHROW(hostapd.Disable());
         REQUIRE(hostapd.Ping());
     }
 }
