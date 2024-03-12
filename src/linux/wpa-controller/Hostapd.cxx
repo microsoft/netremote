@@ -2,6 +2,7 @@
 #include <format>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
@@ -177,3 +178,37 @@ Hostapd::Reload()
 
     return response->IsOk();
 }
+
+bool
+Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange)
+{
+    if (std::empty(protocols)) {
+        throw HostapdException("No WPA protocols were provided");
+    }
+
+    uint32_t protocolsToSet = 0;
+    for (const auto protocol : protocols) {
+        protocolsToSet |= std::to_underlying(protocol);
+    }
+
+    protocolsToSet &= WpaProtocolMask;
+
+    const auto protocolsValue = std::format("{}", protocolsToSet);
+    const bool protocolsWereSet = SetProperty(ProtocolHostapd::PropertyNameWpaProtocol, protocolsValue);
+    if (!protocolsWereSet) {
+        throw HostapdException(std::format("Failed to set hostapd 'wpa' property to '{}'", protocolsValue));
+    }
+
+    if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
+        LOGW << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameWpaProtocol);
+        return true;
+    }
+
+    const bool configurationReloadSucceeded = Reload();
+    if (!configurationReloadSucceeded) {
+        throw HostapdException("Failed to reload hostapd configuration");
+    }
+
+    return true;
+}
+
