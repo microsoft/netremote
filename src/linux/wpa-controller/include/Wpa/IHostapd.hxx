@@ -75,11 +75,8 @@ struct IHostapd
 
     /**
      * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
-     *
-     * @return true If the configuration was reloaded successfully.
-     * @return false If the configuration was not reloaded successfully.
      */
-    virtual bool
+    virtual void
     Reload() = 0;
 
     /**

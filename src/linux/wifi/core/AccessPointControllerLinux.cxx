@@ -192,10 +192,11 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
     }
 
     // Reload the hostapd configuration to pick up the changes.
-    hostapdOperationSucceeded = m_hostapd.Reload();
-    if (!hostapdOperationSucceeded) {
+    try {
+        m_hostapd.Reload();
+    } catch (const Wpa::HostapdException& ex) {
         status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = "failed to reload hostapd configuration";
+        status.Details = std::format("failed to reload hostapd configuration - {}", ex.what());
         return status;
     }
 

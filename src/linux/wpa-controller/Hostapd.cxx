@@ -49,7 +49,7 @@ Hostapd::Ping()
     }
 }
 
-bool
+void
 Hostapd::Reload()
 {
     static constexpr WpaCommand ReloadCommand(ProtocolHostapd::CommandPayloadReload);
@@ -59,7 +59,10 @@ Hostapd::Reload()
         throw HostapdException("Failed to send hostapd 'reload' command");
     }
 
-    return response->IsOk();
+    if (!response->IsOk()) {
+        LOGV << std::format("Invalid response received when reloading hostapd configuration\nResponse payload={}", response->Payload());
+        throw HostapdException("Invalid response received when reloading hostapd configuration");
+    }
 }
 
 HostapdStatus
@@ -115,9 +118,10 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
         return true;
     }
 
-    const bool configurationReloadSucceeded = Reload();
-    if (!configurationReloadSucceeded) {
-        throw HostapdException(std::format("Failed to reload hostapd configuration after '{}' property change", propertyName));
+    try {
+        Reload();
+    } catch (HostapdException& e) {
+        throw HostapdException(std::format("Failed to reload hostapd configuration after '{}' property change: {}", propertyName, e.what()));
     }
 
     return true;
