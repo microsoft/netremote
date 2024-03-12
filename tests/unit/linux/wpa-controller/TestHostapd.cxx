@@ -338,14 +338,9 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
 
-    SECTION("SetSsid() doesn't throw")
+    SECTION("doesn't throw for valid SSID")
     {
         REQUIRE_NOTHROW(hostapd.SetSsid(SsidValid));
-    }
-
-    SECTION("SetSsid() returns true for valid SSID")
-    {
-        REQUIRE(hostapd.SetSsid(SsidValid));
     }
 
     SECTION("SetSsid() throws for empty SSID")
@@ -361,7 +356,7 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
     SECTION("SetSsid() changes the SSID for valid input")
     {
         constexpr auto SsidToSet{ SsidValid };
-        REQUIRE(hostapd.SetSsid(SsidToSet));
+        REQUIRE_NOTHROW(hostapd.SetSsid(SsidToSet));
         const auto status = hostapd.GetStatus();
         REQUIRE(!std::empty(status.Bss));
         REQUIRE(status.Bss[0].Ssid == SsidToSet);

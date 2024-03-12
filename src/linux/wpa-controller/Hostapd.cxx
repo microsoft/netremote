@@ -192,11 +192,13 @@ Hostapd::Terminate()
     }
 }
 
-bool
+void
 Hostapd::SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange)
 {
     const bool ssidWasSet = SetProperty(ProtocolHostapd::PropertyNameSsid, ssid, enforceConfigurationChange);
-    return ssidWasSet;
+    if (!ssidWasSet) {
+        throw HostapdException(std::format("Failed to set hostapd 'ssid' property to '{}'", ssid));
+    }
 }
 
 bool
