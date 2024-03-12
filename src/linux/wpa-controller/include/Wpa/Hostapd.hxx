@@ -117,6 +117,25 @@ struct Hostapd :
     void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
+    /**
+     * @brief Set the allowed cipher suites for the interface.
+     *
+     * @param protocol The WPA protocol to set the cipher suites for.
+     * @param ciphers The ciphers to allow.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    void
+    SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange) override;
+
+    /**
+     * @brief Set the allowed cipher suites for the interface.
+     *
+     * @param protocolCipherMap map specifying the ciphers to allow for each protocol.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    void
+    SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) override;
+
 private:
     const std::string m_interface;
     WpaController m_controller;

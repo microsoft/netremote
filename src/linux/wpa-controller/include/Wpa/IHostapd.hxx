@@ -5,6 +5,7 @@
 #include <exception>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
@@ -140,6 +141,25 @@ struct IHostapd
      */
     virtual void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed cipher suites for the interface.
+     *
+     * @param protocol The WPA protocol to set the cipher suites for.
+     * @param ciphers The ciphers to allow.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed cipher suites for the interface.
+     *
+     * @param protocolCipherMap map specifying the ciphers to allow for each protocol.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**

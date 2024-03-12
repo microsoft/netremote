@@ -305,6 +305,7 @@ struct ProtocolHostapd :
     // Property names for "SET" commands.
     static constexpr auto PropertyEnabled = "1";
     static constexpr auto PropertyDisabled = "0";
+    static constexpr auto PropertyNameInvalid = "invalid";
 
     static constexpr auto PropertyNameSetBand = "setband";
     static constexpr auto PropertySetBandValueAuto = "AUTO";
@@ -494,6 +495,28 @@ WpaCipherPropertyValue(WpaCipher wpaCipher) noexcept
         [[fallthrough]];
     default:
         return WpaCipherInvalidValue;
+    }
+}
+
+/**
+ * @brief Get the hostapd property name to use to set the cipher for the specified WPA protocol.
+ *
+ * Hostapd uses different configuration properties for WPA and WPA2/RSN protocols. This function maps the protocol to
+ * the associated property name.
+ *
+ * @param wpaProtocol The wpa protocol to get the cipher name property for.
+ * @return constexpr std::string_view
+ */
+constexpr std::string_view
+WpaCipherPropertyName(WpaProtocol wpaProtocol) noexcept
+{
+    switch (wpaProtocol) {
+    case WpaProtocol::Wpa:
+        return ProtocolHostapd::PropertyNameWpaPairwise;
+    case WpaProtocol::Rsn:
+        return ProtocolHostapd::PropertyNameRsnPairwise;
+    default:
+        return ProtocolHostapd::PropertyNameInvalid;
     }
 }
 } // namespace Wpa
