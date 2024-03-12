@@ -1,9 +1,12 @@
 
-#include <chrono>
+#include <chrono> // NOLINT
+#include <initializer_list>
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <type_traits>
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
@@ -131,7 +134,7 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
 
         const auto ieee80211acInitial = hostapd.GetStatus().Ieee80211ac;
 
-        auto ieee80211acValueExpected =  static_cast<bool>(ieee80211acInitial);
+        auto ieee80211acValueExpected = static_cast<bool>(ieee80211acInitial);
         REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
         auto ieee80211acValueUpdated = hostapd.GetStatus().Ieee80211ac;
         REQUIRE(ieee80211acValueUpdated == ieee80211acValueExpected);
@@ -203,21 +206,53 @@ TEST_CASE("Send SetProperty() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
+    static constexpr auto PropertyNameInvalid{ "whatever" };
+    static constexpr auto PropertyValueInvalid{ "whatever" };
+
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
 
     SECTION("SetProperty() doesn't throw")
     {
-        REQUIRE_NOTHROW(hostapd.SetProperty("whatever", "whatever"));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
     }
 
     SECTION("SetProperty() returns false for invalid property")
     {
-        REQUIRE_FALSE(hostapd.SetProperty("whatever", "whatever"));
+        REQUIRE_THROWS_AS(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Defer), HostapdException);
     }
 
     SECTION("SetProperty() returns true for valid property")
     {
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("SetProperty() allows setting a property to the same value")
+    {
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("SetProperty allows setting a property to a different value")
+    {
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue2G, EnforceConfigurationChange::Now));
+
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue5G, EnforceConfigurationChange::Defer));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue6G, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("SetProperty allows interleaving enforcement of configuration changes")
+    {
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue2G, EnforceConfigurationChange::Defer));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue5G, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue6G, EnforceConfigurationChange::Defer));
     }
 
     // TODO: validate that the property was actually set. Need to find a property whose value is retrievable.
@@ -288,7 +323,7 @@ TEST_CASE("Send command: Terminate() ping failure (root)", "[wpa][hostapd][clien
     using namespace Wpa;
     using namespace std::chrono_literals;
 
-    static constexpr auto TerminationWaitTime{ 2s };
+    static constexpr auto TerminationWaitTime{ 2s }; // NOLINT
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
     REQUIRE(hostapd.Ping());
@@ -354,5 +389,149 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
         const auto statusAfterFail = hostapd.GetStatus();
         REQUIRE(!std::empty(statusAfterFail.Bss));
         REQUIRE(statusAfterFail.Bss[0].Ssid.starts_with(statusInitial.Bss[0].Ssid));
+    }
+}
+
+TEST_CASE("Send SetWpaProtocols() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    static constexpr auto WpaProtocolInvalid = static_cast<WpaProtocol>(std::numeric_limits<std::underlying_type_t<WpaProtocol>>::max());
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Fails with empty input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({}, EnforceConfigurationChange::Now), HostapdException);
+    }
+
+    SECTION("Fails with invalid input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now), HostapdException);
+
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer), HostapdException);
+    }
+
+    SECTION("Succeeds with valid, single input")
+    {
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid, multiple inputs")
+    {
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid, duplicate inputs")
+    {
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+    }
+}
+
+TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    static constexpr std::initializer_list<WpaKeyManagement> KeyManagementInvalidValues = {
+        WpaKeyManagement::None,
+        WpaKeyManagement::Ieee80211xNoWpa,
+        WpaKeyManagement::WpaNone,
+        WpaKeyManagement::Wps,
+        WpaKeyManagement::WapiPsk,
+        WpaKeyManagement::WapiCert,
+        WpaKeyManagement::Cckm,
+    };
+
+    static constexpr std::initializer_list<WpaKeyManagement> KeyManagementValidValues = {
+        WpaKeyManagement::Ieee80211x,
+        WpaKeyManagement::Psk,
+        // WpaKeyManagement::FtIeee8021x,           // feature work not yet completed
+        // WpaKeyManagement::FtPsk,                 // feature work not yet completed
+        WpaKeyManagement::Ieee8021xSha256,
+        WpaKeyManagement::PskSha256,
+        WpaKeyManagement::Sae,
+        // WpaKeyManagement::FtSae,                 // feature work not yet completed
+        // WpaKeyManagement::Osen,                  // feature work not yet completed
+        // WpaKeyManagement::Ieee80211xSuiteB,      // feature work not yet completed
+        // WpaKeyManagement::Ieee80211xSuiteB192,   // feature work not yet completed
+        // WpaKeyManagement::FilsSha256,            // feature work not yet completed
+        // WpaKeyManagement::FilsSha384,            // feature work not yet completed
+        // WpaKeyManagement::FtFilsSha256,          // feature work not yet completed
+        // WpaKeyManagement::FtFilsSha384,          // feature work not yet completed
+        WpaKeyManagement::Owe,
+        WpaKeyManagement::Dpp,
+        // WpaKeyManagement::FtIeee8021xSha384,     // feature work not yet completed
+        // WpaKeyManagement::Pasn,                  // feature work not yet completed
+    };
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk, WpaKeyManagement::Sae }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk, WpaKeyManagement::Sae }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Fails with empty input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetKeyManagement({}, EnforceConfigurationChange::Now), HostapdException);
+    }
+
+    SECTION("Fails with every invalid input")
+    {
+        std::vector<WpaKeyManagement> keyManagementInvalidValues{};
+        for (const auto keyManagementInvalidValue : KeyManagementInvalidValues) {
+            keyManagementInvalidValues.push_back(keyManagementInvalidValue);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement({ keyManagementInvalidValue }, EnforceConfigurationChange::Now), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement({ keyManagementInvalidValue }, EnforceConfigurationChange::Defer), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement(keyManagementInvalidValues, EnforceConfigurationChange::Now), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement(keyManagementInvalidValues, EnforceConfigurationChange::Defer), HostapdException);
+        }
+    }
+
+    SECTION("Succeeds with all valid, single inputs")
+    {
+        for (const auto keyManagementValidValue : KeyManagementValidValues) {
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Now));
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Succeeds with valid, multiple inputs")
+    {
+        std::vector<WpaKeyManagement> keyManagementValidValues{};
+        for (const auto keyManagementValidValue : KeyManagementValidValues) {
+            keyManagementValidValues.push_back(keyManagementValidValue);
+            REQUIRE(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Now));
+            REQUIRE(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Succeeds with valid, duplicate inputs")
+    {
+        for (const auto keyManagementValidValue : KeyManagementValidValues) {
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Now));
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Defer));
+        }
     }
 }

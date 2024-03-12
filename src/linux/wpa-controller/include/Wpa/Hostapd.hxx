@@ -7,6 +7,7 @@
 
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaController.hxx>
 
 namespace Wpa
@@ -58,6 +59,15 @@ struct Hostapd :
     Ping() override;
 
     /**
+     * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
+     *
+     * @return true If the configuration was reloaded successfully.
+     * @return false If the configuration was not reloaded successfully.
+     */
+    bool
+    Reload() override;
+
+    /**
      * @brief Get the name of the interface hostapd is managing.
      *
      * @return std::string_view
@@ -72,16 +82,6 @@ struct Hostapd :
      */
     HostapdStatus
     GetStatus() override;
-
-    /**
-     * @brief Set the ssid of the access point.
-     *
-     * @param ssid The ssid to set.
-     * @return true
-     * @return false
-     */
-    bool
-    SetSsid(std::string_view ssid, bool reload = true);
 
     /**
      * @brief Get a property value for the interface.
@@ -99,20 +99,45 @@ struct Hostapd :
      *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      * @return true The property was set successfully.
      * @return false The property was not set successfully.
      */
     bool
-    SetProperty(std::string_view propertyName, std::string_view propertyValue) override;
+    SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
-     * @brief Reloads the interface.
+     * @brief Set the ssid for the interface.
      *
-     * @return true
-     * @return false
+     * @param ssid The ssid to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the ssid was set successfully.
+     * @return false If the ssid was not set successfully.
      */
     bool
-    Reload() override;
+    SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
+
+    /**
+     * @brief Set the WPA protocol(s) for the interface.
+     *
+     * @param protocols The protocols to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the protocols were set successfully.
+     * @return false If the protocols were not set successfully.
+     */
+    bool
+    SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
+
+    /**
+     * @brief Set the Key Management object
+     *
+     * @param keyManagements The key management value(s) to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true The key management value(s) were set successfully.
+     * @return false The key management value(s) were not set successfully.
+     */
+    bool
+    SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
 private:
     const std::string m_interface;

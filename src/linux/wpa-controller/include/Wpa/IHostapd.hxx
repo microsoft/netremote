@@ -5,11 +5,21 @@
 #include <exception>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 
 namespace Wpa
 {
+/**
+ * @brief Syntax sugar for specifying when configuration change should be enforced.
+ */
+enum class EnforceConfigurationChange {
+    Now,
+    Defer,
+};
+
 /**
  * @brief Interface for interacting with the hostapd daemon.
  *
@@ -30,9 +40,14 @@ struct IHostapd
      * Prevent copying and moving of IHostapd objects.
      */
     IHostapd(const IHostapd&) = delete;
-    IHostapd& operator=(const IHostapd&) = delete;
+
     IHostapd(IHostapd&&) = delete;
-    IHostapd& operator=(IHostapd&&) = delete;
+
+    IHostapd&
+    operator=(const IHostapd&) = delete;
+
+    IHostapd&
+    operator=(IHostapd&&) = delete;
 
     /**
      * @brief Enables the interface for use.
@@ -68,6 +83,15 @@ struct IHostapd
     Ping() = 0;
 
     /**
+     * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
+     *
+     * @return true If the configuration was reloaded successfully.
+     * @return false If the configuration was not reloaded successfully.
+     */
+    virtual bool
+    Reload() = 0;
+
+    /**
      * @brief Get the name of the interface hostapd is managing.
      *
      * @return std::string_view
@@ -99,20 +123,44 @@ struct IHostapd
      *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      * @return true The property was set successfully.
      * @return false The property was not set successfully.
      */
     virtual bool
-    SetProperty(std::string_view propertyName, std::string_view propertyValue) = 0;
+    SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
-     * @brief Reloads the interface.
+     * @brief Set the ssid for the interface.
      *
-     * @return true
-     * @return false
+     * @param ssid The ssid to set.
+     * @return true If the ssid was set successfully.
+     * @return false If the ssid was not set successfully.
      */
     virtual bool
-    Reload() = 0;
+    SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the WPA protocol(s) for the interface.
+     *
+     * @param protocols The protocols to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the protocols were set successfully.
+     * @return false If the protocols were not set successfully.
+     */
+    virtual bool
+    SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the Key Management object
+     *
+     * @param keyManagements The key management value(s) to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true The key management value(s) were set successfully.
+     * @return false The key management value(s) were not set successfully.
+     */
+    virtual bool
+    SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**
