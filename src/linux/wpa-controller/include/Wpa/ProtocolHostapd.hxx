@@ -447,6 +447,55 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
         return WpaKeyManagementInvalidValue;
     }
 }
+
+/**
+ * @brief WpaCipher sentinel for an invalid value.
+ */
+constexpr std::string_view WpaCipherInvalidValue = "UNKNOWN";
+
+/**
+ * @brief Convert a WpaCipher value to the corresponding property value string expected by hostapd. The returned value
+ * may be used for hostapd properties 'wpa_pairwise' and 'rsn_pairwise'.
+ *
+ * @param wpaCipher The WpaCipher value to convert.
+ * @return constexpr std::string_view The corresponding hostapd property value string.
+ */
+constexpr std::string_view
+WpaCipherPropertyValue(WpaCipher wpaCipher) noexcept
+{
+    switch (wpaCipher) {
+    case WpaCipher::None:
+        return "NONE";
+    case WpaCipher::Wep40:
+        return "WEP40";
+    case WpaCipher::Wep104:
+        return "WEP104";
+    case WpaCipher::Tkip:
+        return "TKIP";
+    case WpaCipher::Ccmp:
+        return "CCMP";
+    case WpaCipher::Aes128Cmac:
+        return "AES-128-CMAC";
+    case WpaCipher::Gcmp:
+        return "GCMP";
+    case WpaCipher::Gcmp256:
+        return "GCMP-256";
+    case WpaCipher::Ccmp256:
+        return "CCMP-256";
+    case WpaCipher::BipGmac128:
+        return "BIP-GMAC-128";
+    case WpaCipher::BipGmac256:
+        return "BIP-GMAC-256";
+    case WpaCipher::BipCmac256:
+        return "BIP-CMAC-256";
+    case WpaCipher::GtkNotUsed:
+        return "GTK_NOT_USED";
+    case WpaCipher::Sms4:
+        [[fallthrough]];
+    default:
+        return WpaCipherInvalidValue;
+    }
+}
 } // namespace Wpa
 
 #endif // HOSTAPD_PROTOCOL_HXX
