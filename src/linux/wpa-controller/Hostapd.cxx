@@ -201,7 +201,7 @@ Hostapd::SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfig
     }
 }
 
-bool
+void
 Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange)
 {
     if (std::empty(protocols)) {
@@ -224,8 +224,6 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
     if (!protocolsWereSet) {
         throw HostapdException(std::format("Failed to set hostapd 'wpa' property to '{}'", protocolsValue));
     }
-
-    return true;
 }
 
 bool

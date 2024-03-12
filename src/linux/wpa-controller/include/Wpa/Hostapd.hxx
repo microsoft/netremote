@@ -106,10 +106,8 @@ struct Hostapd :
      *
      * @param protocols The protocols to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true If the protocols were set successfully.
-     * @return false If the protocols were not set successfully.
      */
-    bool
+    void
     SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**

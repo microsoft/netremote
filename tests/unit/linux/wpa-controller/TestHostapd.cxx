@@ -413,23 +413,23 @@ TEST_CASE("Send SetWpaProtocols() command (root)", "[wpa][hostapd][client][remot
 
     SECTION("Succeeds with valid, single input")
     {
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
     }
 
     SECTION("Succeeds with valid, multiple inputs")
     {
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
     }
 
     SECTION("Succeeds with valid, duplicate inputs")
     {
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
 
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
     }
 }
 
