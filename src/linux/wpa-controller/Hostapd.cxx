@@ -59,26 +59,6 @@ Hostapd::GetStatus()
     return response->Status;
 }
 
-bool
-Hostapd::SetSsid(std::string_view ssid, bool reload)
-{
-    const bool ssidWasSet = SetProperty(ProtocolHostapd::PropertyNameSsid, ssid);
-    if (!ssidWasSet) {
-        throw HostapdException("Failed to set hostapd 'ssid' property");
-    }
-
-    if (!reload) {
-        LOGD << "Skipping hostapd reload after setting 'ssid' (requested)";
-        return true;
-    }
-
-    const bool configurationReloadSucceeded = Reload();
-    if (!configurationReloadSucceeded) {
-        throw HostapdException("Failed to reload hostapd configuration");
-    }
-
-    return true;
-}
 
 bool
 Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
@@ -181,6 +161,27 @@ Hostapd::Reload()
     }
 
     return response->IsOk();
+}
+
+bool
+Hostapd::SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange)
+{
+    const bool ssidWasSet = SetProperty(ProtocolHostapd::PropertyNameSsid, ssid);
+    if (!ssidWasSet) {
+        throw HostapdException("Failed to set hostapd 'ssid' property");
+    }
+
+    if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
+        LOGD << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameSsid);
+        return true;
+    }
+
+    const bool configurationReloadSucceeded = Reload();
+    if (!configurationReloadSucceeded) {
+        throw HostapdException(std::format("Failed to reload hostapd configuration after '{}' property change", ProtocolHostapd::PropertyNameSsid));
+    }
+
+    return true;
 }
 
 bool

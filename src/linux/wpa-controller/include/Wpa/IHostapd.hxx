@@ -130,6 +130,17 @@ struct IHostapd
     Reload() = 0;
 
     /**
+     * @brief Set the ssid for the interface.
+     * 
+     * @param ssid The ssid to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the ssid was set successfully.
+     * @return false If the ssid was not set successfully.
+     */
+    virtual bool
+    SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
      * @brief Set the WPA protocol(s) for the interface.
      *
      * @param protocols The protocols to set.

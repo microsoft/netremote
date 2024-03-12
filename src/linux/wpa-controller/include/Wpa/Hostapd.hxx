@@ -75,16 +75,6 @@ struct Hostapd :
     GetStatus() override;
 
     /**
-     * @brief Set the ssid of the access point.
-     *
-     * @param ssid The ssid to set.
-     * @return true
-     * @return false
-     */
-    bool
-    SetSsid(std::string_view ssid, bool reload = true);
-
-    /**
      * @brief Get a property value for the interface.
      *
      * @param propertyName The name of the property to retrieve.
@@ -114,6 +104,17 @@ struct Hostapd :
      */
     bool
     Reload() override;
+
+    /**
+     * @brief Set the ssid for the interface.
+     *
+     * @param ssid The ssid to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the ssid was set successfully.
+     * @return false If the ssid was not set successfully.
+     */
+    bool
+    SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
      * @brief Set the WPA protocol(s) for the interface.
