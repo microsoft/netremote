@@ -46,7 +46,7 @@ struct Hostapd :
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
-    bool
+    void
     Ping() override;
 
     /**

@@ -33,7 +33,7 @@ Hostapd::GetInterface()
     return m_interface;
 }
 
-bool
+void
 Hostapd::Ping()
 {
     static constexpr WpaCommand PingCommand(ProtocolHostapd::CommandPayloadPing);
@@ -43,7 +43,10 @@ Hostapd::Ping()
         throw HostapdException("Failed to ping hostapd");
     }
 
-    return response->Payload().starts_with(ProtocolHostapd::ResponsePayloadPing);
+    if (!response->Payload().starts_with(ProtocolHostapd::ResponsePayloadPing)) {
+        LOGV << std::format("Invalid response received when sending hostapd ping\nResponse payload={}", response->Payload());
+        throw HostapdException("Invalid response received when pinging hostapd");
+    }
 }
 
 bool

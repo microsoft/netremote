@@ -64,13 +64,13 @@ TEST_CASE("Send Ping() command (root)", "[wpa][hostapd][client][remote]")
 
     SECTION("Send Ping() command")
     {
-        REQUIRE(hostapd.Ping());
+        REQUIRE_NOTHROW(hostapd.Ping());
     }
 
     SECTION("Send Ping() command on second instance")
     {
         Hostapd hostapd2(WpaDaemonManager::InterfaceNameDefault);
-        REQUIRE(hostapd2.Ping());
+        REQUIRE_NOTHROW(hostapd2.Ping());
     }
 }
 
@@ -283,7 +283,7 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
     {
         CHECK_NOTHROW(hostapd.Disable());
         CHECK_NOTHROW(hostapd.Enable());
-        REQUIRE(hostapd.Ping());
+        REQUIRE_NOTHROW(hostapd.Ping());
     }
 
     SECTION("Disable() doesn't throw")
@@ -301,7 +301,7 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
     SECTION("Disable() doesn't prevent further communication")
     {
         CHECK_NOTHROW(hostapd.Disable());
-        REQUIRE(hostapd.Ping());
+        REQUIRE_NOTHROW(hostapd.Ping());
     }
 }
 
@@ -326,7 +326,7 @@ TEST_CASE("Send command: Terminate() ping failure (root)", "[wpa][hostapd][clien
     static constexpr auto TerminationWaitTime{ 2s }; // NOLINT
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
-    REQUIRE(hostapd.Ping());
+    REQUIRE_NOTHROW(hostapd.Ping());
     REQUIRE_NOTHROW(hostapd.Terminate());
 
     // The terminate command merely requests hostapd to shut down. The daemon's

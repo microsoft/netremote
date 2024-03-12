@@ -70,7 +70,7 @@ struct IHostapd
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
-    virtual bool
+    virtual void
     Ping() = 0;
 
     /**
