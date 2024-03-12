@@ -1,5 +1,5 @@
 
-#include <chrono>
+#include <chrono> // NOLINT
 #include <limits>
 #include <optional>
 #include <string>
@@ -11,7 +11,6 @@
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <catch2/catch_test_macros.hpp>
-#include <magic_enum.hpp>
 
 #include "detail/WpaDaemonManager.hxx"
 
@@ -213,14 +212,14 @@ TEST_CASE("Send SetProperty() command (root)", "[wpa][hostapd][client][remote]")
 
     SECTION("SetProperty() doesn't throw")
     {
-        REQUIRE_NOTHROW(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
     }
 
     SECTION("SetProperty() returns false for invalid property")
     {
-        REQUIRE_FALSE(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Now));
-        REQUIRE_FALSE(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Defer));
+        REQUIRE_THROWS_AS(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetProperty(PropertyNameInvalid, PropertyValueInvalid, EnforceConfigurationChange::Defer), HostapdException);
     }
 
     SECTION("SetProperty() returns true for valid property")
@@ -323,7 +322,7 @@ TEST_CASE("Send command: Terminate() ping failure (root)", "[wpa][hostapd][clien
     using namespace Wpa;
     using namespace std::chrono_literals;
 
-    static constexpr auto TerminationWaitTime{ 2s };
+    static constexpr auto TerminationWaitTime{ 2s }; // NOLINT
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
     REQUIRE(hostapd.Ping());
@@ -396,7 +395,7 @@ TEST_CASE("Send SetWpaProtocols() command (root)", "[wpa][hostapd][client][remot
 {
     using namespace Wpa;
 
-    static constexpr WpaProtocol WpaProtocolInvalid = static_cast<WpaProtocol>(std::numeric_limits<std::underlying_type_t<WpaProtocol>>::max());
+    static constexpr auto WpaProtocolInvalid = static_cast<WpaProtocol>(std::numeric_limits<std::underlying_type_t<WpaProtocol>>::max());
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
 
