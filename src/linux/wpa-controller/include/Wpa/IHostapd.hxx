@@ -5,11 +5,21 @@
 #include <exception>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 
 namespace Wpa
 {
+/**
+ * @brief Syntax sugar for specifying when configuration change should be enforced.
+ */
+enum class EnforceConfigurationChange {
+    Now,
+    Defer,
+};
+
 /**
  * @brief Interface for interacting with the hostapd daemon.
  *
@@ -118,6 +128,28 @@ struct IHostapd
      */
     virtual bool
     Reload() = 0;
+
+    /**
+     * @brief Set the WPA protocol(s) for the interface.
+     *
+     * @param protocols The protocols to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the protocols were set successfully.
+     * @return false If the protocols were not set successfully.
+     */
+    virtual bool
+    SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Sets the key management for the interface.
+     *
+     * @param keyManagement The key management to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true The key management value was set successfully.
+     * @return false The key management value was not set successfully.
+     */
+    virtual bool
+    SetKeyManagement(WpaKeyManagement keyManagement, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**

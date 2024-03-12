@@ -7,6 +7,7 @@
 
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaController.hxx>
 
 namespace Wpa
@@ -113,6 +114,28 @@ struct Hostapd :
      */
     bool
     Reload() override;
+
+    /**
+     * @brief Set the WPA protocol(s) for the interface.
+     *
+     * @param protocols The protocols to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true If the protocols were set successfully.
+     * @return false If the protocols were not set successfully.
+     */
+    bool
+    SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
+
+    /**
+     * @brief Sets the key management for the interface.
+     *
+     * @param keyManagement The key management to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @return true The key management value was set successfully.
+     * @return false The key management value was not set successfully.
+     */
+    bool
+    SetKeyManagement(WpaKeyManagement keyManagement, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
 private:
     const std::string m_interface;
