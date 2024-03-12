@@ -27,11 +27,8 @@ struct Hostapd :
 
     /**
      * @brief Enables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    bool
+    void
     Enable() override;
 
     /**

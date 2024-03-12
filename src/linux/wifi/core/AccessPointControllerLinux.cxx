@@ -108,7 +108,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             status.Code = AccessPointOperationStatusCode::Succeeded;
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
-            status.Details = "failed to set operational state to 'enabled'";
+            status.Details = std::format("failed to set operational state to 'enabled' ({})", ex.what());
         }
         break;
     }
@@ -118,7 +118,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             status.Code = AccessPointOperationStatusCode::Succeeded;
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
-            status.Details = "failed to set operational state to 'disabled'";
+            status.Details = std::format("failed to set operational state to 'disabled' ({})", ex.what());
         }
         break;
     }

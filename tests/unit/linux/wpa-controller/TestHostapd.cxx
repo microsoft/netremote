@@ -79,7 +79,7 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
     using namespace Wpa;
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
-    REQUIRE(hostapd.Enable());
+    REQUIRE_NOTHROW(hostapd.Enable());
 
     SECTION("GetStatus() doesn't throw")
     {
@@ -97,7 +97,7 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
         REQUIRE(hostapd.Disable());
         const auto statusInitial = hostapd.GetStatus();
         REQUIRE(statusInitial.State == HostapdInterfaceState::Disabled);
-        REQUIRE(hostapd.Enable());
+        REQUIRE_NOTHROW(hostapd.Enable());
         const auto statusDisabled = hostapd.GetStatus();
         REQUIRE(statusDisabled.State == HostapdInterfaceState::Enabled);
     }
@@ -274,7 +274,7 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
         CHECK(hostapd.Disable());
         auto hostapdStatus = hostapd.GetStatus();
         REQUIRE(hostapdStatus.State != HostapdInterfaceState::Enabled);
-        REQUIRE(hostapd.Enable());
+        REQUIRE_NOTHROW(hostapd.Enable());
         hostapdStatus = hostapd.GetStatus();
         REQUIRE(hostapdStatus.State == HostapdInterfaceState::Enabled);
     }
@@ -282,7 +282,7 @@ TEST_CASE("Send control commands: Enable(), Disable() (root)", "[wpa][hostapd][c
     SECTION("Enable() preserves further communication")
     {
         CHECK(hostapd.Disable());
-        CHECK(hostapd.Enable());
+        CHECK_NOTHROW(hostapd.Enable());
         REQUIRE(hostapd.Ping());
     }
 

@@ -120,7 +120,7 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
     return true;
 }
 
-bool
+void
 Hostapd::Enable()
 {
     static constexpr WpaCommand EnableCommand(ProtocolHostapd::CommandPayloadEnable);
@@ -131,7 +131,8 @@ Hostapd::Enable()
     }
 
     if (response->IsOk()) {
-        return true;
+        LOGV << std::format("Invalid response received when enabling hostapd interface (payload={})", response->Payload());
+        throw HostapdException("Failed to enable hostapd interface (invalid response)");
     }
 
     // The response will indicate failure if the interface is already enabled.
@@ -139,7 +140,9 @@ Hostapd::Enable()
     // This is only done if the 'enable' command fails since the GetStatus()
     // command is fairly heavy-weight in terms of its payload.
     const auto status = GetStatus();
-    return IsHostapdStateOperational(status.State);
+    if (!IsHostapdStateOperational(status.State)) {
+        throw HostapdException(std::format("Failed to enable hostapd interface (invalid state {})", magic_enum::enum_name(status.State)));
+    }
 }
 
 bool

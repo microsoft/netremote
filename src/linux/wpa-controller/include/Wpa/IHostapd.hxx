@@ -51,11 +51,8 @@ struct IHostapd
 
     /**
      * @brief Enables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Enable() = 0;
 
     /**
