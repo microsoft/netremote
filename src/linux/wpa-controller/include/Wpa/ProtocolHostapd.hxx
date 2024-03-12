@@ -366,6 +366,74 @@ HostapdInterfaceStateFromString(std::string_view state) noexcept;
  */
 bool
 IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
+
+/**
+ * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd.
+ *
+ * @param wpaKeyManagement The WpaKeyManagement value to convert.
+ * @return constexpr std::string_view The corresponding hostapd property value string.
+ */
+constexpr std::string_view
+WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
+{
+    switch (wpaKeyManagement) {
+    case WpaKeyManagement::Ieee80211x:
+        return "WPA-EAP";
+    case WpaKeyManagement::Psk:
+        return "WPA-PSK";
+    case WpaKeyManagement::FtIeee8021x:
+        return "FT-EAP";
+    case WpaKeyManagement::FtPsk:
+        return "FT-PSK";
+    case WpaKeyManagement::Ieee8021xSha256:
+        return "WPA-EAP-SHA256";
+    case WpaKeyManagement::PskSha256:
+        return "WPA-PSK-SHA256";
+    case WpaKeyManagement::Sae:
+        return "SAE";
+    case WpaKeyManagement::FtSae:
+        return "FT-SAE";
+    case WpaKeyManagement::Osen:
+        return "OSEN";
+    case WpaKeyManagement::Ieee80211xSuiteB:
+        return "WPA-EAP-SUITE-B";
+    case WpaKeyManagement::Ieee80211xSuiteB192:
+        return "WPA-EAP-SUITE-B-192";
+    case WpaKeyManagement::FilsSha256:
+        return "FILS-SHA256";
+    case WpaKeyManagement::FileSha384:
+        return "FILS-SHA384";
+    case WpaKeyManagement::FtFilsSha256:
+        return "FT-FILS-SHA256";
+    case WpaKeyManagement::FtFilsSha384:
+        return "FT-FILS-SHA384";
+    case WpaKeyManagement::Owe:
+        return "OWE";
+    case WpaKeyManagement::Dpp:
+        return "DPP";
+    case WpaKeyManagement::FtIeee8021xSha384:
+        return "FT-EAP-SHA384";
+    case WpaKeyManagement::Pasn:
+        return "PASN";
+    // Below values are not accepted for nor parsed from the configuration file.
+    case WpaKeyManagement::None:
+        [[fallthrough]];
+    case WpaKeyManagement::Ieee80211xNoWpa:
+        [[fallthrough]];
+    case WpaKeyManagement::WpaNone:
+        [[fallthrough]];
+    case WpaKeyManagement::Wps:
+        [[fallthrough]];
+    case WpaKeyManagement::WapiPsk:
+        [[fallthrough]];
+    case WpaKeyManagement::WapiCert:
+        [[fallthrough]];
+    case WpaKeyManagement::Cckm:
+        [[fallthrough]];
+    default:
+        return "UNKNOWN";
+    }
+}
 } // namespace Wpa
 
 #endif // HOSTAPD_PROTOCOL_HXX
