@@ -83,6 +83,15 @@ struct IHostapd
     Ping() = 0;
 
     /**
+     * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
+     *
+     * @return true If the configuration was reloaded successfully.
+     * @return false If the configuration was not reloaded successfully.
+     */
+    virtual bool
+    Reload() = 0;
+
+    /**
      * @brief Get the name of the interface hostapd is managing.
      *
      * @return std::string_view
@@ -120,15 +129,6 @@ struct IHostapd
      */
     virtual bool
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
-
-    /**
-     * @brief Reloads the interface.
-     *
-     * @return true
-     * @return false
-     */
-    virtual bool
-    Reload() = 0;
 
     /**
      * @brief Set the ssid for the interface.

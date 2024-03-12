@@ -59,6 +59,15 @@ struct Hostapd :
     Ping() override;
 
     /**
+     * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
+     *
+     * @return true If the configuration was reloaded successfully.
+     * @return false If the configuration was not reloaded successfully.
+     */
+    bool
+    Reload() override;
+
+    /**
      * @brief Get the name of the interface hostapd is managing.
      *
      * @return std::string_view
@@ -96,15 +105,6 @@ struct Hostapd :
      */
     bool
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
-
-    /**
-     * @brief Reloads the interface.
-     *
-     * @return true
-     * @return false
-     */
-    bool
-    Reload() override;
 
     /**
      * @brief Set the ssid for the interface.
