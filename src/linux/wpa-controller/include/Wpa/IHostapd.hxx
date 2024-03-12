@@ -114,11 +114,12 @@ struct IHostapd
      *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      * @return true The property was set successfully.
      * @return false The property was not set successfully.
      */
     virtual bool
-    SetProperty(std::string_view propertyName, std::string_view propertyValue) = 0;
+    SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
      * @brief Reloads the interface.
@@ -131,9 +132,8 @@ struct IHostapd
 
     /**
      * @brief Set the ssid for the interface.
-     * 
+     *
      * @param ssid The ssid to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      * @return true If the ssid was set successfully.
      * @return false If the ssid was not set successfully.
      */

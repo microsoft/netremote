@@ -59,7 +59,6 @@ Hostapd::GetStatus()
     return response->Status;
 }
 
-
 bool
 Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
 {
@@ -80,7 +79,7 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
 }
 
 bool
-Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue)
+Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange)
 {
     LOGD << std::format("Attempting to set hostapd property '{}'({}) to '{}'({})", propertyName, std::size(propertyName), propertyValue, std::size(propertyValue));
 
@@ -90,7 +89,22 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
         throw HostapdException("Failed to send hostapd 'set' command");
     }
 
-    return response->IsOk();
+    if (!response->IsOk()) {
+        LOGV << std::format("Invalid response received when setting hostapd property '{}' to '{}' (payload={})", propertyName, propertyValue, response->Payload());
+        throw HostapdException(std::format("Failed to set hostapd property '{}' to '{}'", propertyName, propertyValue));
+    }
+
+    if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
+        LOGD << std::format("Skipping enforcement of '{}' configuration change (requested)", propertyName);
+        return true;
+    }
+
+    const bool configurationReloadSucceeded = Reload();
+    if (!configurationReloadSucceeded) {
+        throw HostapdException(std::format("Failed to reload hostapd configuration after '{}' property change", propertyName));
+    }
+
+    return true;
 }
 
 bool
