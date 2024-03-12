@@ -380,7 +380,8 @@ IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
 constexpr std::string_view WpaKeyManagementInvalidValue = "UNKNOWN";
 
 /**
- * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd.
+ * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd. The return
+ * value may be used for the hostapd property 'wpa_key_mgmt'.
  *
  * @param wpaKeyManagement The WpaKeyManagement value to convert.
  * @return constexpr std::string_view The corresponding hostapd property value string.

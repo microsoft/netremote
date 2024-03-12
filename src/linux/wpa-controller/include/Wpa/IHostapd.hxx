@@ -109,7 +109,7 @@ struct IHostapd
      *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
@@ -118,7 +118,7 @@ struct IHostapd
      * @brief Set the ssid for the interface.
      *
      * @param ssid The ssid to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange) = 0;
@@ -127,16 +127,16 @@ struct IHostapd
      * @brief Set the WPA protocol(s) for the interface.
      *
      * @param protocols The protocols to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
-     * @brief Set the Key Management object
+     * @brief Set the allowed key management algorithms for the interfacallowed key management algorithms for the interface.
      *
      * @param keyManagements The key management value(s) to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
