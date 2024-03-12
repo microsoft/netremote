@@ -68,7 +68,7 @@ Hostapd::SetSsid(std::string_view ssid, bool reload)
     }
 
     if (!reload) {
-        LOGW << "Skipping hostapd reload after setting 'ssid' (requested)";
+        LOGD << "Skipping hostapd reload after setting 'ssid' (requested)";
         return true;
     }
 
@@ -204,7 +204,7 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
     }
 
     if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
-        LOGW << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameWpaProtocol);
+        LOGD << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameWpaProtocol);
         return true;
     }
 
@@ -244,7 +244,7 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
     }
 
     if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
-        LOGW << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameWpaKeyManagement);
+        LOGD << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameWpaKeyManagement);
         return true;
     }
 
