@@ -51,44 +51,32 @@ struct IHostapd
 
     /**
      * @brief Enables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Enable() = 0;
 
     /**
      * @brief Disables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Disable() = 0;
 
     /**
      * @brief Terminates the process hosting the daemon.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Terminate() = 0;
 
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
-    virtual bool
+    virtual void
     Ping() = 0;
 
     /**
      * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
-     *
-     * @return true If the configuration was reloaded successfully.
-     * @return false If the configuration was not reloaded successfully.
      */
-    virtual bool
+    virtual void
     Reload() = 0;
 
     /**
@@ -111,12 +99,10 @@ struct IHostapd
      * @brief Get a property value for the interface.
      *
      * @param propertyName The name of the property to retrieve.
-     * @param propertyValue The string to store the property value in.
-     * @return true If the property value was obtained and its value is in 'propertyValue'.
-     * @return false If t he property value could not be obtained due to an error.
+     * @return std::string The property string value.
      */
-    virtual bool
-    GetProperty(std::string_view propertyName, std::string& propertyValue) = 0;
+    virtual std::string
+    GetProperty(std::string_view propertyName) = 0;
 
     /**
      * @brief Set a property on the interface.
@@ -124,20 +110,17 @@ struct IHostapd
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The property was set successfully.
-     * @return false The property was not set successfully.
      */
-    virtual bool
+    virtual void
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
      * @brief Set the ssid for the interface.
      *
      * @param ssid The ssid to set.
-     * @return true If the ssid was set successfully.
-     * @return false If the ssid was not set successfully.
+     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
-    virtual bool
+    virtual void
     SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
@@ -145,10 +128,8 @@ struct IHostapd
      *
      * @param protocols The protocols to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true If the protocols were set successfully.
-     * @return false If the protocols were not set successfully.
      */
-    virtual bool
+    virtual void
     SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
@@ -156,10 +137,8 @@ struct IHostapd
      *
      * @param keyManagements The key management value(s) to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The key management value(s) were set successfully.
-     * @return false The key management value(s) were not set successfully.
      */
-    virtual bool
+    virtual void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 

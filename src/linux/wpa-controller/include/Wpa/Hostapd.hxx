@@ -27,44 +27,32 @@ struct Hostapd :
 
     /**
      * @brief Enables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    bool
+    void
     Enable() override;
 
     /**
      * @brief Disables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    bool
+    void
     Disable() override;
 
     /**
      * @brief Terminates the process hosting the daemon.
-     *
-     * @return true
-     * @return false
      */
-    bool
+    void
     Terminate() override;
 
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
-    bool
+    void
     Ping() override;
 
     /**
      * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
-     *
-     * @return true If the configuration was reloaded successfully.
-     * @return false If the configuration was not reloaded successfully.
      */
-    bool
+    void
     Reload() override;
 
     /**
@@ -87,12 +75,10 @@ struct Hostapd :
      * @brief Get a property value for the interface.
      *
      * @param propertyName The name of the property to retrieve.
-     * @param propertyValue The string to store the property value in.
-     * @return true If the property value was obtained and its value is in 'propertyValue'.
-     * @return false If t he property value could not be obtained due to an error.
+     * @return std::string The property string value.
      */
-    bool
-    GetProperty(std::string_view propertyName, std::string& propertyValue) override;
+    std::string
+    GetProperty(std::string_view propertyName) override;
 
     /**
      * @brief Set a property on the interface.
@@ -100,10 +86,8 @@ struct Hostapd :
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The property was set successfully.
-     * @return false The property was not set successfully.
      */
-    bool
+    void
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
@@ -111,10 +95,8 @@ struct Hostapd :
      *
      * @param ssid The ssid to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true If the ssid was set successfully.
-     * @return false If the ssid was not set successfully.
      */
-    bool
+    void
     SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
@@ -122,10 +104,8 @@ struct Hostapd :
      *
      * @param protocols The protocols to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true If the protocols were set successfully.
-     * @return false If the protocols were not set successfully.
      */
-    bool
+    void
     SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
@@ -133,10 +113,8 @@ struct Hostapd :
      *
      * @param keyManagements The key management value(s) to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The key management value(s) were set successfully.
-     * @return false The key management value(s) were not set successfully.
      */
-    bool
+    void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
 private:

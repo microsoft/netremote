@@ -33,7 +33,7 @@ Hostapd::GetInterface()
     return m_interface;
 }
 
-bool
+void
 Hostapd::Ping()
 {
     static constexpr WpaCommand PingCommand(ProtocolHostapd::CommandPayloadPing);
@@ -43,10 +43,13 @@ Hostapd::Ping()
         throw HostapdException("Failed to ping hostapd");
     }
 
-    return response->Payload().starts_with(ProtocolHostapd::ResponsePayloadPing);
+    if (!response->Payload().starts_with(ProtocolHostapd::ResponsePayloadPing)) {
+        LOGV << std::format("Invalid response received when sending hostapd ping\nResponse payload={}", response->Payload());
+        throw HostapdException("Invalid response received when pinging hostapd");
+    }
 }
 
-bool
+void
 Hostapd::Reload()
 {
     static constexpr WpaCommand ReloadCommand(ProtocolHostapd::CommandPayloadReload);
@@ -56,7 +59,10 @@ Hostapd::Reload()
         throw HostapdException("Failed to send hostapd 'reload' command");
     }
 
-    return response->IsOk();
+    if (!response->IsOk()) {
+        LOGV << std::format("Invalid response received when reloading hostapd configuration\nResponse payload={}", response->Payload());
+        throw HostapdException("Invalid response received when reloading hostapd configuration");
+    }
 }
 
 HostapdStatus
@@ -72,8 +78,8 @@ Hostapd::GetStatus()
     return response->Status;
 }
 
-bool
-Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
+std::string
+Hostapd::GetProperty(std::string_view propertyName)
 {
     const WpaCommandGet getCommand(propertyName);
     const auto response = m_controller.SendCommand(getCommand);
@@ -84,14 +90,15 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
     // Check Failed() instead of IsOk() since the response will indicate failure
     // with "FAIL", otherwise, the payload is the property value (not "OK").
     if (response->Failed()) {
-        return false;
+        LOGV << std::format("Invalid response received when getting hostapd property '{}'\nResponse payload={}", propertyName, response->Payload());
+        throw HostapdException(std::format("Failed to get hostapd property '{}' (invalid response)", propertyName));
     }
 
-    propertyValue = response->Payload();
-    return true;
+    std::string propertyValue{ response->Payload() };
+    return propertyValue;
 }
 
-bool
+void
 Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange)
 {
     LOGD << std::format("Attempting to set hostapd property '{}' (size={}) to '{}' (size={})", propertyName, std::size(propertyName), propertyValue, std::size(propertyValue));
@@ -103,24 +110,23 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
     }
 
     if (!response->IsOk()) {
-        LOGV << std::format("Invalid response received when setting hostapd property '{}' to '{}' (payload={})", propertyName, propertyValue, response->Payload());
-        throw HostapdException(std::format("Failed to set hostapd property '{}' to '{}'", propertyName, propertyValue));
+        LOGV << std::format("Invalid response received when setting hostapd property '{}' to '{}'\nResponse payload={}", propertyName, propertyValue, response->Payload());
+        throw HostapdException(std::format("Failed to set hostapd property '{}' to '{}' (invalid response)", propertyName, propertyValue));
     }
 
     if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
         LOGD << std::format("Skipping enforcement of '{}' configuration change (requested)", propertyName);
-        return true;
+        return;
     }
 
-    const bool configurationReloadSucceeded = Reload();
-    if (!configurationReloadSucceeded) {
-        throw HostapdException(std::format("Failed to reload hostapd configuration after '{}' property change", propertyName));
+    try {
+        Reload();
+    } catch (HostapdException& e) {
+        throw HostapdException(std::format("Failed to reload hostapd configuration after '{}' property change: {}", propertyName, e.what()));
     }
-
-    return true;
 }
 
-bool
+void
 Hostapd::Enable()
 {
     static constexpr WpaCommand EnableCommand(ProtocolHostapd::CommandPayloadEnable);
@@ -131,7 +137,7 @@ Hostapd::Enable()
     }
 
     if (response->IsOk()) {
-        return true;
+        return;
     }
 
     // The response will indicate failure if the interface is already enabled.
@@ -139,10 +145,12 @@ Hostapd::Enable()
     // This is only done if the 'enable' command fails since the GetStatus()
     // command is fairly heavy-weight in terms of its payload.
     const auto status = GetStatus();
-    return IsHostapdStateOperational(status.State);
+    if (!IsHostapdStateOperational(status.State)) {
+        throw HostapdException(std::format("Failed to enable hostapd interface (invalid state {})", magic_enum::enum_name(status.State)));
+    }
 }
 
-bool
+void
 Hostapd::Disable()
 {
     static constexpr WpaCommand DisableCommand(ProtocolHostapd::CommandPayloadDisable);
@@ -153,7 +161,7 @@ Hostapd::Disable()
     }
 
     if (response->IsOk()) {
-        return true;
+        return;
     }
 
     // The response will indicate failure if the interface is already disabled.
@@ -161,10 +169,12 @@ Hostapd::Disable()
     // This is only done if the 'disable' command fails since the GetStatus()
     // command is fairly heavy-weight in terms of its payload.
     const auto status = GetStatus();
-    return !IsHostapdStateOperational(status.State);
+    if (IsHostapdStateOperational(status.State)) {
+        throw HostapdException(std::format("Failed to disable hostapd interface (invalid state {})", magic_enum::enum_name(status.State)));
+    }
 }
 
-bool
+void
 Hostapd::Terminate()
 {
     static constexpr WpaCommand TerminateCommand(ProtocolHostapd::CommandPayloadTerminate);
@@ -174,17 +184,23 @@ Hostapd::Terminate()
         throw HostapdException("Failed to send hostapd 'terminate' command");
     }
 
-    return response->IsOk();
+    if (!response->IsOk()) {
+        LOGV << std::format("Invalid response received when terminating hostapd\nResponse payload={}", response->Payload());
+        throw HostapdException("Failed to terminate hostapd process (invalid response)");
+    }
 }
 
-bool
+void
 Hostapd::SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange)
 {
-    const bool ssidWasSet = SetProperty(ProtocolHostapd::PropertyNameSsid, ssid, enforceConfigurationChange);
-    return ssidWasSet;
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameSsid, ssid, enforceConfigurationChange);
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set hostapd ssid to '{}' ({})", ssid, e.what()));
+    }
 }
 
-bool
+void
 Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange)
 {
     if (std::empty(protocols)) {
@@ -203,15 +219,14 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
     protocolsToSet &= WpaProtocolMask;
 
     const auto protocolsValue = std::format("{}", protocolsToSet);
-    const bool protocolsWereSet = SetProperty(ProtocolHostapd::PropertyNameWpaProtocol, protocolsValue, enforceConfigurationChange);
-    if (!protocolsWereSet) {
-        throw HostapdException(std::format("Failed to set hostapd 'wpa' property to '{}'", protocolsValue));
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameWpaProtocol, protocolsValue, enforceConfigurationChange);
+    } catch (HostapdException& e) {
+        throw HostapdException(std::format("Failed to set hostapd 'wpa' property to '{}' ({})", protocolsValue, e.what()));
     }
-
-    return true;
 }
 
-bool
+void
 Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange)
 {
     if (std::empty(keyManagements)) {
@@ -233,10 +248,9 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
         keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
     }
 
-    const auto keyManagementWasSet = SetProperty(ProtocolHostapd::PropertyNameWpaKeyManagement, keyManagementPropertyValue, enforceConfigurationChange);
-    if (!keyManagementWasSet) {
-        throw HostapdException(std::format("Failed to set hostapd 'wpa_key_mgmt' property to '{}'", keyManagementPropertyValue));
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameWpaKeyManagement, keyManagementPropertyValue, enforceConfigurationChange);
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set hostapd 'wpa_key_mgmt' property to '{}' ({})", keyManagementPropertyValue, e.what()));
     }
-
-    return true;
 }

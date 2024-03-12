@@ -108,7 +108,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             status.Code = AccessPointOperationStatusCode::Succeeded;
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
-            status.Details = "failed to set operational state to 'enabled'";
+            status.Details = std::format("failed to set operational state to 'enabled' ({})", ex.what());
         }
         break;
     }
@@ -118,7 +118,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             status.Code = AccessPointOperationStatusCode::Succeeded;
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
-            status.Details = "failed to set operational state to 'disabled'";
+            status.Details = std::format("failed to set operational state to 'disabled' ({})", ex.what());
         }
         break;
     }
@@ -175,10 +175,7 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
     try {
         for (auto& propertyToSet : propertiesToSet) {
             std::tie(propertyKeyToSet, propertyValueToSet) = std::move(propertyToSet);
-            hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
-            if (!hostapdOperationSucceeded) {
-                break;
-            }
+            m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
         }
     } catch (const Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
@@ -192,10 +189,11 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
     }
 
     // Reload the hostapd configuration to pick up the changes.
-    hostapdOperationSucceeded = m_hostapd.Reload();
-    if (!hostapdOperationSucceeded) {
+    try {
+        m_hostapd.Reload();
+    } catch (const Wpa::HostapdException& ex) {
         status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = "failed to reload hostapd configuration";
+        status.Details = std::format("failed to reload hostapd configuration - {}", ex.what());
         return status;
     }
 
@@ -234,7 +232,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 
     // Set the hostapd "setband" property.
     try {
-        hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
+        m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
     } catch (const Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
         errorDetails = ex.what();
@@ -269,7 +267,7 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
 
     // Attempt to set the SSID.
     try {
-        hostapdOperationSucceeded = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid, EnforceConfigurationChange::Now);
+        m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid, EnforceConfigurationChange::Now);
     } catch (Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
         errorDetails = ex.what();
