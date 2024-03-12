@@ -38,8 +38,8 @@ enum class HostapdHwMode {
 /**
  * @brief WPA encoding of IEEE 802.11i-2004 protocol types.
  *
- * Note that wpa_supplicant/hostapd configuration don't directly encode WPA3 in this enumeration. Instead, a combination
- * of the 'Wpa2' value below with the 'wpa_key_mgmt' property set to 'SAE' or 'FT-SAE'.
+ * Note that hostapd configuration doesn't directly encode WPA3 in this enumeration. Instead, a combination of the
+ * 'Wpa2' value below with the 'wpa_key_mgmt' property set to 'SAE' or 'FT-SAE'.
  *
  * Values obtained from hostap/src/common/defs.h.
  */

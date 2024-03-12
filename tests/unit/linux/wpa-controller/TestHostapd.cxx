@@ -1,14 +1,17 @@
 
 #include <chrono>
+#include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
+#include <type_traits>
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <catch2/catch_test_macros.hpp>
+#include <magic_enum.hpp>
 
 #include "detail/WpaDaemonManager.hxx"
 
@@ -131,7 +134,7 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
 
         const auto ieee80211acInitial = hostapd.GetStatus().Ieee80211ac;
 
-        auto ieee80211acValueExpected =  static_cast<bool>(ieee80211acInitial);
+        auto ieee80211acValueExpected = static_cast<bool>(ieee80211acInitial);
         REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
         auto ieee80211acValueUpdated = hostapd.GetStatus().Ieee80211ac;
         REQUIRE(ieee80211acValueUpdated == ieee80211acValueExpected);
@@ -386,5 +389,59 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
         const auto statusAfterFail = hostapd.GetStatus();
         REQUIRE(!std::empty(statusAfterFail.Bss));
         REQUIRE(statusAfterFail.Bss[0].Ssid.starts_with(statusInitial.Bss[0].Ssid));
+    }
+}
+
+TEST_CASE("Send SetWpaProtocols() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    static constexpr WpaProtocol WpaProtocolInvalid = static_cast<WpaProtocol>(std::numeric_limits<std::underlying_type_t<WpaProtocol>>::max());
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Fails with empty input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({}, EnforceConfigurationChange::Now), HostapdException);
+    }
+
+    SECTION("Fails with invalid input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now), HostapdException);
+
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer), HostapdException);
+    }
+
+    SECTION("Succeeds with valid, single input")
+    {
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid, multiple inputs")
+    {
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid, duplicate inputs")
+    {
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
     }
 }
