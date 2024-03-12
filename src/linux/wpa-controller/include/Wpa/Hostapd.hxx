@@ -127,15 +127,15 @@ struct Hostapd :
     SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
-     * @brief Sets the key management for the interface.
+     * @brief Set the Key Management object
      *
-     * @param keyManagement The key management to set.
+     * @param keyManagements The key management value(s) to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The key management value was set successfully.
-     * @return false The key management value was not set successfully.
+     * @return true The key management value(s) were set successfully.
+     * @return false The key management value(s) were not set successfully.
      */
     bool
-    SetKeyManagement(WpaKeyManagement keyManagement, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
+    SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
 private:
     const std::string m_interface;

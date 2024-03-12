@@ -1,8 +1,11 @@
 
+#include <cstdint>
 #include <format>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
@@ -13,6 +16,7 @@
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 
 using namespace Wpa;
@@ -212,3 +216,42 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
     return true;
 }
 
+bool
+Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange)
+{
+    if (std::empty(keyManagements)) {
+        throw HostapdException("No WPA key management values were provided");
+    }
+
+    // Convert the key management values to a space-delimited string of individual key management values expected by hostapd.
+    std::string keyManagementPropertyValue;
+    {
+        std::ostringstream keyManagementPropertyValueBuilder{};
+        for (const auto keyManagement : keyManagements) {
+            const auto keyManagementValue = WpaKeyManagementPropertyValue(keyManagement);
+            if (keyManagementValue == WpaKeyManagementValueInvalid) {
+                throw HostapdException(std::format("Invalid WPA key management value '{}'", magic_enum::enum_name(keyManagement)));
+            }
+            keyManagementPropertyValueBuilder << keyManagementValue << ' ';
+        }
+
+        keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
+    }
+
+    const auto keyManagementWasSet = SetProperty(ProtocolHostapd::PropertyNameWpaKeyManagement, keyManagementPropertyValue);
+    if (!keyManagementWasSet) {
+        throw HostapdException(std::format("Failed to set hostapd 'wpa_key_mgmt' property to '{}'", keyManagementPropertyValue));
+    }
+
+    if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {
+        LOGW << std::format("Skipping enforcement of '{}' configuration change (requested)", ProtocolHostapd::PropertyNameWpaKeyManagement);
+        return true;
+    }
+
+    const bool configurationReloadSucceeded = Reload();
+    if (!configurationReloadSucceeded) {
+        throw HostapdException("Failed to reload hostapd configuration");
+    }
+
+    return false;
+}
