@@ -1,5 +1,6 @@
 
 #include <chrono> // NOLINT
+#include <initializer_list>
 #include <limits>
 #include <optional>
 #include <string>
@@ -442,5 +443,95 @@ TEST_CASE("Send SetWpaProtocols() command (root)", "[wpa][hostapd][client][remot
 
         REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
         REQUIRE(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+    }
+}
+
+TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    static constexpr std::initializer_list<WpaKeyManagement> KeyManagementInvalidValues = {
+        WpaKeyManagement::None,
+        WpaKeyManagement::Ieee80211xNoWpa,
+        WpaKeyManagement::WpaNone,
+        WpaKeyManagement::Wps,
+        WpaKeyManagement::WapiPsk,
+        WpaKeyManagement::WapiCert,
+        WpaKeyManagement::Cckm,
+    };
+
+    static constexpr std::initializer_list<WpaKeyManagement> KeyManagementValidValues = {
+        WpaKeyManagement::Ieee80211x,
+        WpaKeyManagement::Psk,
+        // WpaKeyManagement::FtIeee8021x,           // feature work not yet completed
+        // WpaKeyManagement::FtPsk,                 // feature work not yet completed
+        WpaKeyManagement::Ieee8021xSha256,
+        WpaKeyManagement::PskSha256,
+        WpaKeyManagement::Sae,
+        // WpaKeyManagement::FtSae,                 // feature work not yet completed
+        // WpaKeyManagement::Osen,                  // feature work not yet completed
+        // WpaKeyManagement::Ieee80211xSuiteB,      // feature work not yet completed
+        // WpaKeyManagement::Ieee80211xSuiteB192,   // feature work not yet completed
+        // WpaKeyManagement::FilsSha256,            // feature work not yet completed
+        // WpaKeyManagement::FilsSha384,            // feature work not yet completed
+        // WpaKeyManagement::FtFilsSha256,          // feature work not yet completed
+        // WpaKeyManagement::FtFilsSha384,          // feature work not yet completed
+        WpaKeyManagement::Owe,
+        WpaKeyManagement::Dpp,
+        // WpaKeyManagement::FtIeee8021xSha384,     // feature work not yet completed
+        // WpaKeyManagement::Pasn,                  // feature work not yet completed
+    };
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk, WpaKeyManagement::Sae }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetKeyManagement({ WpaKeyManagement::Psk, WpaKeyManagement::Sae }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Fails with empty input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetKeyManagement({}, EnforceConfigurationChange::Now), HostapdException);
+    }
+
+    SECTION("Fails with every invalid input")
+    {
+        std::vector<WpaKeyManagement> keyManagementInvalidValues{};
+        for (const auto keyManagementInvalidValue : KeyManagementInvalidValues) {
+            keyManagementInvalidValues.push_back(keyManagementInvalidValue);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement({ keyManagementInvalidValue }, EnforceConfigurationChange::Now), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement({ keyManagementInvalidValue }, EnforceConfigurationChange::Defer), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement(keyManagementInvalidValues, EnforceConfigurationChange::Now), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetKeyManagement(keyManagementInvalidValues, EnforceConfigurationChange::Defer), HostapdException);
+        }
+    }
+
+    SECTION("Succeeds with all valid, single inputs")
+    {
+        for (const auto keyManagementValidValue : KeyManagementValidValues) {
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Now));
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Succeeds with valid, multiple inputs")
+    {
+        std::vector<WpaKeyManagement> keyManagementValidValues{};
+        for (const auto keyManagementValidValue : KeyManagementValidValues) {
+            keyManagementValidValues.push_back(keyManagementValidValue);
+            REQUIRE(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Now));
+            REQUIRE(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Succeeds with valid, duplicate inputs")
+    {
+        for (const auto keyManagementValidValue : KeyManagementValidValues) {
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Now));
+            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Defer));
+        }
     }
 }

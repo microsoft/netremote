@@ -5,6 +5,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <Wpa/ProtocolWpa.hxx>
@@ -52,6 +53,9 @@ enum class WpaProtocol : uint32_t {
     Rsn = Wpa2,
 };
 
+/**
+ * @brief Numerical bitmask of valid WpaProtocol values.
+ */
 static constexpr auto WpaProtocolMask =
     std::to_underlying(WpaProtocol::Wpa) |
     std::to_underlying(WpaProtocol::Wpa2) |
@@ -136,6 +140,9 @@ enum class WpaKeyManagement : uint32_t {
     Pasn = (1U << 25U),
 };
 
+/**
+ * @brief All valid WpaKeyManagement values supporting fast-transition (FT).
+ */
 static constexpr auto WpaKeyManagementFt =
     std::to_underlying(WpaKeyManagement::Ieee80211x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021x) |
@@ -368,7 +375,7 @@ bool
 IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
 
 /**
- * @brief WpaKeyManagement sentinel for an invalid value. 
+ * @brief WpaKeyManagement sentinel for an invalid value.
  */
 constexpr std::string_view WpaKeyManagementInvalidValue = "UNKNOWN";
 
