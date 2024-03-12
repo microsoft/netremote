@@ -52,10 +52,10 @@ enum class WpaProtocol : uint32_t {
     Rsn = Wpa2,
 };
 
-static constexpr auto WpaProtocolMask = 
+static constexpr auto WpaProtocolMask =
     std::to_underlying(WpaProtocol::Wpa) |
     std::to_underlying(WpaProtocol::Wpa2) |
-    std::to_underlying(WpaProtocol::Wapi) | 
+    std::to_underlying(WpaProtocol::Wapi) |
     std::to_underlying(WpaProtocol::Osen);
 
 /**
@@ -368,6 +368,11 @@ bool
 IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
 
 /**
+ * @brief WpaKeyManagement sentinel for an invalid value. 
+ */
+constexpr std::string_view WpaKeyManagementValueInvalid = "UNKNOWN";
+
+/**
  * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd.
  *
  * @param wpaKeyManagement The WpaKeyManagement value to convert.
@@ -431,7 +436,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
     case WpaKeyManagement::Cckm:
         [[fallthrough]];
     default:
-        return "UNKNOWN";
+        return WpaKeyManagementValueInvalid;
     }
 }
 } // namespace Wpa
