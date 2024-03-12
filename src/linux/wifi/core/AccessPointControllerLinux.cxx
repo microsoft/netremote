@@ -30,6 +30,7 @@
 using namespace Microsoft::Net::Wifi;
 
 using Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy;
+using Wpa::EnforceConfigurationChange;
 
 AccessPointControllerLinux::AccessPointControllerLinux(std::string_view interfaceName) :
     AccessPointController(interfaceName),
@@ -174,7 +175,7 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
     try {
         for (auto& propertyToSet : propertiesToSet) {
             std::tie(propertyKeyToSet, propertyValueToSet) = std::move(propertyToSet);
-            hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
+            hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
             if (!hostapdOperationSucceeded) {
                 break;
             }
@@ -233,7 +234,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 
     // Set the hostapd "setband" property.
     try {
-        hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet);
+        hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
     } catch (const Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
         errorDetails = ex.what();
@@ -242,20 +243,6 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     if (!hostapdOperationSucceeded) {
         status.Code = AccessPointOperationStatusCode::InternalError;
         status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, errorDetails.value_or("unspecified error"));
-        return status;
-    }
-
-    // Reload hostapd configuration to pick up the changes.
-    try {
-        hostapdOperationSucceeded = m_hostapd.Reload();
-    } catch (const Wpa::HostapdException& ex) {
-        hostapdOperationSucceeded = false;
-        errorDetails = ex.what();
-    }
-
-    if (!hostapdOperationSucceeded) {
-        status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = std::format("failed to reload hostapd configuration - {}", errorDetails.value_or("unspecified error"));
         return status;
     }
 
@@ -282,7 +269,7 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
 
     // Attempt to set the SSID.
     try {
-        hostapdOperationSucceeded = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid);
+        hostapdOperationSucceeded = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid, EnforceConfigurationChange::Now);
     } catch (Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
         errorDetails = ex.what();
@@ -291,20 +278,6 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
     if (!hostapdOperationSucceeded) {
         status.Code = AccessPointOperationStatusCode::InternalError;
         status.Details = std::format("failed to set 'ssid' property to {} - {}", ssid, errorDetails.value_or("unspecified error"));
-        return status;
-    }
-
-    // Reload the configuration to pick up the changes.
-    try {
-        hostapdOperationSucceeded = m_hostapd.Reload();
-    } catch (Wpa::HostapdException& ex) {
-        hostapdOperationSucceeded = false;
-        errorDetails = ex.what();
-    }
-
-    if (!hostapdOperationSucceeded) {
-        status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = "failed to reload access point configuration";
         return status;
     }
 
