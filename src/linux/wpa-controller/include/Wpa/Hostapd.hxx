@@ -75,12 +75,10 @@ struct Hostapd :
      * @brief Get a property value for the interface.
      *
      * @param propertyName The name of the property to retrieve.
-     * @param propertyValue The string to store the property value in.
-     * @return true If the property value was obtained and its value is in 'propertyValue'.
-     * @return false If t he property value could not be obtained due to an error.
+     * @return std::string The property string value.
      */
-    bool
-    GetProperty(std::string_view propertyName, std::string& propertyValue) override;
+    std::string
+    GetProperty(std::string_view propertyName) override;
 
     /**
      * @brief Set a property on the interface.

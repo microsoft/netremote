@@ -78,8 +78,8 @@ Hostapd::GetStatus()
     return response->Status;
 }
 
-bool
-Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
+std::string
+Hostapd::GetProperty(std::string_view propertyName)
 {
     const WpaCommandGet getCommand(propertyName);
     const auto response = m_controller.SendCommand(getCommand);
@@ -90,11 +90,12 @@ Hostapd::GetProperty(std::string_view propertyName, std::string& propertyValue)
     // Check Failed() instead of IsOk() since the response will indicate failure
     // with "FAIL", otherwise, the payload is the property value (not "OK").
     if (response->Failed()) {
-        return false;
+        LOGV << std::format("Invalid response received when getting hostapd property '{}'\nResponse payload={}", propertyName, response->Payload());
+        throw HostapdException(std::format("Failed to get hostapd property '{}' (invalid response)", propertyName));
     }
 
-    propertyValue = response->Payload();
-    return true;
+    std::string propertyValue{ response->Payload() };
+    return propertyValue;
 }
 
 bool
@@ -110,7 +111,7 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
 
     if (!response->IsOk()) {
         LOGV << std::format("Invalid response received when setting hostapd property '{}' to '{}'\nResponse payload={}", propertyName, propertyValue, response->Payload());
-        throw HostapdException(std::format("Failed to set hostapd property '{}' to '{}'", propertyName, propertyValue));
+        throw HostapdException(std::format("Failed to set hostapd property '{}' to '{}' (invalid response)", propertyName, propertyValue));
     }
 
     if (enforceConfigurationChange == EnforceConfigurationChange::Defer) {

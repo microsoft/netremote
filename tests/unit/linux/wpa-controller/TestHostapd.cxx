@@ -169,35 +169,27 @@ TEST_CASE("Send GetProperty() command (root)", "[wpa][hostapd][client][remote]")
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
 
-    SECTION("GetProperty() doesn't throw")
+    SECTION("doesn't throw for valid property")
     {
-        std::string whateverValue;
-        REQUIRE_NOTHROW(hostapd.GetProperty("whatever", whateverValue));
+        REQUIRE_NOTHROW(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion));
     }
 
-    SECTION("GetProperty() returns false for invalid property")
-    {
-        std::string whateverValue;
-        REQUIRE_FALSE(hostapd.GetProperty("whatever", whateverValue));
-    }
-
-    SECTION("GetProperty() returns true for valid property")
+    SECTION("doesn't throw for valid property with non-empty value")
     {
         std::string versionValue;
-        REQUIRE(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion, versionValue));
-    }
-
-    SECTION("GetProperty() returns true for valid property with non-empty value")
-    {
-        std::string versionValue;
-        REQUIRE(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion, versionValue));
+        REQUIRE_NOTHROW(versionValue = hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion));
         REQUIRE_FALSE(versionValue.empty());
     }
 
-    SECTION("GetProperty() returns correct value for valid property")
+    SECTION("throws for invalid property")
+    {
+        REQUIRE_THROWS_AS(hostapd.GetProperty("whatever"), HostapdException);
+    }
+
+    SECTION("returns correct value for valid property")
     {
         std::string versionValue;
-        CHECK(hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion, versionValue));
+        CHECK_NOTHROW(versionValue = hostapd.GetProperty(ProtocolHostapd::PropertyNameVersion));
         REQUIRE(versionValue == ProtocolHostapd::PropertyVersionValue);
     }
 }
