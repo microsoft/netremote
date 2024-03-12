@@ -226,7 +226,7 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
     }
 }
 
-bool
+void
 Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange)
 {
     if (std::empty(keyManagements)) {
@@ -252,6 +252,4 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
     if (!keyManagementWasSet) {
         throw HostapdException(std::format("Failed to set hostapd 'wpa_key_mgmt' property to '{}'", keyManagementPropertyValue));
     }
-
-    return true;
 }

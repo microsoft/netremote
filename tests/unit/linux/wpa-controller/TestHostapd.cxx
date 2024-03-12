@@ -499,8 +499,8 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
     SECTION("Succeeds with all valid, single inputs")
     {
         for (const auto keyManagementValidValue : KeyManagementValidValues) {
-            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Now));
-            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Defer));
+            REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Defer));
         }
     }
 
@@ -509,16 +509,16 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
         std::vector<WpaKeyManagement> keyManagementValidValues{};
         for (const auto keyManagementValidValue : KeyManagementValidValues) {
             keyManagementValidValues.push_back(keyManagementValidValue);
-            REQUIRE(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Now));
-            REQUIRE(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Defer));
+            REQUIRE_NOTHROW(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetKeyManagement(keyManagementValidValues, EnforceConfigurationChange::Defer));
         }
     }
 
     SECTION("Succeeds with valid, duplicate inputs")
     {
         for (const auto keyManagementValidValue : KeyManagementValidValues) {
-            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Now));
-            REQUIRE(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Defer));
+            REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue, keyManagementValidValue }, EnforceConfigurationChange::Defer));
         }
     }
 }

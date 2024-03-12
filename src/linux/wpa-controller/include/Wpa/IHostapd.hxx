@@ -139,10 +139,8 @@ struct IHostapd
      *
      * @param keyManagements The key management value(s) to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The key management value(s) were set successfully.
-     * @return false The key management value(s) were not set successfully.
      */
-    virtual bool
+    virtual void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
