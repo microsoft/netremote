@@ -110,10 +110,8 @@ struct IHostapd
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
      * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
-     * @return true The property was set successfully.
-     * @return false The property was not set successfully.
      */
-    virtual bool
+    virtual void
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**

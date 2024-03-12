@@ -118,12 +118,12 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
         const auto ieee80211nInitial = hostapd.GetStatus().Ieee80211n;
 
         auto ieee80211nValueExpected = static_cast<bool>(ieee80211nInitial);
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211N, GetPropertyEnablementValue(ieee80211nValueExpected)));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211N, GetPropertyEnablementValue(ieee80211nValueExpected)));
         auto ieee80211nValueUpdated = hostapd.GetStatus().Ieee80211n;
         REQUIRE(ieee80211nValueUpdated == ieee80211nValueExpected);
 
         ieee80211nValueExpected = static_cast<bool>(ieee80211nValueUpdated);
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211N, GetPropertyEnablementValue(ieee80211nValueExpected)));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211N, GetPropertyEnablementValue(ieee80211nValueExpected)));
         ieee80211nValueUpdated = hostapd.GetStatus().Ieee80211n;
         REQUIRE(ieee80211nValueUpdated == ieee80211nValueExpected);
     }
@@ -135,12 +135,12 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
         const auto ieee80211acInitial = hostapd.GetStatus().Ieee80211ac;
 
         auto ieee80211acValueExpected = static_cast<bool>(ieee80211acInitial);
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
         auto ieee80211acValueUpdated = hostapd.GetStatus().Ieee80211ac;
         REQUIRE(ieee80211acValueUpdated == ieee80211acValueExpected);
 
         ieee80211acValueExpected = static_cast<bool>(ieee80211acValueUpdated);
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AC, GetPropertyEnablementValue(ieee80211acValueExpected)));
         ieee80211acValueUpdated = hostapd.GetStatus().Ieee80211ac;
         REQUIRE(ieee80211acValueUpdated == ieee80211acValueExpected);
     }
@@ -152,12 +152,12 @@ TEST_CASE("Send command: GetStatus() (root)", "[wpa][hostapd][client][remote]")
         const auto ieee80211axInitial = hostapd.GetStatus().Ieee80211ax;
 
         auto ieee80211axValueExpected = static_cast<bool>(ieee80211axInitial);
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AX, GetPropertyEnablementValue(ieee80211axValueExpected)));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AX, GetPropertyEnablementValue(ieee80211axValueExpected)));
         auto ieee80211axValueUpdated = hostapd.GetStatus().Ieee80211ax;
         REQUIRE(ieee80211axValueUpdated == ieee80211axValueExpected);
 
         ieee80211axValueExpected = static_cast<bool>(ieee80211axValueUpdated);
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AX, GetPropertyEnablementValue(ieee80211axValueExpected)));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameIeee80211AX, GetPropertyEnablementValue(ieee80211axValueExpected)));
         ieee80211axValueUpdated = hostapd.GetStatus().Ieee80211ax;
         REQUIRE(ieee80211axValueUpdated == ieee80211axValueExpected);
     }
@@ -217,34 +217,34 @@ TEST_CASE("Send SetProperty() command (root)", "[wpa][hostapd][client][remote]")
 
     SECTION("SetProperty() returns true for valid property")
     {
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
     }
 
     SECTION("SetProperty() allows setting a property to the same value")
     {
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
 
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Defer));
     }
 
     SECTION("SetProperty allows setting a property to a different value")
     {
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue2G, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue2G, EnforceConfigurationChange::Now));
 
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue5G, EnforceConfigurationChange::Defer));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue6G, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue5G, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue6G, EnforceConfigurationChange::Defer));
     }
 
     SECTION("SetProperty allows interleaving enforcement of configuration changes")
     {
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue2G, EnforceConfigurationChange::Defer));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue5G, EnforceConfigurationChange::Now));
-        REQUIRE(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue6G, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValueAuto, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue2G, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue5G, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetProperty(ProtocolHostapd::PropertyNameSetBand, ProtocolHostapd::PropertySetBandValue6G, EnforceConfigurationChange::Defer));
     }
 
     // TODO: validate that the property was actually set. Need to find a property whose value is retrievable.

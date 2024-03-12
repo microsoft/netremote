@@ -175,10 +175,7 @@ AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
     try {
         for (auto& propertyToSet : propertiesToSet) {
             std::tie(propertyKeyToSet, propertyValueToSet) = std::move(propertyToSet);
-            hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
-            if (!hostapdOperationSucceeded) {
-                break;
-            }
+            m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
         }
     } catch (const Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
@@ -235,7 +232,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 
     // Set the hostapd "setband" property.
     try {
-        hostapdOperationSucceeded = m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
+        m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
     } catch (const Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
         errorDetails = ex.what();
@@ -270,7 +267,7 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
 
     // Attempt to set the SSID.
     try {
-        hostapdOperationSucceeded = m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid, EnforceConfigurationChange::Now);
+        m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid, EnforceConfigurationChange::Now);
     } catch (Wpa::HostapdException& ex) {
         hostapdOperationSucceeded = false;
         errorDetails = ex.what();
