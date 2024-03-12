@@ -39,11 +39,8 @@ struct Hostapd :
 
     /**
      * @brief Terminates the process hosting the daemon.
-     *
-     * @return true
-     * @return false
      */
-    bool
+    void
     Terminate() override;
 
     /**

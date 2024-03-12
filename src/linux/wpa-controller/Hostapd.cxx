@@ -168,7 +168,7 @@ Hostapd::Disable()
     }
 }
 
-bool
+void
 Hostapd::Terminate()
 {
     static constexpr WpaCommand TerminateCommand(ProtocolHostapd::CommandPayloadTerminate);
@@ -178,7 +178,10 @@ Hostapd::Terminate()
         throw HostapdException("Failed to send hostapd 'terminate' command");
     }
 
-    return response->IsOk();
+    if (!response->IsOk()) {
+        LOGV << std::format("Invalid response received when terminating hostapd\nResponse payload={}", response->Payload());
+        throw HostapdException("Failed to terminate hostapd process (invalid response)");
+    }
 }
 
 bool

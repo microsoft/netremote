@@ -327,7 +327,7 @@ TEST_CASE("Send command: Terminate() ping failure (root)", "[wpa][hostapd][clien
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
     REQUIRE(hostapd.Ping());
-    REQUIRE(hostapd.Terminate());
+    REQUIRE_NOTHROW(hostapd.Terminate());
 
     // The terminate command merely requests hostapd to shut down. The daemon's
     // polling loop must enter its next cycle before the termination process is

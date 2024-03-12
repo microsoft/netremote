@@ -63,11 +63,8 @@ struct IHostapd
 
     /**
      * @brief Terminates the process hosting the daemon.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Terminate() = 0;
 
     /**
