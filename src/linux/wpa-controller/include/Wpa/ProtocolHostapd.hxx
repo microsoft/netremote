@@ -127,7 +127,7 @@ enum class WpaKeyManagement : uint32_t {
     Ieee80211xSuiteB = (1U << 16U),
     Ieee80211xSuiteB192 = (1U << 17U),
     FilsSha256 = (1U << 18U),
-    FileSha384 = (1U << 19U),
+    FilsSha384 = (1U << 19U),
     FtFilsSha256 = (1U << 20U),
     FtFilsSha384 = (1U << 21U),
     Owe = (1U << 22U),
@@ -370,7 +370,7 @@ IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
 /**
  * @brief WpaKeyManagement sentinel for an invalid value. 
  */
-constexpr std::string_view WpaKeyManagementValueInvalid = "UNKNOWN";
+constexpr std::string_view WpaKeyManagementInvalidValue = "UNKNOWN";
 
 /**
  * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd.
@@ -406,7 +406,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
         return "WPA-EAP-SUITE-B-192";
     case WpaKeyManagement::FilsSha256:
         return "FILS-SHA256";
-    case WpaKeyManagement::FileSha384:
+    case WpaKeyManagement::FilsSha384:
         return "FILS-SHA384";
     case WpaKeyManagement::FtFilsSha256:
         return "FT-FILS-SHA256";
@@ -436,7 +436,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
     case WpaKeyManagement::Cckm:
         [[fallthrough]];
     default:
-        return WpaKeyManagementValueInvalid;
+        return WpaKeyManagementInvalidValue;
     }
 }
 } // namespace Wpa

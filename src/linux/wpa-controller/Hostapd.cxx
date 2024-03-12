@@ -224,7 +224,7 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
         std::ostringstream keyManagementPropertyValueBuilder{};
         for (const auto keyManagement : keyManagements) {
             const auto keyManagementValue = WpaKeyManagementPropertyValue(keyManagement);
-            if (keyManagementValue == WpaKeyManagementValueInvalid) {
+            if (keyManagementValue == WpaKeyManagementInvalidValue) {
                 throw HostapdException(std::format("Invalid WPA key management value '{}'", magic_enum::enum_name(keyManagement)));
             }
             keyManagementPropertyValueBuilder << keyManagementValue << ' ';
