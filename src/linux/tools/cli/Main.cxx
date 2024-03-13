@@ -19,7 +19,7 @@ int
 main(int argc, char *argv[])
 {
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
-    plog::init(plog::verbose, &colorConsoleAppender);
+    plog::init(plog::debug, &colorConsoleAppender);
 
     auto cliData = std::make_shared<NetRemoteCliData>();
     auto cliHandler = std::make_shared<NetRemoteCliHandler>(std::make_unique<NetRemoteCliHandlerOperationsFactory>());

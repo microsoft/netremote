@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 {
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
 
-    plog::init(plog::verbose, &colorConsoleAppender);
+    plog::init(plog::debug, &colorConsoleAppender);
 
     return Catch::Session().run(argc, argv);
 }
