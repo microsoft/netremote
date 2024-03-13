@@ -39,9 +39,9 @@ BuildValueList(const std::vector<std::pair<std::string, std::string>>& values, s
 }
 } // namespace detail
 
-FunctionTracer::FunctionTracer(plog::Severity logSeverityEnter, plog::Severity logSeverityExit, std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
-    m_logSeverityEnter(logSeverityEnter),
-    m_logSeverityExit(logSeverityExit),
+FunctionTracer::FunctionTracer(plog::Severity logSeverity, std::string logPrefix, std::vector<std::pair<std::string, std::string>> arguments, bool deferEnter, std::source_location location) :
+    m_logSeverityEnter(logSeverity),
+    m_logSeverityExit(logSeverity),
     m_logPrefix(std::move(logPrefix)),
     m_location(location),
     m_functionName(m_location.function_name()),
@@ -119,13 +119,13 @@ FunctionTracer::SetFailed() noexcept
 }
 
 void
-FunctionTracer::SetEnterLogSeverity(plog::Severity logSeverityEnter) noexcept
+FunctionTracer::SetEnterLogSeverity(plog::Severity logSeverity) noexcept
 {
     if (m_entered) {
         LOGW << "warning: calling SetEnterLogSeverity after entered log has already been printed; this will have no effect.";
     }
 
-    m_logSeverityEnter = logSeverityEnter;
+    m_logSeverityEnter = logSeverity;
 }
 
 void

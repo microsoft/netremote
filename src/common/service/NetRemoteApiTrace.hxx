@@ -19,11 +19,10 @@ struct NetRemoteApiTrace :
      * @brief Construct a new NetRemoteApiTrace object.
      *
      * @param deferEnter Whether to defer the entry log message upon construction.
-     * @param logSeverityEnter The log severity to use when tracing function entrance.
-     * @param logSeverityExit The log severity to use when tracing function exit.
+     * @param logSeverity The default log severity to use when tracing.
      * @param location The source code location of the function call.
      */
-    NetRemoteApiTrace(bool deferEnter = false, plog::Severity logSeverityEnter = LogSeverityDefaultApi, plog::Severity logSeverityExit = LogSeverityDefaultApi, std::source_location location = std::source_location::current());
+    NetRemoteApiTrace(bool deferEnter = false, plog::Severity logSeverity = LogSeverityDefaultApi, std::source_location location = std::source_location::current());
 
 protected:
     static constexpr auto LogSeverityDefaultApi{ plog::Severity::info };
