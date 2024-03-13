@@ -155,12 +155,34 @@ using Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest;
 
 namespace detail
 {
-// protobuf encodes enums in repeated fields as 'int' instead of the enum type itself. So, the below is a simple
-// function to convert the repeated field of int to the enum type.
+/**
+ * protobuf encodes enums in repeated fields as 'int' instead of the enum type itself. So, the below are simple
+ * functions to convert a repeated field of int type to the associated enum type.
+ */
+
+/**
+ * @brief Convert an int-typed Dot11AuthenticationAlgorithm to its proper enum type.
+ */
+constexpr auto toDot11AuthenticationAlgorithm = [](const auto& authenticationAlgorithm) {
+    return static_cast<Dot11AuthenticationAlgorithm>(authenticationAlgorithm);
+};
+
+/**
+ * @brief Convert an int-typed Dot11FrequencyBand to its proper enum type.
+ */
 constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
     return static_cast<Dot11FrequencyBand>(frequencyBand);
 };
 } // details
+
+std::vector<Dot11AuthenticationAlgorithm>
+ToDot11AuthenticationAlgorithms(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept
+{
+    std::vector<Dot11AuthenticationAlgorithm> dot11AuthenticationAlgorithms(static_cast<std::size_t>(std::size(dot11AccessPointConfiguration.authenticationalgorithms())));
+    std::ranges::transform(dot11AccessPointConfiguration.authenticationalgorithms(), std::begin(dot11AuthenticationAlgorithms), detail::toDot11AuthenticationAlgorithm);
+
+    return dot11AuthenticationAlgorithms;
+}
 
 std::vector<Dot11FrequencyBand>
 ToDot11FrequencyBands(const WifiAccessPointSetFrequencyBandsRequest& request) noexcept

@@ -453,8 +453,12 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        if (dot11AccessPointConfiguration->authenticationalgorithm() != Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
-            // TODO: set authentication algorithm.
+        if (dot11AccessPointConfiguration->authenticationalgorithms_size() > 0) {
+            auto dot11AuthenticationAlgorithms = ToDot11AuthenticationAlgorithms(*dot11AccessPointConfiguration);
+            wifiOperationStatus = WifiAccessPointSetAuthenticationAlgorithsmImpl(accessPointId, dot11AuthenticationAlgorithms, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
         }
 
         if (dot11AccessPointConfiguration->ciphersuite() != Dot11CipherSuite::Dot11CipherSuiteUnknown) {

@@ -104,6 +104,15 @@ Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm
 ToDot11AuthenticationAlgorithm(Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept;
 
 /**
+ * @brief Obtain a vector of Dot11AuthenticationAlgorithms from the specified Dot11AccessPointConfiguration.
+ *
+ * @param dot11AccessPointConfiguration The Dot11AccessPointConfiguration to extract the Dot11AuthenticationAlgorithms from.
+ * @return std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>
+ */
+std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>
+ToDot11AuthenticationAlgorithms(const Microsoft::Net::Wifi::Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept;
+
+/**
  * @brief Convert the specified Dot11AuthenticationAlgorithm to the equivalent IEEE 802.11 authentication algorithm.
  *
  * @param dot11AuthenticationAlgorithm The Dot11AuthenticationAlgorithm to convert.
