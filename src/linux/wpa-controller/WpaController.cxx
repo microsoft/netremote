@@ -36,6 +36,14 @@ WpaController::WpaController(std::string_view interfaceName, WpaType type, std::
 {
 }
 
+WpaController::~WpaController()
+{
+    if (m_controlSocketCommand != nullptr) {
+        wpa_ctrl_close(m_controlSocketCommand);
+        m_controlSocketCommand = nullptr;
+    }
+}
+
 WpaType
 WpaController::Type() const noexcept
 {

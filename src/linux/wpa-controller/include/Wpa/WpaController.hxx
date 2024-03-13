@@ -51,6 +51,11 @@ struct WpaController
     WpaController(std::string_view interfaceName, WpaType type, std::filesystem::path controlSocketPath);
 
     /**
+     * @brief Destroy the WpaController object.
+     */
+    virtual ~WpaController();
+
+    /**
      * @brief The type of daemon this object is controlling.
      *
      * @return WpaType
