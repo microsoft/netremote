@@ -132,7 +132,7 @@ protected:
      * @brief Enable an access point. This brings the access point online, making it available for use by clients.
      *
      * @param accessPointId The access point identifier.
-     * @param dot11AccessPointConfiguration (optional) The access point configuration to enforce prior to enablement. 
+     * @param dot11AccessPointConfiguration (optional) The access point configuration to enforce prior to enablement.
      * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
@@ -164,12 +164,24 @@ protected:
     WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>& dot11FrequencyBands, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
+     * @brief Set the active authentication algorithms of the access point. If the access point is online, this will
+     * cause it to temporarily go offline while the change is being applied.
+     *
+     * @param accessPointId The access point identifier.
+     * @param dot11AuthenticationAlgorithms The new authentication algorithms to set.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>& dot11AuthenticationAlgorithms, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
      * @brief Set the SSID of the access point.
-     * 
+     *
      * @param accessPointId The access point identifier.
      * @param dot11Ssid The new SSID to set.
      * @param accessPointController The access point controller for the specified access point (optional).
-     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
