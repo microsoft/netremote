@@ -2,9 +2,11 @@
 #ifndef HOSTAPD_PROTOCOL_HXX
 #define HOSTAPD_PROTOCOL_HXX
 
+#include <array>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -56,7 +58,7 @@ enum class WpaProtocol : uint32_t {
 /**
  * @brief Numerical bitmask of valid WpaProtocol values.
  */
-static constexpr auto WpaProtocolMask =
+static constexpr std::underlying_type_t<WpaProtocol> WpaProtocolMask =
     std::to_underlying(WpaProtocol::Wpa) |
     std::to_underlying(WpaProtocol::Wpa2) |
     std::to_underlying(WpaProtocol::Wapi) |
@@ -83,6 +85,28 @@ enum class WpaCipher : uint32_t {
     BipGmac256 = (1U << 12U),
     BipCmac256 = (1U << 13U),
     GtkNotUsed = (1U << 14U),
+};
+
+/**
+ * @brief Array of all WpaCipher values.
+ *
+ * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
+ */
+inline constexpr std::array<WpaCipher, 14> AllWpaCiphers = {
+    WpaCipher::None,
+    WpaCipher::Wep40,
+    WpaCipher::Wep104,
+    WpaCipher::Tkip,
+    WpaCipher::Ccmp,
+    WpaCipher::Aes128Cmac,
+    WpaCipher::Gcmp,
+    WpaCipher::Sms4,
+    WpaCipher::Gcmp256,
+    WpaCipher::Ccmp256,
+    WpaCipher::BipGmac128,
+    WpaCipher::BipGmac256,
+    WpaCipher::BipCmac256,
+    WpaCipher::GtkNotUsed,
 };
 
 /**
@@ -141,9 +165,43 @@ enum class WpaKeyManagement : uint32_t {
 };
 
 /**
+ * @brief Array of all WpaKeyManagement values.
+ *
+ * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
+ */
+inline constexpr std::array<WpaKeyManagement, 26> AllWpaKeyManagements = {
+    WpaKeyManagement::Ieee80211x,
+    WpaKeyManagement::Psk,
+    WpaKeyManagement::None,
+    WpaKeyManagement::Ieee80211xNoWpa,
+    WpaKeyManagement::WpaNone,
+    WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtPsk,
+    WpaKeyManagement::Ieee8021xSha256,
+    WpaKeyManagement::PskSha256,
+    WpaKeyManagement::Wps,
+    WpaKeyManagement::Sae,
+    WpaKeyManagement::FtSae,
+    WpaKeyManagement::WapiPsk,
+    WpaKeyManagement::WapiCert,
+    WpaKeyManagement::Cckm,
+    WpaKeyManagement::Osen,
+    WpaKeyManagement::Ieee80211xSuiteB,
+    WpaKeyManagement::Ieee80211xSuiteB192,
+    WpaKeyManagement::FilsSha256,
+    WpaKeyManagement::FilsSha384,
+    WpaKeyManagement::FtFilsSha256,
+    WpaKeyManagement::FtFilsSha384,
+    WpaKeyManagement::Owe,
+    WpaKeyManagement::Dpp,
+    WpaKeyManagement::FtIeee8021xSha384,
+    WpaKeyManagement::Pasn,
+};
+
+/**
  * @brief All valid WpaKeyManagement values supporting fast-transition (FT).
  */
-static constexpr auto WpaKeyManagementFt =
+static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementFt =
     std::to_underlying(WpaKeyManagement::Ieee80211x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021xSha384) |
