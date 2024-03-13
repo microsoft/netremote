@@ -624,3 +624,54 @@ TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remot
         REQUIRE_NOTHROW(hostapd.SetCipherSuites({ { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac } } }, EnforceConfigurationChange::Defer));
     }
 }
+
+TEST_CASE("Send SetAuthenticationAlgorithms() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Fails with empty input")
+    {
+        REQUIRE_THROWS_AS(hostapd.SetAuthenticationAlgorithms({}, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetAuthenticationAlgorithms({}, EnforceConfigurationChange::Defer), HostapdException);
+    }
+
+    SECTION("Fails with invalid input")
+    {
+        for (const auto wpaAuthenticationAlgorithmUnsupported : WpaAuthenticationAlgorithmsUnsupported) {
+            REQUIRE_THROWS_AS(hostapd.SetAuthenticationAlgorithms({ wpaAuthenticationAlgorithmUnsupported }, EnforceConfigurationChange::Now), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetAuthenticationAlgorithms({ wpaAuthenticationAlgorithmUnsupported }, EnforceConfigurationChange::Defer), HostapdException);
+        }
+    }
+
+    SECTION("Succeeds with valid, single input")
+    {
+        for (const auto wpaAuthenticationAlgorithm : WpaAuthenticationAlgorithmsAll | std::views::filter(IsWpaAuthenticationAlgorithmSupported)) {
+            REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ wpaAuthenticationAlgorithm }, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ wpaAuthenticationAlgorithm }, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Succeeds with valid, multiple inputs")
+    {
+        std::vector<WpaAuthenticationAlgorithm> wpaAuthenticationAlgorithms{};
+        for (const auto wpaAuthenticationAlgorithm : WpaAuthenticationAlgorithmsAll | std::views::filter(IsWpaAuthenticationAlgorithmSupported)) {
+            wpaAuthenticationAlgorithms.push_back(wpaAuthenticationAlgorithm);
+            REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms(wpaAuthenticationAlgorithms, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms(wpaAuthenticationAlgorithms, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Succeeds with valid, duplicate inputs")
+    {
+        REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem, WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem, WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Defer));
+    }
+}
