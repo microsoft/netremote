@@ -5,6 +5,7 @@
 #include <exception>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
@@ -109,7 +110,7 @@ struct IHostapd
      *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
@@ -118,7 +119,7 @@ struct IHostapd
      * @brief Set the ssid for the interface.
      *
      * @param ssid The ssid to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange) = 0;
@@ -127,19 +128,38 @@ struct IHostapd
      * @brief Set the WPA protocol(s) for the interface.
      *
      * @param protocols The protocols to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
-     * @brief Set the Key Management object
+     * @brief Set the allowed key management algorithms for the interfacallowed key management algorithms for the interface.
      *
      * @param keyManagements The key management value(s) to set.
-     * @param enforceConfigurationChange When the enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed cipher suites for the interface.
+     *
+     * @param protocol The WPA protocol to set the cipher suites for.
+     * @param ciphers The ciphers to allow.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed cipher suites for the interface.
+     *
+     * @param protocolCipherMap map specifying the ciphers to allow for each protocol.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**

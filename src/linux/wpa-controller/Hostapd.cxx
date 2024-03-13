@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -252,5 +253,50 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
         SetProperty(ProtocolHostapd::PropertyNameWpaKeyManagement, keyManagementPropertyValue, enforceConfigurationChange);
     } catch (const HostapdException& e) {
         throw HostapdException(std::format("Failed to set hostapd 'wpa_key_mgmt' property to '{}' ({})", keyManagementPropertyValue, e.what()));
+    }
+}
+
+void
+Hostapd::SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange)
+{
+    SetCipherSuites({ { protocol, std::move(ciphers) } }, enforceConfigurationChange);
+}
+
+void
+Hostapd::SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange)
+{
+    if (std::empty(protocolCipherMap)) {
+        throw HostapdException("No WPA cipher suites were provided");
+    }
+
+    for (const auto& [protocol, ciphers] : protocolCipherMap) {
+        if (std::empty(ciphers)) {
+            throw HostapdException(std::format("No WPA cipher suites were provided for protocol '{}'", magic_enum::enum_name(protocol)));
+        }
+
+        std::string cipherPropertyValue;
+        {
+            std::ostringstream cipherPropertyValueBuilder{};
+            for (const auto cipher : ciphers) {
+                const auto cipherValue = WpaCipherPropertyValue(cipher);
+                if (cipherValue == WpaCipherInvalidValue) {
+                    throw HostapdException(std::format("Invalid WPA cipher suite value '{}' for protocol '{}", magic_enum::enum_name(cipher), magic_enum::enum_name(protocol)));
+                }
+                cipherPropertyValueBuilder << cipherValue << ' ';
+            }
+
+            cipherPropertyValue = cipherPropertyValueBuilder.str();
+        }
+
+        const auto cipherPropertyName = WpaCipherPropertyName(protocol);
+        if (cipherPropertyName == ProtocolHostapd::PropertyNameInvalid) {
+            throw HostapdException(std::format("Invalid WPA protocol value '{}'", magic_enum::enum_name(protocol)));
+        }
+
+        try {
+            SetProperty(cipherPropertyName, cipherPropertyValue, enforceConfigurationChange);
+        } catch (const HostapdException& e) {
+            throw HostapdException(std::format("Failed to set hostapd 'wpa_cipher' property to '{}' for protocol '{}' ({})", cipherPropertyValue, magic_enum::enum_name(protocol), e.what()));
+        }
     }
 }

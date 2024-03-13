@@ -2,9 +2,12 @@
 #ifndef HOSTAPD_PROTOCOL_HXX
 #define HOSTAPD_PROTOCOL_HXX
 
+#include <algorithm>
+#include <array>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -54,9 +57,30 @@ enum class WpaProtocol : uint32_t {
 };
 
 /**
+ * @brief Array of all unsupported WpaProtocol values.
+ */
+inline constexpr std::array<WpaProtocol, 2> WpaProtocolsUnsupported = {
+    WpaProtocol::Wapi,
+    WpaProtocol::Osen,
+};
+
+/**
+ * @brief Determine if the specified WpaProtocol is supported by hostapd.
+ *
+ * @param wpaProtocol The WpaProtocol to check.
+ * @return true The protocol is supported.
+ * @return false The protocol is not supported.
+ */
+constexpr bool
+IsWpaProtocolSupported(WpaProtocol wpaProtocol) noexcept
+{
+    return !std::ranges::contains(WpaProtocolsUnsupported, wpaProtocol);
+}
+
+/**
  * @brief Numerical bitmask of valid WpaProtocol values.
  */
-static constexpr auto WpaProtocolMask =
+static constexpr std::underlying_type_t<WpaProtocol> WpaProtocolMask =
     std::to_underlying(WpaProtocol::Wpa) |
     std::to_underlying(WpaProtocol::Wpa2) |
     std::to_underlying(WpaProtocol::Wapi) |
@@ -84,6 +108,51 @@ enum class WpaCipher : uint32_t {
     BipCmac256 = (1U << 13U),
     GtkNotUsed = (1U << 14U),
 };
+
+/**
+ * @brief Array of all WpaCipher values.
+ *
+ * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
+ */
+inline constexpr std::array<WpaCipher, 14> WpaCiphersAll = {
+    WpaCipher::None,
+    WpaCipher::Wep40,
+    WpaCipher::Wep104,
+    WpaCipher::Tkip,
+    WpaCipher::Ccmp,
+    WpaCipher::Aes128Cmac,
+    WpaCipher::Gcmp,
+    WpaCipher::Sms4,
+    WpaCipher::Gcmp256,
+    WpaCipher::Ccmp256,
+    WpaCipher::BipGmac128,
+    WpaCipher::BipGmac256,
+    WpaCipher::BipCmac256,
+    WpaCipher::GtkNotUsed,
+};
+
+/**
+ * @brief Array of all unsupported WpaCipher values.
+ */
+inline constexpr std::array<WpaCipher, 4> WpaCiphersUnsupported = {
+    WpaCipher::None,
+    WpaCipher::Wep40,
+    WpaCipher::Wep104,
+    WpaCipher::Sms4,
+};
+
+/**
+ * @brief Detrmine if the specified WpaCipher is supported by hostapd.
+ *
+ * @param wpaCipher The WpaCipher to check.
+ * @return true The cipher is supported.
+ * @return false The cipher is not supported.
+ */
+constexpr bool
+IsWpaCipherSupported(WpaCipher wpaCipher) noexcept
+{
+    return !std::ranges::contains(WpaCiphersUnsupported, wpaCipher);
+}
 
 /**
  * @brief WPA encoding of IEEE 802.11 algorithm types.
@@ -141,9 +210,43 @@ enum class WpaKeyManagement : uint32_t {
 };
 
 /**
+ * @brief Array of all WpaKeyManagement values.
+ *
+ * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
+ */
+inline constexpr std::array<WpaKeyManagement, 26> AllWpaKeyManagements = {
+    WpaKeyManagement::Ieee80211x,
+    WpaKeyManagement::Psk,
+    WpaKeyManagement::None,
+    WpaKeyManagement::Ieee80211xNoWpa,
+    WpaKeyManagement::WpaNone,
+    WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtPsk,
+    WpaKeyManagement::Ieee8021xSha256,
+    WpaKeyManagement::PskSha256,
+    WpaKeyManagement::Wps,
+    WpaKeyManagement::Sae,
+    WpaKeyManagement::FtSae,
+    WpaKeyManagement::WapiPsk,
+    WpaKeyManagement::WapiCert,
+    WpaKeyManagement::Cckm,
+    WpaKeyManagement::Osen,
+    WpaKeyManagement::Ieee80211xSuiteB,
+    WpaKeyManagement::Ieee80211xSuiteB192,
+    WpaKeyManagement::FilsSha256,
+    WpaKeyManagement::FilsSha384,
+    WpaKeyManagement::FtFilsSha256,
+    WpaKeyManagement::FtFilsSha384,
+    WpaKeyManagement::Owe,
+    WpaKeyManagement::Dpp,
+    WpaKeyManagement::FtIeee8021xSha384,
+    WpaKeyManagement::Pasn,
+};
+
+/**
  * @brief All valid WpaKeyManagement values supporting fast-transition (FT).
  */
-static constexpr auto WpaKeyManagementFt =
+static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementFt =
     std::to_underlying(WpaKeyManagement::Ieee80211x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021xSha384) |
@@ -305,6 +408,7 @@ struct ProtocolHostapd :
     // Property names for "SET" commands.
     static constexpr auto PropertyEnabled = "1";
     static constexpr auto PropertyDisabled = "0";
+    static constexpr auto PropertyNameInvalid = "invalid";
 
     static constexpr auto PropertyNameSetBand = "setband";
     static constexpr auto PropertySetBandValueAuto = "AUTO";
@@ -380,7 +484,8 @@ IsHostapdStateOperational(HostapdInterfaceState state) noexcept;
 constexpr std::string_view WpaKeyManagementInvalidValue = "UNKNOWN";
 
 /**
- * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd.
+ * @brief Convert a WpaKeyManagement value to the corresponding property value string expected by hostapd. The return
+ * value may be used for the hostapd property 'wpa_key_mgmt'.
  *
  * @param wpaKeyManagement The WpaKeyManagement value to convert.
  * @return constexpr std::string_view The corresponding hostapd property value string.
@@ -444,6 +549,77 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
         [[fallthrough]];
     default:
         return WpaKeyManagementInvalidValue;
+    }
+}
+
+/**
+ * @brief WpaCipher sentinel for an invalid value.
+ */
+constexpr std::string_view WpaCipherInvalidValue = "UNKNOWN";
+
+/**
+ * @brief Convert a WpaCipher value to the corresponding property value string expected by hostapd. The returned value
+ * may be used for hostapd properties 'wpa_pairwise' and 'rsn_pairwise'.
+ *
+ * @param wpaCipher The WpaCipher value to convert.
+ * @return constexpr std::string_view The corresponding hostapd property value string.
+ */
+constexpr std::string_view
+WpaCipherPropertyValue(WpaCipher wpaCipher) noexcept
+{
+    switch (wpaCipher) {
+    case WpaCipher::None:
+        return "NONE";
+    case WpaCipher::Wep40:
+        return "WEP40";
+    case WpaCipher::Wep104:
+        return "WEP104";
+    case WpaCipher::Tkip:
+        return "TKIP";
+    case WpaCipher::Ccmp:
+        return "CCMP";
+    case WpaCipher::Aes128Cmac:
+        return "AES-128-CMAC";
+    case WpaCipher::Gcmp:
+        return "GCMP";
+    case WpaCipher::Gcmp256:
+        return "GCMP-256";
+    case WpaCipher::Ccmp256:
+        return "CCMP-256";
+    case WpaCipher::BipGmac128:
+        return "BIP-GMAC-128";
+    case WpaCipher::BipGmac256:
+        return "BIP-GMAC-256";
+    case WpaCipher::BipCmac256:
+        return "BIP-CMAC-256";
+    case WpaCipher::GtkNotUsed:
+        return "GTK_NOT_USED";
+    case WpaCipher::Sms4:
+        [[fallthrough]];
+    default:
+        return WpaCipherInvalidValue;
+    }
+}
+
+/**
+ * @brief Get the hostapd property name to use to set the cipher for the specified WPA protocol.
+ *
+ * Hostapd uses different configuration properties for WPA and WPA2/RSN protocols. This function maps the protocol to
+ * the associated property name.
+ *
+ * @param wpaProtocol The wpa protocol to get the cipher name property for.
+ * @return constexpr std::string_view
+ */
+constexpr std::string_view
+WpaCipherPropertyName(WpaProtocol wpaProtocol) noexcept
+{
+    switch (wpaProtocol) {
+    case WpaProtocol::Wpa:
+        return ProtocolHostapd::PropertyNameWpaPairwise;
+    case WpaProtocol::Rsn:
+        return ProtocolHostapd::PropertyNameRsnPairwise;
+    default:
+        return ProtocolHostapd::PropertyNameInvalid;
     }
 }
 } // namespace Wpa
