@@ -26,7 +26,7 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
     // Configure console logging.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
-    plog::init(plog::verbose, &colorConsoleAppender);
+    plog::init(plog::debug, &colorConsoleAppender);
 
     // Configure monitoring with the netlink protocol.
     auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
