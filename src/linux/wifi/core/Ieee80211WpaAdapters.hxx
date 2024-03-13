@@ -17,7 +17,7 @@ namespace Microsoft::Net::Wifi
  * @return Wpa::HostapdHwMode
  */
 Wpa::HostapdHwMode
-IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol);
+IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol) noexcept;
 
 /**
  * @brief Get a string representation of a HostapdHwMode.
@@ -26,7 +26,7 @@ IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol);
  * @return std::string
  */
 std::string
-HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode);
+HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode) noexcept;
 
 /**
  * @brief Get a string representation of a Ieee80211FrequencyBand.
@@ -35,7 +35,16 @@ HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode);
  * @return std::string_view
  */
 std::string_view
-IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand);
+IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand) noexcept;
+
+/**
+ * @brief Convert a Ieee80211AuthenticationAlgorithm to a WpaAuthenticationAlgorithm.
+ *
+ * @param ieee80211AuthenticationAlgorithm The Ieee80211AuthenticationAlgorithm to convert.
+ * @return Wpa::WpaAuthenticationAlgorithm
+ */
+Wpa::WpaAuthenticationAlgorithm
+Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept;
 } // namespace Microsoft::Net::Wifi
 
 #endif // IEEE_80211_WPA_ADAPTERS_HXX

@@ -43,6 +43,7 @@ enum class HostapdHwMode {
  * @brief Initial authentication algorithms supported by hostapd.
  */
 enum class WpaAuthenticationAlgorithm : uint32_t {
+    Invalid = 0U,
     OpenSystem = 1U << 0U,
     SharedKey = 1U << 1U,
     Leap = 1U << 2U,
@@ -55,7 +56,8 @@ enum class WpaAuthenticationAlgorithm : uint32_t {
 /**
  * @brief Array of all authentication algorithm values.
  */
-inline constexpr std::array<WpaAuthenticationAlgorithm, 7> WpaAuthenticationAlgorithmsAll = {
+inline constexpr std::array<WpaAuthenticationAlgorithm, 8> WpaAuthenticationAlgorithmsAll = {
+    WpaAuthenticationAlgorithm::Invalid,
     WpaAuthenticationAlgorithm::OpenSystem,
     WpaAuthenticationAlgorithm::SharedKey,
     WpaAuthenticationAlgorithm::Leap,
@@ -68,7 +70,8 @@ inline constexpr std::array<WpaAuthenticationAlgorithm, 7> WpaAuthenticationAlgo
 /**
  * @brief Array of all unsupported authentication algorithm values.
  */
-inline constexpr std::array<WpaAuthenticationAlgorithm, 5> WpaAuthenticationAlgorithmsUnsupported = {
+inline constexpr std::array<WpaAuthenticationAlgorithm, 6> WpaAuthenticationAlgorithmsUnsupported = {
+    WpaAuthenticationAlgorithm::Invalid,
     WpaAuthenticationAlgorithm::Leap,
     WpaAuthenticationAlgorithm::Ft,
     WpaAuthenticationAlgorithm::Sae,
@@ -683,9 +686,9 @@ WpaCipherPropertyName(WpaProtocol wpaProtocol) noexcept
 
 /**
  * @brief Get the hostapd property value for the specified WpaProtocol.
- * 
+ *
  * @param wpaProtocol The WpaProtocol to get the property value for.
- * @return constexpr std::underlying_type_t<WpaProtocol> 
+ * @return constexpr std::underlying_type_t<WpaProtocol>
  */
 constexpr std::underlying_type_t<WpaProtocol>
 WpaProtocolPropertyValue(WpaProtocol wpaProtocol) noexcept
@@ -695,9 +698,9 @@ WpaProtocolPropertyValue(WpaProtocol wpaProtocol) noexcept
 
 /**
  * @brief Get the hostapd property value for the specified WpaAuthenticationAlgorithm.
- * 
+ *
  * @param wpaAuthenticationAlgorithm The WpaAuthenticationAlgorithm to get the property value for.
- * @return constexpr std::underlying_type_t<WpaAuthenticationAlgorithm> 
+ * @return constexpr std::underlying_type_t<WpaAuthenticationAlgorithm>
  */
 constexpr std::underlying_type_t<WpaAuthenticationAlgorithm>
 WpaAuthenticationAlgorithmPropertyValue(WpaAuthenticationAlgorithm wpaAuthenticationAlgorithm) noexcept

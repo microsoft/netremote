@@ -15,7 +15,7 @@ namespace Microsoft::Net::Wifi
 using namespace Wpa;
 
 HostapdHwMode
-IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol)
+IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol) noexcept
 {
     switch (ieeeProtocol) {
     case Ieee80211Protocol::B:
@@ -40,7 +40,7 @@ IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol)
 }
 
 std::string
-HostapdHwModeToPropertyValue(HostapdHwMode hwMode)
+HostapdHwModeToPropertyValue(HostapdHwMode hwMode) noexcept
 {
     switch (hwMode) {
     case HostapdHwMode::Ieee80211b:
@@ -60,7 +60,7 @@ HostapdHwModeToPropertyValue(HostapdHwMode hwMode)
 }
 
 std::string_view
-IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
+IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand) noexcept
 {
     switch (ieeeFrequencyBand) {
     case Ieee80211FrequencyBand::TwoPointFourGHz:
@@ -72,6 +72,33 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand)
     default:
         LOGE << std::format("Invalid ieee80211 frequency band value {}", magic_enum::enum_name(ieeeFrequencyBand));
         return "invalid";
+    }
+}
+
+WpaAuthenticationAlgorithm
+Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept
+{
+    switch (ieee80211AuthenticationAlgorithm) {
+    case Ieee80211AuthenticationAlgorithm::OpenSystem:
+        return WpaAuthenticationAlgorithm::OpenSystem;
+    case Ieee80211AuthenticationAlgorithm::SharedKey:
+        return WpaAuthenticationAlgorithm::SharedKey;
+    case Ieee80211AuthenticationAlgorithm::FastBssTransition:
+        return WpaAuthenticationAlgorithm::Ft;
+    case Ieee80211AuthenticationAlgorithm::Sae:
+        return WpaAuthenticationAlgorithm::Sae;
+    case Ieee80211AuthenticationAlgorithm::Fils:
+        return WpaAuthenticationAlgorithm::Fils;
+    case Ieee80211AuthenticationAlgorithm::FilsPfs:
+        [[fallthrough]];
+    case Ieee80211AuthenticationAlgorithm::FilsPublicKey:
+        return WpaAuthenticationAlgorithm::FilsSkPfs;
+    case Ieee80211AuthenticationAlgorithm::VendorSpecific:
+        [[fallthrough]];
+    case Ieee80211AuthenticationAlgorithm::Unknown:
+        [[fallthrough]];
+    default:
+        return WpaAuthenticationAlgorithm::Invalid;
     }
 }
 } // namespace Microsoft::Net::Wifi
