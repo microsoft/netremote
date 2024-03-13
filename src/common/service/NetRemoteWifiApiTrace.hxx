@@ -28,7 +28,7 @@ struct NetRemoteWifiApiTrace :
      * @param operationStatus The result status of the operation, if present.
      * @param location The source code location of the function call.
      */
-    NetRemoteWifiApiTrace(std::optional<std::string> accessPointId = std::nullopt, const Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus* operationStatus = nullptr, plog::Severity logSeverityEnter = LogSeverityDefaultApi, plog::Severity logSeverityExit = LogSeverityDefaultApi, std::source_location location = std::source_location::current());
+    NetRemoteWifiApiTrace(std::optional<std::string> accessPointId = std::nullopt, const Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus* operationStatus = nullptr, plog::Severity logSeverity = LogSeverityDefaultApi, std::source_location location = std::source_location::current());
 
     /**
      * @brief Destroy the NetRemoteWifiApiTrace object.

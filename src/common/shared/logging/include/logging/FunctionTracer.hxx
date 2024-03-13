@@ -24,14 +24,13 @@ struct FunctionTracer
     /**
      * @brief Construct a new FunctionTracer object.
      *
-     * @param logSeverityEnter The severity to log entrance with.
-     * @param logSeverityExit The severity to log exit with.
+     * @param logSeverity The default severity to log with.
      * @param logPrefix The prefix to use for both log messages.
      * @param arguments The arguments the function was called with.
      * @param deferEnter Whether to defer the call to Enter().
      * @param location The source location information of the caller.
      */
-    FunctionTracer(plog::Severity logSeverityEnter = LogSeverityEnterDefault, plog::Severity logSeverityExit = LogSeverityExitDefault, std::string logPrefix = {}, std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current());
+    FunctionTracer(plog::Severity logSeverity = LogSeverityEnterDefault, std::string logPrefix = {}, std::vector<std::pair<std::string, std::string>> arguments = {}, bool deferEnter = false, std::source_location location = std::source_location::current());
 
     /**
      * @brief Destroy the FunctionTracer object.
@@ -84,10 +83,10 @@ struct FunctionTracer
      * @brief Manually set the log severity for the enter log message. This only has an effect if the object was created
      * with deferEnter = true.
      *
-     * @param logSeverityEnter The log severity to use when printing the entrance log message.
+     * @param logSeverity The log severity to use when printing the entrance log message.
      */
     void
-    SetEnterLogSeverity(plog::Severity logSeverityEnter) noexcept;
+    SetEnterLogSeverity(plog::Severity logSeverity) noexcept;
 
     /**
      * @brief Manually set the log severity for the exit log message. This overrides the SetSucceeded and SetFailed methods.
