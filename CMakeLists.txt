@@ -125,6 +125,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GN
     endif()
   # clang specific options
   elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    # Enable AddressSanitizer for all targets in Debug builds.
+    add_compile_options("$<$<CONFIG:Debug>:-fsanitize=address>")
+    add_compile_options("$<$<CONFIG:Debug>:-fno-omit-frame-pointer>")
+    add_link_options("$<$<CONFIG:Debug>:-fsanitize=address>")
+
     if (NETREMOTE_CODE_COVERAGE)
       add_compile_options(
         -fprofile-instr-generate
