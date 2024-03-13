@@ -2,6 +2,7 @@
 #ifndef HOSTAPD_PROTOCOL_HXX
 #define HOSTAPD_PROTOCOL_HXX
 
+#include <algorithm>
 #include <array>
 #include <optional>
 #include <string>
@@ -56,6 +57,27 @@ enum class WpaProtocol : uint32_t {
 };
 
 /**
+ * @brief Array of all unsupported WpaProtocol values.
+ */
+inline constexpr std::array<WpaProtocol, 2> WpaProtocolsUnsupported = {
+    WpaProtocol::Wapi,
+    WpaProtocol::Osen,
+};
+
+/**
+ * @brief Determine if the specified WpaProtocol is supported by hostapd.
+ *
+ * @param wpaProtocol The WpaProtocol to check.
+ * @return true The protocol is supported.
+ * @return false The protocol is not supported.
+ */
+constexpr bool
+IsWpaProtocolSupported(WpaProtocol wpaProtocol) noexcept
+{
+    return !std::ranges::contains(WpaProtocolsUnsupported, wpaProtocol);
+}
+
+/**
  * @brief Numerical bitmask of valid WpaProtocol values.
  */
 static constexpr std::underlying_type_t<WpaProtocol> WpaProtocolMask =
@@ -92,7 +114,7 @@ enum class WpaCipher : uint32_t {
  *
  * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
  */
-inline constexpr std::array<WpaCipher, 14> AllWpaCiphers = {
+inline constexpr std::array<WpaCipher, 14> WpaCiphersAll = {
     WpaCipher::None,
     WpaCipher::Wep40,
     WpaCipher::Wep104,
@@ -108,6 +130,29 @@ inline constexpr std::array<WpaCipher, 14> AllWpaCiphers = {
     WpaCipher::BipCmac256,
     WpaCipher::GtkNotUsed,
 };
+
+/**
+ * @brief Array of all unsupported WpaCipher values.
+ */
+inline constexpr std::array<WpaCipher, 4> WpaCiphersUnsupported = {
+    WpaCipher::None,
+    WpaCipher::Wep40,
+    WpaCipher::Wep104,
+    WpaCipher::Sms4,
+};
+
+/**
+ * @brief Detrmine if the specified WpaCipher is supported by hostapd.
+ *
+ * @param wpaCipher The WpaCipher to check.
+ * @return true The cipher is supported.
+ * @return false The cipher is not supported.
+ */
+constexpr bool
+IsWpaCipherSupported(WpaCipher wpaCipher) noexcept
+{
+    return !std::ranges::contains(WpaCiphersUnsupported, wpaCipher);
+}
 
 /**
  * @brief WPA encoding of IEEE 802.11 algorithm types.

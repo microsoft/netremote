@@ -529,28 +529,6 @@ TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remot
 {
     using namespace Wpa;
 
-    constexpr auto isValidCipher = [](WpaCipher wpaCipher) noexcept {
-        switch (wpaCipher) {
-        case WpaCipher::None:
-        case WpaCipher::Wep40:
-        case WpaCipher::Wep104:
-        case WpaCipher::Sms4:
-            return false;
-        default:
-            return true;
-        }
-    };
-
-    constexpr auto isValidProtocol = [](WpaProtocol wpaProtocol) noexcept {
-        switch (wpaProtocol) {
-        case WpaProtocol::Wpa:
-        case WpaProtocol::Wpa2:
-            return true;
-        default:
-            return false;
-        }
-    };
-
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
 
     SECTION("Doesn't throw")
@@ -614,8 +592,8 @@ TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remot
 
     SECTION("Succeeds with all valid, single inputs")
     {
-        for (const auto wpaProtocol : magic_enum::enum_values<WpaProtocol>() | std::views::filter(isValidProtocol)) {
-            for (const auto wpaCipher : AllWpaCiphers | std::views::filter(isValidCipher)) {
+        for (const auto wpaProtocol : magic_enum::enum_values<WpaProtocol>() | std::views::filter(IsWpaProtocolSupported)) {
+            for (const auto wpaCipher : WpaCiphersAll | std::views::filter(IsWpaCipherSupported)) {
                 REQUIRE_NOTHROW(hostapd.SetCipherSuites(wpaProtocol, { wpaCipher }, EnforceConfigurationChange::Now));
                 REQUIRE_NOTHROW(hostapd.SetCipherSuites(wpaProtocol, { wpaCipher }, EnforceConfigurationChange::Defer));
             }
@@ -628,8 +606,8 @@ TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remot
 
         std::vector<WpaKeyManagement> keyManagementValidValues{};
 
-        for (const auto wpaProtocol : magic_enum::enum_values<WpaProtocol>() | std::views::filter(isValidProtocol)) {
-            for (const auto wpaCipher : AllWpaCiphers | std::views::filter(isValidCipher)) {
+        for (const auto wpaProtocol : magic_enum::enum_values<WpaProtocol>() | std::views::filter(IsWpaProtocolSupported)) {
+            for (const auto wpaCipher : WpaCiphersAll | std::views::filter(IsWpaCipherSupported)) {
                 protocolCipherMap[wpaProtocol].push_back(wpaCipher);
                 REQUIRE_NOTHROW(hostapd.SetCipherSuites(protocolCipherMap, EnforceConfigurationChange::Now));
                 REQUIRE_NOTHROW(hostapd.SetCipherSuites(protocolCipherMap, EnforceConfigurationChange::Defer));
