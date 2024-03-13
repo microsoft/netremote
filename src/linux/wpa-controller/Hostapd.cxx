@@ -202,6 +202,38 @@ Hostapd::SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfig
 }
 
 void
+Hostapd::SetAuthenticationAlgorithms(std::vector<WpaAuthenticationAlgorithm> algorithms, EnforceConfigurationChange enforceConfigurationChange)
+{
+    using AlgorithmsUnderlyingType = std::underlying_type_t<decltype(algorithms)::value_type>;
+
+    if (std::empty(algorithms)) {
+        throw HostapdException("No WPA authentication algorithms were provided");
+    }
+
+    // Convert the authentication algorithm values to an OR'ed unsigned integer value expected by hostapd.
+    std::string algorithmsPropertyValue;
+    {
+        AlgorithmsUnderlyingType algorithmsValue = 0;
+        for (const auto algorithm : algorithms) {
+            const auto algorithmValue = WpaAuthenticationAlgorithmPropertyValue(algorithm);
+            if ((algorithmValue & ~WpaAuthenticationAlgorithmMask) != 0) {
+                throw HostapdException(std::format("Invalid WPA authentication algorithm value '{}'", algorithmValue));
+            }
+            algorithmsValue |= algorithmValue;
+        }
+
+        algorithmsValue &= WpaAuthenticationAlgorithmMask;
+        algorithmsPropertyValue = std::format("{}", algorithmsValue);
+    }
+
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameAuthenticationAlgorithms, algorithmsPropertyValue, enforceConfigurationChange);
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set authentication algorithms to '{}' ({})", algorithmsPropertyValue, e.what()));
+    }
+}
+
+void
 Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange)
 {
     if (std::empty(protocols)) {
@@ -210,7 +242,7 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
 
     uint32_t protocolsToSet = 0;
     for (const auto protocol : protocols) {
-        const auto protocolValue = std::to_underlying(protocol);
+        const auto protocolValue = WpaProtocolPropertyValue(protocol);
         if ((protocolValue & ~WpaProtocolMask) != 0) {
             throw HostapdException(std::format("Invalid WPA protocol value '{}'", protocolValue));
         }

@@ -100,6 +100,15 @@ struct Hostapd :
     SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
 
     /**
+     * @brief Set the authentication algorithm(s) for the interface.
+     *
+     * @param algorithms The set of allowed authentication algorithms.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    void
+    SetAuthenticationAlgorithms(std::vector<WpaAuthenticationAlgorithm> algorithms, EnforceConfigurationChange enforceConfigurationChange) override;
+
+    /**
      * @brief Set the WPA protocol(s) for the interface.
      *
      * @param protocols The protocols to set.
