@@ -26,6 +26,7 @@
 #include <plog/Severity.h>
 
 #include "Ieee80211Nl80211Adapters.hxx"
+#include "Ieee80211WpaAdapters.hxx"
 
 using namespace Microsoft::Net::Wifi;
 
@@ -250,14 +251,30 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetAuthenticationAlgorithms([[maybe_unused]] std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept
+AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
-    AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
-    // status.Code = AccessPointOperationStatusCode::Succeeded;
-    status.Code = AccessPointOperationStatusCode::OperationNotSupported;
-    status.Details = "SetAuthenticationAlgorithms is not implemented";
+    // Ensure at least one authentication algorithm is requested.
+    if (std::empty(authenticationAlgorithms)) {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Details = "no authentication algorithms specified";
+        return status;
+    }
+
+    std::vector<Wpa::WpaAuthenticationAlgorithm> authenticationAlgorithmsHostapd(std::size(authenticationAlgorithms));
+    std::ranges::transform(authenticationAlgorithms, std::begin(authenticationAlgorithmsHostapd), Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm);
+
+    try {
+        m_hostapd.SetAuthenticationAlgorithms(authenticationAlgorithmsHostapd, EnforceConfigurationChange::Now);
+    } catch (Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set authentication algorithms - {}", ex.what());
+        return status;
+    }
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
 
     return status;
 }
