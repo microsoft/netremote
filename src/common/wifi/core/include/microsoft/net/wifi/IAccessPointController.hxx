@@ -93,6 +93,15 @@ struct IAccessPointController
     SetFrequencyBands(std::vector<Ieee80211FrequencyBand> frequencyBands) noexcept = 0;
 
     /**
+     * @brief Set the authentication algorithms the access point should enable.
+     *
+     * @param authenticationAlgorithms The authentication algorithms to be allow.
+     * @return AccessPointOperationStatus
+     */
+    virtual AccessPointOperationStatus
+    SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept = 0;
+
+    /**
      * @brief Set the SSID of the access point.
      *
      * @param ssid The SSID to be set.

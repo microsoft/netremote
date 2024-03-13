@@ -250,6 +250,19 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 }
 
 AccessPointOperationStatus
+AccessPointControllerLinux::SetAuthenticationAlgorithms([[maybe_unused]] std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    // status.Code = AccessPointOperationStatusCode::Succeeded;
+    status.Code = AccessPointOperationStatusCode::OperationNotSupported;
+    status.Details = "SetAuthenticationAlgorithms is not implemented";
+
+    return status;
+}
+
+AccessPointOperationStatus
 AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
