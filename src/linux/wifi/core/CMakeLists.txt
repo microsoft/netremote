@@ -11,6 +11,8 @@ target_sources(wifi-core-linux
         AccessPointLinux.cxx
         Ieee80211Nl80211Adapters.cxx
         Ieee80211Nl80211Adapters.hxx
+        Ieee80211WpaAdapters.cxx
+        Ieee80211WpaAdapters.hxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_LINUX_PUBLIC_INCLUDE}
