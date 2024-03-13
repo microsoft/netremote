@@ -40,6 +40,63 @@ enum class HostapdHwMode {
 };
 
 /**
+ * @brief Initial authentication algorithms supported by hostapd.
+ */
+enum class WpaAuthenticationAlgorithm : uint32_t {
+    OpenSystem = 1U << 0U,
+    SharedKey = 1U << 1U,
+    Leap = 1U << 2U,
+    Ft = 1U << 3U,
+    Sae = 1U << 4U,
+    Fils = 1U << 5U,
+    FilsSkPfs = 1U << 6U,
+};
+
+/**
+ * @brief Array of all authentication algorithm values.
+ */
+inline constexpr std::array<WpaAuthenticationAlgorithm, 7> WpaAuthenticationAlgorithmsAll = {
+    WpaAuthenticationAlgorithm::OpenSystem,
+    WpaAuthenticationAlgorithm::SharedKey,
+    WpaAuthenticationAlgorithm::Leap,
+    WpaAuthenticationAlgorithm::Ft,
+    WpaAuthenticationAlgorithm::Sae,
+    WpaAuthenticationAlgorithm::Fils,
+    WpaAuthenticationAlgorithm::FilsSkPfs,
+};
+
+/**
+ * @brief Array of all unsupported authentication algorithm values.
+ */
+inline constexpr std::array<WpaAuthenticationAlgorithm, 5> WpaAuthenticationAlgorithmsUnsupported = {
+    WpaAuthenticationAlgorithm::Leap,
+    WpaAuthenticationAlgorithm::Ft,
+    WpaAuthenticationAlgorithm::Sae,
+    WpaAuthenticationAlgorithm::Fils,
+    WpaAuthenticationAlgorithm::FilsSkPfs,
+};
+
+/**
+ * @brief Numerical bitmask of valid WpaAuthenticationAlgorithm values.
+ */
+inline constexpr std::underlying_type_t<WpaAuthenticationAlgorithm> WpaAuthenticationAlgorithmMask =
+    std::to_underlying(WpaAuthenticationAlgorithm::OpenSystem) |
+    std::to_underlying(WpaAuthenticationAlgorithm::SharedKey);
+
+/**
+ * @brief Determine if the specified WpaAuthenticationAlgorithm is supported by hostapd.
+ *
+ * @param wpaProtocol The WpaAuthenticationAlgorithm to check.
+ * @return true The authentication algorithm is supported.
+ * @return false The authentication algorithm is not supported.
+ */
+constexpr bool
+IsWpaAuthenticationAlgorithmSupported(WpaAuthenticationAlgorithm wpaAuthenticationAlgorithm) noexcept
+{
+    return !std::ranges::contains(WpaAuthenticationAlgorithmsUnsupported, wpaAuthenticationAlgorithm);
+}
+
+/**
  * @brief WPA encoding of IEEE 802.11i-2004 protocol types.
  *
  * Note that hostapd configuration doesn't directly encode WPA3 in this enumeration. Instead, a combination of the
@@ -423,6 +480,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyHwModeValueAD = "ad";
     static constexpr auto PropertyHwModeValueAny = "any";
 
+    static constexpr auto PropertyNameAuthenticationAlgorithms = "auth_algs";
     static constexpr auto PropertyNameSsid = "ssid";
 
     static constexpr auto PropertyNameIeee80211N = "ieee80211n";
@@ -621,6 +679,30 @@ WpaCipherPropertyName(WpaProtocol wpaProtocol) noexcept
     default:
         return ProtocolHostapd::PropertyNameInvalid;
     }
+}
+
+/**
+ * @brief Get the hostapd property value for the specified WpaProtocol.
+ * 
+ * @param wpaProtocol The WpaProtocol to get the property value for.
+ * @return constexpr std::underlying_type_t<WpaProtocol> 
+ */
+constexpr std::underlying_type_t<WpaProtocol>
+WpaProtocolPropertyValue(WpaProtocol wpaProtocol) noexcept
+{
+    return std::to_underlying(wpaProtocol);
+}
+
+/**
+ * @brief Get the hostapd property value for the specified WpaAuthenticationAlgorithm.
+ * 
+ * @param wpaAuthenticationAlgorithm The WpaAuthenticationAlgorithm to get the property value for.
+ * @return constexpr std::underlying_type_t<WpaAuthenticationAlgorithm> 
+ */
+constexpr std::underlying_type_t<WpaAuthenticationAlgorithm>
+WpaAuthenticationAlgorithmPropertyValue(WpaAuthenticationAlgorithm wpaAuthenticationAlgorithm) noexcept
+{
+    return std::to_underlying(wpaAuthenticationAlgorithm);
 }
 } // namespace Wpa
 
