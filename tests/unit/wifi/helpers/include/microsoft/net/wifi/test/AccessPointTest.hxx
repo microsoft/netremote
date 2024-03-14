@@ -28,6 +28,7 @@ struct AccessPointTest final :
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211Protocol Protocol{ Microsoft::Net::Wifi::Ieee80211Protocol::Unknown };
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
+    std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
 
     /**

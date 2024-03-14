@@ -109,6 +109,22 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
 }
 
 AccessPointOperationStatus
+AccessPointControllerTest::SetAuthenticationAlgorithms([[maybe_unused]] std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept
+{
+    assert(AccessPoint != nullptr);
+
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    // TODO: does AccessPointCapabilities need to reflect Ieee80211AuthenticationAlgorithms?
+    // If so, ensure authenticationAlgorithms is subset of those in AccessPointCapabilities.AuthenticationAlgorithms.
+
+    AccessPoint->AuthenticationAlgorithms = std::move(authenticationAlgorithms);
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
+AccessPointOperationStatus
 AccessPointControllerTest::SetSsid(std::string_view ssid) noexcept
 {
     assert(AccessPoint != nullptr);

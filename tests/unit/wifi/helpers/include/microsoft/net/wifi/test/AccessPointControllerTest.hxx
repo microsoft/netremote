@@ -104,6 +104,15 @@ struct AccessPointControllerTest final :
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) noexcept override;
 
     /**
+     * @brief Set the authentication algorithms the access point should enable.
+     *
+     * @param authenticationAlgorithms The authentication algorithms to be allow.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept override;
+
+    /**
      * @brief Set the SSID of the access point.
      *
      * @param ssid The SSID to be set.
