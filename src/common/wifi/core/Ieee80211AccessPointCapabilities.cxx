@@ -12,9 +12,9 @@ Ieee80211AccessPointCapabilities::ToString() const
 {
     std::ostringstream result{};
 
-    result << "Protocols: ";
-    for (const auto& protocol : Protocols) {
-        result << magic_enum::enum_name(protocol);
+    result << "PHY Types: ";
+    for (const auto& phyType : PhyTypes) {
+        result << magic_enum::enum_name(phyType);
         result << ' ';
     }
 

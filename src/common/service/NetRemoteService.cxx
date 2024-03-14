@@ -533,10 +533,10 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
         }
     }
 
-    // Convert PHY type to Ieee80211 protocol.
-    auto ieee80211Protocol = FromDot11PhyType(dot11PhyType);
+    // Convert dot11 PHY type to Ieee80211 PHY type.
+    auto ieee80211PhyType = FromDot11PhyType(dot11PhyType);
 
-    // Check if Ieee80211 protocol is supported by AP.
+    // Check if Ieee80211 PHY type is supported by AP.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};
     operationStatus = accessPointController->GetCapabilities(accessPointCapabilities);
     if (!operationStatus) {
@@ -545,15 +545,15 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
         return wifiOperationStatus;
     }
 
-    const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
-    if (!std::ranges::contains(supportedIeee80211Protocols, ieee80211Protocol)) {
+    const auto& supportedIeee80211PhyTypes = accessPointCapabilities.PhyTypes;
+    if (!std::ranges::contains(supportedIeee80211PhyTypes, ieee80211PhyType)) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
-        wifiOperationStatus.set_message(std::format("PHY type '{}' not supported by access point {}", magic_enum::enum_name(ieee80211Protocol), accessPointId));
+        wifiOperationStatus.set_message(std::format("PHY type '{}' not supported by access point {}", magic_enum::enum_name(ieee80211PhyType), accessPointId));
         return wifiOperationStatus;
     }
 
-    // Set the Ieee80211 protocol.
-    operationStatus = accessPointController->SetProtocol(ieee80211Protocol);
+    // Set the Ieee80211 PHY type.
+    operationStatus = accessPointController->SetPhyType(ieee80211PhyType);
     if (!operationStatus) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set PHY type for access point {} - {}", accessPointId, operationStatus.ToString()));

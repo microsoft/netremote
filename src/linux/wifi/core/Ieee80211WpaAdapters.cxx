@@ -15,24 +15,24 @@ namespace Microsoft::Net::Wifi
 using namespace Wpa;
 
 HostapdHwMode
-IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol) noexcept
+IeeePhyTypeToHostapdHwMode(Ieee80211PhyType ieeePhyType) noexcept
 {
-    switch (ieeeProtocol) {
-    case Ieee80211Protocol::B:
+    switch (ieeePhyType) {
+    case Ieee80211PhyType::B:
         return HostapdHwMode::Ieee80211b;
-    case Ieee80211Protocol::G:
+    case Ieee80211PhyType::G:
         return HostapdHwMode::Ieee80211g;
-    case Ieee80211Protocol::N:
+    case Ieee80211PhyType::N:
         return HostapdHwMode::Ieee80211a; // TODO: Could be a or g depending on band
-    case Ieee80211Protocol::A:
+    case Ieee80211PhyType::A:
         return HostapdHwMode::Ieee80211a;
-    case Ieee80211Protocol::AC:
+    case Ieee80211PhyType::AC:
         return HostapdHwMode::Ieee80211a;
-    case Ieee80211Protocol::AD:
+    case Ieee80211PhyType::AD:
         return HostapdHwMode::Ieee80211ad;
-    case Ieee80211Protocol::AX:
+    case Ieee80211PhyType::AX:
         return HostapdHwMode::Ieee80211a;
-    case Ieee80211Protocol::BE:
+    case Ieee80211PhyType::BE:
         return HostapdHwMode::Ieee80211a; // TODO: Assuming a, although hostapd docs don't mention it
     default:
         return HostapdHwMode::Unknown;

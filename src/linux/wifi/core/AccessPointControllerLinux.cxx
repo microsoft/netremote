@@ -54,8 +54,8 @@ AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ie
 
     Ieee80211AccessPointCapabilities capabilities{};
 
-    // Convert protocols.
-    capabilities.Protocols = Nl80211WiphyToIeee80211Protocols(wiphy.value());
+    // Convert phy types.
+    capabilities.PhyTypes = Nl80211WiphyToIeee80211PhyTypes(wiphy.value());
 
     // Convert frequency bands.
     capabilities.FrequencyBands = std::vector<Ieee80211FrequencyBand>(std::size(wiphy->Bands));
@@ -134,31 +134,31 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
+AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
 {
-    const auto ieeeProtocolName = std::format("802.11 {}", magic_enum::enum_name(ieeeProtocol));
-    AccessPointOperationStatus status{ GetInterfaceName(), std::format("SetProtocol {}", ieeeProtocolName) };
+    const auto ieeePhyTypeName = std::format("802.11 {}", magic_enum::enum_name(ieeePhyType));
+    AccessPointOperationStatus status{ GetInterfaceName(), std::format("SetPhyType {}", ieeePhyTypeName) };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
     // Populate a list of required properties to set.
     std::vector<std::pair<std::string_view, std::string_view>> propertiesToSet{};
 
     // Add the hw_mode property.
-    const auto hwMode = IeeeProtocolToHostapdHwMode(ieeeProtocol);
+    const auto hwMode = IeeePhyTypeToHostapdHwMode(ieeePhyType);
     const auto hwModeValue = HostapdHwModeToPropertyValue(hwMode);
     propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameHwMode, hwModeValue);
 
     // Additively set other hostapd properties based on the protocol.
-    switch (ieeeProtocol) {
-    case Ieee80211Protocol::AX:
+    switch (ieeePhyType) {
+    case Ieee80211PhyType::AX:
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211AX, Wpa::ProtocolHostapd::PropertyEnabled);
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11AX, Wpa::ProtocolHostapd::PropertyDisabled);
         [[fallthrough]];
-    case Ieee80211Protocol::AC:
+    case Ieee80211PhyType::AC:
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211AC, Wpa::ProtocolHostapd::PropertyEnabled);
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11AC, Wpa::ProtocolHostapd::PropertyDisabled);
         [[fallthrough]];
-    case Ieee80211Protocol::N:
+    case Ieee80211PhyType::N:
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameWmmEnabled, Wpa::ProtocolHostapd::PropertyEnabled);
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameIeee80211N, Wpa::ProtocolHostapd::PropertyEnabled);
         propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameDisable11N, Wpa::ProtocolHostapd::PropertyDisabled);

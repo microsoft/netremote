@@ -33,19 +33,19 @@ FromDot11AccessPointOperationStatusCode(Microsoft::Net::Remote::Wifi::WifiAccess
 /**
  * @brief Convert the specified Dot11PhyType to the equivalent IEEE 802.11 protocol.
  *
- * @param ieee80211Protocol The IEEE 802.11 protocol to convert.
+ * @param ieee80211PhyType The IEEE 802.11 PHY type to convert.
  * @return Microsoft::Net::Wifi::Dot11PhyType
  */
 Microsoft::Net::Wifi::Dot11PhyType
-ToDot11PhyType(Microsoft::Net::Wifi::Ieee80211Protocol ieee80211Protocol) noexcept;
+ToDot11PhyType(Microsoft::Net::Wifi::Ieee80211PhyType ieee80211PhyType) noexcept;
 
 /**
  * @brief Convert the specified Dot11PhyType to the equivalent IEEE 802.11 protocol.
  *
  * @param dot11PhyType The Dot11PhyType to convert.
- * @return Microsoft::Net::Wifi::Ieee80211Protocol
+ * @return Microsoft::Net::Wifi::Ieee80211PhyType
  */
-Microsoft::Net::Wifi::Ieee80211Protocol
+Microsoft::Net::Wifi::Ieee80211PhyType
 FromDot11PhyType(Microsoft::Net::Wifi::Dot11PhyType dot11PhyType) noexcept;
 
 /**

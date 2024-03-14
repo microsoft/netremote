@@ -72,7 +72,7 @@ AccessPointControllerTest::SetOperationalState(AccessPointOperationalState opera
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
+AccessPointControllerTest::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
 {
     assert(AccessPoint != nullptr);
 
@@ -80,7 +80,7 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
         return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
-    AccessPoint->Protocol = ieeeProtocol;
+    AccessPoint->PhyType = ieeePhyType;
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 

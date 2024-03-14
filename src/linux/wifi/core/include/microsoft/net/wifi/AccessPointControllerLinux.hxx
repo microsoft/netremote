@@ -73,13 +73,13 @@ struct AccessPointControllerLinux :
     SetOperationalState(AccessPointOperationalState operationalState) noexcept override;
 
     /**
-     * @brief Set the Ieee80211 protocol.
+     * @brief Set the Ieee80211 PHY type.
      *
-     * @param ieeeProtocol The Ieee80211 protocol to be set.
+     * @param ieeePhyType The Ieee80211 PHY type to be set.
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept override;
+    SetPhyType(Ieee80211PhyType ieeePhyType) noexcept override;
 
     /**
      * @brief Set the frquency bands the access point should enable.
