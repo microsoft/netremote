@@ -31,6 +31,24 @@ Microsoft::Net::Wifi::AccessPointOperationStatusCode
 FromDot11AccessPointOperationStatusCode(Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode wifiAccessPointOperationStatusCode) noexcept;
 
 /**
+ * @brief Convert the specified Ieee80211SecurityProtocol to the equivalent Dot11SecurityProtocol.
+ *
+ * @param ieee80211SecurityProtocol The IEEE 802.11 security protocol to convert.
+ * @return Microsoft::Net::Wifi::Dot11SecurityProtocol
+ */
+Microsoft::Net::Wifi::Dot11SecurityProtocol
+ToDot11SecurityProtocol(Microsoft::Net::Wifi::Ieee80211SecurityProtocol ieee80211SecurityProtocol) noexcept;
+
+/**
+ * @brief Convert the specified Dot11SecurityProtocol to the equivalent Ieee80211SecurityProtocol.
+ *
+ * @param dot11SecurityProtocol The Dot11SecurityProtocol to convert.
+ * @return Microsoft::Net::Wifi::Ieee80211SecurityProtocol
+ */
+Microsoft::Net::Wifi::Ieee80211SecurityProtocol
+FromDot11SecurityProtocol(Microsoft::Net::Wifi::Dot11SecurityProtocol dot11SecurityProtocol) noexcept;
+
+/**
  * @brief Convert the specified Dot11PhyType to the equivalent IEEE 802.11 protocol.
  *
  * @param ieee80211PhyType The IEEE 802.11 PHY type to convert.

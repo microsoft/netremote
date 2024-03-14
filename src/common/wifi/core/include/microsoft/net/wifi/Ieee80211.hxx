@@ -11,6 +11,16 @@
 
 namespace Microsoft::Net::Wifi
 {
+/**
+ * @brief Overall security protocol for an IEEE 802.11 network.
+ */
+enum class Ieee80211SecurityProtocol {
+    Unknown,
+    Wpa,
+    Wpa2,
+    Wpa3,
+};
+
 enum class Ieee80211FrequencyBand {
     Unknown,
     TwoPointFourGHz,
