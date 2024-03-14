@@ -681,6 +681,58 @@ NetRemoteService::WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_vie
 }
 
 WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetCipherSuitesImpl(std::string_view accessPointId, std::vector<Dot11CipherSuite>& dot11CipherSuites, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (std::empty(dot11CipherSuites)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No cipher suites provided");
+        return wifiOperationStatus;
+    }
+    if (std::ranges::contains(dot11CipherSuites, Dot11CipherSuite::Dot11CipherSuiteUnknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid cipher suite algorithm provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Convert to 802.11 neutral type.
+    std::vector<Ieee80211CipherSuite> ieee80211CipherSuites(static_cast<std::size_t>(std::size(dot11CipherSuites)));
+    std::ranges::transform(dot11CipherSuites, std::begin(ieee80211CipherSuites), FromDot11CipherSuite);
+    if (std::ranges::contains(ieee80211CipherSuites, Ieee80211CipherSuite::Unknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid cipher suite provided");
+        return wifiOperationStatus;
+    }
+
+    // Set the cipher suites.
+    operationStatus.Code = AccessPointOperationStatusCode::OperationNotSupported;
+    // TODO: operationStatus = accessPointController->SetCipherSuites(std::move(ieee80211CipherSuites));
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set cipher suites for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
 NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Dot11Ssid& dot11Ssid, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
