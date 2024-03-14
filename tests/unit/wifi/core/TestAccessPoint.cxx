@@ -37,8 +37,9 @@ TEST_CASE("Destroy an AccessPoint instance", "[wifi][core][ap]")
 
     SECTION("Destroy doesn't cause a crash")
     {
-        AccessPoint accessPoint{ Test::InterfaceNameDefault, std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        REQUIRE_NOTHROW(accessPoint.~AccessPoint());
+        std::optional<AccessPoint> accessPoint{};
+        accessPoint.emplace(Test::InterfaceNameDefault, std::make_shared<Test::AccessPointControllerFactoryTest>());
+        REQUIRE_NOTHROW(accessPoint.reset());
     }
 }
 

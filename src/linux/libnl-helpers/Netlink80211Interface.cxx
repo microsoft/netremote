@@ -66,7 +66,7 @@ Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
 
     // Parse the message.
     std::array<struct nlattr *, NL80211_ATTR_MAX + 1> newInterfaceMessageAttributes{};
-    int ret = nla_parse(std::data(newInterfaceMessageAttributes), std::size(newInterfaceMessageAttributes), genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
+    int ret = nla_parse(std::data(newInterfaceMessageAttributes), std::size(newInterfaceMessageAttributes) - 1, genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
     if (ret < 0) {
         LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
         return std::nullopt;

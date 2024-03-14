@@ -27,7 +27,7 @@ WiphyBandFrequency::Parse(struct nlattr *wiphyBandFrequencyNlAttribute) noexcept
 {
     // Parse the attribute message.
     std::array<struct nlattr *, NL80211_FREQUENCY_ATTR_MAX + 1> wiphyBandFrequenciesAttributes{};
-    int ret = nla_parse(std::data(wiphyBandFrequenciesAttributes), std::size(wiphyBandFrequenciesAttributes), static_cast<struct nlattr *>(nla_data(wiphyBandFrequencyNlAttribute)), nla_len(wiphyBandFrequencyNlAttribute), nullptr);
+    int ret = nla_parse(std::data(wiphyBandFrequenciesAttributes), std::size(wiphyBandFrequenciesAttributes) - 1, static_cast<struct nlattr *>(nla_data(wiphyBandFrequencyNlAttribute)), nla_len(wiphyBandFrequencyNlAttribute), nullptr);
     if (ret < 0) {
         LOGE << std::format("Failed to parse wiphy band frequency attributes with error {} ({})", ret, nl_geterror(ret));
         return std::nullopt;
