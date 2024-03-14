@@ -75,13 +75,13 @@ struct IAccessPointController
     SetOperationalState(AccessPointOperationalState operationalState) noexcept = 0;
 
     /**
-     * @brief Set the Ieee80211 protocol of the access point.
+     * @brief Set the Ieee80211 PHY type of the access point.
      *
-     * @param ieeeProtocol The Ieee80211 protocol to be set.
+     * @param ieeePhyType The Ieee80211 PHY type to be set.
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
-    SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept = 0;
+    SetPhyType(Ieee80211PhyType ieeePhyType) noexcept = 0;
 
     /**
      * @brief Set the frquency bands the access point should enable.

@@ -26,7 +26,7 @@ struct AccessPointTest final :
     std::string Ssid;
     std::string InterfaceName;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
-    Microsoft::Net::Wifi::Ieee80211Protocol Protocol{ Microsoft::Net::Wifi::Ieee80211Protocol::Unknown };
+    Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };

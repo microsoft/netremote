@@ -26,7 +26,7 @@
 
 namespace Microsoft::Net::Remote::Test
 {
-constexpr auto AllProtocols = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211Protocol>();
+constexpr auto AllPhyTypes = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211PhyType>();
 constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211FrequencyBand>();
 } // namespace Microsoft::Net::Remote::Test
 
@@ -98,7 +98,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) },
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) },
         .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
     };
 
@@ -224,7 +224,7 @@ TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
     };
 
     auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
@@ -323,7 +323,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
     };
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);

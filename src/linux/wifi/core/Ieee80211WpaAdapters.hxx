@@ -11,13 +11,13 @@
 namespace Microsoft::Net::Wifi
 {
 /**
- * @brief Convert a WPA "hwmode" value from a Ieee80211Protocol value.
+ * @brief Convert a WPA "hwmode" value from a Ieee80211PhyType value.
  *
- * @param ieeeProtocol The Ieee80211Protocol value to convert.
+ * @param ieeePhyType The Ieee80211PhyType value to convert.
  * @return Wpa::HostapdHwMode
  */
 Wpa::HostapdHwMode
-IeeeProtocolToHostapdHwMode(Ieee80211Protocol ieeeProtocol) noexcept;
+IeeePhyTypeToHostapdHwMode(Ieee80211PhyType ieeePhyType) noexcept;
 
 /**
  * @brief Get a string representation of a HostapdHwMode.

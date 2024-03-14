@@ -74,7 +74,7 @@ operator"" _MHz(unsigned long long int value) noexcept
 }
 } // namespace Literals
 
-enum class Ieee80211Protocol {
+enum class Ieee80211PhyType {
     Unknown,
     B,
     G,

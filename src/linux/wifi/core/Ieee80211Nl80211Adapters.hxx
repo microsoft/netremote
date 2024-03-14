@@ -42,13 +42,13 @@ Ieee80211FrequencyBand
 Nl80211BandToIeee80211FrequencyBand(nl80211_band nl80211Band) noexcept;
 
 /**
- * @brief Obtain a list of Ieee80211Protocols from a Nl80211Wiphy.
+ * @brief Obtain a list of Ieee80211PhyTypes from a Nl80211Wiphy.
  *
  * @param nl80211Wiphy The Nl80211Wiphy to obtain the protocols from.
- * @return std::vector<Ieee80211Protocol>
+ * @return std::vector<Ieee80211PhyType>
  */
-std::vector<Ieee80211Protocol>
-Nl80211WiphyToIeee80211Protocols(const Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy& nl80211Wiphy);
+std::vector<Ieee80211PhyType>
+Nl80211WiphyToIeee80211PhyTypes(const Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy& nl80211Wiphy);
 } // namespace Microsoft::Net::Wifi
 
 #endif // IEEE_80211_NL80211_ADAPTERS_HXX

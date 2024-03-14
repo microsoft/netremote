@@ -86,13 +86,13 @@ struct AccessPointControllerTest final :
     SetOperationalState(AccessPointOperationalState operationalState) noexcept override;
 
     /**
-     * @brief Set the Ieee80211 protocol of the access point.
+     * @brief Set the Ieee80211 PHY type of the access point.
      *
-     * @param ieeeProtocol The Ieee80211 protocol to be set
+     * @param ieeePhyType The Ieee80211 PHY type to be set
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) noexcept override;
+    SetPhyType(Microsoft::Net::Wifi::Ieee80211PhyType ieeePhyType) noexcept override;
 
     /**
      * @brief Set the frquency bands the access point should enable.

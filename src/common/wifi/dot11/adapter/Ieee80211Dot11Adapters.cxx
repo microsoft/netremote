@@ -63,57 +63,57 @@ FromDot11AccessPointOperationStatusCode(WifiAccessPointOperationStatusCode wifiA
 }
 
 using Microsoft::Net::Wifi::Dot11PhyType;
-using Microsoft::Net::Wifi::Ieee80211Protocol;
+using Microsoft::Net::Wifi::Ieee80211PhyType;
 
 Dot11PhyType
-ToDot11PhyType(const Ieee80211Protocol ieee80211Protocol) noexcept
+ToDot11PhyType(const Ieee80211PhyType ieee80211PhyType) noexcept
 {
-    switch (ieee80211Protocol) {
-    case Ieee80211Protocol::Unknown:
+    switch (ieee80211PhyType) {
+    case Ieee80211PhyType::Unknown:
         return Dot11PhyType::Dot11PhyTypeUnknown;
-    case Ieee80211Protocol::B:
+    case Ieee80211PhyType::B:
         return Dot11PhyType::Dot11PhyTypeB;
-    case Ieee80211Protocol::G:
+    case Ieee80211PhyType::G:
         return Dot11PhyType::Dot11PhyTypeG;
-    case Ieee80211Protocol::N:
+    case Ieee80211PhyType::N:
         return Dot11PhyType::Dot11PhyTypeN;
-    case Ieee80211Protocol::A:
+    case Ieee80211PhyType::A:
         return Dot11PhyType::Dot11PhyTypeA;
-    case Ieee80211Protocol::AC:
+    case Ieee80211PhyType::AC:
         return Dot11PhyType::Dot11PhyTypeAC;
-    case Ieee80211Protocol::AD:
+    case Ieee80211PhyType::AD:
         return Dot11PhyType::Dot11PhyTypeAD;
-    case Ieee80211Protocol::AX:
+    case Ieee80211PhyType::AX:
         return Dot11PhyType::Dot11PhyTypeAX;
-    case Ieee80211Protocol::BE:
+    case Ieee80211PhyType::BE:
         return Dot11PhyType::Dot11PhyTypeBE;
     }
 
     return Dot11PhyType::Dot11PhyTypeUnknown;
 }
 
-Ieee80211Protocol
+Ieee80211PhyType
 FromDot11PhyType(const Dot11PhyType dot11PhyType) noexcept
 {
     switch (dot11PhyType) {
     case Dot11PhyType::Dot11PhyTypeB:
-        return Ieee80211Protocol::B;
+        return Ieee80211PhyType::B;
     case Dot11PhyType::Dot11PhyTypeG:
-        return Ieee80211Protocol::G;
+        return Ieee80211PhyType::G;
     case Dot11PhyType::Dot11PhyTypeN:
-        return Ieee80211Protocol::N;
+        return Ieee80211PhyType::N;
     case Dot11PhyType::Dot11PhyTypeA:
-        return Ieee80211Protocol::A;
+        return Ieee80211PhyType::A;
     case Dot11PhyType::Dot11PhyTypeAC:
-        return Ieee80211Protocol::AC;
+        return Ieee80211PhyType::AC;
     case Dot11PhyType::Dot11PhyTypeAD:
-        return Ieee80211Protocol::AD;
+        return Ieee80211PhyType::AD;
     case Dot11PhyType::Dot11PhyTypeAX:
-        return Ieee80211Protocol::AX;
+        return Ieee80211PhyType::AX;
     case Dot11PhyType::Dot11PhyTypeBE:
-        return Ieee80211Protocol::BE;
+        return Ieee80211PhyType::BE;
     default:
-        return Ieee80211Protocol::Unknown;
+        return Ieee80211PhyType::Unknown;
     }
 }
 
@@ -455,8 +455,8 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211
 {
     Dot11AccessPointCapabilities dot11Capabilities{};
 
-    std::vector<Dot11PhyType> phyTypes(std::size(ieee80211AccessPointCapabilities.Protocols));
-    std::ranges::transform(ieee80211AccessPointCapabilities.Protocols, std::begin(phyTypes), ToDot11PhyType);
+    std::vector<Dot11PhyType> phyTypes(std::size(ieee80211AccessPointCapabilities.PhyTypes));
+    std::ranges::transform(ieee80211AccessPointCapabilities.PhyTypes, std::begin(phyTypes), ToDot11PhyType);
 
     *dot11Capabilities.mutable_phytypes() = {
         std::make_move_iterator(std::begin(phyTypes)),

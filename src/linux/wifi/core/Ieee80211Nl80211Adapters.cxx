@@ -48,30 +48,30 @@ Nl80211BandToIeee80211FrequencyBand(nl80211_band nl80211Band) noexcept
     }
 }
 
-std::vector<Ieee80211Protocol>
-Nl80211WiphyToIeee80211Protocols(const Nl80211Wiphy& nl80211Wiphy)
+std::vector<Ieee80211PhyType>
+Nl80211WiphyToIeee80211PhyTypes(const Nl80211Wiphy& nl80211Wiphy)
 {
     // Ieee80211 B & G are always supported.
-    std::vector<Ieee80211Protocol> protocols{
-        Ieee80211Protocol::B,
-        Ieee80211Protocol::G,
+    std::vector<Ieee80211PhyType> phyTypes{
+        Ieee80211PhyType::B,
+        Ieee80211PhyType::G,
     };
 
     for (const auto& band : std::views::values(nl80211Wiphy.Bands)) {
         if (band.HtCapabilities != 0) {
-            protocols.push_back(Ieee80211Protocol::N);
+            phyTypes.push_back(Ieee80211PhyType::N);
         }
         if (band.VhtCapabilities != 0) {
-            protocols.push_back(Ieee80211Protocol::AC);
+            phyTypes.push_back(Ieee80211PhyType::AC);
         }
         // TODO: once Nl80211WiphyBand is updated to support HE (AX) and EHT (BE), add them here.
     }
 
     // Remove duplicates.
-    std::ranges::sort(protocols);
-    protocols.erase(std::ranges::begin(std::ranges::unique(protocols)), std::ranges::end(protocols));
+    std::ranges::sort(phyTypes);
+    phyTypes.erase(std::ranges::begin(std::ranges::unique(phyTypes)), std::ranges::end(phyTypes));
 
-    return protocols;
+    return phyTypes;
 }
 
 } // namespace Microsoft::Net::Wifi

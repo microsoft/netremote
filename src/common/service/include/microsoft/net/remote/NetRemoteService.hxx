@@ -74,7 +74,7 @@ private:
     WifiAccessPointDisable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointDisableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointDisableResult* result) override;
 
     /**
-     * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause
+     * @brief Set the active PHY type of the access point. The access point must be enabled. This will cause
      * the access point to temporarily go offline while the change is being applied.
      *
      * @param context
@@ -140,7 +140,7 @@ protected:
     WifiAccessPointEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
-     * @brief Set the active PHY type or protocol of the access point. The access point must be enabled. This will cause
+     * @brief Set the active PHY type of the access point. The access point must be enabled. This will cause
      * the access point to temporarily go offline while the change is being applied.
      *
      * @param accessPointId The access point identifier.
