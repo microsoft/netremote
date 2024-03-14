@@ -461,7 +461,7 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        if (dot11AccessPointConfiguration->ciphersuite() != Dot11CipherSuite::Dot11CipherSuiteUnknown) {
+        if (dot11AccessPointConfiguration->ciphersuites_size() > 0) {
             // TODO: set cipher suite.
         }
 
