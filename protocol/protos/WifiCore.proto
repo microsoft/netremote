@@ -27,13 +27,14 @@ enum Dot11SecurityProtocol
 {
     option allow_alias = true;
 
-    Wpa1 = 0;
-    Wpa2 = 1;
-    Wpa3 = 2;
+    Dot11SecurityProtocolUnknown = 0;
+    Dot11SecurityProtocolWpa1 = 1;
+    Dot11SecurityProtocolWpa2 = 2; 
+    Dot11SecurityProtocolWpa3 = 3;
 
     // Aliases
-    Wpa = 0;
-    Rsn = 2;
+    Dot11SecurityProtocolWpa = 1;
+    Dot11SecurityProtocolRsn = 3;
 }
 
 // 802.11 PHY Types.

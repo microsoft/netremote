@@ -62,6 +62,43 @@ FromDot11AccessPointOperationStatusCode(WifiAccessPointOperationStatusCode wifiA
     }
 }
 
+using Microsoft::Net::Wifi::Dot11SecurityProtocol;
+using Microsoft::Net::Wifi::Ieee80211SecurityProtocol;
+
+Dot11SecurityProtocol
+ToDot11SecurityProtocol(Ieee80211SecurityProtocol ieee80211SecurityProtocol) noexcept
+{
+    switch (ieee80211SecurityProtocol) {
+    case Ieee80211SecurityProtocol::Wpa:
+        return Dot11SecurityProtocol::Dot11SecurityProtocolWpa1;
+    case Ieee80211SecurityProtocol::Wpa2:
+        return Dot11SecurityProtocol::Dot11SecurityProtocolWpa2;
+    case Ieee80211SecurityProtocol::Wpa3:
+        return Dot11SecurityProtocol::Dot11SecurityProtocolWpa3;
+    case Ieee80211SecurityProtocol::Unknown:
+        [[fallthrough]];
+    default:
+        return Dot11SecurityProtocol::Dot11SecurityProtocolUnknown;
+    }
+}
+
+Ieee80211SecurityProtocol
+FromDot11SecurityProtocol(Dot11SecurityProtocol dot11SecurityProtocol) noexcept
+{
+    switch (dot11SecurityProtocol) {
+    case Dot11SecurityProtocol::Dot11SecurityProtocolWpa1:
+        return Ieee80211SecurityProtocol::Wpa;
+    case Dot11SecurityProtocol::Dot11SecurityProtocolWpa2:
+        return Ieee80211SecurityProtocol::Wpa2;
+    case Dot11SecurityProtocol::Dot11SecurityProtocolWpa3:
+        return Ieee80211SecurityProtocol::Wpa3;
+    case Dot11SecurityProtocol::Dot11SecurityProtocolUnknown:
+        [[fallthrough]];
+    default:
+        return Ieee80211SecurityProtocol::Unknown;
+    }
+}
+
 using Microsoft::Net::Wifi::Dot11PhyType;
 using Microsoft::Net::Wifi::Ieee80211PhyType;
 
@@ -173,7 +210,7 @@ constexpr auto toDot11AuthenticationAlgorithm = [](const auto& authenticationAlg
 constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
     return static_cast<Dot11FrequencyBand>(frequencyBand);
 };
-} // details
+} // namespace detail
 
 std::vector<Dot11AuthenticationAlgorithm>
 ToDot11AuthenticationAlgorithms(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept
@@ -454,6 +491,8 @@ Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept
 {
     Dot11AccessPointCapabilities dot11Capabilities{};
+
+    std::vector<Dot11SecurityProtocol> securityProtocols(std::size(ieee80211AccessPointCapabilities.SecurityProtocols));
 
     std::vector<Dot11PhyType> phyTypes(std::size(ieee80211AccessPointCapabilities.PhyTypes));
     std::ranges::transform(ieee80211AccessPointCapabilities.PhyTypes, std::begin(phyTypes), ToDot11PhyType);
