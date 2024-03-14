@@ -163,10 +163,11 @@ message Dot11AccessPointConfiguration
 
 message Dot11AccessPointCapabilities
 {
-    repeated Microsoft.Net.Wifi.Dot11FrequencyBand FrequencyBands = 1;
+    repeated Microsoft.Net.Wifi.Dot11SecurityProtocol SecurityProtocols = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
-    repeated Microsoft.Net.Wifi.Dot11AkmSuite AkmSuites = 3;
+    repeated Microsoft.Net.Wifi.Dot11FrequencyBand FrequencyBands = 3;
     repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;
+    repeated Microsoft.Net.Wifi.Dot11AkmSuite AkmSuites = 5;
 }
 
 enum Dot11AccessPointState

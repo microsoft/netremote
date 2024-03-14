@@ -493,6 +493,12 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211
     Dot11AccessPointCapabilities dot11Capabilities{};
 
     std::vector<Dot11SecurityProtocol> securityProtocols(std::size(ieee80211AccessPointCapabilities.SecurityProtocols));
+    std::ranges::transform(ieee80211AccessPointCapabilities.SecurityProtocols, std::begin(securityProtocols), ToDot11SecurityProtocol);
+
+    *dot11Capabilities.mutable_securityprotocols() = {
+        std::make_move_iterator(std::begin(securityProtocols)),
+        std::make_move_iterator(std::end(securityProtocols))
+    };
 
     std::vector<Dot11PhyType> phyTypes(std::size(ieee80211AccessPointCapabilities.PhyTypes));
     std::ranges::transform(ieee80211AccessPointCapabilities.PhyTypes, std::begin(phyTypes), ToDot11PhyType);
