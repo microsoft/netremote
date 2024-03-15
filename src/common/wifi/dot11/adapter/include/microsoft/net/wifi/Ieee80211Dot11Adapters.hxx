@@ -177,13 +177,22 @@ Microsoft::Net::Wifi::Ieee80211CipherSuite
 FromDot11CipherSuite(Microsoft::Net::Wifi::Dot11CipherSuite dot11CipherSuite) noexcept;
 
 /**
- * @brief Convert the list of Dot11CipherSuiteConfigurations to the equivalent list of IEEE 802.11 cipher suite configurations.
+ * @brief Convert the specified repeated field of Dot11CipherSuiteConfigurations to the equivalent map of Dot11SecurityProtocol to Dot11CipherSuite.
  *
- * @param dot11CipherSuiteConfigurations The list of Dot11CipherSuiteConfigurations to convert.
- * @return std::unordered_map<Ieee80211SecurityProtocol, Ieee80211CipherSuite>
+ * @param dot11CipherSuiteConfigurations The repeated field of Dot11CipherSuiteConfigurations to convert.
+ * @return std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>
  */
-std::unordered_map<Microsoft::Net::Wifi::Ieee80211SecurityProtocol, Microsoft::Net::Wifi::Ieee80211CipherSuite>
-FromDot11CipherSuiteConfigurations(const google::protobuf::RepeatedField<Microsoft::Net::Wifi::Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept;
+std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>
+ToDot11CipherSuiteConfigurations(const google::protobuf::RepeatedPtrField<Microsoft::Net::Wifi::Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept;
+
+/**
+ * @brief Convert the specified map of Dot11SecurityProtocol to Dot11CipherSuite to the equivalent map of IEEE 802.11 security protocol to cipher suite.
+ *
+ * @param dot11CipherSuiteConfigurations The map of Dot11SecurityProtocol to Dot11CipherSuite to convert.
+ * @return std::unordered_map<Microsoft::Net::Wifi::Ieee80211SecurityProtocol, std::vector<Microsoft::Net::Wifi::Ieee80211CipherSuite>>
+ */
+std::unordered_map<Microsoft::Net::Wifi::Ieee80211SecurityProtocol, std::vector<Microsoft::Net::Wifi::Ieee80211CipherSuite>>
+FromDot11CipherSuiteConfigurations(const std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>& dot11CipherSuiteConfigurations) noexcept;
 
 /**
  * @brief Convert the specified IEEE 802.11 access point capabilities to the equivalent Dot11AccessPointCapabilities.

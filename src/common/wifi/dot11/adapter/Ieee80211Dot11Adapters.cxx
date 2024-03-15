@@ -211,6 +211,13 @@ constexpr auto toDot11AuthenticationAlgorithm = [](const auto& authenticationAlg
 constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
     return static_cast<Dot11FrequencyBand>(frequencyBand);
 };
+
+/**
+ * @brief Convert an int-typed Dot11CipherSuite to its proper enum type.
+ */
+constexpr auto toDot11CipherSuite = [](const auto& cipherSuite) {
+    return static_cast<Dot11CipherSuite>(cipherSuite);
+};
 } // namespace detail
 
 std::vector<Dot11AuthenticationAlgorithm>
@@ -485,19 +492,32 @@ FromDot11CipherSuite(const Dot11CipherSuite dot11CipherSuite) noexcept
     }
 }
 
-std::unordered_map<Ieee80211SecurityProtocol, Ieee80211CipherSuite>
-FromDot11CipherSuiteConfigurations(const google::protobuf::RepeatedField<Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept
+std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>
+ToDot11CipherSuiteConfigurations(const google::protobuf::RepeatedPtrField<Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept
 {
-    std::unordered_map<Ieee80211SecurityProtocol, Ieee80211CipherSuite> ieee80211CipherSuites{};
+    std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>> dot11CipherSuiteConfigurationsStrong{};
 
     for (const auto& dot11CipherSuiteConfiguration : dot11CipherSuiteConfigurations) {
-        const auto& dot11CipherSuites = dot11CipherSuiteConfiguration.ciphersuites();
-        for (const auto& dot11CipherSuite : dot11CipherSuites) {
-            ieee80211CipherSuites.emplace(FromDot11SecurityProtocol(dot11CipherSuiteConfiguration.securityprotocol()), FromDot11CipherSuite(static_cast<Dot11CipherSuite>(dot11CipherSuite)));
-        }
+        std::vector<Dot11CipherSuite> dot11CipherSuites(static_cast<std::size_t>(dot11CipherSuiteConfiguration.ciphersuites_size()));
+        std::ranges::transform(dot11CipherSuiteConfiguration.ciphersuites(), std::begin(dot11CipherSuites), detail::toDot11CipherSuite);
+        dot11CipherSuiteConfigurationsStrong.emplace(dot11CipherSuiteConfiguration.securityprotocol(), std::move(dot11CipherSuites));
     }
 
-    return ieee80211CipherSuites;
+    return dot11CipherSuiteConfigurationsStrong;
+}
+
+std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>
+FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>& dot11CipherSuiteConfigurations) noexcept
+{
+    std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> ieee80211CipherSuiteConfigurations{};
+
+    for (const auto& [dot11SecurityProtocol, dot11CipherSuites] : dot11CipherSuiteConfigurations) {
+        std::vector<Ieee80211CipherSuite> ieee80211CipherSuites(std::size(dot11CipherSuites));
+        std::ranges::transform(dot11CipherSuites, std::begin(ieee80211CipherSuites), FromDot11CipherSuite);
+        ieee80211CipherSuiteConfigurations.emplace(FromDot11SecurityProtocol(dot11SecurityProtocol), std::move(ieee80211CipherSuites));
+    }
+
+    return ieee80211CipherSuiteConfigurations;
 }
 
 using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;

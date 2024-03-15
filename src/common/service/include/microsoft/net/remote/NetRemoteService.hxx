@@ -185,7 +185,7 @@ protected:
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointSetCipherSuitesImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>& dot11CipherSuites, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+    WifiAccessPointSetCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>& dot11CipherSuites, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
      * @brief Set the SSID of the access point.
