@@ -2,6 +2,7 @@
 #ifndef IEEE_80211_DOT11_ADAPTERS_HXX
 #define IEEE_80211_DOT11_ADAPTERS_HXX
 
+#include <unordered_map>
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
@@ -174,6 +175,15 @@ ToDot11CipherSuite(Microsoft::Net::Wifi::Ieee80211CipherSuite ieee80211CipherSui
  */
 Microsoft::Net::Wifi::Ieee80211CipherSuite
 FromDot11CipherSuite(Microsoft::Net::Wifi::Dot11CipherSuite dot11CipherSuite) noexcept;
+
+/**
+ * @brief Convert the list of Dot11CipherSuiteConfigurations to the equivalent list of IEEE 802.11 cipher suite configurations.
+ *
+ * @param dot11CipherSuiteConfigurations The list of Dot11CipherSuiteConfigurations to convert.
+ * @return std::unordered_map<Ieee80211SecurityProtocol, Ieee80211CipherSuite>
+ */
+std::unordered_map<Microsoft::Net::Wifi::Ieee80211SecurityProtocol, Microsoft::Net::Wifi::Ieee80211CipherSuite>
+FromDot11CipherSuiteConfigurations(const google::protobuf::RepeatedField<Microsoft::Net::Wifi::Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept;
 
 /**
  * @brief Convert the specified IEEE 802.11 access point capabilities to the equivalent Dot11AccessPointCapabilities.

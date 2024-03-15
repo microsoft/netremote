@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iterator>
 #include <ranges>
+#include <unordered_map>
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
@@ -482,6 +483,21 @@ FromDot11CipherSuite(const Dot11CipherSuite dot11CipherSuite) noexcept
     default:
         return Ieee80211CipherSuite::Unknown;
     }
+}
+
+std::unordered_map<Ieee80211SecurityProtocol, Ieee80211CipherSuite>
+FromDot11CipherSuiteConfigurations(const google::protobuf::RepeatedField<Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept
+{
+    std::unordered_map<Ieee80211SecurityProtocol, Ieee80211CipherSuite> ieee80211CipherSuites{};
+
+    for (const auto& dot11CipherSuiteConfiguration : dot11CipherSuiteConfigurations) {
+        const auto& dot11CipherSuites = dot11CipherSuiteConfiguration.ciphersuites();
+        for (const auto& dot11CipherSuite : dot11CipherSuites) {
+            ieee80211CipherSuites.emplace(FromDot11SecurityProtocol(dot11CipherSuiteConfiguration.securityprotocol()), FromDot11CipherSuite(static_cast<Dot11CipherSuite>(dot11CipherSuite)));
+        }
+    }
+
+    return ieee80211CipherSuites;
 }
 
 using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
