@@ -86,6 +86,8 @@ NetRemoteCli::AddSubcommandWifi(CLI::App* parent)
 
     // Sub-commands.
     m_cliAppWifiEnumerateAccessPoints = AddSubcommandWifiEnumerateAccessPoints(wifiApp);
+    m_cliAppWifiAccessPointEnable = AddSubcommandWifiAccessPointEnable(wifiApp);
+    m_cliAppWifiAccessPointDisable = AddSubcommandWifiAccessPointDisable(wifiApp);
 
     return wifiApp;
 }
@@ -100,6 +102,32 @@ NetRemoteCli::AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent)
     });
 
     return cliAppWifiEnumerateAccessPoints;
+}
+
+CLI::App*
+NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
+{
+    auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
+    cliAppWifiAccessPointEnable->alias("ap-enable");
+    cliAppWifiAccessPointEnable->callback([this] {
+        OnWifiAccessPointEnable();
+    });
+
+    return cliAppWifiAccessPointEnable;
+}
+
+CLI::App*
+NetRemoteCli::AddSubcommandWifiAccessPointDisable(CLI::App* parent)
+{
+    auto* cliAppWifiAccessPointDisable = parent->add_subcommand("access-point-disable", "Disable a Wi-Fi access point");
+    cliAppWifiAccessPointDisable->alias("ap-disable");
+    cliAppWifiAccessPointDisable->callback([this] {
+        OnWifiAccessPointEnable();
+    });
+
+    cliAppWifiAccessPointDisable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to disable")->required();
+
+    return cliAppWifiAccessPointDisable;
 }
 
 void
@@ -128,4 +156,16 @@ void
 NetRemoteCli::OnWifiEnumerateAccessPoints()
 {
     m_cliHandler->HandleCommandWifiEnumerateAccessPoints();
+}
+
+void
+NetRemoteCli::OnWifiAccessPointEnable()
+{
+    m_cliHandler->HandleCommandWifiAccessPointEnable(m_cliData->WifiAccessPointId);
+}
+
+void
+NetRemoteCli::OnWifiAccessPointDisable()
+{
+    m_cliHandler->HandleCommandWifiAccessPointDisable(m_cliData->WifiAccessPointId);
 }

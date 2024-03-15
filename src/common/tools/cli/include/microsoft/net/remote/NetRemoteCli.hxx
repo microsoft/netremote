@@ -95,6 +95,24 @@ private:
     AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent);
 
     /**
+     * @brief Add the 'wifi ap-enable' sub-command.
+     * 
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App* 
+     */
+    CLI::App*
+    AddSubcommandWifiAccessPointEnable(CLI::App* parent);
+
+    /**
+     * @brief Add the 'wifi ap-disable' sub-command.
+     * 
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App* 
+     */
+    CLI::App*
+    AddSubcommandWifiAccessPointDisable(CLI::App* parent);
+
+    /**
      * @brief Handle the 'server' option.
      *
      * @param serverAddress The server address to connect to.
@@ -108,6 +126,18 @@ private:
     void
     OnWifiEnumerateAccessPoints();
 
+    /**
+     * @brief Handle the 'wifi ap-enable' command.
+     */
+    void
+    OnWifiAccessPointEnable();
+
+    /**
+     * @brief Handle the 'wifi ap-disable' command.
+     */
+    void
+    OnWifiAccessPointDisable();
+
 private:
     std::shared_ptr<NetRemoteCliData> m_cliData;
     std::shared_ptr<NetRemoteCliHandler> m_cliHandler;
@@ -118,6 +148,8 @@ private:
     CLI::Option* m_cliAppServerAddress{ nullptr };
     CLI::App* m_cliAppWifi{ nullptr };
     CLI::App* m_cliAppWifiEnumerateAccessPoints{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointEnable{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointDisable{ nullptr };
 };
 } // namespace Microsoft::Net::Remote
 

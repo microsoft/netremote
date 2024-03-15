@@ -3,6 +3,7 @@
 #define NET_REMOTE_CLI_HANDLER_HXX
 
 #include <memory>
+#include <string_view>
 
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 
@@ -22,12 +23,17 @@ struct NetRemoteCliHandler
     virtual ~NetRemoteCliHandler() = default;
 
     /**
-     * Prevent copying and moving of NetRemoteCliHandler objects. 
+     * Prevent copying and moving of NetRemoteCliHandler objects.
      */
     NetRemoteCliHandler(const NetRemoteCliHandler&) = delete;
-    NetRemoteCliHandler& operator=(const NetRemoteCliHandler&) = delete;
+
     NetRemoteCliHandler(NetRemoteCliHandler&&) = delete;
-    NetRemoteCliHandler& operator=(NetRemoteCliHandler&&) = delete;
+
+    NetRemoteCliHandler&
+    operator=(const NetRemoteCliHandler&) = delete;
+
+    NetRemoteCliHandler&
+    operator=(NetRemoteCliHandler&&) = delete;
 
     /**
      * @brief Construct a new NetRemoteCliHandler object.
@@ -57,6 +63,22 @@ struct NetRemoteCliHandler
      */
     void
     HandleCommandWifiEnumerateAccessPoints();
+
+    /**
+     * @brief Handle a command to enable a Wi-Fi access point.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     */
+    void
+    HandleCommandWifiAccessPointEnable(std::string_view accessPointId);
+
+    /**
+     * @brief Handle a command to disable a Wi-Fi access point.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     */
+    void
+    HandleCommandWifiAccessPointDisable(std::string_view accessPointId);
 
 private:
     /**

@@ -21,12 +21,17 @@ struct NetRemoteCliHandlerOperations :
     NetRemoteCliHandlerOperations() = delete;
 
     /**
-     * Prevent copying and moving of this object. 
+     * Prevent copying and moving of this object.
      */
     NetRemoteCliHandlerOperations(const NetRemoteCliHandlerOperations&) = delete;
+
     NetRemoteCliHandlerOperations(NetRemoteCliHandlerOperations&&) = delete;
-    NetRemoteCliHandlerOperations& operator=(const NetRemoteCliHandlerOperations&) = delete;
-    NetRemoteCliHandlerOperations& operator=(NetRemoteCliHandlerOperations&&) = delete;
+
+    NetRemoteCliHandlerOperations&
+    operator=(const NetRemoteCliHandlerOperations&) = delete;
+
+    NetRemoteCliHandlerOperations&
+    operator=(NetRemoteCliHandlerOperations&&) = delete;
 
     /**
      * @brief Construct a new NetRemoteCliHandlerOperations object with the specified server connection.
@@ -41,6 +46,22 @@ struct NetRemoteCliHandlerOperations :
     void
     WifiEnumerateAccessPoints() override;
 
+    /**
+     * @brief Enable the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     */
+    void
+    WifiAccessPointEnable(std::string_view accessPointId) override;
+
+    /**
+     * @brief Disable the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to disable.
+     */
+    void
+    WifiAccessPointDisable(std::string_view accessPointId) override;
+
 private:
     std::shared_ptr<NetRemoteServerConnection> m_connection;
 };
@@ -53,12 +74,17 @@ struct NetRemoteCliHandlerOperationsFactory :
     ~NetRemoteCliHandlerOperationsFactory() override = default;
 
     /**
-     * Prevent copying and moving of this object. 
+     * Prevent copying and moving of this object.
      */
     NetRemoteCliHandlerOperationsFactory(const NetRemoteCliHandlerOperationsFactory&) = delete;
+
     NetRemoteCliHandlerOperationsFactory(NetRemoteCliHandlerOperationsFactory&&) = delete;
-    NetRemoteCliHandlerOperationsFactory& operator=(const NetRemoteCliHandlerOperationsFactory&) = delete;
-    NetRemoteCliHandlerOperationsFactory& operator=(NetRemoteCliHandlerOperationsFactory&&) = delete;
+
+    NetRemoteCliHandlerOperationsFactory&
+    operator=(const NetRemoteCliHandlerOperationsFactory&) = delete;
+
+    NetRemoteCliHandlerOperationsFactory&
+    operator=(NetRemoteCliHandlerOperationsFactory&&) = delete;
 
     /**
      * @brief Create a new INetRemoteCliHandlerOperationsFactory instance with the specified server connection.

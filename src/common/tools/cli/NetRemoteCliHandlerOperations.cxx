@@ -136,6 +136,38 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
     }
 }
 
+void
+NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId)
+{
+    WifiAccessPointEnableRequest request{};
+    WifiAccessPointEnableResult result{};
+    grpc::ClientContext clientContext{};
+
+    request.set_accesspointid(std::string(accessPointId));
+
+    auto status = m_connection->Client->WifiAccessPointEnable(&clientContext, request, &result);
+    if (!status.ok()) {
+        LOGE << std::format("Failed to enable WiFi access point, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        return;
+    }
+}
+
+void
+NetRemoteCliHandlerOperations::WifiAccessPointDisable(std::string_view accessPointId)
+{
+    WifiAccessPointDisableRequest request{};
+    WifiAccessPointDisableResult result{};
+    grpc::ClientContext clientContext{};
+
+    request.set_accesspointid(std::string(accessPointId));
+
+    auto status = m_connection->Client->WifiAccessPointDisable(&clientContext, request, &result);
+    if (!status.ok()) {
+        LOGE << std::format("Failed to disable WiFi access point, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        return;
+    }
+}
+
 std::unique_ptr<INetRemoteCliHandlerOperations>
 NetRemoteCliHandlerOperationsFactory::Create(std::shared_ptr<NetRemoteServerConnection> connection)
 {
