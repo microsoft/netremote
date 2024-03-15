@@ -176,6 +176,18 @@ protected:
     WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>& dot11AuthenticationAlgorithms, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
+     * @brief Set the active cipher suites of the access point. If the access point is online, this will cause it to
+     * temporarily go offline while the change is being applied.
+     *
+     * @param accessPointId The access point identifier.
+     * @param dot11CipherSuites The new cipher suites to set.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>& dot11CipherSuites, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
      * @brief Set the SSID of the access point.
      *
      * @param accessPointId The access point identifier.

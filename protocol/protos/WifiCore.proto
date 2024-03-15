@@ -151,12 +151,18 @@ message Dot11SharedKey
     }
 }
 
+message Dot11CipherSuiteConfiguration
+{
+    Dot11SecurityProtocol SecurityProtocol = 1;
+    repeated Dot11CipherSuite CipherSuites = 2;
+}
+
 message Dot11AccessPointConfiguration
 {
     Dot11Ssid Ssid = 1;
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
-    Dot11CipherSuite CipherSuite = 4;
+    repeated Dot11CipherSuiteConfiguration CipherSuites = 4;
     repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 5;
     repeated Dot11FrequencyBand FrequencyBands = 6;
 }
