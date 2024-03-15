@@ -293,7 +293,7 @@ AccessPointControllerLinux::SetPairwiseCipherSuites([[maybe_unused]] std::unorde
         return status;
     }
 
-    auto pairwiseCipherSuitesWpa = Ieee80211CipherSuitesToWpaCipherSuites(pairwiseCipherSuites);
+    auto pairwiseCipherSuitesHostapd = Ieee80211CipherSuitesToWpaCipherSuites(pairwiseCipherSuites);
 
     // TODO
 
