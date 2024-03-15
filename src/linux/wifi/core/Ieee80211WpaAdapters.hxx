@@ -4,6 +4,7 @@
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 #include <Wpa/ProtocolHostapd.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -45,6 +46,15 @@ IeeeFrequencyBandToHostapdBand(Ieee80211FrequencyBand ieeeFrequencyBand) noexcep
  */
 Wpa::WpaAuthenticationAlgorithm
 Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept;
+
+/**
+ * @brief Convert a map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to a map of WpaProtocol to list of WpaCipher.
+ * 
+ * @param ieee80211CipherSuites The map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to convert.
+ * @return std::unordered_map<Wpa::WpaProtocol, Wpa::WpaCipher> 
+ */
+std::unordered_map<Wpa::WpaProtocol, Wpa::WpaCipher>
+Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuites) noexcept;
 } // namespace Microsoft::Net::Wifi
 
 #endif // IEEE_80211_WPA_ADAPTERS_HXX

@@ -286,6 +286,15 @@ AccessPointControllerLinux::SetPairwiseCipherSuites([[maybe_unused]] std::unorde
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
+    // Ensure at least one pairwise cipher suite is requested.
+    if (std::empty(pairwiseCipherSuites)) {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Details = "no pairwise cipher suites specified";
+        return status;
+    }
+
+    auto pairwiseCipherSuitesWpa = Ieee80211CipherSuitesToWpaCipherSuites(pairwiseCipherSuites);
+
     // TODO
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
