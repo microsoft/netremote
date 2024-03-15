@@ -281,7 +281,7 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetPairwiseCipherSuites([[maybe_unused]] std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept
+AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
@@ -295,7 +295,13 @@ AccessPointControllerLinux::SetPairwiseCipherSuites([[maybe_unused]] std::unorde
 
     auto pairwiseCipherSuitesHostapd = Ieee80211CipherSuitesToWpaCipherSuites(pairwiseCipherSuites);
 
-    // TODO
+    try {
+        m_hostapd.SetPairwiseCipherSuites(pairwiseCipherSuitesHostapd, EnforceConfigurationChange::Now);
+    } catch (const Wpa::HostapdException& e) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set pairwise cipher suites - {}", e.what());
+        return status;
+    }
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
     return status;

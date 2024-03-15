@@ -723,8 +723,7 @@ NetRemoteService::WifiAccessPointSetPairwiseCipherSuitesImpl(std::string_view ac
     }
 
     // Set the cipher suites.
-    operationStatus.Code = AccessPointOperationStatusCode::OperationNotSupported;
-    // TODO: operationStatus = accessPointController->SetCipherSuites(std::move(ieee80211CipherSuites));
+    operationStatus = accessPointController->SetPairwiseCipherSuites(std::move(ieee80211CipherSuites));
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set cipher suites for access point {} - {}", accessPointId, operationStatus.ToString()));
