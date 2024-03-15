@@ -101,4 +101,74 @@ Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211Authentica
         return WpaAuthenticationAlgorithm::Invalid;
     }
 }
+
+WpaSecurityProtocol
+Ieee80211SecurityProtocolToWpaSecurityProtocol(Ieee80211SecurityProtocol ieee80211SecurityProtocol) noexcept
+{
+    switch (ieee80211SecurityProtocol) {
+    case Ieee80211SecurityProtocol::Wpa:
+        return WpaSecurityProtocol::Wpa;
+    case Ieee80211SecurityProtocol::Wpa2:
+        return WpaSecurityProtocol::Wpa2;
+    case Ieee80211SecurityProtocol::Wpa3:
+        return WpaSecurityProtocol::Wpa3;
+    case Ieee80211SecurityProtocol::Unknown:
+        [[fallthrough]];
+    default:
+        return WpaSecurityProtocol::Unknown;
+    }
+}
+
+WpaCipher
+Ieee80211CipherSuiteToWpaCipher(Ieee80211CipherSuite ieee80211CipherSuite) noexcept
+{
+    switch (ieee80211CipherSuite) {
+    case Ieee80211CipherSuite::BipCmac128:
+        return WpaCipher::Aes128Cmac;
+    case Ieee80211CipherSuite::BipCmac256:
+        return WpaCipher::BipCmac256;
+    case Ieee80211CipherSuite::BipGmac128:
+        return WpaCipher::BipGmac128;
+    case Ieee80211CipherSuite::BipGmac256:
+        return WpaCipher::BipGmac256;
+    case Ieee80211CipherSuite::Ccmp128:
+        return WpaCipher::Ccmp;
+    case Ieee80211CipherSuite::Ccmp256:
+        return WpaCipher::Ccmp256;
+    case Ieee80211CipherSuite::Gcmp128:
+        return WpaCipher::Gcmp;
+    case Ieee80211CipherSuite::Gcmp256:
+        return WpaCipher::Gcmp256;
+    case Ieee80211CipherSuite::GroupAddressesTrafficNotAllowed:
+        return WpaCipher::GtkNotUsed;
+    case Ieee80211CipherSuite::Tkip:
+        return WpaCipher::Tkip;
+    case Ieee80211CipherSuite::UseGroup:
+        return WpaCipher::None;
+    case Ieee80211CipherSuite::Wep104:
+        return WpaCipher::Wep104;
+    case Ieee80211CipherSuite::Wep40:
+        return WpaCipher::Wep40;
+    case Ieee80211CipherSuite::Unknown:
+        [[fallthrough]];
+    default:
+        return WpaCipher::Unknown;
+    }
+}
+
+std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>>
+Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuitesConfigurations) noexcept
+{
+    std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> wpaCipherSuites{};
+
+    for (const auto& [ieee80211SecurityProtocol, ieee80211CipherSuites] : ieee80211CipherSuitesConfigurations) {
+        WpaSecurityProtocol wpaSecurityProtocol = Ieee80211SecurityProtocolToWpaSecurityProtocol(ieee80211SecurityProtocol);
+        std::vector<WpaCipher> cipherSuitesWpa(std::size(ieee80211CipherSuites));
+        std::ranges::transform(ieee80211CipherSuites, std::begin(cipherSuitesWpa), Ieee80211CipherSuiteToWpaCipher);
+
+        wpaCipherSuites.emplace(wpaSecurityProtocol, std::move(cipherSuitesWpa));
+    }
+
+    return wpaCipherSuites;
+}
 } // namespace Microsoft::Net::Wifi

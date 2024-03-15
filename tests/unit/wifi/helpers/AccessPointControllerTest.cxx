@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -121,6 +122,19 @@ AccessPointControllerTest::SetAuthenticationAlgorithms([[maybe_unused]] std::vec
     // If so, ensure authenticationAlgorithms is subset of those in AccessPointCapabilities.AuthenticationAlgorithms.
 
     AccessPoint->AuthenticationAlgorithms = std::move(authenticationAlgorithms);
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
+AccessPointOperationStatus
+AccessPointControllerTest::SetPairwiseCipherSuites(std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept
+{
+    assert(AccessPoint != nullptr);
+
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    AccessPoint->CipherSuites = std::move(pairwiseCipherSuites);
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 

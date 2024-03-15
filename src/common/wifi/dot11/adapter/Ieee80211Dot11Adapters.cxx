@@ -1,6 +1,5 @@
 
 #include <algorithm>
-#include <cstddef>
 #include <iterator>
 #include <ranges>
 #include <unordered_map>
@@ -12,7 +11,6 @@
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
-#include <notstd/Exceptions.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -569,12 +567,6 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211
     };
 
     return dot11Capabilities;
-}
-
-Ieee80211AccessPointCapabilities
-FromDot11AccessPointCapabilities([[maybe_unused]] const Dot11AccessPointCapabilities& dot11AccessPointCapabilities) /* noexcept */
-{
-    throw notstd::NotImplementedException();
 }
 
 } // namespace Microsoft::Net::Wifi

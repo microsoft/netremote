@@ -203,15 +203,6 @@ FromDot11CipherSuiteConfigurations(const std::unordered_map<Microsoft::Net::Wifi
 Microsoft::Net::Wifi::Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept;
 
-/**
- * @brief Convert the specified Dot11AccessPointCapabilities to the equivalent IEEE 802.11 access point capabilities.
- *
- * @param dot11AccessPointCapabilities The Dot11AccessPointCapabilities to convert.
- * @return Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities
- */
-Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities
-FromDot11AccessPointCapabilities(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities& dot11AccessPointCapabilities) /* noexcept */;
-
 } // namespace Microsoft::Net::Wifi
 
 #endif // IEEE_80211_DOT11_ADAPTERS_HXX

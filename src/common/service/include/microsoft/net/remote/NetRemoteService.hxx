@@ -180,12 +180,12 @@ protected:
      * temporarily go offline while the change is being applied.
      *
      * @param accessPointId The access point identifier.
-     * @param dot11CipherSuites The new cipher suites to set.
+     * @param dot11PairwiseCipherSuites The new pairwise cipher suites to set.
      * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointSetCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>& dot11CipherSuites, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+    WifiAccessPointSetPairwiseCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Microsoft::Net::Wifi::Dot11CipherSuite>>& dot11PairwiseCipherSuites, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
      * @brief Set the SSID of the access point.

@@ -381,57 +381,57 @@ TEST_CASE("Send SetSsid() command (root)", "[wpa][hostapd][client][remote]")
     }
 }
 
-TEST_CASE("Send SetWpaProtocols() command (root)", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send SetWpaSecurityProtocols() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
-    static constexpr auto WpaProtocolInvalid = static_cast<WpaProtocol>(std::numeric_limits<std::underlying_type_t<WpaProtocol>>::max());
+    static constexpr auto WpaSecurityProtocolInvalid = static_cast<WpaSecurityProtocol>(std::numeric_limits<std::underlying_type_t<WpaSecurityProtocol>>::max());
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
 
     SECTION("Doesn't throw")
     {
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
     }
 
     SECTION("Fails with empty input")
     {
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({}, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({}, EnforceConfigurationChange::Now), HostapdException);
     }
 
     SECTION("Fails with invalid input")
     {
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocolInvalid }, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocolInvalid, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Now), HostapdException);
 
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocolInvalid, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocolInvalid }, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocolInvalid, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Defer), HostapdException);
     }
 
     SECTION("Succeeds with valid, single input")
     {
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa }, EnforceConfigurationChange::Defer));
     }
 
     SECTION("Succeeds with valid, multiple inputs")
     {
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
     }
 
     SECTION("Succeeds with valid, duplicate inputs")
     {
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa, WpaProtocol::Wpa }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocol::Wpa }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa, WpaSecurityProtocol::Wpa }, EnforceConfigurationChange::Defer));
 
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetWpaProtocols({ WpaProtocol::Wpa2, WpaProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa2, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetWpaSecurityProtocols({ WpaSecurityProtocol::Wpa2, WpaSecurityProtocol::Wpa2 }, EnforceConfigurationChange::Defer));
     }
 }
 
@@ -525,7 +525,7 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
     }
 }
 
-TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remote]")
+TEST_CASE("Send SetPairwiseCipherSuites() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
 
@@ -533,58 +533,58 @@ TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remot
 
     SECTION("Doesn't throw")
     {
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites(WpaProtocol::Wpa, { WpaCipher::Ccmp }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites(WpaProtocol::Wpa, { WpaCipher::Ccmp }, EnforceConfigurationChange::Defer));
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites({ { WpaProtocol::Wpa, { WpaCipher::Ccmp } } }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites({ { WpaProtocol::Wpa, { WpaCipher::Ccmp } } }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol::Wpa, { WpaCipher::Ccmp }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol::Wpa, { WpaCipher::Ccmp }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites({ { WpaSecurityProtocol::Wpa, { WpaCipher::Ccmp } } }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites({ { WpaSecurityProtocol::Wpa, { WpaCipher::Ccmp } } }, EnforceConfigurationChange::Defer));
     }
 
     SECTION("Fails with empty inputs")
     {
         // Empty cipher list.
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites(WpaProtocol::Wpa, {}, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites(WpaProtocol::Wpa, {}, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol::Wpa, {}, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol::Wpa, {}, EnforceConfigurationChange::Defer), HostapdException);
 
         // Empty protocol list.
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({}, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({}, EnforceConfigurationChange::Defer), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({}, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({}, EnforceConfigurationChange::Defer), HostapdException);
 
         // clang-format off
         // Empty protocol list in map entry.
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
-            { WpaProtocol::Wpa, {} },
-            { WpaProtocol::Wpa2, { WpaCipher::Aes128Cmac } },
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
+            { WpaSecurityProtocol::Wpa, {} },
+            { WpaSecurityProtocol::Wpa2, { WpaCipher::Aes128Cmac } },
         }, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
-            { WpaProtocol::Wpa, {} },
-            { WpaProtocol::Wpa2, { WpaCipher::Aes128Cmac } },
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
+            { WpaSecurityProtocol::Wpa, {} },
+            { WpaSecurityProtocol::Wpa2, { WpaCipher::Aes128Cmac } },
         }, EnforceConfigurationChange::Defer), HostapdException);
 
         // Empty protocol list in map entry.
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
-            { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac } },
-            { WpaProtocol::Wpa2, { } },
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
+            { WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac } },
+            { WpaSecurityProtocol::Wpa2, { } },
         }, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
-            { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac } },
-            { WpaProtocol::Wpa2, { } },
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
+            { WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac } },
+            { WpaSecurityProtocol::Wpa2, { } },
         }, EnforceConfigurationChange::Defer), HostapdException);
 
         // Empty protocol list and empty cipher list in map entry.
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
-            { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac } },
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
+            { WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac } },
             { {}, {} },
         }, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
-            { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac } },
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
+            { WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac } },
             { {}, {} },
         }, EnforceConfigurationChange::Defer), HostapdException);
 
         // Only empty protocol and cipher lists in map.
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
             { {}, {} },
         }, EnforceConfigurationChange::Now), HostapdException);
-        REQUIRE_THROWS_AS(hostapd.SetCipherSuites({
+        REQUIRE_THROWS_AS(hostapd.SetPairwiseCipherSuites({
             { {}, {} },
         }, EnforceConfigurationChange::Defer), HostapdException);
         // clang-format on
@@ -592,36 +592,36 @@ TEST_CASE("Send SetCipherSuites() command (root)", "[wpa][hostapd][client][remot
 
     SECTION("Succeeds with all valid, single inputs")
     {
-        for (const auto wpaProtocol : magic_enum::enum_values<WpaProtocol>() | std::views::filter(IsWpaProtocolSupported)) {
+        for (const auto WpaSecurityProtocol : magic_enum::enum_values<WpaSecurityProtocol>() | std::views::filter(IsWpaSecurityProtocolSupported)) {
             for (const auto wpaCipher : WpaCiphersAll | std::views::filter(IsWpaCipherSupported)) {
-                REQUIRE_NOTHROW(hostapd.SetCipherSuites(wpaProtocol, { wpaCipher }, EnforceConfigurationChange::Now));
-                REQUIRE_NOTHROW(hostapd.SetCipherSuites(wpaProtocol, { wpaCipher }, EnforceConfigurationChange::Defer));
+                REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol, { wpaCipher }, EnforceConfigurationChange::Now));
+                REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol, { wpaCipher }, EnforceConfigurationChange::Defer));
             }
         }
     }
 
     SECTION("Succeeds with valid, multiple inputs")
     {
-        std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap{};
+        std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap{};
 
         std::vector<WpaKeyManagement> keyManagementValidValues{};
 
-        for (const auto wpaProtocol : magic_enum::enum_values<WpaProtocol>() | std::views::filter(IsWpaProtocolSupported)) {
+        for (const auto WpaSecurityProtocol : magic_enum::enum_values<WpaSecurityProtocol>() | std::views::filter(IsWpaSecurityProtocolSupported)) {
             for (const auto wpaCipher : WpaCiphersAll | std::views::filter(IsWpaCipherSupported)) {
-                protocolCipherMap[wpaProtocol].push_back(wpaCipher);
-                REQUIRE_NOTHROW(hostapd.SetCipherSuites(protocolCipherMap, EnforceConfigurationChange::Now));
-                REQUIRE_NOTHROW(hostapd.SetCipherSuites(protocolCipherMap, EnforceConfigurationChange::Defer));
+                protocolCipherMap[WpaSecurityProtocol].push_back(wpaCipher);
+                REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(protocolCipherMap, EnforceConfigurationChange::Now));
+                REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(protocolCipherMap, EnforceConfigurationChange::Defer));
             }
         }
     }
 
     SECTION("Succeeds with valid, duplicate inputs")
     {
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites(WpaProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites(WpaProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites(WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac }, EnforceConfigurationChange::Defer));
 
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites({ { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac } } }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.SetCipherSuites({ { WpaProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac } } }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites({ { WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac } } }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetPairwiseCipherSuites({ { WpaSecurityProtocol::Wpa, { WpaCipher::Aes128Cmac, WpaCipher::Aes128Cmac } } }, EnforceConfigurationChange::Defer));
     }
 }
 

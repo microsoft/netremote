@@ -53,7 +53,7 @@ struct ProtocolWpa
     static constexpr auto CommandPayloadReload = "RELOAD";
 
     // Common property names.
-    static constexpr auto PropertyNameWpaProtocol = "wpa";
+    static constexpr auto PropertyNameWpaSecurityProtocol = "wpa";
 
     // Response payloads.
     static constexpr auto ResponsePayloadOk = "OK";

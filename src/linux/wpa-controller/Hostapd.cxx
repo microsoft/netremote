@@ -234,7 +234,7 @@ Hostapd::SetAuthenticationAlgorithms(std::vector<WpaAuthenticationAlgorithm> alg
 }
 
 void
-Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange)
+Hostapd::SetWpaSecurityProtocols(std::vector<WpaSecurityProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange)
 {
     if (std::empty(protocols)) {
         throw HostapdException("No WPA protocols were provided");
@@ -242,18 +242,18 @@ Hostapd::SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfiguratio
 
     uint32_t protocolsToSet = 0;
     for (const auto protocol : protocols) {
-        const auto protocolValue = WpaProtocolPropertyValue(protocol);
-        if ((protocolValue & ~WpaProtocolMask) != 0) {
+        const auto protocolValue = WpaSecurityProtocolPropertyValue(protocol);
+        if ((protocolValue & ~WpaSecurityProtocolMask) != 0) {
             throw HostapdException(std::format("Invalid WPA protocol value '{}'", protocolValue));
         }
         protocolsToSet |= protocolValue;
     }
 
-    protocolsToSet &= WpaProtocolMask;
+    protocolsToSet &= WpaSecurityProtocolMask;
 
     const auto protocolsValue = std::format("{}", protocolsToSet);
     try {
-        SetProperty(ProtocolHostapd::PropertyNameWpaProtocol, protocolsValue, enforceConfigurationChange);
+        SetProperty(ProtocolHostapd::PropertyNameWpaSecurityProtocol, protocolsValue, enforceConfigurationChange);
     } catch (HostapdException& e) {
         throw HostapdException(std::format("Failed to set hostapd 'wpa' property to '{}' ({})", protocolsValue, e.what()));
     }
@@ -289,19 +289,19 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
 }
 
 void
-Hostapd::SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange)
+Hostapd::SetPairwiseCipherSuites(WpaSecurityProtocol protocol, std::vector<WpaCipher> pairwiseCiphers, EnforceConfigurationChange enforceConfigurationChange)
 {
-    SetCipherSuites({ { protocol, std::move(ciphers) } }, enforceConfigurationChange);
+    SetPairwiseCipherSuites({ { protocol, std::move(pairwiseCiphers) } }, enforceConfigurationChange);
 }
 
 void
-Hostapd::SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange)
+Hostapd::SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolPairwiseCipherMap, EnforceConfigurationChange enforceConfigurationChange)
 {
-    if (std::empty(protocolCipherMap)) {
+    if (std::empty(protocolPairwiseCipherMap)) {
         throw HostapdException("No WPA cipher suites were provided");
     }
 
-    for (const auto& [protocol, ciphers] : protocolCipherMap) {
+    for (const auto& [protocol, ciphers] : protocolPairwiseCipherMap) {
         if (std::empty(ciphers)) {
             throw HostapdException(std::format("No WPA cipher suites were provided for protocol '{}'", magic_enum::enum_name(protocol)));
         }

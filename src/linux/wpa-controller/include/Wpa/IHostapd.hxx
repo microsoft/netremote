@@ -140,7 +140,7 @@ struct IHostapd
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
-    SetWpaProtocols(std::vector<WpaProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
+    SetWpaSecurityProtocols(std::vector<WpaSecurityProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
      * @brief Set the allowed key management algorithms for the interfacallowed key management algorithms for the interface.
@@ -152,23 +152,23 @@ struct IHostapd
     SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
-     * @brief Set the allowed cipher suites for the interface.
+     * @brief Set the allowed pairwise cipher suites for the interface.
      *
      * @param protocol The WPA protocol to set the cipher suites for.
-     * @param ciphers The ciphers to allow.
+     * @param ciphers The pairwise ciphers to allow.
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
-    SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange) = 0;
+    SetPairwiseCipherSuites(WpaSecurityProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
-     * @brief Set the allowed cipher suites for the interface.
+     * @brief Set the allowed pairwise cipher suites for the interface.
      *
-     * @param protocolCipherMap map specifying the ciphers to allow for each protocol.
+     * @param protocolCipherMap Map specifying the pairwise ciphers to allow for each protocol.
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
-    SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
+    SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**
