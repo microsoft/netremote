@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -29,6 +30,7 @@ struct AccessPointTest final :
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
+    std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> CipherSuites;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
 
     /**

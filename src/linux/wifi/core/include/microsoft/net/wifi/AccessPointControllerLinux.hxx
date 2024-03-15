@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <Wpa/Hostapd.hxx>
@@ -98,6 +99,15 @@ struct AccessPointControllerLinux :
      */
     AccessPointOperationStatus
     SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept override;
+
+    /**
+     * @brief Set the pairwise cipher suites the access point should enable. These are used to encrypt unicast packets.
+     *
+     * @param pairwiseCipherSuites The pairwise cipher suites to enable.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetPairwiseCipherSuites(std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept override;
 
     /**
      * @brief Set the SSID of the access point.

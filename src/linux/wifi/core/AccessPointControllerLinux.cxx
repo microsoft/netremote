@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -276,6 +277,18 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
 
+    return status;
+}
+
+AccessPointOperationStatus
+AccessPointControllerLinux::SetPairwiseCipherSuites([[maybe_unused]] std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    // TODO
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
     return status;
 }
 

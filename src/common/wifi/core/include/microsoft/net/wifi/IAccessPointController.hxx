@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
@@ -95,11 +96,20 @@ struct IAccessPointController
     /**
      * @brief Set the authentication algorithms the access point should enable.
      *
-     * @param authenticationAlgorithms The authentication algorithms to be allow.
+     * @param authenticationAlgorithms The authentication algorithms to be allowed.
      * @return AccessPointOperationStatus
      */
     virtual AccessPointOperationStatus
     SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept = 0;
+
+    /**
+     * @brief Set the pairwise cipher suites the access point should enable. These are used to encrypt unicast packets.
+     *
+     * @param pairwiseCipherSuites The pairwise cipher suites to enable.
+     * @return AccessPointOperationStatus
+     */
+    virtual AccessPointOperationStatus
+    SetPairwiseCipherSuites(std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept = 0;
 
     /**
      * @brief Set the SSID of the access point.
