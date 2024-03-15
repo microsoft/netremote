@@ -89,7 +89,7 @@ inline constexpr std::underlying_type_t<WpaAuthenticationAlgorithm> WpaAuthentic
 /**
  * @brief Determine if the specified WpaAuthenticationAlgorithm is supported by hostapd.
  *
- * @param wpaProtocol The WpaAuthenticationAlgorithm to check.
+ * @param WpaSecurityProtocol The WpaAuthenticationAlgorithm to check.
  * @return true The authentication algorithm is supported.
  * @return false The authentication algorithm is not supported.
  */
@@ -107,7 +107,7 @@ IsWpaAuthenticationAlgorithmSupported(WpaAuthenticationAlgorithm wpaAuthenticati
  *
  * Values obtained from hostap/src/common/defs.h.
  */
-enum class WpaProtocol : uint32_t {
+enum class WpaSecurityProtocol : uint32_t {
     Wpa = (1U << 0U),
     Wpa2 = (1U << 1U),
     Wapi = (1U << 2U),
@@ -117,34 +117,34 @@ enum class WpaProtocol : uint32_t {
 };
 
 /**
- * @brief Array of all unsupported WpaProtocol values.
+ * @brief Array of all unsupported WpaSecurityProtocol values.
  */
-inline constexpr std::array<WpaProtocol, 2> WpaProtocolsUnsupported = {
-    WpaProtocol::Wapi,
-    WpaProtocol::Osen,
+inline constexpr std::array<WpaSecurityProtocol, 2> WpaSecurityProtocolsUnsupported = {
+    WpaSecurityProtocol::Wapi,
+    WpaSecurityProtocol::Osen,
 };
 
 /**
- * @brief Determine if the specified WpaProtocol is supported by hostapd.
+ * @brief Determine if the specified WpaSecurityProtocol is supported by hostapd.
  *
- * @param wpaProtocol The WpaProtocol to check.
+ * @param WpaSecurityProtocol The WpaSecurityProtocol to check.
  * @return true The protocol is supported.
  * @return false The protocol is not supported.
  */
 constexpr bool
-IsWpaProtocolSupported(WpaProtocol wpaProtocol) noexcept
+IsWpaSecurityProtocolSupported(WpaSecurityProtocol WpaSecurityProtocol) noexcept
 {
-    return !std::ranges::contains(WpaProtocolsUnsupported, wpaProtocol);
+    return !std::ranges::contains(WpaSecurityProtocolsUnsupported, WpaSecurityProtocol);
 }
 
 /**
- * @brief Numerical bitmask of valid WpaProtocol values.
+ * @brief Numerical bitmask of valid WpaSecurityProtocol values.
  */
-static constexpr std::underlying_type_t<WpaProtocol> WpaProtocolMask =
-    std::to_underlying(WpaProtocol::Wpa) |
-    std::to_underlying(WpaProtocol::Wpa2) |
-    std::to_underlying(WpaProtocol::Wapi) |
-    std::to_underlying(WpaProtocol::Osen);
+static constexpr std::underlying_type_t<WpaSecurityProtocol> WpaSecurityProtocolMask =
+    std::to_underlying(WpaSecurityProtocol::Wpa) |
+    std::to_underlying(WpaSecurityProtocol::Wpa2) |
+    std::to_underlying(WpaSecurityProtocol::Wapi) |
+    std::to_underlying(WpaSecurityProtocol::Osen);
 
 /**
  * @brief WPA encoding of IEEE 802.11 cipher types.
@@ -668,16 +668,16 @@ WpaCipherPropertyValue(WpaCipher wpaCipher) noexcept
  * Hostapd uses different configuration properties for WPA and WPA2/RSN protocols. This function maps the protocol to
  * the associated property name.
  *
- * @param wpaProtocol The wpa protocol to get the cipher name property for.
+ * @param WpaSecurityProtocol The wpa protocol to get the cipher name property for.
  * @return constexpr std::string_view
  */
 constexpr std::string_view
-WpaCipherPropertyName(WpaProtocol wpaProtocol) noexcept
+WpaCipherPropertyName(WpaSecurityProtocol WpaSecurityProtocol) noexcept
 {
-    switch (wpaProtocol) {
-    case WpaProtocol::Wpa:
+    switch (WpaSecurityProtocol) {
+    case WpaSecurityProtocol::Wpa:
         return ProtocolHostapd::PropertyNameWpaPairwise;
-    case WpaProtocol::Rsn:
+    case WpaSecurityProtocol::Rsn:
         return ProtocolHostapd::PropertyNameRsnPairwise;
     default:
         return ProtocolHostapd::PropertyNameInvalid;
@@ -685,15 +685,15 @@ WpaCipherPropertyName(WpaProtocol wpaProtocol) noexcept
 }
 
 /**
- * @brief Get the hostapd property value for the specified WpaProtocol.
+ * @brief Get the hostapd property value for the specified WpaSecurityProtocol.
  *
- * @param wpaProtocol The WpaProtocol to get the property value for.
- * @return constexpr std::underlying_type_t<WpaProtocol>
+ * @param WpaSecurityProtocol The WpaSecurityProtocol to get the property value for.
+ * @return constexpr std::underlying_type_t<WpaSecurityProtocol>
  */
-constexpr std::underlying_type_t<WpaProtocol>
-WpaProtocolPropertyValue(WpaProtocol wpaProtocol) noexcept
+constexpr std::underlying_type_t<WpaSecurityProtocol>
+WpaSecurityProtocolPropertyValue(WpaSecurityProtocol WpaSecurityProtocol) noexcept
 {
-    return std::to_underlying(wpaProtocol);
+    return std::to_underlying(WpaSecurityProtocol);
 }
 
 /**

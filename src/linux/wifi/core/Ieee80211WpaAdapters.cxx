@@ -102,10 +102,10 @@ Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211Authentica
     }
 }
 
-std::unordered_map<WpaProtocol, WpaCipher>
+std::unordered_map<WpaSecurityProtocol, WpaCipher>
 Ieee80211CipherSuitesToWpaCipherSuites([[maybe_unused]] const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuites) noexcept
 {
-    std::unordered_map<WpaProtocol, WpaCipher> wpaCipherSuites{};
+    std::unordered_map<WpaSecurityProtocol, WpaCipher> wpaCipherSuites{};
 
     // TODO:
 

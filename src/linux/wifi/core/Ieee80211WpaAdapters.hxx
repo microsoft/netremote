@@ -48,12 +48,12 @@ Wpa::WpaAuthenticationAlgorithm
 Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept;
 
 /**
- * @brief Convert a map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to a map of WpaProtocol to list of WpaCipher.
+ * @brief Convert a map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to a map of WpaSecurityProtocol to list of WpaCipher.
  * 
  * @param ieee80211CipherSuites The map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to convert.
- * @return std::unordered_map<Wpa::WpaProtocol, Wpa::WpaCipher> 
+ * @return std::unordered_map<Wpa::WpaSecurityProtocol, Wpa::WpaCipher> 
  */
-std::unordered_map<Wpa::WpaProtocol, Wpa::WpaCipher>
+std::unordered_map<Wpa::WpaSecurityProtocol, Wpa::WpaCipher>
 Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuites) noexcept;
 } // namespace Microsoft::Net::Wifi
 
