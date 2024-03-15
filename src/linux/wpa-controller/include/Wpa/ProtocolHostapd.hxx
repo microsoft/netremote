@@ -108,33 +108,23 @@ IsWpaAuthenticationAlgorithmSupported(WpaAuthenticationAlgorithm wpaAuthenticati
  * Values obtained from hostap/src/common/defs.h.
  */
 enum class WpaSecurityProtocol : uint32_t {
+    Unknown = 0,
     Wpa = (1U << 0U),
     Wpa2 = (1U << 1U),
-    Wapi = (1U << 2U),
-    Osen = (1U << 3U),
-    // Aliases
-    Rsn = Wpa2,
-};
-
-/**
- * @brief Array of all unsupported WpaSecurityProtocol values.
- */
-inline constexpr std::array<WpaSecurityProtocol, 2> WpaSecurityProtocolsUnsupported = {
-    WpaSecurityProtocol::Wapi,
-    WpaSecurityProtocol::Osen,
+    Wpa3 = (1U << 1U), // intentionally the same as Wpa3, see note above.
 };
 
 /**
  * @brief Determine if the specified WpaSecurityProtocol is supported by hostapd.
  *
- * @param WpaSecurityProtocol The WpaSecurityProtocol to check.
+ * @param wpaSecurityProtocol The WpaSecurityProtocol to check.
  * @return true The protocol is supported.
  * @return false The protocol is not supported.
  */
 constexpr bool
-IsWpaSecurityProtocolSupported(WpaSecurityProtocol WpaSecurityProtocol) noexcept
+IsWpaSecurityProtocolSupported(WpaSecurityProtocol wpaSecurityProtocol) noexcept
 {
-    return !std::ranges::contains(WpaSecurityProtocolsUnsupported, WpaSecurityProtocol);
+    return wpaSecurityProtocol != WpaSecurityProtocol::Unknown;
 }
 
 /**
@@ -143,8 +133,7 @@ IsWpaSecurityProtocolSupported(WpaSecurityProtocol WpaSecurityProtocol) noexcept
 static constexpr std::underlying_type_t<WpaSecurityProtocol> WpaSecurityProtocolMask =
     std::to_underlying(WpaSecurityProtocol::Wpa) |
     std::to_underlying(WpaSecurityProtocol::Wpa2) |
-    std::to_underlying(WpaSecurityProtocol::Wapi) |
-    std::to_underlying(WpaSecurityProtocol::Osen);
+    std::to_underlying(WpaSecurityProtocol::Wpa3);
 
 /**
  * @brief WPA encoding of IEEE 802.11 cipher types.
@@ -152,6 +141,7 @@ static constexpr std::underlying_type_t<WpaSecurityProtocol> WpaSecurityProtocol
  * Values obtained from hostap/src/common/defs.h.
  */
 enum class WpaCipher : uint32_t {
+    Unknown = 0U,
     None = (1U << 0U),
     Wep40 = (1U << 1U),
     Wep104 = (1U << 2U),
@@ -174,7 +164,8 @@ enum class WpaCipher : uint32_t {
  *
  * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
  */
-inline constexpr std::array<WpaCipher, 14> WpaCiphersAll = {
+inline constexpr std::array<WpaCipher, 15> WpaCiphersAll = {
+    WpaCipher::Unknown,
     WpaCipher::None,
     WpaCipher::Wep40,
     WpaCipher::Wep104,
@@ -194,7 +185,8 @@ inline constexpr std::array<WpaCipher, 14> WpaCiphersAll = {
 /**
  * @brief Array of all unsupported WpaCipher values.
  */
-inline constexpr std::array<WpaCipher, 4> WpaCiphersUnsupported = {
+inline constexpr std::array<WpaCipher, 5> WpaCiphersUnsupported = {
+    WpaCipher::Unknown,
     WpaCipher::None,
     WpaCipher::Wep40,
     WpaCipher::Wep104,
@@ -677,7 +669,8 @@ WpaCipherPropertyName(WpaSecurityProtocol WpaSecurityProtocol) noexcept
     switch (WpaSecurityProtocol) {
     case WpaSecurityProtocol::Wpa:
         return ProtocolHostapd::PropertyNameWpaPairwise;
-    case WpaSecurityProtocol::Rsn:
+    case WpaSecurityProtocol::Wpa2:
+    // case WpaSecurityProtocol::Wpa3: // duplicate case value not allowed
         return ProtocolHostapd::PropertyNameRsnPairwise;
     default:
         return ProtocolHostapd::PropertyNameInvalid;
