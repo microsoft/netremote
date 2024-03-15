@@ -462,9 +462,9 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        if (dot11AccessPointConfiguration->ciphersuites_size() > 0) {
-            auto dot11CipherSuites = ToDot11CipherSuiteConfigurations(dot11AccessPointConfiguration->ciphersuites());
-            wifiOperationStatus = WifiAccessPointSetCipherSuitesImpl(accessPointId, dot11CipherSuites, accessPointController);
+        if (dot11AccessPointConfiguration->pairwiseciphersuites_size() > 0) {
+            auto dot11PairwiseCipherSuites = ToDot11CipherSuiteConfigurations(dot11AccessPointConfiguration->pairwiseciphersuites());
+            wifiOperationStatus = WifiAccessPointSetPairwiseCipherSuitesImpl(accessPointId, dot11PairwiseCipherSuites, accessPointController);
             if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
                 return wifiOperationStatus;
             }
@@ -686,17 +686,17 @@ NetRemoteService::WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_vie
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSetCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>& dot11CipherSuites, std::shared_ptr<IAccessPointController> accessPointController)
+NetRemoteService::WifiAccessPointSetPairwiseCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>& dot11PairwiseCipherSuites, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
     // Validate basic parameters in the request.
-    if (std::empty(dot11CipherSuites)) {
+    if (std::empty(dot11PairwiseCipherSuites)) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         wifiOperationStatus.set_message("No cipher suites provided");
         return wifiOperationStatus;
     }
-    if (std::ranges::contains(dot11CipherSuites | std::views::keys, Dot11SecurityProtocol::Dot11SecurityProtocolUnknown)) {
+    if (std::ranges::contains(dot11PairwiseCipherSuites | std::views::keys, Dot11SecurityProtocol::Dot11SecurityProtocolUnknown)) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         wifiOperationStatus.set_message("Invalid security protocol provided");
         return wifiOperationStatus;
@@ -715,7 +715,7 @@ NetRemoteService::WifiAccessPointSetCipherSuitesImpl(std::string_view accessPoin
     }
 
     // Convert to 802.11 neutral type.
-    auto ieee80211CipherSuites = FromDot11CipherSuiteConfigurations(dot11CipherSuites);
+    auto ieee80211CipherSuites = FromDot11CipherSuiteConfigurations(dot11PairwiseCipherSuites);
     if (std::ranges::contains(ieee80211CipherSuites | std::views::keys, Ieee80211SecurityProtocol::Unknown)) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         wifiOperationStatus.set_message("Invalid security protocol provided");

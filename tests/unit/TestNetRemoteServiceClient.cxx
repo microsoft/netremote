@@ -127,7 +127,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         Dot11AccessPointConfiguration apConfiguration{};
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
         apConfiguration.mutable_ssid()->set_name(SsidName);
-        apConfiguration.mutable_ciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
+        apConfiguration.mutable_pairwiseciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
         apConfiguration.mutable_authenticationalgorithms()->Add(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
@@ -175,7 +175,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         Dot11AccessPointConfiguration apConfiguration{};
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
         apConfiguration.mutable_ssid()->set_name(SsidName);
-        apConfiguration.mutable_ciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
+        apConfiguration.mutable_pairwiseciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
         apConfiguration.mutable_authenticationalgorithms()->Add(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
 

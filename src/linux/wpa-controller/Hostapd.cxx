@@ -289,19 +289,19 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
 }
 
 void
-Hostapd::SetCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange)
+Hostapd::SetPairwiseCipherSuites(WpaProtocol protocol, std::vector<WpaCipher> pairwiseCiphers, EnforceConfigurationChange enforceConfigurationChange)
 {
-    SetCipherSuites({ { protocol, std::move(ciphers) } }, enforceConfigurationChange);
+    SetPairwiseCipherSuites({ { protocol, std::move(pairwiseCiphers) } }, enforceConfigurationChange);
 }
 
 void
-Hostapd::SetCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange)
+Hostapd::SetPairwiseCipherSuites(std::unordered_map<WpaProtocol, std::vector<WpaCipher>> protocolPairwiseCipherMap, EnforceConfigurationChange enforceConfigurationChange)
 {
-    if (std::empty(protocolCipherMap)) {
+    if (std::empty(protocolPairwiseCipherMap)) {
         throw HostapdException("No WPA cipher suites were provided");
     }
 
-    for (const auto& [protocol, ciphers] : protocolCipherMap) {
+    for (const auto& [protocol, ciphers] : protocolPairwiseCipherMap) {
         if (std::empty(ciphers)) {
             throw HostapdException(std::format("No WPA cipher suites were provided for protocol '{}'", magic_enum::enum_name(protocol)));
         }
