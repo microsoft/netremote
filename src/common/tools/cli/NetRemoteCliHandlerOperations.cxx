@@ -16,6 +16,7 @@
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
@@ -133,6 +134,81 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
            << detail::NetRemoteAccessPointCapabilitiesToString(accessPoint.capabilities())
            << '\n';
         LOGI << ss.str();
+    }
+}
+
+void
+NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
+{
+    WifiAccessPointEnableRequest request{};
+    WifiAccessPointEnableResult result{};
+    grpc::ClientContext clientContext{};
+
+    request.set_accesspointid(std::string(accessPointId));
+
+    // Populate access point configuration if present.
+    if (ieee80211AccessPointConfiguration.has_value()) {
+        auto& dot11AccessPointConfiguration = *request.mutable_configuration();
+
+        // Populate SSID if present.
+        if (ieee80211AccessPointConfiguration->Ssid.has_value()) {
+            dot11AccessPointConfiguration.mutable_ssid()->set_name(ieee80211AccessPointConfiguration->Ssid.value());
+        }
+
+        // Populate PHY type if present.
+        if (ieee80211AccessPointConfiguration->PhyType.has_value()) {
+            const auto dot11PhyType = ToDot11PhyType(ieee80211AccessPointConfiguration->PhyType.value());
+            dot11AccessPointConfiguration.set_phytype(dot11PhyType);
+        }
+
+        // Populate pairwise cipher suites if present.
+        if (!std::empty(ieee80211AccessPointConfiguration->PairwiseCipherSuites)) {
+            auto dot11PairwiseCipherSuites = ToDot11CipherSuiteConfigurations(ieee80211AccessPointConfiguration->PairwiseCipherSuites);
+            *dot11AccessPointConfiguration.mutable_pairwiseciphersuites() = {
+                std::make_move_iterator(std::begin(dot11PairwiseCipherSuites)),
+                std::make_move_iterator(std::end(dot11PairwiseCipherSuites))
+            };
+        }
+
+        // Populate authentication algorithms if present.
+        if (!std::empty(ieee80211AccessPointConfiguration->AuthenticationAlgorithms)) {
+            auto dot11AuthenticationAlgorithms = ToDot11AuthenticationAlgorithms(ieee80211AccessPointConfiguration->AuthenticationAlgorithms);
+            *dot11AccessPointConfiguration.mutable_authenticationalgorithms() = {
+                std::make_move_iterator(std::begin(dot11AuthenticationAlgorithms)),
+                std::make_move_iterator(std::end(dot11AuthenticationAlgorithms))
+            };
+        }
+
+        // Populate frequency bands if present.
+        if (!std::empty(ieee80211AccessPointConfiguration->FrequencyBands)) {
+            auto dot11FrequencyBands = ToDot11FrequencyBands(ieee80211AccessPointConfiguration->FrequencyBands);
+            *dot11AccessPointConfiguration.mutable_frequencybands() = {
+                std::make_move_iterator(std::begin(dot11FrequencyBands)),
+                std::make_move_iterator(std::end(dot11FrequencyBands))
+            };
+        }
+    }
+
+    auto status = m_connection->Client->WifiAccessPointEnable(&clientContext, request, &result);
+    if (!status.ok()) {
+        LOGE << std::format("Failed to enable WiFi access point, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        return;
+    }
+}
+
+void
+NetRemoteCliHandlerOperations::WifiAccessPointDisable(std::string_view accessPointId)
+{
+    WifiAccessPointDisableRequest request{};
+    WifiAccessPointDisableResult result{};
+    grpc::ClientContext clientContext{};
+
+    request.set_accesspointid(std::string(accessPointId));
+
+    auto status = m_connection->Client->WifiAccessPointDisable(&clientContext, request, &result);
+    if (!status.ok()) {
+        LOGE << std::format("Failed to disable WiFi access point, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        return;
     }
 }
 

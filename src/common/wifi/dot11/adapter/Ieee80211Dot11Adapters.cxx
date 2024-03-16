@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <cstdlib>
 #include <iterator>
 #include <ranges>
 #include <unordered_map>
@@ -15,7 +16,6 @@
 namespace Microsoft::Net::Wifi
 {
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::AccessPointOperationStatusCode;
 
 WifiAccessPointOperationStatusCode
 ToDot11AccessPointOperationStatusCode(AccessPointOperationStatusCode& accessPointOperationStatusCode) noexcept
@@ -61,9 +61,6 @@ FromDot11AccessPointOperationStatusCode(WifiAccessPointOperationStatusCode wifiA
     }
 }
 
-using Microsoft::Net::Wifi::Dot11SecurityProtocol;
-using Microsoft::Net::Wifi::Ieee80211SecurityProtocol;
-
 Dot11SecurityProtocol
 ToDot11SecurityProtocol(Ieee80211SecurityProtocol ieee80211SecurityProtocol) noexcept
 {
@@ -97,9 +94,6 @@ FromDot11SecurityProtocol(Dot11SecurityProtocol dot11SecurityProtocol) noexcept
         return Ieee80211SecurityProtocol::Unknown;
     }
 }
-
-using Microsoft::Net::Wifi::Dot11PhyType;
-using Microsoft::Net::Wifi::Ieee80211PhyType;
 
 Dot11PhyType
 ToDot11PhyType(const Ieee80211PhyType ieee80211PhyType) noexcept
@@ -153,9 +147,6 @@ FromDot11PhyType(const Dot11PhyType dot11PhyType) noexcept
     }
 }
 
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
-
 Dot11FrequencyBand
 ToDot11FrequencyBand(const Ieee80211FrequencyBand ieee80211FrequencyBand) noexcept
 {
@@ -169,6 +160,15 @@ ToDot11FrequencyBand(const Ieee80211FrequencyBand ieee80211FrequencyBand) noexce
     default:
         return Dot11FrequencyBand::Dot11FrequencyBandUnknown;
     }
+}
+
+std::vector<Dot11FrequencyBand>
+ToDot11FrequencyBands(const std::vector<Ieee80211FrequencyBand>& ieee80211FrequencyBands) noexcept
+{
+    std::vector<Dot11FrequencyBand> dot11FrequencyBands(static_cast<std::size_t>(std::size(ieee80211FrequencyBands)));
+    std::ranges::transform(ieee80211FrequencyBands, std::begin(dot11FrequencyBands), ToDot11FrequencyBand);
+
+    return dot11FrequencyBands;
 }
 
 Ieee80211FrequencyBand
@@ -256,9 +256,6 @@ FromDot11SetFrequencyBandsRequest(const WifiAccessPointSetFrequencyBandsRequest&
     return ieee80211FrequencyBands;
 }
 
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
-
 Dot11AuthenticationAlgorithm
 ToDot11AuthenticationAlgorithm(const Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept
 {
@@ -283,6 +280,15 @@ ToDot11AuthenticationAlgorithm(const Ieee80211AuthenticationAlgorithm ieee80211A
     default:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
     }
+}
+
+std::vector<Dot11AuthenticationAlgorithm>
+ToDot11AuthenticationAlgorithms(const std::vector<Ieee80211AuthenticationAlgorithm>& ieee80211AuthenticationAlgorithms) noexcept
+{
+    std::vector<Dot11AuthenticationAlgorithm> dot11AuthenticationAlgorithms(static_cast<std::size_t>(std::size(ieee80211AuthenticationAlgorithms)));
+    std::ranges::transform(ieee80211AuthenticationAlgorithms, std::begin(dot11AuthenticationAlgorithms), ToDot11AuthenticationAlgorithm);
+
+    return dot11AuthenticationAlgorithms;
 }
 
 Ieee80211AuthenticationAlgorithm
@@ -310,9 +316,6 @@ FromDot11AuthenticationAlgorithm(const Dot11AuthenticationAlgorithm dot11Authent
         return Ieee80211AuthenticationAlgorithm::Unknown;
     }
 }
-
-using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::Ieee80211AkmSuite;
 
 Dot11AkmSuite
 ToDot11AkmSuite(const Ieee80211AkmSuite ieee80211AkmSuite) noexcept
@@ -416,9 +419,6 @@ FromDot11AkmSuite(const Dot11AkmSuite dot11AkmSuite) noexcept
     }
 }
 
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Ieee80211CipherSuite;
-
 Dot11CipherSuite
 ToDot11CipherSuite(const Ieee80211CipherSuite ieee80211CipherSuite) noexcept
 {
@@ -504,6 +504,29 @@ ToDot11CipherSuiteConfigurations(const google::protobuf::RepeatedPtrField<Dot11C
     return dot11CipherSuiteConfigurationsStrong;
 }
 
+std::vector<Dot11CipherSuiteConfiguration>
+ToDot11CipherSuiteConfigurations(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuiteConfigurations) noexcept
+{
+    std::vector<Dot11CipherSuiteConfiguration> dot11CipherSuiteConfigurations(std::size(ieee80211CipherSuiteConfigurations));
+
+    std::ranges::transform(ieee80211CipherSuiteConfigurations, std::begin(dot11CipherSuiteConfigurations), [](const auto& ieee80211CipherSuiteConfiguration) {
+        const auto& [ieee80211SecurityProtocol, ieee80211CipherSuites] = ieee80211CipherSuiteConfiguration;
+        const auto dot11SecurityProtocol = ToDot11SecurityProtocol(ieee80211SecurityProtocol);
+        std::vector<Dot11CipherSuite> dot11CipherSuites(std::size(ieee80211CipherSuites));
+        std::ranges::transform(ieee80211CipherSuiteConfiguration.second, std::begin(dot11CipherSuites), ToDot11CipherSuite);
+
+        Dot11CipherSuiteConfiguration dot11CipherSuiteConfiguration{};
+        dot11CipherSuiteConfiguration.set_securityprotocol(dot11SecurityProtocol);
+        *dot11CipherSuiteConfiguration.mutable_ciphersuites() = {
+            std::make_move_iterator(std::begin(dot11CipherSuites)),
+            std::make_move_iterator(std::end(dot11CipherSuites))
+        };
+        return dot11CipherSuiteConfiguration;
+    });
+
+    return dot11CipherSuiteConfigurations;
+}
+
 std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>
 FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>& dot11CipherSuiteConfigurations) noexcept
 {
@@ -517,9 +540,6 @@ FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtoco
 
     return ieee80211CipherSuiteConfigurations;
 }
-
-using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
 Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept

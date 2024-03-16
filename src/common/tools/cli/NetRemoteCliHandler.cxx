@@ -1,11 +1,14 @@
 
 #include <memory>
+#include <optional>
+#include <string_view>
 #include <utility>
 
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteCli.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
@@ -50,4 +53,44 @@ NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints()
 
     LOGD << "Executing command WifiEnumerateAccessPoints";
     m_operations->WifiEnumerateAccessPoints();
+}
+
+using Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration;
+
+void
+NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const std::optional<Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
+{
+    if (!m_operations) {
+        LOGE << "No operations instance available to handle command";
+        return;
+    }
+
+    auto parentStrong{ GetParentStrongRef() };
+    if (parentStrong == nullptr) {
+        LOGW << "Parent cli object is no longer valid, aborting command";
+        return;
+    }
+
+    LOGD << "Executing command WifiAccessPointEnable";
+
+    m_operations->WifiAccessPointEnable(accessPointId, ieee80211AccessPointConfiguration);
+}
+
+void
+NetRemoteCliHandler::HandleCommandWifiAccessPointDisable(std::string_view accessPointId)
+{
+    if (!m_operations) {
+        LOGE << "No operations instance available to handle command";
+        return;
+    }
+
+    auto parentStrong{ GetParentStrongRef() };
+    if (parentStrong == nullptr) {
+        LOGW << "Parent cli object is no longer valid, aborting command";
+        return;
+    }
+
+    LOGD << "Executing command WifiAccessPointDisable";
+
+    m_operations->WifiAccessPointDisable(accessPointId);
 }

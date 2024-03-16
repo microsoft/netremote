@@ -3,8 +3,11 @@
 #define I_NET_REMOTE_CLI_HANDLER_OPERATIONS_HXX
 
 #include <memory>
+#include <optional>
+#include <string_view>
 
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -21,15 +24,37 @@ struct INetRemoteCliHandlerOperations
      * Prevent copying and moving of INetRemoteCliHandlerOperations objects.
      */
     INetRemoteCliHandlerOperations(const INetRemoteCliHandlerOperations&) = delete;
-    INetRemoteCliHandlerOperations& operator=(const INetRemoteCliHandlerOperations&) = delete;
+
     INetRemoteCliHandlerOperations(INetRemoteCliHandlerOperations&&) = delete;
-    INetRemoteCliHandlerOperations& operator=(INetRemoteCliHandlerOperations&&) = delete;
+
+    INetRemoteCliHandlerOperations&
+    operator=(const INetRemoteCliHandlerOperations&) = delete;
+
+    INetRemoteCliHandlerOperations&
+    operator=(INetRemoteCliHandlerOperations&&) = delete;
 
     /**
      * @brief Enumerate available WiFi access points.
      */
     virtual void
     WifiEnumerateAccessPoints() = 0;
+
+    /**
+     * @brief Enable the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     * @param ieee80211AccessPointConfiguration The optional configuration to apply to the access point.
+     */
+    virtual void
+    WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration) = 0;
+
+    /**
+     * @brief Disable the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to disable.
+     */
+    virtual void
+    WifiAccessPointDisable(std::string_view accessPointId) = 0;
 };
 
 /**
@@ -42,12 +67,17 @@ struct INetRemoteCliHandlerOperationsFactory
     virtual ~INetRemoteCliHandlerOperationsFactory() = default;
 
     /**
-     * Prevent copying and moving of INetRemoteCliHandlerOperationsFactory objects. 
+     * Prevent copying and moving of INetRemoteCliHandlerOperationsFactory objects.
      */
     INetRemoteCliHandlerOperationsFactory(const INetRemoteCliHandlerOperationsFactory&) = delete;
-    INetRemoteCliHandlerOperationsFactory& operator=(const INetRemoteCliHandlerOperationsFactory&) = delete;
+
     INetRemoteCliHandlerOperationsFactory(INetRemoteCliHandlerOperationsFactory&&) = delete;
-    INetRemoteCliHandlerOperationsFactory& operator=(INetRemoteCliHandlerOperationsFactory&&) = delete;
+
+    INetRemoteCliHandlerOperationsFactory&
+    operator=(const INetRemoteCliHandlerOperationsFactory&) = delete;
+
+    INetRemoteCliHandlerOperationsFactory&
+    operator=(INetRemoteCliHandlerOperationsFactory&&) = delete;
 
     /**
      * @brief Create a new INetRemoteCliHandlerOperationsFactory instance with the specified server connection.

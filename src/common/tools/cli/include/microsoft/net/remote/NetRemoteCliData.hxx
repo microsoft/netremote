@@ -19,6 +19,8 @@ struct NetRemoteCliData
 {
     std::string ServerAddress{ Protocol::NetRemoteProtocol::AddressDefault };
     NetRemoteCommandId Command{ NetRemoteCommandId::None };
+
+    std::string WifiAccessPointId{};
 };
 } // namespace Microsoft::Net::Remote
 
