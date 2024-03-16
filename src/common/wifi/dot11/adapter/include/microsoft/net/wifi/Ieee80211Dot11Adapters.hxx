@@ -77,6 +77,15 @@ Microsoft::Net::Wifi::Dot11FrequencyBand
 ToDot11FrequencyBand(Microsoft::Net::Wifi::Ieee80211FrequencyBand ieee80211FrequencyBand) noexcept;
 
 /**
+ * @brief Convert the specified IEEE 802.11 frequency bands to the equivalent Dot11FrequencyBands.
+ *
+ * @param ieee80211FrequencyBands The IEEE 802.11 frequency bands to convert.
+ * @return std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>
+ */
+std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>
+ToDot11FrequencyBands(const std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand>& ieee80211FrequencyBands) noexcept;
+
+/**
  * @brief Obtain a vector of Dot11FrequencyBands from the specified WifiAccessPointSetFrequencyBandsRequest.
  *
  * @param request The request to extract the Dot11FrequencyBands from.
@@ -121,6 +130,15 @@ FromDot11SetFrequencyBandsRequest(const Microsoft::Net::Remote::Wifi::WifiAccess
  */
 Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm
 ToDot11AuthenticationAlgorithm(Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 authentication algorithms to the equivalent Dot11AuthenticationAlgorithms.
+ *
+ * @param ieee80211AuthenticationAlgorithms The IEEE 802.11 authentication algorithms to convert.
+ * @return std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>
+ */
+std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>
+ToDot11AuthenticationAlgorithms(const std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm>& ieee80211AuthenticationAlgorithms) noexcept;
 
 /**
  * @brief Obtain a vector of Dot11AuthenticationAlgorithms from the specified Dot11AccessPointConfiguration.

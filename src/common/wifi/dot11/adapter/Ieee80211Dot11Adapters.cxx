@@ -171,6 +171,15 @@ ToDot11FrequencyBand(const Ieee80211FrequencyBand ieee80211FrequencyBand) noexce
     }
 }
 
+std::vector<Dot11FrequencyBand>
+ToDot11FrequencyBands(const std::vector<Ieee80211FrequencyBand>& ieee80211FrequencyBands) noexcept
+{
+    std::vector<Dot11FrequencyBand> dot11FrequencyBands(static_cast<std::size_t>(std::size(ieee80211FrequencyBands)));
+    std::ranges::transform(ieee80211FrequencyBands, std::begin(dot11FrequencyBands), ToDot11FrequencyBand);
+
+    return dot11FrequencyBands;
+}
+
 Ieee80211FrequencyBand
 FromDot11FrequencyBand(const Dot11FrequencyBand dot11FrequencyBand) noexcept
 {
@@ -283,6 +292,15 @@ ToDot11AuthenticationAlgorithm(const Ieee80211AuthenticationAlgorithm ieee80211A
     default:
         return Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown;
     }
+}
+
+std::vector<Dot11AuthenticationAlgorithm>
+ToDot11AuthenticationAlgorithms(const std::vector<Ieee80211AuthenticationAlgorithm>& ieee80211AuthenticationAlgorithms) noexcept
+{
+    std::vector<Dot11AuthenticationAlgorithm> dot11AuthenticationAlgorithms(static_cast<std::size_t>(std::size(ieee80211AuthenticationAlgorithms)));
+    std::ranges::transform(ieee80211AuthenticationAlgorithms, std::begin(dot11AuthenticationAlgorithms), ToDot11AuthenticationAlgorithm);
+
+    return dot11AuthenticationAlgorithms;
 }
 
 Ieee80211AuthenticationAlgorithm

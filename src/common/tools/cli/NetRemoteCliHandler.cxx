@@ -1,5 +1,6 @@
 
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -7,6 +8,7 @@
 #include <microsoft/net/remote/NetRemoteCli.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
@@ -53,8 +55,10 @@ NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints()
     m_operations->WifiEnumerateAccessPoints();
 }
 
+using Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration;
+
 void
-NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessPointId)
+NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const std::optional<Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
 {
     if (!m_operations) {
         LOGE << "No operations instance available to handle command";
@@ -69,7 +73,7 @@ NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessP
 
     LOGD << "Executing command WifiAccessPointEnable";
 
-    m_operations->WifiAccessPointEnable(accessPointId);
+    m_operations->WifiAccessPointEnable(accessPointId, ieee80211AccessPointConfiguration);
 }
 
 void

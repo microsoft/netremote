@@ -3,9 +3,11 @@
 #define NET_REMOTE_CLI_HANDLER_OPERATIONS_HXX
 
 #include <memory>
+#include <optional>
 
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -50,9 +52,10 @@ struct NetRemoteCliHandlerOperations :
      * @brief Enable the specified WiFi access point.
      *
      * @param accessPointId The identifier of the access point to enable.
+     * @param ieee80211AccessPointConfiguration The optional configuration to apply to the access point.
      */
     void
-    WifiAccessPointEnable(std::string_view accessPointId) override;
+    WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration) override;
 
     /**
      * @brief Disable the specified WiFi access point.

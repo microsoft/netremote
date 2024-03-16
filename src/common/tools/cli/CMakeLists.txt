@@ -27,9 +27,10 @@ target_link_libraries(${PROJECT_NAME}-cli
         magic_enum::magic_enum
         notstd
         plog::plog
-        wifi-core-adapter-dot11
     PUBLIC
         ${PROJECT_NAME}-client
+        wifi-core
+        wifi-core-adapter-dot11
 )
 
 install(
