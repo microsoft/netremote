@@ -194,7 +194,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
 
     // Parse the message attributes.
     std::array<struct nlattr *, NL80211_ATTR_MAX + 1> netlinkMessageAttributes{};
-    int ret = nla_parse(std::data(netlinkMessageAttributes), std::size(netlinkMessageAttributes), genlmsg_attrdata(genlMessageHeader, 0), genlmsg_attrlen(genlMessageHeader, 0), nullptr);
+    int ret = nla_parse(std::data(netlinkMessageAttributes), std::size(netlinkMessageAttributes) - 1, genlmsg_attrdata(genlMessageHeader, 0), genlmsg_attrlen(genlMessageHeader, 0), nullptr);
     if (ret < 0) {
         LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
         return NL_SKIP;
