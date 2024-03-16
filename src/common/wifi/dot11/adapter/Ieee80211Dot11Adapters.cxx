@@ -528,8 +528,9 @@ ToDot11CipherSuiteConfigurations(const std::unordered_map<Ieee80211SecurityProto
     std::vector<Dot11CipherSuiteConfiguration> dot11CipherSuiteConfigurations(std::size(ieee80211CipherSuiteConfigurations));
 
     std::ranges::transform(ieee80211CipherSuiteConfigurations, std::begin(dot11CipherSuiteConfigurations), [](const auto& ieee80211CipherSuiteConfiguration) {
-        const auto dot11SecurityProtocol = ToDot11SecurityProtocol(ieee80211CipherSuiteConfiguration.first);
-        std::vector<Dot11CipherSuite> dot11CipherSuites(std::size(ieee80211CipherSuiteConfiguration.second));
+        const auto& [ieee80211SecurityProtocol, ieee80211CipherSuites] = ieee80211CipherSuiteConfiguration;
+        const auto dot11SecurityProtocol = ToDot11SecurityProtocol(ieee80211SecurityProtocol);
+        std::vector<Dot11CipherSuite> dot11CipherSuites(std::size(ieee80211CipherSuites));
         std::ranges::transform(ieee80211CipherSuiteConfiguration.second, std::begin(dot11CipherSuites), ToDot11CipherSuite);
 
         Dot11CipherSuiteConfiguration dot11CipherSuiteConfiguration{};
