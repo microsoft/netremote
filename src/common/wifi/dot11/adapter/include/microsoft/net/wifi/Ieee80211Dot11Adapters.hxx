@@ -204,6 +204,15 @@ std::unordered_map<Microsoft::Net::Wifi::Dot11SecurityProtocol, std::vector<Micr
 ToDot11CipherSuiteConfigurations(const google::protobuf::RepeatedPtrField<Microsoft::Net::Wifi::Dot11CipherSuiteConfiguration>& dot11CipherSuiteConfigurations) noexcept;
 
 /**
+ * @brief Convert the specified map of Ieee80211SecurityProtocol to Ieee80211CipherSuite to the equivalent vector of Dot11CipherSuiteConfiguratios.
+ *
+ * @param ieee80211CipherSuiteConfigurations The map of Ieee80211SecurityProtocol to Ieee80211CipherSuite to convert.
+ * @return std::vector<Microsoft::Net::Wifi::Dot11CipherSuiteConfiguration>
+ */
+std::vector<Microsoft::Net::Wifi::Dot11CipherSuiteConfiguration>
+ToDot11CipherSuiteConfigurations(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuiteConfigurations) noexcept;
+
+/**
  * @brief Convert the specified map of Dot11SecurityProtocol to Dot11CipherSuite to the equivalent map of IEEE 802.11 security protocol to cipher suite.
  *
  * @param dot11CipherSuiteConfigurations The map of Dot11SecurityProtocol to Dot11CipherSuite to convert.

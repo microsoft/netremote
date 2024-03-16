@@ -163,7 +163,11 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
 
         // Populate pairwise cipher suites if present.
         if (!std::empty(ieee80211AccessPointConfiguration->PairwiseCipherSuites)) {
-            // TODO
+            auto dot11PairwiseCipherSuites = ToDot11CipherSuiteConfigurations(ieee80211AccessPointConfiguration->PairwiseCipherSuites);
+            *dot11AccessPointConfiguration.mutable_pairwiseciphersuites() = {
+                std::make_move_iterator(std::begin(dot11PairwiseCipherSuites)),
+                std::make_move_iterator(std::end(dot11PairwiseCipherSuites))
+            };
         }
 
         // Populate authentication algorithms if present.

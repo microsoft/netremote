@@ -522,6 +522,28 @@ ToDot11CipherSuiteConfigurations(const google::protobuf::RepeatedPtrField<Dot11C
     return dot11CipherSuiteConfigurationsStrong;
 }
 
+std::vector<Dot11CipherSuiteConfiguration>
+ToDot11CipherSuiteConfigurations(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuiteConfigurations) noexcept
+{
+    std::vector<Dot11CipherSuiteConfiguration> dot11CipherSuiteConfigurations(std::size(ieee80211CipherSuiteConfigurations));
+
+    std::ranges::transform(ieee80211CipherSuiteConfigurations, std::begin(dot11CipherSuiteConfigurations), [](const auto& ieee80211CipherSuiteConfiguration) {
+        const auto dot11SecurityProtocol = ToDot11SecurityProtocol(ieee80211CipherSuiteConfiguration.first);
+        std::vector<Dot11CipherSuite> dot11CipherSuites(std::size(ieee80211CipherSuiteConfiguration.second));
+        std::ranges::transform(ieee80211CipherSuiteConfiguration.second, std::begin(dot11CipherSuites), ToDot11CipherSuite);
+
+        Dot11CipherSuiteConfiguration dot11CipherSuiteConfiguration{};
+        dot11CipherSuiteConfiguration.set_securityprotocol(dot11SecurityProtocol);
+        *dot11CipherSuiteConfiguration.mutable_ciphersuites() = {
+            std::make_move_iterator(std::begin(dot11CipherSuites)),
+            std::make_move_iterator(std::end(dot11CipherSuites))
+        };
+        return dot11CipherSuiteConfiguration;
+    });
+
+    return dot11CipherSuiteConfigurations;
+}
+
 std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>
 FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>& dot11CipherSuiteConfigurations) noexcept
 {
