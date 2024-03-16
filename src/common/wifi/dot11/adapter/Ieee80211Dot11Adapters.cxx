@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <cstdlib>
 #include <iterator>
 #include <ranges>
 #include <unordered_map>
@@ -15,7 +16,6 @@
 namespace Microsoft::Net::Wifi
 {
 using Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatusCode;
-using Microsoft::Net::Wifi::AccessPointOperationStatusCode;
 
 WifiAccessPointOperationStatusCode
 ToDot11AccessPointOperationStatusCode(AccessPointOperationStatusCode& accessPointOperationStatusCode) noexcept
@@ -61,9 +61,6 @@ FromDot11AccessPointOperationStatusCode(WifiAccessPointOperationStatusCode wifiA
     }
 }
 
-using Microsoft::Net::Wifi::Dot11SecurityProtocol;
-using Microsoft::Net::Wifi::Ieee80211SecurityProtocol;
-
 Dot11SecurityProtocol
 ToDot11SecurityProtocol(Ieee80211SecurityProtocol ieee80211SecurityProtocol) noexcept
 {
@@ -97,9 +94,6 @@ FromDot11SecurityProtocol(Dot11SecurityProtocol dot11SecurityProtocol) noexcept
         return Ieee80211SecurityProtocol::Unknown;
     }
 }
-
-using Microsoft::Net::Wifi::Dot11PhyType;
-using Microsoft::Net::Wifi::Ieee80211PhyType;
 
 Dot11PhyType
 ToDot11PhyType(const Ieee80211PhyType ieee80211PhyType) noexcept
@@ -152,9 +146,6 @@ FromDot11PhyType(const Dot11PhyType dot11PhyType) noexcept
         return Ieee80211PhyType::Unknown;
     }
 }
-
-using Microsoft::Net::Wifi::Dot11FrequencyBand;
-using Microsoft::Net::Wifi::Ieee80211FrequencyBand;
 
 Dot11FrequencyBand
 ToDot11FrequencyBand(const Ieee80211FrequencyBand ieee80211FrequencyBand) noexcept
@@ -265,9 +256,6 @@ FromDot11SetFrequencyBandsRequest(const WifiAccessPointSetFrequencyBandsRequest&
     return ieee80211FrequencyBands;
 }
 
-using Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm;
-using Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm;
-
 Dot11AuthenticationAlgorithm
 ToDot11AuthenticationAlgorithm(const Ieee80211AuthenticationAlgorithm ieee80211AuthenticationAlgorithm) noexcept
 {
@@ -328,9 +316,6 @@ FromDot11AuthenticationAlgorithm(const Dot11AuthenticationAlgorithm dot11Authent
         return Ieee80211AuthenticationAlgorithm::Unknown;
     }
 }
-
-using Microsoft::Net::Wifi::Dot11AkmSuite;
-using Microsoft::Net::Wifi::Ieee80211AkmSuite;
 
 Dot11AkmSuite
 ToDot11AkmSuite(const Ieee80211AkmSuite ieee80211AkmSuite) noexcept
@@ -433,9 +418,6 @@ FromDot11AkmSuite(const Dot11AkmSuite dot11AkmSuite) noexcept
         return Ieee80211AkmSuite::Reserved0; // FIXME: this needs to be an invalid value instead
     }
 }
-
-using Microsoft::Net::Wifi::Dot11CipherSuite;
-using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
 Dot11CipherSuite
 ToDot11CipherSuite(const Ieee80211CipherSuite ieee80211CipherSuite) noexcept
@@ -558,9 +540,6 @@ FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtoco
 
     return ieee80211CipherSuiteConfigurations;
 }
-
-using Microsoft::Net::Wifi::Dot11AccessPointCapabilities;
-using Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities;
 
 Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept
