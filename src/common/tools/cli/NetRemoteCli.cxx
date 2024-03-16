@@ -113,6 +113,8 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
         OnWifiAccessPointEnable();
     });
 
+    cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
+
     return cliAppWifiAccessPointEnable;
 }
 
