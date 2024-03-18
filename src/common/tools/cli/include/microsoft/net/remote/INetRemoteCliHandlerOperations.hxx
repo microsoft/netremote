@@ -35,9 +35,11 @@ struct INetRemoteCliHandlerOperations
 
     /**
      * @brief Enumerate available WiFi access points.
+     *
+     * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     virtual void
-    WifiEnumerateAccessPoints() = 0;
+    WifiEnumerateAccessPoints(bool detailedOutput) = 0;
 
     /**
      * @brief Enable the specified WiFi access point.

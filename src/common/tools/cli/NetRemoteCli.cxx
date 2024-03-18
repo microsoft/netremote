@@ -96,9 +96,10 @@ CLI::App*
 NetRemoteCli::AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent)
 {
     auto* cliAppWifiEnumerateAccessPoints = parent->add_subcommand("enumerate-access-points", "Enumerate available Wi-Fi access points");
+    cliAppWifiEnumerateAccessPoints->add_flag("--detailed", m_cliData->DetailedOutput, "Show detailed information about each access point");
     cliAppWifiEnumerateAccessPoints->alias("enumaps");
     cliAppWifiEnumerateAccessPoints->callback([this] {
-        OnWifiEnumerateAccessPoints();
+        OnWifiEnumerateAccessPoints(m_cliData->DetailedOutput.value_or(false));
     });
 
     return cliAppWifiEnumerateAccessPoints;
@@ -155,9 +156,9 @@ NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 }
 
 void
-NetRemoteCli::OnWifiEnumerateAccessPoints()
+NetRemoteCli::OnWifiEnumerateAccessPoints(bool detailedOutput)
 {
-    m_cliHandler->HandleCommandWifiEnumerateAccessPoints();
+    m_cliHandler->HandleCommandWifiEnumerateAccessPoints(detailedOutput);
 }
 
 void

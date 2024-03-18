@@ -62,9 +62,11 @@ struct NetRemoteCliHandler
 
     /**
      * @brief Handle a command request to enumerate available Wi-Fi access points.
+     *
+     * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    HandleCommandWifiEnumerateAccessPoints();
+    HandleCommandWifiEnumerateAccessPoints(bool detailedOutput);
 
     /**
      * @brief Handle a command to enable a Wi-Fi access point.
