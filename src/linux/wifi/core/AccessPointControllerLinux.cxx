@@ -16,6 +16,7 @@
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/nl80211/Ieee80211Nl80211Adapters.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
@@ -26,7 +27,6 @@
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <plog/Severity.h>
 
-#include "Ieee80211Nl80211Adapters.hxx"
 #include "Ieee80211WpaAdapters.hxx"
 
 using namespace Microsoft::Net::Wifi;
@@ -69,6 +69,10 @@ AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ie
     // Convert cipher suites.
     capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
     std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), Nl80211CipherSuiteToIeee80211CipherSuite);
+
+    // Convert security types.
+    capabilities.SecurityProtocols = std::vector<Ieee80211SecurityProtocol>(std::size(wiphy->WpaVersions));
+    std::ranges::transform(wiphy->WpaVersions, std::begin(capabilities.SecurityProtocols), Nl80211WpaVersionToIeee80211SecurityProtocol);
 
     ieee80211AccessPointCapabilities = std::move(capabilities);
 

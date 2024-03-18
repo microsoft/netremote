@@ -32,6 +32,7 @@ struct Nl80211Wiphy
     std::vector<uint32_t> CipherSuites;
     std::unordered_map<nl80211_band, Nl80211WiphyBand> Bands;
     std::vector<nl80211_iftype> SupportedInterfaceTypes;
+    std::vector<nl80211_wpa_versions> WpaVersions;
     bool SupportsRoaming;
 
     /**
@@ -76,9 +77,15 @@ private:
      * @brief Construct a new Nl80211Wiphy object.
      *
      * @param index The wiphy index.
-     * @param name The wiphy name.
+     * @param name The wiphy (interface) name.
+     * @param akmSuites The supported AKM suites.
+     * @param cipherSuites The supported cipher suites.
+     * @param bands The supported frequency bands.
+     * @param supportedInterfaceTypes The supported interface types.
+     * @param wpaVersions The supported WPA versions (security protocols).
+     * @param supportsRoaming Whether roaming is supported.
      */
-    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept;
+    Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, std::vector<nl80211_wpa_versions> wpaVersions, bool supportsRoaming) noexcept;
 
     /**
      * @brief Creates a new Nl80211Wiphy object, using the specified function to add an identifier to the message,

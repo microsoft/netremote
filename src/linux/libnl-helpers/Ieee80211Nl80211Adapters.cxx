@@ -7,20 +7,34 @@
 #include <string_view>
 #include <vector>
 
-#include <Wpa/ProtocolHostapd.hxx>
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/nl80211/Ieee80211Nl80211Adapters.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
-#include <plog/Log.h>
 
-#include "Ieee80211Nl80211Adapters.hxx"
+#include <plog/Log.h>
 
 using Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy;
 
 namespace Microsoft::Net::Wifi
 {
+Ieee80211SecurityProtocol
+Nl80211WpaVersionToIeee80211SecurityProtocol(nl80211_wpa_versions nl80211WpaVersion) noexcept
+{
+    switch (nl80211WpaVersion) {
+    case NL80211_WPA_VERSION_1:
+        return Ieee80211SecurityProtocol::Wpa;
+    case NL80211_WPA_VERSION_2:
+        return Ieee80211SecurityProtocol::Wpa2;
+    case NL80211_WPA_VERSION_3:
+        return Ieee80211SecurityProtocol::Wpa3;
+    default:
+        return Ieee80211SecurityProtocol::Unknown;
+    }
+}
+
 Ieee80211CipherSuite
 Nl80211CipherSuiteToIeee80211CipherSuite(uint32_t nl80211CipherSuite) noexcept
 {

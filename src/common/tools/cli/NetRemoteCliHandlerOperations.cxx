@@ -52,12 +52,15 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
     for (const auto& securityProtocol : accessPointCapabilities.securityprotocols()) {
         std::string_view securityProtocolName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11SecurityProtocol>(securityProtocol)));
         securityProtocolName.remove_prefix(SecurityProtocolPrefixLength);
-        ss << '\n'
-           << indent1 << securityProtocolName;
+        if (securityProtocol != accessPointCapabilities.securityprotocols()[0]) {
+            ss << ' ';
+        }
+        ss << securityProtocolName;
     }
 
     constexpr auto PhyTypePrefixLength = std::size(std::string_view("Dot11PhyType"));
-    ss << indent0
+    ss << '\n'
+       << indent0
        << "Phy Types: ";
     for (const auto& phyType : accessPointCapabilities.phytypes()) {
         std::string_view phyTypeName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11PhyType>(phyType)));
