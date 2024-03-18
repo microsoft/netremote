@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <cstddef>
@@ -7,6 +8,8 @@
 #include <format>
 #include <functional>
 #include <optional>
+#include <ranges>
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -19,6 +22,7 @@
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
+#include <microsoft/net/netlink/nl80211/Ieee80211Nl80211Adapters.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
@@ -36,6 +40,8 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
+using Microsoft::Net::Wifi::Ieee80211AkmSuite;
+using Microsoft::Net::Wifi::Ieee80211CipherSuite;
 
 Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, std::vector<nl80211_wpa_versions> wpaVersions, bool supportsRoaming) noexcept :
     Index(index),
@@ -72,6 +78,69 @@ HandleNl80211GetWiphyResponse(struct nl_msg *nl80211Message, void *context) noex
     LOGD << std::format("Successfully parsed an nl80211 wiphy:\n{}", nl80211WiphyResult->ToString());
 
     return NL_OK;
+}
+
+using Microsoft::Net::Wifi::Nl80211WpaVersionToIeee80211SecurityProtocol;
+
+/**
+ * @brief Determine if the given WPA version is supported by the given cipher suites.
+ *
+ * @param wpaVersion The WPA version to check.
+ * @param cipherSuites The cipher suites to check.
+ * @return true If the cipher suites support the WPA version.
+ * @return false It the cipher suites do not support the WPA version.
+ */
+bool
+IsWpaVersionSupportedByCipherSuites(nl80211_wpa_versions wpaVersion, std::span<uint32_t> cipherSuites)
+{
+    constexpr auto toIeee80211CipherSuite = [](uint32_t nl80211CipherSuite) noexcept -> Ieee80211CipherSuite {
+        return static_cast<Ieee80211CipherSuite>(nl80211CipherSuite);
+    };
+
+    const auto ieee80211SecurityProtocol = Nl80211WpaVersionToIeee80211SecurityProtocol(wpaVersion);
+    const auto ieee80211CipherSuites = cipherSuites | std::views::transform(toIeee80211CipherSuite);
+    const auto ieee80211CipherSuitesForWpa = WpaCipherSuites(ieee80211SecurityProtocol);
+    const auto isWpaVersionSupported = std::ranges::find_first_of(ieee80211CipherSuites, ieee80211CipherSuitesForWpa) != std::ranges::end(ieee80211CipherSuites);
+
+    return isWpaVersionSupported;
+}
+
+/**
+ * @brief Determine if the given WPA version is supported by the given AKM suites.
+ *
+ * @param wpaVersion The WPA version to check.
+ * @param akmSuites The AKM suites to check.
+ * @return true If the AKM suites support the WPA version.
+ * @return false If the AKM suites do not support the WPA version.
+ */
+bool
+IsWpaVersionSupportedByAkmSuites(nl80211_wpa_versions wpaVersion, std::span<uint32_t> akmSuites)
+{
+    constexpr auto toIeee80211AkmSuite = [](uint32_t nl80211AkmSuite) noexcept -> Ieee80211AkmSuite {
+        return static_cast<Ieee80211AkmSuite>(nl80211AkmSuite);
+    };
+
+    const auto ieee80211SecurityProtocol = Nl80211WpaVersionToIeee80211SecurityProtocol(wpaVersion);
+    const auto ieee80211AkmSuites = akmSuites | std::views::transform(toIeee80211AkmSuite);
+    const auto ieee80211AkmSuitesForWpa = WpaAkmSuites(ieee80211SecurityProtocol);
+    const auto isWpaVersionSupported = std::ranges::find_first_of(ieee80211AkmSuites, ieee80211AkmSuitesForWpa) != std::ranges::end(ieee80211AkmSuites);
+
+    return isWpaVersionSupported;
+}
+
+/**
+ * @brief Determine if the given WPA version is supported by the given cipher suites and AKM suites.
+ *
+ * @param wpaVersion The WPA version to check.
+ * @param cipherSuites The cipher suites to check.
+ * @param akmSuites The AKM suites to check.
+ * @return true If the cipher suites and AKM suites support the WPA version.
+ * @return false If the cipher suites and AKM suites do not support the WPA version.
+ */
+bool
+IsWpaVersionSupported(nl80211_wpa_versions wpaVersion, std::span<uint32_t> cipherSuites, std::span<uint32_t> akmSuites)
+{
+    return IsWpaVersionSupportedByCipherSuites(wpaVersion, cipherSuites) && IsWpaVersionSupportedByAkmSuites(wpaVersion, akmSuites);
 }
 } // namespace detail
 
@@ -250,6 +319,15 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     // the attribute value using a pure nl80211 attribute query. So, populate the values heuristically here based on
     // ciphers+akms supported that are exclusive to each version.
     std::vector<nl80211_wpa_versions> wpaVersions{};
+    if (detail::IsWpaVersionSupported(nl80211_wpa_versions::NL80211_WPA_VERSION_1, cipherSuites, akmSuites)) {
+        wpaVersions.emplace_back(nl80211_wpa_versions::NL80211_WPA_VERSION_1);
+    }
+    if (detail::IsWpaVersionSupported(nl80211_wpa_versions::NL80211_WPA_VERSION_2, cipherSuites, akmSuites)) {
+        wpaVersions.emplace_back(nl80211_wpa_versions::NL80211_WPA_VERSION_2);
+    }
+    if (detail::IsWpaVersionSupported(nl80211_wpa_versions::NL80211_WPA_VERSION_3, cipherSuites, akmSuites)) {
+        wpaVersions.emplace_back(nl80211_wpa_versions::NL80211_WPA_VERSION_3);
+    }
 
     Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(akmSuites), std::move(cipherSuites), std::move(wiphyBandMap), std::move(supportedInterfaceTypes), std::move(wpaVersions), wiphySupportsRoaming };
     return nl80211Wiphy;
@@ -263,7 +341,15 @@ Nl80211Wiphy::ToString() const
     ss << std::format("Wiphy {} [{}]\n", Name, Index);
     ss << std::format(" Supports roaming: {}\n", SupportsRoaming);
 
-    ss << " Cipher Suites:\n  ";
+    constexpr auto WpaVersionPrefixLength = std::size(std::string_view("NL80211_WPA_VERSION_"));
+    ss << " WPA Versions:\n  ";
+    for (const auto &wpaVersion : WpaVersions) {
+        std::string_view wpaVersionName{ magic_enum::enum_name(wpaVersion) };
+        wpaVersionName.remove_prefix(WpaVersionPrefixLength);
+        ss << std::format("{} ", wpaVersionName);
+    }
+
+    ss << "\n Cipher Suites:\n  ";
     for (const auto &cipherSuite : CipherSuites) {
         ss << std::format("{} ", Nl80211CipherSuiteToString(cipherSuite));
     }
