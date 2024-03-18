@@ -70,6 +70,10 @@ AccessPointControllerLinux::GetCapabilities(Ieee80211AccessPointCapabilities& ie
     capabilities.CipherSuites = std::vector<Ieee80211CipherSuite>(std::size(wiphy->CipherSuites));
     std::ranges::transform(wiphy->CipherSuites, std::begin(capabilities.CipherSuites), Nl80211CipherSuiteToIeee80211CipherSuite);
 
+    // Convert security types.
+    capabilities.SecurityProtocols = std::vector<Ieee80211SecurityProtocol>(std::size(wiphy->WpaVersions));
+    std::ranges::transform(wiphy->WpaVersions, std::begin(capabilities.SecurityProtocols), Nl80211WpaVersionToIeee80211SecurityProtocol);
+
     ieee80211AccessPointCapabilities = std::move(capabilities);
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
