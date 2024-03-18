@@ -36,13 +36,15 @@
 
 using namespace Microsoft::Net::Netlink::Nl80211;
 
-Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, bool supportsRoaming) noexcept :
+
+Nl80211Wiphy::Nl80211Wiphy(uint32_t index, std::string_view name, std::vector<uint32_t> akmSuites, std::vector<uint32_t> cipherSuites, std::unordered_map<nl80211_band, Nl80211WiphyBand> bands, std::vector<nl80211_iftype> supportedInterfaceTypes, std::vector<nl80211_wpa_versions> wpaVersions, bool supportsRoaming) noexcept :
     Index(index),
     Name(name),
     AkmSuites(std::move(akmSuites)),
     CipherSuites(std::move(cipherSuites)),
     Bands(std::move(bands)),
     SupportedInterfaceTypes(std::move(supportedInterfaceTypes)),
+    WpaVersions(std::move(wpaVersions)),
     SupportsRoaming(supportsRoaming)
 {
 }
@@ -243,7 +245,13 @@ Nl80211Wiphy::Parse(struct nl_msg *nl80211Message) noexcept
     // Process roaming support.
     auto wiphySupportsRoaming = wiphyAttributes[NL80211_ATTR_ROAM_SUPPORT] != nullptr;
 
-    Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(akmSuites), std::move(cipherSuites), std::move(wiphyBandMap), std::move(supportedInterfaceTypes), wiphySupportsRoaming };
+    // Process security protocol support.
+    // Note: The NL80211_ATTR_WPA_VERSIONS attribute technically describes this perfectly, but there is no way to obtain
+    // the attribute value using a pure nl80211 attribute query. So, populate the values heuristically here based on
+    // ciphers+akms supported that are exclusive to each version.
+    std::vector<nl80211_wpa_versions> wpaVersions{};
+
+    Nl80211Wiphy nl80211Wiphy{ wiphyIndex, wiphyName, std::move(akmSuites), std::move(cipherSuites), std::move(wiphyBandMap), std::move(supportedInterfaceTypes), std::move(wpaVersions), wiphySupportsRoaming };
     return nl80211Wiphy;
 }
 
