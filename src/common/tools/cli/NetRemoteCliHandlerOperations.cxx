@@ -57,7 +57,8 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
     }
 
     constexpr auto PhyTypePrefixLength = std::size(std::string_view("Dot11PhyType"));
-    ss << indent0
+    ss << '\n'
+       << indent0
        << "Phy Types: ";
     for (const auto& phyType : accessPointCapabilities.phytypes()) {
         std::string_view phyTypeName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11PhyType>(phyType)));
