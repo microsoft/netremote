@@ -9,8 +9,6 @@ target_sources(wifi-core-linux
     PRIVATE
         AccessPointControllerLinux.cxx
         AccessPointLinux.cxx
-        Ieee80211Nl80211Adapters.cxx
-        Ieee80211Nl80211Adapters.hxx
         Ieee80211WpaAdapters.cxx
         Ieee80211WpaAdapters.hxx
     PUBLIC

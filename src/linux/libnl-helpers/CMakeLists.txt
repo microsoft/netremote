@@ -7,6 +7,7 @@ set(LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX ${LIBNL_HELPERS_PUBLIC_INCLUDE}/${LIBNL_
 
 target_sources(libnl-helpers
     PRIVATE
+        Ieee80211Nl80211Adapters.cxx
         Netlink80211.cxx
         Netlink80211Interface.cxx
         NetlinkException.cxx
@@ -22,9 +23,10 @@ target_sources(libnl-helpers
     BASE_DIRS ${LIBNL_HELPERS_PUBLIC_INCLUDE}
     FILES
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkErrorCategory.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkException.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
-        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkException.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Ieee80211Nl80211Adapters.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Interface.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211ProtocolState.hxx

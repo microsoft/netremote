@@ -7,13 +7,21 @@
 #include <string_view>
 #include <vector>
 
-#include <Wpa/ProtocolHostapd.hxx>
 #include <linux/nl80211.h>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Wifi
 {
+/**
+ * @brief Convert the specific nl80211 wpa version to the equivalent Ieee80211SecurityProtocol.
+ *
+ * @param nl80211WpaVersion The nl80211 wpa version to convert.
+ * @return Ieee80211SecurityProtocol
+ */
+Ieee80211SecurityProtocol
+Nl80211WpaVersionToIeee80211SecurityProtocol(nl80211_wpa_versions nl80211WpaVersion) noexcept;
+
 /**
  * @brief Convert the specified nl80211 cipher suite value to the equivalent Ieee80211CipherSuite.
  *

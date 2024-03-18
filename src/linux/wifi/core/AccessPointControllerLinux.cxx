@@ -16,6 +16,7 @@
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <magic_enum.hpp>
+#include <microsoft/net/netlink/nl80211/Ieee80211Nl80211Adapters.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
@@ -26,7 +27,6 @@
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <plog/Severity.h>
 
-#include "Ieee80211Nl80211Adapters.hxx"
 #include "Ieee80211WpaAdapters.hxx"
 
 using namespace Microsoft::Net::Wifi;
