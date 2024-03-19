@@ -50,6 +50,15 @@ private:
      */
     grpc::ServerBidiReactor<Microsoft::Net::Remote::DataStream::DataStreamUploadData, Microsoft::Net::Remote::DataStream::DataStreamDownloadData>*
     DataStreamBidirectional(grpc::CallbackServerContext* context) override;
+
+    /**
+     * @brief Allows the client to ping the server for availability.
+     *
+     * @param context
+     * @return grpc::ServerUnaryReactor*
+     */
+    grpc::ServerUnaryReactor*
+    DataStreamPing(grpc::CallbackServerContext* context, const google::protobuf::Empty* request, google::protobuf::Empty* response) override;
 };
 } // namespace Microsoft::Net::Remote::Service
 
