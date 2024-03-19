@@ -1,11 +1,13 @@
 
 #include <format>
+#include <map>
 #include <memory>
 #include <string>
 #include <utility>
 
 #include <CLI/App.hpp>
 #include <CLI/Error.hpp>
+#include <CLI/Validators.hpp>
 #include <microsoft/net/remote/NetRemoteCli.hxx>
 #include <microsoft/net/remote/NetRemoteCliData.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
@@ -109,6 +111,15 @@ NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
 CLI::App*
 NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
 {
+    const std::map<std::string, Ieee80211PhyType> Ieee80211PhyTypeNames{
+        { "a", Ieee80211PhyType::A },
+        { "b", Ieee80211PhyType::B },
+        { "g", Ieee80211PhyType::G },
+        { "n", Ieee80211PhyType::N },
+        { "ac", Ieee80211PhyType::AC },
+        { "ax", Ieee80211PhyType::AX },
+    };
+
     auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
     cliAppWifiAccessPointEnable->alias("ap-enable");
     cliAppWifiAccessPointEnable->callback([this] {
