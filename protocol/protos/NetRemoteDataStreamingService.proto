@@ -3,6 +3,8 @@ syntax = "proto3";
 
 package Microsoft.Net.Remote.Service;
 
+import "google/protobuf/empty.proto";
+
 import "NetRemote.proto";
 import "NetRemoteDataStream.proto";
 
@@ -11,4 +13,5 @@ service NetRemoteDataStreaming
     rpc DataStreamUpload (stream Microsoft.Net.Remote.DataStream.DataStreamUploadData) returns (Microsoft.Net.Remote.DataStream.DataStreamUploadResult);
     rpc DataStreamDownload (Microsoft.Net.Remote.DataStream.DataStreamDownloadRequest) returns (stream Microsoft.Net.Remote.DataStream.DataStreamDownloadData);
     rpc DataStreamBidirectional (stream Microsoft.Net.Remote.DataStream.DataStreamUploadData) returns (stream Microsoft.Net.Remote.DataStream.DataStreamDownloadData);
+    rpc DataStreamPing (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
