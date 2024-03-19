@@ -45,7 +45,12 @@ Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, u
 std::string
 Nl80211Interface::ToString() const
 {
-    return std::format("[{}/{}] {} {}", Index, WiphyIndex, Name, magic_enum::enum_name(Type));
+    static constexpr auto InterfaceTypePrefixLength{ std::size(std::string_view("NL80211_IFTYPE_")) };
+
+    auto interfaceType = std::string_view{ magic_enum::enum_name(Type) };
+    interfaceType.remove_prefix(InterfaceTypePrefixLength);
+
+    return std::format("[{}/{}] {} {}", Index, WiphyIndex, Name, interfaceType);
 }
 
 /* static */
@@ -190,7 +195,10 @@ Nl80211Interface::IsAccessPoint() const noexcept
 bool
 Nl80211Interface::SupportsAccessPointMode() const noexcept
 {
-    return std::ranges::find_first_of(SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes) != std::cend(SupportedInterfaceTypes);
+    auto result = std::ranges::find_first_of(SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes);
+    auto isSupported = result != std::cend(SupportedInterfaceTypes);
+    return isSupported;
+    // return std::ranges::find_first_of(SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes) != std::cend(SupportedInterfaceTypes);
 }
 
 // NOLINTEND(concurrency-mt-unsafe)
