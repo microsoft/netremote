@@ -8,7 +8,7 @@ import "NetRemoteWifi.proto";
 
 service NetRemote
 {
-    rpc WifiEnumerateAccessPoints (Microsoft.Net.Remote.Wifi.WifiEnumerateAccessPointsRequest) returns (Microsoft.Net.Remote.Wifi.WifiEnumerateAccessPointsResult);
+    rpc WifiAccessPointsEnumerate (Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateResult);
     rpc WifiAccessPointEnable (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableResult);
     rpc WifiAccessPointDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableResult);
     rpc WifiAccessPointSetPhyType (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeResult);

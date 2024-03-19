@@ -244,13 +244,13 @@ NetRemoteAccessPointCapabilitiesToString(const Dot11AccessPointCapabilities& acc
 } // namespace detail
 
 void
-NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints(bool detailedOutput)
+NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)
 {
-    const WifiEnumerateAccessPointsRequest request{};
-    WifiEnumerateAccessPointsResult result{};
+    const WifiAccessPointsEnumerateRequest request{};
+    WifiAccessPointsEnumerateResult result{};
     grpc::ClientContext clientContext{};
 
-    auto status = m_connection->Client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+    auto status = m_connection->Client->WifiAccessPointsEnumerate(&clientContext, request, &result);
     if (!status.ok()) {
         LOGE << std::format("Failed to enumerate WiFi access points, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
         return;
@@ -275,7 +275,7 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints(bool detailedOutput)
 }
 
 void
-NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
+NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
 {
     WifiAccessPointEnableRequest request{};
     WifiAccessPointEnableResult result{};
@@ -284,7 +284,7 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
     request.set_accesspointid(std::string(accessPointId));
 
     // Populate access point configuration if present.
-    if (ieee80211AccessPointConfiguration.has_value()) {
+    if (ieee80211AccessPointConfiguration != nullptr) {
         auto& dot11AccessPointConfiguration = *request.mutable_configuration();
 
         // Populate SSID if present.

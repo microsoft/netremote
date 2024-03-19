@@ -32,7 +32,7 @@ constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee8021
 
 using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
+TEST_CASE("WifiAccessPointsEnumerate API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
@@ -54,12 +54,12 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        const WifiEnumerateAccessPointsRequest request{};
+        const WifiAccessPointsEnumerateRequest request{};
 
-        WifiEnumerateAccessPointsResult result{};
+        WifiAccessPointsEnumerateResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+        auto status = client->WifiAccessPointsEnumerate(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE_NOTHROW([&] {
             [[maybe_unused]] const auto& accessPoints = result.accesspoints();
@@ -68,12 +68,12 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     SECTION("Initial enablement status is disabled")
     {
-        const WifiEnumerateAccessPointsRequest request{};
+        const WifiAccessPointsEnumerateRequest request{};
 
-        WifiEnumerateAccessPointsResult result{};
+        WifiAccessPointsEnumerateResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+        auto status = client->WifiAccessPointsEnumerate(&clientContext, request, &result);
         REQUIRE(status.ok());
 
         for (const auto& accessPoint : result.accesspoints()) {

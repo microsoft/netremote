@@ -6,20 +6,20 @@ package Microsoft.Net.Remote.Wifi;
 import "google/protobuf/any.proto";
 import "WifiCore.proto";
 
-message WifiEnumerateAccessPointsResultItem
+message WifiAccessPointsEnumerateResultItem
 {
     string AccessPointId = 1;
     Microsoft.Net.Wifi.Dot11AccessPointCapabilities Capabilities = 2;
     bool IsEnabled = 3;
 }
 
-message WifiEnumerateAccessPointsRequest
+message WifiAccessPointsEnumerateRequest
 {
 }
 
-message WifiEnumerateAccessPointsResult
+message WifiAccessPointsEnumerateResult
 {
-    repeated Microsoft.Net.Remote.Wifi.WifiEnumerateAccessPointsResultItem AccessPoints = 1;
+    repeated Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateResultItem AccessPoints = 1;
 }
 
 enum WifiAccessPointOperationStatusCode

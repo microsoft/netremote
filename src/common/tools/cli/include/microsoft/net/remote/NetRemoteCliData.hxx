@@ -5,7 +5,6 @@
 #include <optional>
 #include <string>
 
-#include <microsoft/net/remote/NetRemoteClient.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 
 namespace Microsoft::Net::Remote
@@ -19,7 +18,6 @@ struct NetRemoteCli;
 struct NetRemoteCliData
 {
     std::string ServerAddress{ Protocol::NetRemoteProtocol::AddressDefault };
-    NetRemoteCommandId Command{ NetRemoteCommandId::None };
     std::optional<bool> DetailedOutput;
 
     std::string WifiAccessPointId{};

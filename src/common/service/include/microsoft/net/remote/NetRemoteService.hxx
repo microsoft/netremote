@@ -49,7 +49,7 @@ private:
      * @return grpc::Status
      */
     grpc::Status
-    WifiEnumerateAccessPoints(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsRequest* request, Microsoft::Net::Remote::Wifi::WifiEnumerateAccessPointsResult* response) override;
+    WifiAccessPointsEnumerate(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointsEnumerateRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointsEnumerateResult* response) override;
 
     /**
      * @brief Enable an access point. This brings the access point online, making it available for use by clients.
