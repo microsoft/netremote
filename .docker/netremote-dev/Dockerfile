@@ -30,8 +30,8 @@ LABEL org.label-schema.schema-version = "1.0"
 # 4. Install other development dependencies and helpful tools:
 # sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
 #
-# 5. Install hostapd development dependencies:
-# sudo apt install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
+# 5. Install hostapd development dependencies and tools:
+# sudo apt install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc iw
 #
 
 # Install packages.
@@ -166,6 +166,8 @@ RUN apt-get $APT_ARGS_COMMON update && \
         policycoreutils-python-utils \
         python-is-python3 \
         vim \
+        # Wireless tools.
+        iw \
         && \
     # Reduce image size by removing package cache.
     apt-get -yqq clean && \
