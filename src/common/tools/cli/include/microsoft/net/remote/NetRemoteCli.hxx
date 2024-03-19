@@ -8,6 +8,7 @@
 #include <microsoft/net/remote/NetRemoteCliData.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -130,9 +131,11 @@ private:
 
     /**
      * @brief Handle the 'wifi ap-enable' command.
+     *
+     * @param ieee80211AccessPointConfiguration Optional configuration for the access point to enable.
      */
     void
-    OnWifiAccessPointEnable();
+    OnWifiAccessPointEnable(const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
 
     /**
      * @brief Handle the 'wifi ap-disable' command.

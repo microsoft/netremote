@@ -1,6 +1,5 @@
 
 #include <memory>
-#include <optional>
 #include <string_view>
 #include <utility>
 
@@ -12,6 +11,7 @@
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Wifi;
 
 NetRemoteCliHandler::NetRemoteCliHandler(std::unique_ptr<INetRemoteCliHandlerOperationsFactory> operationsFactory) :
     m_operationsFactory(std::move(operationsFactory))
@@ -55,10 +55,8 @@ NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints(bool detailedOutput)
     m_operations->WifiEnumerateAccessPoints(detailedOutput);
 }
 
-using Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration;
-
 void
-NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const std::optional<Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
+NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
 {
     if (!m_operations) {
         LOGE << "No operations instance available to handle command";

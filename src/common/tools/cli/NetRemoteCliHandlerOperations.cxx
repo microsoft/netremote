@@ -275,7 +275,7 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints(bool detailedOutput)
 }
 
 void
-NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
+NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
 {
     WifiAccessPointEnableRequest request{};
     WifiAccessPointEnableResult result{};
@@ -284,7 +284,7 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
     request.set_accesspointid(std::string(accessPointId));
 
     // Populate access point configuration if present.
-    if (ieee80211AccessPointConfiguration.has_value()) {
+    if (ieee80211AccessPointConfiguration != nullptr) {
         auto& dot11AccessPointConfiguration = *request.mutable_configuration();
 
         // Populate SSID if present.

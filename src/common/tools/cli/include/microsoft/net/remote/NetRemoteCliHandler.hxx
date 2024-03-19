@@ -3,7 +3,6 @@
 #define NET_REMOTE_CLI_HANDLER_HXX
 
 #include <memory>
-#include <optional>
 #include <string_view>
 
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
@@ -75,7 +74,7 @@ struct NetRemoteCliHandler
      * @param ieee80211AccessPointConfiguration The optional configuration to apply to the access point.
      */
     void
-    HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration = std::nullopt);
+    HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
 
     /**
      * @brief Handle a command to disable a Wi-Fi access point.

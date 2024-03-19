@@ -15,6 +15,7 @@
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Wifi;
 
 NetRemoteCli::NetRemoteCli(std::shared_ptr<NetRemoteCliData> cliData, std::shared_ptr<NetRemoteCliHandler> cliHandler) :
     m_cliData{ std::move(cliData) },
@@ -162,9 +163,9 @@ NetRemoteCli::OnWifiEnumerateAccessPoints(bool detailedOutput)
 }
 
 void
-NetRemoteCli::OnWifiAccessPointEnable()
+NetRemoteCli::OnWifiAccessPointEnable(const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
 {
-    m_cliHandler->HandleCommandWifiAccessPointEnable(m_cliData->WifiAccessPointId);
+    m_cliHandler->HandleCommandWifiAccessPointEnable(m_cliData->WifiAccessPointId, ieee80211AccessPointConfiguration);
 }
 
 void
