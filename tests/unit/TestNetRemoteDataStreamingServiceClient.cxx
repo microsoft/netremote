@@ -9,6 +9,8 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <google/protobuf/empty.pb.h>
+#include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/impl/codegen/status_code_enum.h>
@@ -245,10 +247,10 @@ TEST_CASE("DataStreamPing API", "[basic][rpc][client][remote][stream]")
     SECTION("Can be called")
     {
         grpc::ClientContext clientContext{};
-        google::protobuf::Empty request{};
+        const google::protobuf::Empty request{};
         google::protobuf::Empty response{};
 
-        grpc::Status status = client->DataStreamPing(&clientContext, request, &response);
+        const grpc::Status status = client->DataStreamPing(&clientContext, request, &response);
         REQUIRE(status.ok());
     }
 }
