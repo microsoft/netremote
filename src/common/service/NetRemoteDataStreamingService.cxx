@@ -1,6 +1,7 @@
 
 #include <memory>
 
+#include <google/protobuf/empty.pb.h>
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/server_callback.h>
 #include <microsoft/net/remote/NetRemoteDataStreamingService.hxx>
@@ -35,4 +36,15 @@ NetRemoteDataStreamingService::DataStreamBidirectional([[maybe_unused]] grpc::Ca
     const NetRemoteApiTrace traceMe{};
 
     return std::make_unique<Reactors::DataStreamReaderWriter>().release();
+}
+
+grpc::ServerUnaryReactor*
+NetRemoteDataStreamingService::DataStreamPing(grpc::CallbackServerContext* context, [[maybe_unused]] const google::protobuf::Empty* request, [[maybe_unused]] google::protobuf::Empty* response)
+{
+    const NetRemoteApiTrace traceMe{};
+
+    auto* reactor = context->DefaultReactor();
+    reactor->Finish(grpc::Status::OK);
+
+    return reactor;
 }

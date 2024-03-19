@@ -9,6 +9,8 @@
 #include <vector>
 
 #include <catch2/catch_test_macros.hpp>
+#include <google/protobuf/empty.pb.h>
+#include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/impl/codegen/status_code_enum.h>
@@ -220,5 +222,35 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
         REQUIRE(numberOfDataBlocksReceived > 0);
         REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
         REQUIRE(lostDataBlockSequenceNumbers.empty());
+    }
+}
+
+TEST_CASE("DataStreamPing API", "[basic][rpc][client][remote][stream]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::DataStream;
+    using namespace Microsoft::Net::Remote::Service;
+
+    using Microsoft::Net::Remote::Test::DataStreamReaderWriter;
+    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+
+    const NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemoteDataStreaming::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        grpc::ClientContext clientContext{};
+        const google::protobuf::Empty request{};
+        google::protobuf::Empty response{};
+
+        const grpc::Status status = client->DataStreamPing(&clientContext, request, &response);
+        REQUIRE(status.ok());
     }
 }
