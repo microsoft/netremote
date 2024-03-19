@@ -100,7 +100,7 @@ NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
 {
     auto* cliAppWifiAccessPointsEnumerate = parent->add_subcommand("enumerate-access-points", "Enumerate available Wi-Fi access points");
     cliAppWifiAccessPointsEnumerate->add_flag("--detailed", m_cliData->DetailedOutput, "Show detailed information about each access point");
-    cliAppWifiAccessPointsEnumerate->alias("enumaps");
+    cliAppWifiAccessPointsEnumerate->alias("enumaps")->alias("enum")->alias("aps");
     cliAppWifiAccessPointsEnumerate->callback([this] {
         OnWifiAccessPointsEnumerate(m_cliData->DetailedOutput.value_or(false));
     });
@@ -121,7 +121,7 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
     };
 
     auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
-    cliAppWifiAccessPointEnable->alias("ap-enable");
+    cliAppWifiAccessPointEnable->alias("ap-enable")->alias("enable")->alias("ap-en");
     cliAppWifiAccessPointEnable->callback([this] {
         Ieee80211AccessPointConfiguration ieee80211AccessPointConfiguration{};
         if (!std::empty(m_cliData->WifiAccessPointSsid)) {
@@ -146,7 +146,7 @@ CLI::App*
 NetRemoteCli::AddSubcommandWifiAccessPointDisable(CLI::App* parent)
 {
     auto* cliAppWifiAccessPointDisable = parent->add_subcommand("access-point-disable", "Disable a Wi-Fi access point");
-    cliAppWifiAccessPointDisable->alias("ap-disable");
+    cliAppWifiAccessPointDisable->alias("ap-disable")->alias("disable")->alias("ap-dis");
     cliAppWifiAccessPointDisable->callback([this] {
         OnWifiAccessPointDisable(m_cliData->WifiAccessPointId);
     });
