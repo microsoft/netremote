@@ -65,7 +65,7 @@ struct NetRemoteCliHandler
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    HandleCommandWifiEnumerateAccessPoints(bool detailedOutput);
+    HandleCommandWifiAccessPointsEnumerate(bool detailedOutput);
 
     /**
      * @brief Handle a command to enable a Wi-Fi access point.

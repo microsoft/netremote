@@ -86,7 +86,7 @@ NetRemoteCli::AddSubcommandWifi(CLI::App* parent)
     wifiApp->needs(m_cliAppServerAddress);
 
     // Sub-commands.
-    m_cliAppWifiEnumerateAccessPoints = AddSubcommandWifiEnumerateAccessPoints(wifiApp);
+    m_cliAppWifiAccessPointsEnumerate = AddSubcommandWifiAccessPointsEnumerate(wifiApp);
     m_cliAppWifiAccessPointEnable = AddSubcommandWifiAccessPointEnable(wifiApp);
     m_cliAppWifiAccessPointDisable = AddSubcommandWifiAccessPointDisable(wifiApp);
 
@@ -94,16 +94,16 @@ NetRemoteCli::AddSubcommandWifi(CLI::App* parent)
 }
 
 CLI::App*
-NetRemoteCli::AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent)
+NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
 {
-    auto* cliAppWifiEnumerateAccessPoints = parent->add_subcommand("enumerate-access-points", "Enumerate available Wi-Fi access points");
-    cliAppWifiEnumerateAccessPoints->add_flag("--detailed", m_cliData->DetailedOutput, "Show detailed information about each access point");
-    cliAppWifiEnumerateAccessPoints->alias("enumaps");
-    cliAppWifiEnumerateAccessPoints->callback([this] {
-        OnWifiEnumerateAccessPoints(m_cliData->DetailedOutput.value_or(false));
+    auto* cliAppWifiAccessPointsEnumerate = parent->add_subcommand("enumerate-access-points", "Enumerate available Wi-Fi access points");
+    cliAppWifiAccessPointsEnumerate->add_flag("--detailed", m_cliData->DetailedOutput, "Show detailed information about each access point");
+    cliAppWifiAccessPointsEnumerate->alias("enumaps");
+    cliAppWifiAccessPointsEnumerate->callback([this] {
+        OnWifiAccessPointsEnumerate(m_cliData->DetailedOutput.value_or(false));
     });
 
-    return cliAppWifiEnumerateAccessPoints;
+    return cliAppWifiAccessPointsEnumerate;
 }
 
 CLI::App*
@@ -157,9 +157,9 @@ NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 }
 
 void
-NetRemoteCli::OnWifiEnumerateAccessPoints(bool detailedOutput)
+NetRemoteCli::OnWifiAccessPointsEnumerate(bool detailedOutput)
 {
-    m_cliHandler->HandleCommandWifiEnumerateAccessPoints(detailedOutput);
+    m_cliHandler->HandleCommandWifiAccessPointsEnumerate(detailedOutput);
 }
 
 void

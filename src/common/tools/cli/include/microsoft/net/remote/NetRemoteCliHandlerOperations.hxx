@@ -47,7 +47,7 @@ struct NetRemoteCliHandlerOperations :
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    WifiEnumerateAccessPoints(bool detailedOutput) override;
+    WifiAccessPointsEnumerate(bool detailedOutput) override;
 
     /**
      * @brief Enable the specified WiFi access point.

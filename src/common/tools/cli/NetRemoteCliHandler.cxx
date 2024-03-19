@@ -38,7 +38,7 @@ NetRemoteCliHandler::GetParentStrongRef() const
 }
 
 void
-NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints(bool detailedOutput)
+NetRemoteCliHandler::HandleCommandWifiAccessPointsEnumerate(bool detailedOutput)
 {
     if (!m_operations) {
         LOGE << "No operations instance available to handle command";
@@ -51,8 +51,8 @@ NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints(bool detailedOutput)
         return;
     }
 
-    LOGD << "Executing command WifiEnumerateAccessPoints";
-    m_operations->WifiEnumerateAccessPoints(detailedOutput);
+    LOGD << "Executing command WifiAccessPointsEnumerate";
+    m_operations->WifiAccessPointsEnumerate(detailedOutput);
 }
 
 void

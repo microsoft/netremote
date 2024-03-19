@@ -185,17 +185,17 @@ static constexpr auto AccessPointIdInvalid{ "invalid" };
 /**
  * @brief Create an invalid access point result item.
  *
- * @return WifiEnumerateAccessPointsResultItem
+ * @return WifiAccessPointsEnumerateResultItem
  */
-WifiEnumerateAccessPointsResultItem
+WifiAccessPointsEnumerateResultItem
 MakeInvalidAccessPointResultItem()
 {
-    WifiEnumerateAccessPointsResultItem item{};
+    WifiAccessPointsEnumerateResultItem item{};
     item.set_accesspointid(AccessPointIdInvalid);
     return item;
 }
 
-WifiEnumerateAccessPointsResultItem
+WifiAccessPointsEnumerateResultItem
 IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 {
     std::string id{};
@@ -229,7 +229,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     const bool isEnabled{ operationalState == AccessPointOperationalState::Enabled };
 
     // Populate the result item.
-    WifiEnumerateAccessPointsResultItem item{};
+    WifiAccessPointsEnumerateResultItem item{};
     item.set_accesspointid(std::move(id));
     item.set_isenabled(isEnabled);
     *item.mutable_capabilities() = std::move(dot11AccessPointCapabilities);
@@ -237,10 +237,10 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     return item;
 }
 
-WifiEnumerateAccessPointsResultItem
+WifiAccessPointsEnumerateResultItem
 IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& accessPointWeak)
 {
-    WifiEnumerateAccessPointsResultItem item{};
+    WifiAccessPointsEnumerateResultItem item{};
 
     auto accessPoint = accessPointWeak.lock();
     if (accessPoint != nullptr) {
@@ -253,7 +253,7 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& ac
 }
 
 bool
-NetRemoteAccessPointResultItemIsInvalid(const WifiEnumerateAccessPointsResultItem& item)
+NetRemoteAccessPointResultItemIsInvalid(const WifiAccessPointsEnumerateResultItem& item)
 {
     return (item.accesspointid() == AccessPointIdInvalid);
 }
@@ -273,13 +273,13 @@ NetRemoteService::GetAccessPointManager() noexcept
 }
 
 grpc::Status
-NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const WifiEnumerateAccessPointsRequest* request, WifiEnumerateAccessPointsResult* response)
+NetRemoteService::WifiAccessPointsEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const WifiAccessPointsEnumerateRequest* request, WifiAccessPointsEnumerateResult* response)
 {
     const NetRemoteApiTrace traceMe{};
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
-    std::vector<WifiEnumerateAccessPointsResultItem> accessPointResultItems(std::size(accessPoints));
+    std::vector<WifiAccessPointsEnumerateResultItem> accessPointResultItems(std::size(accessPoints));
     std::ranges::transform(accessPoints, std::begin(accessPointResultItems), [](auto& accessPointWeak) {
         return detail::IAccessPointWeakToNetRemoteAccessPointResultItem(accessPointWeak);
     });

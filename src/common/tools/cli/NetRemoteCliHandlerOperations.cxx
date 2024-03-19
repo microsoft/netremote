@@ -244,13 +244,13 @@ NetRemoteAccessPointCapabilitiesToString(const Dot11AccessPointCapabilities& acc
 } // namespace detail
 
 void
-NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints(bool detailedOutput)
+NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)
 {
-    const WifiEnumerateAccessPointsRequest request{};
-    WifiEnumerateAccessPointsResult result{};
+    const WifiAccessPointsEnumerateRequest request{};
+    WifiAccessPointsEnumerateResult result{};
     grpc::ClientContext clientContext{};
 
-    auto status = m_connection->Client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+    auto status = m_connection->Client->WifiAccessPointsEnumerate(&clientContext, request, &result);
     if (!status.ok()) {
         LOGE << std::format("Failed to enumerate WiFi access points, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
         return;

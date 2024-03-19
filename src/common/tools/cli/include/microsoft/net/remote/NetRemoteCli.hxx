@@ -93,7 +93,7 @@ private:
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent);
+    AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent);
 
     /**
      * @brief Add the 'wifi ap-enable' sub-command.
@@ -127,7 +127,7 @@ private:
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    OnWifiEnumerateAccessPoints(bool detailedOutput = false);
+    OnWifiAccessPointsEnumerate(bool detailedOutput = false);
 
     /**
      * @brief Handle the 'wifi ap-enable' command.
@@ -152,7 +152,7 @@ private:
     // The following are helper references to the subcommands of m_cliApp; the memory is managed by CLI11.
     CLI::Option* m_cliAppServerAddress{ nullptr };
     CLI::App* m_cliAppWifi{ nullptr };
-    CLI::App* m_cliAppWifiEnumerateAccessPoints{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointsEnumerate{ nullptr };
     CLI::App* m_cliAppWifiAccessPointEnable{ nullptr };
     CLI::App* m_cliAppWifiAccessPointDisable{ nullptr };
 };
