@@ -127,12 +127,17 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
         if (!std::empty(m_cliData->WifiAccessPointSsid)) {
             ieee80211AccessPointConfiguration.Ssid = m_cliData->WifiAccessPointSsid;
         }
+        if (m_cliData->WifiAccessPointPhyType != Ieee80211PhyType::Unknown) {
+            ieee80211AccessPointConfiguration.PhyType = m_cliData->WifiAccessPointPhyType;
+        }
 
         OnWifiAccessPointEnable(m_cliData->WifiAccessPointId, &ieee80211AccessPointConfiguration);
     });
 
     cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
-    cliAppWifiAccessPointEnable->add_option("ssid,--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--phy,--phyType,", m_cliData->WifiAccessPointPhyType, "The PHY type of the access point to enable")
+        ->transform(CLI::CheckedTransformer(Ieee80211PhyTypeNames, CLI::ignore_case));
 
     return cliAppWifiAccessPointEnable;
 }

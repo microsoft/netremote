@@ -173,7 +173,6 @@ AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
 
     std::string_view propertyKeyToSet;
     std::string_view propertyValueToSet;
-    bool hostapdOperationSucceeded{ false };
 
     // Attempt to set all required properties.
     try {
