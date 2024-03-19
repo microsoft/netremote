@@ -21,6 +21,7 @@ struct NetRemoteCliData
     std::optional<bool> DetailedOutput;
 
     std::string WifiAccessPointId{};
+    std::string WifiAccessPointSsid{};
 };
 } // namespace Microsoft::Net::Remote
 

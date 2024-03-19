@@ -132,16 +132,19 @@ private:
     /**
      * @brief Handle the 'wifi ap-enable' command.
      *
+     * @param accessPointId The identifier of the access point to enable.
      * @param ieee80211AccessPointConfiguration Optional configuration for the access point to enable.
      */
     void
-    OnWifiAccessPointEnable(const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
+    OnWifiAccessPointEnable(std::string_view accessPointId, const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
 
     /**
      * @brief Handle the 'wifi ap-disable' command.
+     *
+     * @param accessPointId The identifier of the access point to disable.
      */
     void
-    OnWifiAccessPointDisable();
+    OnWifiAccessPointDisable(std::string_view accessPointId);
 
 private:
     std::shared_ptr<NetRemoteCliData> m_cliData;

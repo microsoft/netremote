@@ -123,10 +123,16 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
     auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
     cliAppWifiAccessPointEnable->alias("ap-enable");
     cliAppWifiAccessPointEnable->callback([this] {
-        OnWifiAccessPointEnable();
+        Ieee80211AccessPointConfiguration ieee80211AccessPointConfiguration{};
+        if (!std::empty(m_cliData->WifiAccessPointSsid)) {
+            ieee80211AccessPointConfiguration.Ssid = m_cliData->WifiAccessPointSsid;
+        }
+
+        OnWifiAccessPointEnable(m_cliData->WifiAccessPointId, &ieee80211AccessPointConfiguration);
     });
 
     cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
+    cliAppWifiAccessPointEnable->add_option("ssid,--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
 
     return cliAppWifiAccessPointEnable;
 }
@@ -137,7 +143,7 @@ NetRemoteCli::AddSubcommandWifiAccessPointDisable(CLI::App* parent)
     auto* cliAppWifiAccessPointDisable = parent->add_subcommand("access-point-disable", "Disable a Wi-Fi access point");
     cliAppWifiAccessPointDisable->alias("ap-disable");
     cliAppWifiAccessPointDisable->callback([this] {
-        OnWifiAccessPointEnable();
+        OnWifiAccessPointDisable(m_cliData->WifiAccessPointId);
     });
 
     cliAppWifiAccessPointDisable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to disable")->required();
@@ -174,13 +180,13 @@ NetRemoteCli::OnWifiAccessPointsEnumerate(bool detailedOutput)
 }
 
 void
-NetRemoteCli::OnWifiAccessPointEnable(const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
+NetRemoteCli::OnWifiAccessPointEnable(std::string_view accessPointId, const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
 {
-    m_cliHandler->HandleCommandWifiAccessPointEnable(m_cliData->WifiAccessPointId, ieee80211AccessPointConfiguration);
+    m_cliHandler->HandleCommandWifiAccessPointEnable(accessPointId, ieee80211AccessPointConfiguration);
 }
 
 void
-NetRemoteCli::OnWifiAccessPointDisable()
+NetRemoteCli::OnWifiAccessPointDisable(std::string_view accessPointId)
 {
-    m_cliHandler->HandleCommandWifiAccessPointDisable(m_cliData->WifiAccessPointId);
+    m_cliHandler->HandleCommandWifiAccessPointDisable(accessPointId);
 }
