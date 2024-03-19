@@ -3,6 +3,7 @@
 #include <format>
 #include <iterator>
 #include <memory>
+#include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -22,6 +23,7 @@
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Wifi;
+using namespace Microsoft::Net::Wifi;
 
 NetRemoteCliHandlerOperations::NetRemoteCliHandlerOperations(std::shared_ptr<NetRemoteServerConnection> connection) :
     m_connection(std::move(connection))
@@ -30,40 +32,112 @@ NetRemoteCliHandlerOperations::NetRemoteCliHandlerOperations(std::shared_ptr<Net
 
 namespace detail
 {
+enum PrintOption {
+    None,
+    WithSuffix,
+};
+
 /**
- * @brief Generate a string representation of a Dot11AccessPointCapabilities object.
+ * @brief Convert a Dot11FrequencyBand to a string representation.
  *
- * @param accessPointCapabilities The object to generate a string representation of.
- * @param indentationLevel The indentation level to use.
- * @param indentation The number of spaces in each indentation level.
+ * @tparam printOption Option to control the output format.
+ * @param frequencyBand The frequency band to convert.
+ * @return std::string_view
+ */
+template <PrintOption printOption = PrintOption::None>
+constexpr std::string_view
+Dot11FrequencyBandToString(Dot11FrequencyBand frequencyBand)
+{
+#define TWO_POINT_4  "2.4"
+#define FIVE_POINT_0 "5.0"
+#define SIX_POINT_0  "6.0"
+#define GHZ          " GHz"
+#define QQ           "??"
+
+    if constexpr (printOption == PrintOption::WithSuffix) {
+        switch (frequencyBand) {
+        case Dot11FrequencyBand::Dot11FrequencyBand2_4GHz:
+            return TWO_POINT_4 GHZ;
+        case Dot11FrequencyBand::Dot11FrequencyBand5_0GHz:
+            return FIVE_POINT_0 GHZ;
+        case Dot11FrequencyBand::Dot11FrequencyBand6_0GHz:
+            return SIX_POINT_0 GHZ;
+        default:
+            return QQ;
+        }
+    } else {
+        switch (frequencyBand) {
+        case Dot11FrequencyBand::Dot11FrequencyBand2_4GHz:
+            return TWO_POINT_4;
+        case Dot11FrequencyBand::Dot11FrequencyBand5_0GHz:
+            return FIVE_POINT_0;
+        case Dot11FrequencyBand::Dot11FrequencyBand6_0GHz:
+            return SIX_POINT_0;
+        default:
+            return QQ;
+        }
+    }
+
+#undef TWO_POINT_4
+#undef FIVE_POINT_0
+#undef SIX_POINT_0
+#undef GHZ
+#undef QQ
+}
+
+/**
+ * @brief Convert a Dot11SecurityProtocol to a string representation.
+ *
+ * @param securityProtocol The security protocol to convert.
+ * @return constexpr std::string_view
+ */
+constexpr std::string_view
+Dot11SecurityProtocolToString(Dot11SecurityProtocol securityProtocol)
+{
+    switch (securityProtocol) {
+    case Dot11SecurityProtocol::Dot11SecurityProtocolWpa1:
+        return "WPA1";
+    case Dot11SecurityProtocol::Dot11SecurityProtocolWpa2:
+        return "WPA2";
+    case Dot11SecurityProtocol::Dot11SecurityProtocolWpa3:
+        return "WPA3";
+    default:
+        return "??";
+    }
+}
+
+constexpr auto PhyTypePrefixLength = std::size(std::string_view("Dot11PhyType"));
+constexpr auto AkmSuitePrefixLength = std::size(std::string_view("Dot11AkmSuite"));
+constexpr auto BandPrefixLength = std::size(std::string_view("Dot11FrequencyBand"));
+constexpr auto CipherAlgorithmPrefixLength = std::size(std::string_view("Dot11CipherSuite"));
+
+/**
+ * @brief Convert a Dot11AccessPointCapabilities to a detailed string representation.
+ *
+ * @param accessPointCapabilities The capabilities to convert.
+ * @param indent0 The first level of indentation.
+ * @param indent1 The second level of indentation.
  * @return std::string
  */
 std::string
-NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11AccessPointCapabilities& accessPointCapabilities, std::size_t indentationLevel = 1, std::size_t indentation = 2)
+NetRemoteAccessPointCapabilitiesToStringDetailed(const Dot11AccessPointCapabilities& accessPointCapabilities, std::string_view indent0, std::string_view indent1)
 {
-    const auto indent0 = std::string((indentationLevel + 0) * indentation, ' ');
-    const auto indent1 = std::string((indentationLevel + 1) * indentation, ' ');
-
     std::stringstream ss;
 
-    constexpr auto SecurityProtocolPrefixLength = std::size(std::string_view("Dot11SecurityProtocol"));
     ss << indent0
        << "Security Protocols: ";
     for (const auto& securityProtocol : accessPointCapabilities.securityprotocols()) {
-        std::string_view securityProtocolName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11SecurityProtocol>(securityProtocol)));
-        securityProtocolName.remove_prefix(SecurityProtocolPrefixLength);
         if (securityProtocol != accessPointCapabilities.securityprotocols()[0]) {
             ss << ' ';
         }
-        ss << securityProtocolName;
+        ss << Dot11SecurityProtocolToString(static_cast<Dot11SecurityProtocol>(securityProtocol));
     }
 
-    constexpr auto PhyTypePrefixLength = std::size(std::string_view("Dot11PhyType"));
     ss << '\n'
        << indent0
-       << "Phy Types: ";
+       << "Phy Types: 802.11 ";
     for (const auto& phyType : accessPointCapabilities.phytypes()) {
-        std::string_view phyTypeName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11PhyType>(phyType)));
+        std::string_view phyTypeName(magic_enum::enum_name(static_cast<Dot11PhyType>(phyType)));
         phyTypeName.remove_prefix(PhyTypePrefixLength);
         if (phyType != accessPointCapabilities.phytypes()[0]) {
             ss << ' ';
@@ -71,34 +145,31 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
         ss << phyTypeName;
     }
 
-    constexpr auto BandPrefixLength = std::size(std::string_view("Dot11FrequencyBand"));
     ss << '\n'
        << indent0
-       << "Bands:";
+       << "Frequency Bands:";
     for (const auto& band : accessPointCapabilities.frequencybands()) {
-        std::string_view bandName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11FrequencyBand>(band)));
+        std::string_view bandName(magic_enum::enum_name(static_cast<Dot11FrequencyBand>(band)));
         bandName.remove_prefix(BandPrefixLength);
         ss << '\n'
            << indent1 << bandName;
     }
 
-    constexpr auto AkmSuitePrefixLength = std::size(std::string_view("Dot11AkmSuite"));
     ss << '\n'
        << indent0
        << "Authentication and Key Management (AKM) Suites:";
     for (const auto& akmSuite : accessPointCapabilities.akmsuites()) {
-        std::string_view akmSuiteName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11AkmSuite>(akmSuite)));
+        std::string_view akmSuiteName(magic_enum::enum_name(static_cast<Dot11AkmSuite>(akmSuite)));
         akmSuiteName.remove_prefix(AkmSuitePrefixLength);
         ss << '\n'
            << indent1 << akmSuiteName;
     }
 
-    constexpr auto CipherAlgorithmPrefixLength = std::size(std::string_view("Dot11CipherSuite"));
     ss << '\n'
        << indent0
        << "Cipher Algorithms:";
     for (const auto& ciperSuite : accessPointCapabilities.ciphersuites()) {
-        std::string_view cipherSuiteName(magic_enum::enum_name(static_cast<Microsoft::Net::Wifi::Dot11CipherSuite>(ciperSuite)));
+        std::string_view cipherSuiteName(magic_enum::enum_name(static_cast<Dot11CipherSuite>(ciperSuite)));
         cipherSuiteName.remove_prefix(CipherAlgorithmPrefixLength);
         ss << '\n'
            << indent1 << cipherSuiteName;
@@ -106,10 +177,74 @@ NetRemoteAccessPointCapabilitiesToString(const Microsoft::Net::Wifi::Dot11Access
 
     return ss.str();
 }
+
+/**
+ * @brief Convert a Dot11AccessPointCapabilities to a brief, single-line string representation.
+ *
+ * @param accessPointCapabilities The capabilities to convert.
+ * @param indent The indentation to use.
+ * @return std::string
+ */
+std::string
+NetRemoteAccessPointCapabilitiesToStringBrief(const Dot11AccessPointCapabilities& accessPointCapabilities)
+{
+    std::stringstream ss;
+
+    for (const auto& securityProtocol : accessPointCapabilities.securityprotocols()) {
+        if (securityProtocol != accessPointCapabilities.securityprotocols()[0]) {
+            ss << ' ';
+        }
+        ss << Dot11SecurityProtocolToString(static_cast<Dot11SecurityProtocol>(securityProtocol));
+    }
+
+    ss << " IEEE 802.11 ";
+    for (const auto& phyType : accessPointCapabilities.phytypes()) {
+        std::string_view phyTypeName(magic_enum::enum_name(static_cast<Dot11PhyType>(phyType)));
+        phyTypeName.remove_prefix(PhyTypePrefixLength);
+        if (phyType != accessPointCapabilities.phytypes()[0]) {
+            ss << '/';
+        }
+        ss << phyTypeName;
+    }
+
+    auto frequencyBands = accessPointCapabilities.frequencybands();
+    std::ranges::sort(frequencyBands);
+    ss << ' ';
+    for (const auto& frequencyBand : frequencyBands) {
+        if (frequencyBand != frequencyBands[0]) {
+            ss << ' ';
+        }
+        ss << Dot11FrequencyBandToString<PrintOption::WithSuffix>(static_cast<Dot11FrequencyBand>(frequencyBand));
+    }
+
+    return ss.str();
+}
+
+/**
+ * @brief Generate a string representation of a Dot11AccessPointCapabilities object.
+ *
+ * @param accessPointCapabilities The object to generate a string representation of.
+ * @param detailedOutput Whether the output should be detailed (true) or brief (false, default).
+ * @param indentationLevel The indentation level to use.
+ * @param indentation The number of spaces in each indentation level.
+ * @return std::string
+ */
+std::string
+NetRemoteAccessPointCapabilitiesToString(const Dot11AccessPointCapabilities& accessPointCapabilities, bool detailedOutput = false, std::size_t indentationLevel = 1, std::size_t indentation = 2)
+{
+    if (!detailedOutput) {
+        return NetRemoteAccessPointCapabilitiesToStringBrief(accessPointCapabilities);
+    } else {
+        const auto indent0 = std::string((indentationLevel + 0) * indentation, ' ');
+        const auto indent1 = std::string((indentationLevel + 1) * indentation, ' ');
+
+        return NetRemoteAccessPointCapabilitiesToStringDetailed(accessPointCapabilities, indent0, indent1);
+    }
+}
 } // namespace detail
 
 void
-NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
+NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints(bool detailedOutput)
 {
     const WifiEnumerateAccessPointsRequest request{};
     WifiEnumerateAccessPointsResult result{};
@@ -133,15 +268,14 @@ NetRemoteCliHandlerOperations::WifiEnumerateAccessPoints()
         if (!accessPoint.isenabled()) {
             ss << " (disabled)";
         }
-        ss << '\n'
-           << detail::NetRemoteAccessPointCapabilitiesToString(accessPoint.capabilities())
-           << '\n';
+        ss << ((detailedOutput) ? "\n" : ": ")
+           << detail::NetRemoteAccessPointCapabilitiesToString(accessPoint.capabilities(), detailedOutput);
         LOGI << ss.str();
     }
 }
 
 void
-NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
+NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPointId, const std::optional<Ieee80211AccessPointConfiguration>& ieee80211AccessPointConfiguration)
 {
     WifiAccessPointEnableRequest request{};
     WifiAccessPointEnableResult result{};

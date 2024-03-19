@@ -96,18 +96,18 @@ private:
 
     /**
      * @brief Add the 'wifi ap-enable' sub-command.
-     * 
+     *
      * @param parent The parent app to add the sub-command to.
-     * @return CLI::App* 
+     * @return CLI::App*
      */
     CLI::App*
     AddSubcommandWifiAccessPointEnable(CLI::App* parent);
 
     /**
      * @brief Add the 'wifi ap-disable' sub-command.
-     * 
+     *
      * @param parent The parent app to add the sub-command to.
-     * @return CLI::App* 
+     * @return CLI::App*
      */
     CLI::App*
     AddSubcommandWifiAccessPointDisable(CLI::App* parent);
@@ -122,9 +122,11 @@ private:
 
     /**
      * @brief Handle the 'wifi enumerate-access-points' command.
+     *
+     * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    OnWifiEnumerateAccessPoints();
+    OnWifiEnumerateAccessPoints(bool detailedOutput = false);
 
     /**
      * @brief Handle the 'wifi ap-enable' command.

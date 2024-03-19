@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_CLI_DATA_HXX
 #define NET_REMOTE_CLI_DATA_HXX
 
+#include <optional>
 #include <string>
 
 #include <microsoft/net/remote/NetRemoteClient.hxx>
@@ -19,6 +20,7 @@ struct NetRemoteCliData
 {
     std::string ServerAddress{ Protocol::NetRemoteProtocol::AddressDefault };
     NetRemoteCommandId Command{ NetRemoteCommandId::None };
+    std::optional<bool> DetailedOutput;
 
     std::string WifiAccessPointId{};
 };

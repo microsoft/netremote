@@ -38,7 +38,7 @@ NetRemoteCliHandler::GetParentStrongRef() const
 }
 
 void
-NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints()
+NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints(bool detailedOutput)
 {
     if (!m_operations) {
         LOGE << "No operations instance available to handle command";
@@ -52,7 +52,7 @@ NetRemoteCliHandler::HandleCommandWifiEnumerateAccessPoints()
     }
 
     LOGD << "Executing command WifiEnumerateAccessPoints";
-    m_operations->WifiEnumerateAccessPoints();
+    m_operations->WifiEnumerateAccessPoints(detailedOutput);
 }
 
 using Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration;
