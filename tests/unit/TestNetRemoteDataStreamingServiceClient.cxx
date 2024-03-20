@@ -155,7 +155,7 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         if (status.error_code() == grpc::StatusCode::CANCELLED) {
             REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
             REQUIRE(lostDataBlockSequenceNumbers.empty());
-        // The cancelation may cause a write failure before the server's OnCancel callback is invoked
+            // The cancelation may cause a write failure before the server's OnCancel callback is invoked
         } else if (status.error_code() == grpc::StatusCode::OK) {
             REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeFailed);
         }
