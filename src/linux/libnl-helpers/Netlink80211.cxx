@@ -5,6 +5,7 @@
 #include <system_error>
 
 #include <linux/nl80211.h>
+#include <magic_enum.hpp>
 #include <microsoft/net/netlink/NetlinkErrorCategory.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
@@ -425,36 +426,12 @@ Nl80211CommandToString(nl80211_commands command) noexcept
 std::string_view
 Nl80211InterfaceTypeToString(nl80211_iftype interfaceType) noexcept
 {
-    switch (interfaceType) {
-    case NL80211_IFTYPE_UNSPECIFIED:
-        return "NL80211_IFTYPE_UNSPECIFIED";
-    case NL80211_IFTYPE_ADHOC:
-        return "NL80211_IFTYPE_ADHOC";
-    case NL80211_IFTYPE_STATION:
-        return "NL80211_IFTYPE_STATION";
-    case NL80211_IFTYPE_AP:
-        return "NL80211_IFTYPE_AP";
-    case NL80211_IFTYPE_AP_VLAN:
-        return "NL80211_IFTYPE_AP_VLAN";
-    case NL80211_IFTYPE_WDS:
-        return "NL80211_IFTYPE_WDS";
-    case NL80211_IFTYPE_MONITOR:
-        return "NL80211_IFTYPE_MONITOR";
-    case NL80211_IFTYPE_MESH_POINT:
-        return "NL80211_IFTYPE_MESH_POINT";
-    case NL80211_IFTYPE_P2P_CLIENT:
-        return "NL80211_IFTYPE_P2P_CLIENT";
-    case NL80211_IFTYPE_P2P_GO:
-        return "NL80211_IFTYPE_P2P_GO";
-    case NL80211_IFTYPE_P2P_DEVICE:
-        return "NL80211_IFTYPE_P2P_DEVICE";
-    case NL80211_IFTYPE_OCB:
-        return "NL80211_IFTYPE_OCB";
-    case NL80211_IFTYPE_NAN:
-        return "NL80211_IFTYPE_NAN";
-    default:
-        return "NL80211_IFTYPE_UNKNOWN";
-    }
+    static constexpr auto InterfaceTypePrefixLength{ std::size(std::string_view("NL80211_IFTYPE_")) };
+
+    auto interfaceTypeName{ magic_enum::enum_name(interfaceType) };
+    interfaceTypeName.remove_prefix(InterfaceTypePrefixLength);
+
+    return interfaceTypeName;
 }
 
 std::string_view
