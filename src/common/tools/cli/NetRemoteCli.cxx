@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -14,6 +15,8 @@
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>
 
@@ -127,34 +130,46 @@ NetRemoteCli::WifiAccessPointEnableCallback()
     OnWifiAccessPointEnable(m_cliData->WifiAccessPointId, &ieee80211AccessPointConfiguration);
 }
 
+namespace detail
+{
+const std::map<std::string, Ieee80211PhyType> Ieee80211PhyTypeNames{
+    { "a", Ieee80211PhyType::A },
+    { "b", Ieee80211PhyType::B },
+    { "g", Ieee80211PhyType::G },
+    { "n", Ieee80211PhyType::N },
+    { "ac", Ieee80211PhyType::AC },
+    { "ax", Ieee80211PhyType::AX },
+};
+const std::map<std::string, Ieee80211FrequencyBand> Ieee80211FrequencyBandNames{
+    { "2", Ieee80211FrequencyBand::TwoPointFourGHz },
+    { "2.4", Ieee80211FrequencyBand::TwoPointFourGHz },
+    { "5", Ieee80211FrequencyBand::FiveGHz },
+    { "5.0", Ieee80211FrequencyBand::FiveGHz },
+    { "6", Ieee80211FrequencyBand::SixGHz },
+    { "6.0", Ieee80211FrequencyBand::SixGHz },
+};
+const std::map<std::string, Ieee80211AuthenticationAlgorithm> Ieee80211AuthenticationAlgorithmNames{
+    { "open", Ieee80211AuthenticationAlgorithm::OpenSystem },
+    { "open-system", Ieee80211AuthenticationAlgorithm::OpenSystem },
+    { "shared", Ieee80211AuthenticationAlgorithm::SharedKey },
+    { "shared-key", Ieee80211AuthenticationAlgorithm::SharedKey },
+    { "skey", Ieee80211AuthenticationAlgorithm::SharedKey },
+};
+} // namespace detail
+
 CLI::App*
 NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
 {
-    const std::map<std::string, Ieee80211PhyType> Ieee80211PhyTypeNames{
-        { "a", Ieee80211PhyType::A },
-        { "b", Ieee80211PhyType::B },
-        { "g", Ieee80211PhyType::G },
-        { "n", Ieee80211PhyType::N },
-        { "ac", Ieee80211PhyType::AC },
-        { "ax", Ieee80211PhyType::AX },
-    };
-    const std::map<std::string, Ieee80211FrequencyBand> Ieee80211FrequencyBandNames{
-        { "2", Ieee80211FrequencyBand::TwoPointFourGHz },
-        { "2.4", Ieee80211FrequencyBand::TwoPointFourGHz },
-        { "5", Ieee80211FrequencyBand::FiveGHz },
-        { "5.0", Ieee80211FrequencyBand::FiveGHz },
-        { "6", Ieee80211FrequencyBand::SixGHz },
-        { "6.0", Ieee80211FrequencyBand::SixGHz },
-    };
-
     auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
     cliAppWifiAccessPointEnable->alias("ap-enable")->alias("enable")->alias("ape");
     cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
     cliAppWifiAccessPointEnable->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
     cliAppWifiAccessPointEnable->add_option("--phy,--phyType,", m_cliData->WifiAccessPointPhyType, "The PHY type of the access point to enable")
-        ->transform(CLI::CheckedTransformer(Ieee80211PhyTypeNames, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211PhyTypeNames, CLI::ignore_case));
     cliAppWifiAccessPointEnable->add_option("--freq,--freqs,--frequencies,--frequencyBand,--frequencyBands,--band,--bands", m_cliData->WifiAccessPointFrequencyBands, "The frequency bands of the access point to enable")
-        ->transform(CLI::CheckedTransformer(Ieee80211FrequencyBandNames));
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211FrequencyBandNames));
+    cliAppWifiAccessPointEnable->add_option("--auth,--auths,--authAlg,--authAlgs,--authentication,--authenticationAlgorithm,--authenticationAlgorithms", m_cliData->WifiAccessPointAuthenticationAlgorithms, "The authentication algorithms of the access point to enable")
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211AuthenticationAlgorithmNames, CLI::ignore_case));
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
     });
