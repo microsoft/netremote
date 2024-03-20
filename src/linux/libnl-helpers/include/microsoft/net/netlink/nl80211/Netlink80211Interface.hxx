@@ -24,8 +24,7 @@ struct Nl80211Interface
     std::string Name;
     nl80211_iftype Type{ nl80211_iftype::NL80211_IFTYPE_UNSPECIFIED };
     uint32_t Index{ 0 };
-    uint32_t WiphyIndex{ 0 };
-    std::vector<nl80211_iftype> SupportedInterfaceTypes{};
+    uint32_t WiphyIndex;
 
     Nl80211Interface() = default;
 
@@ -39,9 +38,8 @@ struct Nl80211Interface
      * @param type The nl80211_iftype of the interface.
      * @param index The interface index in the kernel.
      * @param wiphyIndex The phy interface index in the kernel.
-     * @param supportedInterfaceTypes The supported interface types.
      */
-    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex, std::vector<nl80211_iftype> supportedInterfaceTypes) noexcept;
+    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept;
 
     /**
      * @brief Parse a netlink message into an Nl80211Interface. The netlink message must contain a response to the

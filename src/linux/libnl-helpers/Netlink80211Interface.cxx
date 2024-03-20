@@ -33,12 +33,11 @@ using namespace Microsoft::Net::Netlink::Nl80211;
 
 // NOLINTBEGIN(concurrency-mt-unsafe)
 
-Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex, std::vector<nl80211_iftype> supportedInterfaceTypes) noexcept :
+Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
     Name(name),
     Type(type),
     Index(index),
-    WiphyIndex(wiphyIndex),
-    SupportedInterfaceTypes(std::move(supportedInterfaceTypes))
+    WiphyIndex(wiphyIndex)
 {
 }
 
@@ -87,18 +86,7 @@ Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
     auto interfaceIndex = static_cast<uint32_t>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_IFINDEX]));
     auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_WIPHY]));
 
-    std::vector<nl80211_iftype> supportedInterfaceTypes{};
-    if (interfaceMessageAttributes[NL80211_ATTR_SUPPORTED_IFTYPES] != nullptr) {
-        int remainingSupportedInterfaceTypes = 0;
-        struct nlattr *supportedInterfaceType = nullptr;
-        nla_for_each_nested(supportedInterfaceType, interfaceMessageAttributes[NL80211_ATTR_SUPPORTED_IFTYPES], remainingSupportedInterfaceTypes)
-        {
-            auto interfaceTypeValue = static_cast<nl80211_iftype>(supportedInterfaceType->nla_type);
-            supportedInterfaceTypes.emplace_back(interfaceTypeValue);
-        }
-    }
-
-    return Nl80211Interface(interfaceName, interfaceType, interfaceIndex, wiphyIndex, std::move(supportedInterfaceTypes));
+    return Nl80211Interface(interfaceName, interfaceType, interfaceIndex, wiphyIndex);
 }
 
 namespace detail
@@ -195,10 +183,11 @@ Nl80211Interface::IsAccessPoint() const noexcept
 bool
 Nl80211Interface::SupportsAccessPointMode() const noexcept
 {
-    auto result = std::ranges::find_first_of(SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes);
-    auto isSupported = result != std::cend(SupportedInterfaceTypes);
-    return isSupported;
-    // return std::ranges::find_first_of(SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes) != std::cend(SupportedInterfaceTypes);
+    // clang-format off
+    return GetWiphy().transform([](const Nl80211Wiphy &wiphy) {
+        return std::ranges::find_first_of(wiphy.SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes) != std::cend(wiphy.SupportedInterfaceTypes);
+    }).value_or(false);
+    // clang-format on
 }
 
 // NOLINTEND(concurrency-mt-unsafe)
