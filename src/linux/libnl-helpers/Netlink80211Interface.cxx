@@ -1,7 +1,10 @@
+
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <cstring>
 #include <format>
+#include <initializer_list>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -41,7 +44,12 @@ Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, u
 std::string
 Nl80211Interface::ToString() const
 {
-    return std::format("[{}/{}] {} {}", Index, WiphyIndex, Name, magic_enum::enum_name(Type));
+    static constexpr auto InterfaceTypePrefixLength{ std::size(std::string_view("NL80211_IFTYPE_")) };
+
+    auto interfaceType = std::string_view{ magic_enum::enum_name(Type) };
+    interfaceType.remove_prefix(InterfaceTypePrefixLength);
+
+    return std::format("[{}/{}] {} {}", Index, WiphyIndex, Name, interfaceType);
 }
 
 /* static */
@@ -65,18 +73,18 @@ Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
     const auto *genl80211MessageHeader{ static_cast<struct genlmsghdr *>(nlmsg_data(nl80211MessageHeader)) };
 
     // Parse the message.
-    std::array<struct nlattr *, NL80211_ATTR_MAX + 1> newInterfaceMessageAttributes{};
-    int ret = nla_parse(std::data(newInterfaceMessageAttributes), std::size(newInterfaceMessageAttributes) - 1, genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
+    std::array<struct nlattr *, NL80211_ATTR_MAX + 1> interfaceMessageAttributes{};
+    int ret = nla_parse(std::data(interfaceMessageAttributes), std::size(interfaceMessageAttributes) - 1, genlmsg_attrdata(genl80211MessageHeader, 0), genlmsg_attrlen(genl80211MessageHeader, 0), nullptr);
     if (ret < 0) {
         LOGE << std::format("Failed to parse netlink message attributes with error {} ({})", ret, strerror(-ret));
         return std::nullopt;
     }
 
     // Tease out parameters to populate the Nl80211Interface instance.
-    const auto *interfaceName = static_cast<const char *>(nla_data(newInterfaceMessageAttributes[NL80211_ATTR_IFNAME]));
-    auto interfaceType = static_cast<nl80211_iftype>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_IFTYPE]));
-    auto interfaceIndex = static_cast<uint32_t>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_IFINDEX]));
-    auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(newInterfaceMessageAttributes[NL80211_ATTR_WIPHY]));
+    const auto *interfaceName = static_cast<const char *>(nla_data(interfaceMessageAttributes[NL80211_ATTR_IFNAME]));
+    auto interfaceType = static_cast<nl80211_iftype>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_IFTYPE]));
+    auto interfaceIndex = static_cast<uint32_t>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_IFINDEX]));
+    auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_WIPHY]));
 
     return Nl80211Interface(interfaceName, interfaceType, interfaceIndex, wiphyIndex);
 }
@@ -169,7 +177,17 @@ Nl80211Interface::GetWiphy() const
 bool
 Nl80211Interface::IsAccessPoint() const noexcept
 {
-    return (Type == nl80211_iftype::NL80211_IFTYPE_AP);
+    return std::ranges::contains(Nl80211AccessPointInterfaceTypes, Type);
+}
+
+bool
+Nl80211Interface::SupportsAccessPointMode() const noexcept
+{
+    // clang-format off
+    return GetWiphy().transform([](const Nl80211Wiphy &wiphy) {
+        return std::ranges::find_first_of(wiphy.SupportedInterfaceTypes, Nl80211AccessPointInterfaceTypes) != std::cend(wiphy.SupportedInterfaceTypes);
+    }).value_or(false);
+    // clang-format on
 }
 
 // NOLINTEND(concurrency-mt-unsafe)

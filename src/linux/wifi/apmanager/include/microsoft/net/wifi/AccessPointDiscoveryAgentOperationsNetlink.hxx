@@ -7,7 +7,6 @@
 #include <memory>
 #include <stop_token>
 #include <thread>
-#include <unordered_set>
 #include <vector>
 
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
@@ -126,7 +125,6 @@ private:
     int m_eventLoopStopFd{ -1 };
     std::jthread m_netlinkMessageProcessingThread;
 
-    std::unordered_set<Microsoft::Net::Netlink::Nl80211::Nl80211Interface> m_interfacesSeen;
     Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState &m_netlink80211ProtocolState;
 };
 } // namespace Microsoft::Net::Wifi

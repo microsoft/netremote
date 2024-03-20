@@ -3,7 +3,6 @@
 #include <format>
 #include <iterator>
 #include <memory>
-#include <optional>
 #include <ranges>
 #include <sstream>
 #include <string>
@@ -172,10 +171,8 @@ AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
         break;
     }
 
-    std::optional<std::string> errorDetails;
     std::string_view propertyKeyToSet;
     std::string_view propertyValueToSet;
-    bool hostapdOperationSucceeded{ false };
 
     // Attempt to set all required properties.
     try {
@@ -184,13 +181,8 @@ AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
             m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
         }
     } catch (const Wpa::HostapdException& ex) {
-        hostapdOperationSucceeded = false;
-        errorDetails = ex.what();
-    }
-
-    if (!hostapdOperationSucceeded) {
         status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, errorDetails.value_or("unspecified error"));
+        status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, ex.what());
         return status;
     }
 
@@ -231,8 +223,6 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     const std::string setBandArgumentAll = setBandArgumentBuilder.str();
     const std::string_view setBandArgument(std::data(setBandArgumentAll), std::size(setBandArgumentAll) - 1); // Remove trailing comma
 
-    bool hostapdOperationSucceeded{ false };
-    std::optional<std::string> errorDetails{};
     std::string_view propertyKeyToSet{ Wpa::ProtocolHostapd::PropertyNameSetBand };
     std::string_view propertyValueToSet{ setBandArgument };
 
@@ -240,13 +230,8 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     try {
         m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
     } catch (const Wpa::HostapdException& ex) {
-        hostapdOperationSucceeded = false;
-        errorDetails = ex.what();
-    }
-
-    if (!hostapdOperationSucceeded) {
         status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, errorDetails.value_or("unspecified error"));
+        status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, ex.what());
         return status;
     }
 
@@ -324,20 +309,12 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
         return status;
     }
 
-    bool hostapdOperationSucceeded{ false };
-    std::optional<std::string> errorDetails{};
-
     // Attempt to set the SSID.
     try {
         m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameSsid, ssid, EnforceConfigurationChange::Now);
     } catch (Wpa::HostapdException& ex) {
-        hostapdOperationSucceeded = false;
-        errorDetails = ex.what();
-    }
-
-    if (!hostapdOperationSucceeded) {
         status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = std::format("failed to set 'ssid' property to {} - {}", ssid, errorDetails.value_or("unspecified error"));
+        status.Details = std::format("failed to set 'ssid' property to {} - {}", ssid, ex.what());
         return status;
     }
 

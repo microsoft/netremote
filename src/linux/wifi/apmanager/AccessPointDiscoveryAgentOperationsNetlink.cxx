@@ -128,16 +128,16 @@ AccessPointDiscoveryAgentOperationsNetlink::Stop()
 namespace detail
 {
 /**
- * @brief Helper function to determine if an nl80211 interface is an AP. To be used in range expressions.
+ * @brief Helper function to determine if an nl80211 interface supports interface mode. To be used in range expressions.
  *
  * @param nl80211Interface The nl80211 interface to check.
  * @return true
  * @return false
  */
 bool
-IsNl80211InterfaceTypeAp(const Nl80211Interface &nl80211Interface)
+InterfaceSupportsAccessPointMode(const Nl80211Interface &nl80211Interface)
 {
-    return (nl80211Interface.Type == nl80211_iftype::NL80211_IFTYPE_AP);
+    return nl80211Interface.SupportsAccessPointMode();
 }
 
 /**
@@ -158,7 +158,7 @@ MakeAccessPoint(const std::shared_ptr<AccessPointFactoryLinux> &accessPointFacto
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
-    const auto MakeAccessPoint = [this](const Nl80211Interface &nl80211Interface) {
+    const auto ToAccessPoint = [this](const Nl80211Interface &nl80211Interface) {
         return detail::MakeAccessPoint(m_accessPointFactory, nl80211Interface);
     };
 
@@ -167,7 +167,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 
     // Enumerate all nl80211 interfaces and filter out those that are not APs.
     auto nl80211Interfaces{ Nl80211Interface::Enumerate() };
-    auto accessPointsView = nl80211Interfaces | std::views::filter(detail::IsNl80211InterfaceTypeAp) | std::views::transform(MakeAccessPoint);
+    auto accessPointsView = nl80211Interfaces | std::views::filter(detail::InterfaceSupportsAccessPointMode) | std::views::transform(ToAccessPoint);
     std::vector<std::shared_ptr<IAccessPoint>> accessPoints(std::make_move_iterator(std::begin(accessPointsView)), std::make_move_iterator(std::end(accessPointsView)));
 
     // Clear the vector since most of the items were moved out.
@@ -200,37 +200,14 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
         return NL_SKIP;
     }
 
-    if (genlMessageHeader->cmd != NL80211_CMD_NEW_INTERFACE &&
-        genlMessageHeader->cmd != NL80211_CMD_DEL_INTERFACE &&
-        genlMessageHeader->cmd != NL80211_CMD_SET_INTERFACE) {
-        LOGD << std::format("Ignoring {} nl80211 command message", nl80211CommandName);
-        return NL_SKIP;
-    }
-
     LOGD << std::format("Received {} nl80211 command message", nl80211CommandName);
 
-    // Parse the message into an Nl80211Interface object.
-    auto nl80211InterfaceOpt = Nl80211Interface::Parse(netlinkMessage);
-    if (!nl80211InterfaceOpt.has_value()) {
-        LOGE << "Failed to parse nl80211 interface dump response";
-        return NL_OK;
-    }
-
     AccessPointPresenceEvent accessPointPresenceEvent{};
-    auto &nl80211Interface = nl80211InterfaceOpt.value();
 
     switch (genlMessageHeader->cmd) {
     case NL80211_CMD_NEW_INTERFACE:
     case NL80211_CMD_DEL_INTERFACE: {
-        if (!nl80211Interface.IsAccessPoint()) {
-            LOGD << std::format("Ignoring interface presence change nl80211 message for non-ap wi-fi interface (type={})", Nl80211InterfaceTypeToString(nl80211Interface.Type));
-            return NL_OK;
-        }
         accessPointPresenceEvent = (genlMessageHeader->cmd == NL80211_CMD_NEW_INTERFACE) ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
-        break;
-    }
-    case NL80211_CMD_SET_INTERFACE: {
-        accessPointPresenceEvent = nl80211Interface.IsAccessPoint() ? AccessPointPresenceEvent::Arrived : AccessPointPresenceEvent::Departed;
         break;
     }
     default: {
@@ -239,24 +216,24 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     }
     }
 
-    // Update interface seen cache, handling the case where the interface has already been seen. This happens for
-    // NL80211_CMD_SET_INTERFACE whern the interface type did not change.
-    auto interfaceSeenIterator = m_interfacesSeen.find(nl80211Interface);
-    if (interfaceSeenIterator == std::cend(m_interfacesSeen)) {
-        if (accessPointPresenceEvent == AccessPointPresenceEvent::Arrived) {
-            m_interfacesSeen.insert(nl80211Interface);
-        }
-    } else {
-        if (accessPointPresenceEvent == AccessPointPresenceEvent::Departed) {
-            m_interfacesSeen.erase(interfaceSeenIterator);
-        }
+    // Parse the message into an Nl80211Interface object.
+    auto nl80211Interface = Nl80211Interface::Parse(netlinkMessage);
+    if (!nl80211Interface.has_value()) {
+        LOGE << "Failed to parse nl80211 interface dump response";
+        return NL_OK;
+    }
+
+    // Ignore the interface if it doesn't support AP mode.
+    if (!nl80211Interface->SupportsAccessPointMode()) {
+        LOGD << std::format("Ignoring nl80211 interface presence change message for {} interface (type={}) which does not support AP mode", nl80211Interface->Name, Nl80211InterfaceTypeToString(nl80211Interface->Type));
+        return NL_OK;
     }
 
     // Invoke presence event callback if present.
     if (accessPointPresenceEventCallback != nullptr) {
-        const auto interfaceName{ nl80211Interface.Name };
+        const auto interfaceName{ nl80211Interface->Name };
         LOGD << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", interfaceName, magic_enum::enum_name(accessPointPresenceEvent));
-        auto accessPointCreateArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface));
+        auto accessPointCreateArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface.value()));
         auto accessPoint = m_accessPointFactory->Create(interfaceName, std::move(accessPointCreateArgs));
 
         accessPointPresenceEventCallback(accessPointPresenceEvent, accessPoint);

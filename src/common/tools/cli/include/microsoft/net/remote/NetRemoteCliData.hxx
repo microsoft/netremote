@@ -6,6 +6,7 @@
 #include <string>
 
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -21,6 +22,8 @@ struct NetRemoteCliData
     std::optional<bool> DetailedOutput;
 
     std::string WifiAccessPointId{};
+    std::string WifiAccessPointSsid{};
+    Microsoft::Net::Wifi::Ieee80211PhyType WifiAccessPointPhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
 };
 } // namespace Microsoft::Net::Remote
 
