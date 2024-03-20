@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -24,6 +25,7 @@ struct NetRemoteCliData
     std::string WifiAccessPointId{};
     std::string WifiAccessPointSsid{};
     Microsoft::Net::Wifi::Ieee80211PhyType WifiAccessPointPhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
+    std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> WifiAccessPointFrequencyBands{};
 };
 } // namespace Microsoft::Net::Remote
 

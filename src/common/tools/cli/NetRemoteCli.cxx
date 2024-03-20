@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <CLI/App.hpp>
 #include <CLI/Error.hpp>
@@ -108,6 +109,24 @@ NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
     return cliAppWifiAccessPointsEnumerate;
 }
 
+void
+NetRemoteCli::WifiAccessPointEnableCallback()
+{
+    Ieee80211AccessPointConfiguration ieee80211AccessPointConfiguration{};
+
+    if (!std::empty(m_cliData->WifiAccessPointSsid)) {
+        ieee80211AccessPointConfiguration.Ssid = m_cliData->WifiAccessPointSsid;
+    }
+    if (!std::empty(m_cliData->WifiAccessPointFrequencyBands)) {
+        ieee80211AccessPointConfiguration.FrequencyBands = m_cliData->WifiAccessPointFrequencyBands;
+    }
+    if (m_cliData->WifiAccessPointPhyType != Ieee80211PhyType::Unknown) {
+        ieee80211AccessPointConfiguration.PhyType = m_cliData->WifiAccessPointPhyType;
+    }
+
+    OnWifiAccessPointEnable(m_cliData->WifiAccessPointId, &ieee80211AccessPointConfiguration);
+}
+
 CLI::App*
 NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
 {
@@ -119,25 +138,26 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
         { "ac", Ieee80211PhyType::AC },
         { "ax", Ieee80211PhyType::AX },
     };
+    const std::map<std::string, Ieee80211FrequencyBand> Ieee80211FrequencyBandNames{
+        { "2", Ieee80211FrequencyBand::TwoPointFourGHz },
+        { "2.4", Ieee80211FrequencyBand::TwoPointFourGHz },
+        { "5", Ieee80211FrequencyBand::FiveGHz },
+        { "5.0", Ieee80211FrequencyBand::FiveGHz },
+        { "6", Ieee80211FrequencyBand::SixGHz },
+        { "6.0", Ieee80211FrequencyBand::SixGHz },
+    };
 
     auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
-    cliAppWifiAccessPointEnable->alias("ap-enable")->alias("enable")->alias("ap-en");
-    cliAppWifiAccessPointEnable->callback([this] {
-        Ieee80211AccessPointConfiguration ieee80211AccessPointConfiguration{};
-        if (!std::empty(m_cliData->WifiAccessPointSsid)) {
-            ieee80211AccessPointConfiguration.Ssid = m_cliData->WifiAccessPointSsid;
-        }
-        if (m_cliData->WifiAccessPointPhyType != Ieee80211PhyType::Unknown) {
-            ieee80211AccessPointConfiguration.PhyType = m_cliData->WifiAccessPointPhyType;
-        }
-
-        OnWifiAccessPointEnable(m_cliData->WifiAccessPointId, &ieee80211AccessPointConfiguration);
-    });
-
+    cliAppWifiAccessPointEnable->alias("ap-enable")->alias("enable")->alias("ape");
     cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
     cliAppWifiAccessPointEnable->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
     cliAppWifiAccessPointEnable->add_option("--phy,--phyType,", m_cliData->WifiAccessPointPhyType, "The PHY type of the access point to enable")
         ->transform(CLI::CheckedTransformer(Ieee80211PhyTypeNames, CLI::ignore_case));
+    cliAppWifiAccessPointEnable->add_option("--freq,--freqs,--frequencies,--frequencyBand,--frequencyBands,--band,--bands", m_cliData->WifiAccessPointFrequencyBands, "The frequency bands of the access point to enable")
+        ->transform(CLI::CheckedTransformer(Ieee80211FrequencyBandNames));
+    cliAppWifiAccessPointEnable->callback([this] {
+        WifiAccessPointEnableCallback();
+    });
 
     return cliAppWifiAccessPointEnable;
 }
@@ -146,7 +166,7 @@ CLI::App*
 NetRemoteCli::AddSubcommandWifiAccessPointDisable(CLI::App* parent)
 {
     auto* cliAppWifiAccessPointDisable = parent->add_subcommand("access-point-disable", "Disable a Wi-Fi access point");
-    cliAppWifiAccessPointDisable->alias("ap-disable")->alias("disable")->alias("ap-dis");
+    cliAppWifiAccessPointDisable->alias("ap-disable")->alias("disable")->alias("apd");
     cliAppWifiAccessPointDisable->callback([this] {
         OnWifiAccessPointDisable(m_cliData->WifiAccessPointId);
     });
