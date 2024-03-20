@@ -14,7 +14,8 @@ namespace Microsoft::Net::Wifi
  */
 struct Ieee80211AccessPointCapabilities
 {
-    std::vector<Ieee80211Protocol> Protocols;
+    std::vector<Ieee80211SecurityProtocol> SecurityProtocols;
+    std::vector<Ieee80211PhyType> PhyTypes;
     std::vector<Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Ieee80211AkmSuite> AkmSuites;
     std::vector<Ieee80211CipherSuite> CipherSuites;

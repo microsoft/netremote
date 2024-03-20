@@ -4,6 +4,7 @@
 #include <format>
 #include <iterator>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -184,17 +185,17 @@ static constexpr auto AccessPointIdInvalid{ "invalid" };
 /**
  * @brief Create an invalid access point result item.
  *
- * @return WifiEnumerateAccessPointsResultItem
+ * @return WifiAccessPointsEnumerateResultItem
  */
-WifiEnumerateAccessPointsResultItem
+WifiAccessPointsEnumerateResultItem
 MakeInvalidAccessPointResultItem()
 {
-    WifiEnumerateAccessPointsResultItem item{};
+    WifiAccessPointsEnumerateResultItem item{};
     item.set_accesspointid(AccessPointIdInvalid);
     return item;
 }
 
-WifiEnumerateAccessPointsResultItem
+WifiAccessPointsEnumerateResultItem
 IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
 {
     std::string id{};
@@ -228,7 +229,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     const bool isEnabled{ operationalState == AccessPointOperationalState::Enabled };
 
     // Populate the result item.
-    WifiEnumerateAccessPointsResultItem item{};
+    WifiAccessPointsEnumerateResultItem item{};
     item.set_accesspointid(std::move(id));
     item.set_isenabled(isEnabled);
     *item.mutable_capabilities() = std::move(dot11AccessPointCapabilities);
@@ -236,10 +237,10 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     return item;
 }
 
-WifiEnumerateAccessPointsResultItem
+WifiAccessPointsEnumerateResultItem
 IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& accessPointWeak)
 {
-    WifiEnumerateAccessPointsResultItem item{};
+    WifiAccessPointsEnumerateResultItem item{};
 
     auto accessPoint = accessPointWeak.lock();
     if (accessPoint != nullptr) {
@@ -252,7 +253,7 @@ IAccessPointWeakToNetRemoteAccessPointResultItem(std::weak_ptr<IAccessPoint>& ac
 }
 
 bool
-NetRemoteAccessPointResultItemIsInvalid(const WifiEnumerateAccessPointsResultItem& item)
+NetRemoteAccessPointResultItemIsInvalid(const WifiAccessPointsEnumerateResultItem& item)
 {
     return (item.accesspointid() == AccessPointIdInvalid);
 }
@@ -272,13 +273,13 @@ NetRemoteService::GetAccessPointManager() noexcept
 }
 
 grpc::Status
-NetRemoteService::WifiEnumerateAccessPoints([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const WifiEnumerateAccessPointsRequest* request, WifiEnumerateAccessPointsResult* response)
+NetRemoteService::WifiAccessPointsEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const WifiAccessPointsEnumerateRequest* request, WifiAccessPointsEnumerateResult* response)
 {
     const NetRemoteApiTrace traceMe{};
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
-    std::vector<WifiEnumerateAccessPointsResultItem> accessPointResultItems(std::size(accessPoints));
+    std::vector<WifiAccessPointsEnumerateResultItem> accessPointResultItems(std::size(accessPoints));
     std::ranges::transform(accessPoints, std::begin(accessPointResultItems), [](auto& accessPointWeak) {
         return detail::IAccessPointWeakToNetRemoteAccessPointResultItem(accessPointWeak);
     });
@@ -453,12 +454,20 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        if (dot11AccessPointConfiguration->authenticationalgorithm() != Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown) {
-            // TODO: set authentication algorithm.
+        if (dot11AccessPointConfiguration->authenticationalgorithms_size() > 0) {
+            auto dot11AuthenticationAlgorithms = ToDot11AuthenticationAlgorithms(*dot11AccessPointConfiguration);
+            wifiOperationStatus = WifiAccessPointSetAuthenticationAlgorithsmImpl(accessPointId, dot11AuthenticationAlgorithms, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
         }
 
-        if (dot11AccessPointConfiguration->ciphersuite() != Dot11CipherSuite::Dot11CipherSuiteUnknown) {
-            // TODO: set cipher suite.
+        if (dot11AccessPointConfiguration->pairwiseciphersuites_size() > 0) {
+            auto dot11PairwiseCipherSuites = ToDot11CipherSuiteConfigurations(dot11AccessPointConfiguration->pairwiseciphersuites());
+            wifiOperationStatus = WifiAccessPointSetPairwiseCipherSuitesImpl(accessPointId, dot11PairwiseCipherSuites, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
         }
 
         if (dot11AccessPointConfiguration->has_ssid()) {
@@ -529,10 +538,10 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
         }
     }
 
-    // Convert PHY type to Ieee80211 protocol.
-    auto ieee80211Protocol = FromDot11PhyType(dot11PhyType);
+    // Convert dot11 PHY type to Ieee80211 PHY type.
+    auto ieee80211PhyType = FromDot11PhyType(dot11PhyType);
 
-    // Check if Ieee80211 protocol is supported by AP.
+    // Check if Ieee80211 PHY type is supported by AP.
     Ieee80211AccessPointCapabilities accessPointCapabilities{};
     operationStatus = accessPointController->GetCapabilities(accessPointCapabilities);
     if (!operationStatus) {
@@ -541,15 +550,15 @@ NetRemoteService::WifiAccessPointSetPhyTypeImpl(std::string_view accessPointId, 
         return wifiOperationStatus;
     }
 
-    const auto& supportedIeee80211Protocols = accessPointCapabilities.Protocols;
-    if (std::ranges::find(supportedIeee80211Protocols, ieee80211Protocol) == std::cend(supportedIeee80211Protocols)) {
+    const auto& supportedIeee80211PhyTypes = accessPointCapabilities.PhyTypes;
+    if (!std::ranges::contains(supportedIeee80211PhyTypes, ieee80211PhyType)) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
-        wifiOperationStatus.set_message(std::format("PHY type '{}' not supported by access point {}", magic_enum::enum_name(ieee80211Protocol), accessPointId));
+        wifiOperationStatus.set_message(std::format("PHY type '{}' not supported by access point {}", magic_enum::enum_name(ieee80211PhyType), accessPointId));
         return wifiOperationStatus;
     }
 
-    // Set the Ieee80211 protocol.
-    operationStatus = accessPointController->SetProtocol(ieee80211Protocol);
+    // Set the Ieee80211 PHY type.
+    operationStatus = accessPointController->SetPhyType(ieee80211PhyType);
     if (!operationStatus) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set PHY type for access point {} - {}", accessPointId, operationStatus.ToString()));
@@ -572,7 +581,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
         wifiOperationStatus.set_message("No frequency band provided");
         return wifiOperationStatus;
     }
-    if (std::ranges::find(dot11FrequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown) != std::cend(dot11FrequencyBands)) {
+    if (std::ranges::contains(dot11FrequencyBands, Dot11FrequencyBand::Dot11FrequencyBandUnknown)) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         wifiOperationStatus.set_message("Invalid frequency band provided");
         return wifiOperationStatus;
@@ -605,7 +614,7 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
 
     // Check if requested bands are supported by the AP.
     for (const auto& requestedFrequencyBand : ieee80211FrequencyBands) {
-        if (std::ranges::find(accessPointCapabilities.FrequencyBands, requestedFrequencyBand) == std::cend(accessPointCapabilities.FrequencyBands)) {
+        if (!std::ranges::contains(accessPointCapabilities.FrequencyBands, requestedFrequencyBand)) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
             wifiOperationStatus.set_message(std::format("Frequency band '{}' not supported by access point {}", magic_enum::enum_name(requestedFrequencyBand), accessPointId));
             return wifiOperationStatus;
@@ -617,6 +626,107 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set frequency bands for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_view accessPointId, std::vector<Dot11AuthenticationAlgorithm>& dot11AuthenticationAlgorithms, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (std::empty(dot11AuthenticationAlgorithms)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No authentication algorithms provided");
+        return wifiOperationStatus;
+    }
+    if (std::ranges::contains(dot11AuthenticationAlgorithms, Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmUnknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid authentication algorithm provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Convert to 802.11 neutral type.
+    std::vector<Ieee80211AuthenticationAlgorithm> ieee80211AuthenticationAlgorithms(static_cast<std::size_t>(std::size(dot11AuthenticationAlgorithms)));
+    std::ranges::transform(dot11AuthenticationAlgorithms, std::begin(ieee80211AuthenticationAlgorithms), FromDot11AuthenticationAlgorithm);
+    if (std::ranges::contains(ieee80211AuthenticationAlgorithms, Ieee80211AuthenticationAlgorithm::Unknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid authentication algorithm provided");
+        return wifiOperationStatus;
+    }
+
+    // Set the algorithms.
+    operationStatus = accessPointController->SetAuthenticationAlgorithms(std::move(ieee80211AuthenticationAlgorithms));
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set authentication algorithms for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetPairwiseCipherSuitesImpl(std::string_view accessPointId, std::unordered_map<Dot11SecurityProtocol, std::vector<Dot11CipherSuite>>& dot11PairwiseCipherSuites, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (std::empty(dot11PairwiseCipherSuites)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No cipher suites provided");
+        return wifiOperationStatus;
+    }
+    if (std::ranges::contains(dot11PairwiseCipherSuites | std::views::keys, Dot11SecurityProtocol::Dot11SecurityProtocolUnknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid security protocol provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Convert to 802.11 neutral type.
+    auto ieee80211CipherSuites = FromDot11CipherSuiteConfigurations(dot11PairwiseCipherSuites);
+    if (std::ranges::contains(ieee80211CipherSuites | std::views::keys, Ieee80211SecurityProtocol::Unknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid security protocol provided");
+        return wifiOperationStatus;
+    }
+
+    // Set the cipher suites.
+    operationStatus = accessPointController->SetPairwiseCipherSuites(std::move(ieee80211CipherSuites));
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set cipher suites for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
 
@@ -659,14 +769,14 @@ NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, con
     case Dot11Ssid::ValueCase::kData:
         operationStatus = accessPointController->SetSsid(dot11Ssid.data());
         break;
-    case Dot11Ssid::ValueCase::VALUE_NOT_SET: 
+    case Dot11Ssid::ValueCase::VALUE_NOT_SET:
         [[fallthrough]];
     default:
         operationStatus.Code = AccessPointOperationStatusCode::InvalidParameter;
         operationStatus.Details = "No SSID provided";
         break;
     }
-    
+
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set SSID for access point {} - {}", accessPointId, operationStatus.ToString()));

@@ -51,6 +51,11 @@ struct WpaController
     WpaController(std::string_view interfaceName, WpaType type, std::filesystem::path controlSocketPath);
 
     /**
+     * @brief Destroy the WpaController object.
+     */
+    virtual ~WpaController();
+
+    /**
      * @brief The type of daemon this object is controlling.
      *
      * @return WpaType
@@ -109,8 +114,8 @@ struct WpaController
          */
         static constexpr auto MessageSizeMax = 4096;
 
-        static constexpr auto DefaultPathHostapd = "/var/run/hostapd";
-        static constexpr auto DefaultPathWpaSupplicant = "/var/run/wpa_supplicant";
+        static constexpr auto DefaultPathHostapd = "/usr/local/var/run/hostapd";
+        static constexpr auto DefaultPathWpaSupplicant = "/usr/local/var/run/wpa_supplicant";
 
         /**
          * @brief Get the default path for the control socket of the specified daemon.

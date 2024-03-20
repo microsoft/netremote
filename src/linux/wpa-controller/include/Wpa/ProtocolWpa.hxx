@@ -2,7 +2,9 @@
 #ifndef PROTOCOL_WPA_HXX
 #define PROTOCOL_WPA_HXX
 
+#include <cstdint>
 #include <string_view>
+#include <utility>
 
 namespace Wpa
 {
@@ -49,6 +51,9 @@ struct ProtocolWpa
     static constexpr auto CommandPayloadAclClear = "CLEAR";
     static constexpr auto CommandPayloadLogLevel = "LOG_LEVEL";
     static constexpr auto CommandPayloadReload = "RELOAD";
+
+    // Common property names.
+    static constexpr auto PropertyNameWpaSecurityProtocol = "wpa";
 
     // Response payloads.
     static constexpr auto ResponsePayloadOk = "OK";

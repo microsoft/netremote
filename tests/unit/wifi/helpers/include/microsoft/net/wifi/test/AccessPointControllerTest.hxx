@@ -86,13 +86,13 @@ struct AccessPointControllerTest final :
     SetOperationalState(AccessPointOperationalState operationalState) noexcept override;
 
     /**
-     * @brief Set the Ieee80211 protocol of the access point.
+     * @brief Set the Ieee80211 PHY type of the access point.
      *
-     * @param ieeeProtocol The Ieee80211 protocol to be set
+     * @param ieeePhyType The Ieee80211 PHY type to be set
      * @return AccessPointOperationStatus
      */
     AccessPointOperationStatus
-    SetProtocol(Microsoft::Net::Wifi::Ieee80211Protocol ieeeProtocol) noexcept override;
+    SetPhyType(Microsoft::Net::Wifi::Ieee80211PhyType ieeePhyType) noexcept override;
 
     /**
      * @brief Set the frquency bands the access point should enable.
@@ -102,6 +102,24 @@ struct AccessPointControllerTest final :
      */
     AccessPointOperationStatus
     SetFrequencyBands(std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> frequencyBands) noexcept override;
+
+    /**
+     * @brief Set the authentication algorithms the access point should enable.
+     *
+     * @param authenticationAlgorithms The authentication algorithms to be allow.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept override;
+
+    /**
+     * @brief Set the pairwise cipher suites the access point should enable. These are used to encrypt unicast packets.
+     *
+     * @param pairwiseCipherSuites The pairwise cipher suites to enable.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetPairwiseCipherSuites(std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept override;
 
     /**
      * @brief Set the SSID of the access point.

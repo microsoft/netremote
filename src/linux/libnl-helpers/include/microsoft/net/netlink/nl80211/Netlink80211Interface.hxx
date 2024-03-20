@@ -85,6 +85,15 @@ struct Nl80211Interface
      */
     bool
     IsAccessPoint() const noexcept;
+
+    /**
+     * @brief Indicates if the interface supports operating as an access point.
+     *
+     * @return true The interface can be used as an access point.
+     * @return false The interface cannot be used as an access point.
+     */
+    bool
+    SupportsAccessPointMode() const noexcept;
 };
 
 } // namespace Microsoft::Net::Netlink::Nl80211

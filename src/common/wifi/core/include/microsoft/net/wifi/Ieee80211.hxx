@@ -11,6 +11,16 @@
 
 namespace Microsoft::Net::Wifi
 {
+/**
+ * @brief Overall security protocol for an IEEE 802.11 network.
+ */
+enum class Ieee80211SecurityProtocol {
+    Unknown,
+    Wpa,
+    Wpa2,
+    Wpa3,
+};
+
 enum class Ieee80211FrequencyBand {
     Unknown,
     TwoPointFourGHz,
@@ -74,7 +84,7 @@ operator"" _MHz(unsigned long long int value) noexcept
 }
 } // namespace Literals
 
-enum class Ieee80211Protocol {
+enum class Ieee80211PhyType {
     Unknown,
     B,
     G,
@@ -228,6 +238,56 @@ constexpr std::initializer_list<uint32_t> AllIeee80211Akms{
 };
 
 /**
+ * @brief List of AKM suites that are supported by WPA v1.
+ */
+constexpr std::initializer_list<Ieee80211AkmSuite> Wpa1AkmSuites{
+    Ieee80211AkmSuite::Ieee8021x,
+    Ieee80211AkmSuite::Psk,
+};
+
+/**
+ * @brief List of AKM suites that are supported by WPA v2.
+ */
+constexpr std::initializer_list<Ieee80211AkmSuite> Wpa2AkmSuites{
+    Ieee80211AkmSuite::Ieee8021x,
+    Ieee80211AkmSuite::Psk,
+};
+
+/**
+ * @brief List of AKM suites that are supported by WPA v3.
+ */
+constexpr std::initializer_list<Ieee80211AkmSuite> Wpa3AkmSuites{
+    Ieee80211AkmSuite::Ieee8021x,
+    Ieee80211AkmSuite::Ft8021x,
+    Ieee80211AkmSuite::FtSae,
+    Ieee80211AkmSuite::Ieee8021xSuiteB,
+    Ieee80211AkmSuite::Ieee8011xSuiteB192,
+    Ieee80211AkmSuite::Sae,
+    Ieee80211AkmSuite::Owe,
+};
+
+/**
+ * @brief Obtain a list of supported AKM suites for a given security protocol.
+ *
+ * @param securityProtocol The security protocol to obtain AKM suites for.
+ * @return constexpr std::initializer_list<Ieee80211AkmSuite>
+ */
+constexpr std::initializer_list<Ieee80211AkmSuite>
+WpaAkmSuites(const Ieee80211SecurityProtocol& securityProtocol)
+{
+    switch (securityProtocol) {
+    case Ieee80211SecurityProtocol::Wpa:
+        return Wpa1AkmSuites;
+    case Ieee80211SecurityProtocol::Wpa2:
+        return Wpa2AkmSuites;
+    case Ieee80211SecurityProtocol::Wpa3:
+        return Wpa3AkmSuites;
+    default:
+        return {};
+    }
+}
+
+/**
  * @brief Cipher suite identifiers or "selectors".
  *
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.2, Table 9-149.
@@ -268,6 +328,53 @@ enum class Ieee80211CipherSuite : uint32_t {
     Wep104 = MakeIeee80211Suite(Ieee80211CipherSuiteIdWep104),
     Wep40 = MakeIeee80211Suite(Ieee80211CipherSuiteIdWep40),
 };
+
+/**
+ * @brief List of cipher suites supported by WPA v1.
+ */
+constexpr std::initializer_list<Ieee80211CipherSuite> Wpa1CipherSuites{
+    Ieee80211CipherSuite::Tkip,
+};
+
+/**
+ * @brief List of cipher suites supported by WPA v2.
+ */
+constexpr std::initializer_list<Ieee80211CipherSuite> Wpa2CipherSuites{
+    Ieee80211CipherSuite::Tkip,
+    Ieee80211CipherSuite::Ccmp128,
+};
+
+/**
+ * @brief List of cipher suites supported by WPA v3.
+ */
+constexpr std::initializer_list<Ieee80211CipherSuite> Wpa3CipherSuites{
+    Ieee80211CipherSuite::Tkip,
+    Ieee80211CipherSuite::Ccmp128,
+    Ieee80211CipherSuite::Ccmp256,
+    Ieee80211CipherSuite::Gcmp128,
+    Ieee80211CipherSuite::Gcmp256,
+};
+
+/**
+ * @brief Obtain a list of supported cipher suites for a given security protocol.
+ *
+ * @param securityProtocol The security protocol to obtain cipher suites for.
+ * @return constexpr std::initializer_list<Ieee80211CipherSuite>
+ */
+constexpr std::initializer_list<Ieee80211CipherSuite>
+WpaCipherSuites(const Ieee80211SecurityProtocol& securityProtocol)
+{
+    switch (securityProtocol) {
+    case Ieee80211SecurityProtocol::Wpa:
+        return Wpa1CipherSuites;
+    case Ieee80211SecurityProtocol::Wpa2:
+        return Wpa2CipherSuites;
+    case Ieee80211SecurityProtocol::Wpa3:
+        return Wpa3CipherSuites;
+    default:
+        return {};
+    }
+}
 
 /**
  * @brief IEEE 802.11 BSS Types.

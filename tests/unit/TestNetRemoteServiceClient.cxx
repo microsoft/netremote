@@ -26,13 +26,13 @@
 
 namespace Microsoft::Net::Remote::Test
 {
-constexpr auto AllProtocols = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211Protocol>();
+constexpr auto AllPhyTypes = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211PhyType>();
 constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211FrequencyBand>();
 } // namespace Microsoft::Net::Remote::Test
 
 using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
+TEST_CASE("WifiAccessPointsEnumerate API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
@@ -54,12 +54,12 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        const WifiEnumerateAccessPointsRequest request{};
+        const WifiAccessPointsEnumerateRequest request{};
 
-        WifiEnumerateAccessPointsResult result{};
+        WifiAccessPointsEnumerateResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+        auto status = client->WifiAccessPointsEnumerate(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE_NOTHROW([&] {
             [[maybe_unused]] const auto& accessPoints = result.accesspoints();
@@ -68,12 +68,12 @@ TEST_CASE("WifiEnumerateAccessPoints API", "[basic][rpc][client][remote]")
 
     SECTION("Initial enablement status is disabled")
     {
-        const WifiEnumerateAccessPointsRequest request{};
+        const WifiAccessPointsEnumerateRequest request{};
 
-        WifiEnumerateAccessPointsResult result{};
+        WifiAccessPointsEnumerateResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiEnumerateAccessPoints(&clientContext, request, &result);
+        auto status = client->WifiAccessPointsEnumerate(&clientContext, request, &result);
         REQUIRE(status.ok());
 
         for (const auto& accessPoint : result.accesspoints()) {
@@ -98,7 +98,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) },
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) },
         .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
     };
 
@@ -120,11 +120,15 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
+        Dot11CipherSuiteConfiguration dot11CipherSuiteConfigurationWpa1{};
+        dot11CipherSuiteConfigurationWpa1.set_securityprotocol(Dot11SecurityProtocol::Dot11SecurityProtocolWpa);
+        dot11CipherSuiteConfigurationWpa1.mutable_ciphersuites()->Add(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+
         Dot11AccessPointConfiguration apConfiguration{};
-        apConfiguration.mutable_ssid()->set_name(SsidName);
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
-        apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
-        apConfiguration.set_ciphersuite(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+        apConfiguration.mutable_ssid()->set_name(SsidName);
+        apConfiguration.mutable_pairwiseciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
+        apConfiguration.mutable_authenticationalgorithms()->Add(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
 
@@ -147,7 +151,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
     SECTION("Fails with invalid access point")
     {
         WifiAccessPointEnableRequest request{};
-        *request.mutable_configuration() = {}; 
+        *request.mutable_configuration() = {};
         request.set_accesspointid(InterfaceNameInvalid);
 
         WifiAccessPointEnableResult result{};
@@ -163,12 +167,16 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
 
     SECTION("Succeeds without access point configuration if already configured")
     {
+        Dot11CipherSuiteConfiguration dot11CipherSuiteConfigurationWpa1{};
+        dot11CipherSuiteConfigurationWpa1.set_securityprotocol(Dot11SecurityProtocol::Dot11SecurityProtocolWpa);
+        dot11CipherSuiteConfigurationWpa1.mutable_ciphersuites()->Add(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+
         // Perform initial enable with configuration.
         Dot11AccessPointConfiguration apConfiguration{};
-        apConfiguration.mutable_ssid()->set_name(SsidName);
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
-        apConfiguration.set_authenticationalgorithm(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
-        apConfiguration.set_ciphersuite(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+        apConfiguration.mutable_ssid()->set_name(SsidName);
+        apConfiguration.mutable_pairwiseciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
+        apConfiguration.mutable_authenticationalgorithms()->Add(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
 
         WifiAccessPointEnableRequest request{};
@@ -224,7 +232,7 @@ TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
     };
 
     auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
@@ -323,7 +331,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
-        .Protocols{ std::cbegin(AllProtocols), std::cend(AllProtocols) }
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
     };
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);

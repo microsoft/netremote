@@ -21,6 +21,22 @@ enum Dot11FrequencyBand
     Dot11FrequencyBandSixGHz = 3;
 }
 
+// 802.11 Security Protocol types.
+// This encompasses the major overall security characteristics and options for Wi-Fi networks.
+enum Dot11SecurityProtocol
+{
+    option allow_alias = true;
+
+    Dot11SecurityProtocolUnknown = 0;
+    Dot11SecurityProtocolWpa1 = 1;
+    Dot11SecurityProtocolWpa2 = 2; 
+    Dot11SecurityProtocolWpa3 = 3;
+
+    // Aliases
+    Dot11SecurityProtocolWpa = 1;
+    Dot11SecurityProtocolRsn = 3;
+}
+
 // 802.11 PHY Types.
 // Values map to those defined in IEEE 802.11-2020, Annex C, Page 3934, 'dot11PHYType'.
 enum Dot11PhyType
@@ -135,22 +151,29 @@ message Dot11SharedKey
     }
 }
 
+message Dot11CipherSuiteConfiguration
+{
+    Dot11SecurityProtocol SecurityProtocol = 1;
+    repeated Dot11CipherSuite CipherSuites = 2;
+}
+
 message Dot11AccessPointConfiguration
 {
     Dot11Ssid Ssid = 1;
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
-    Dot11AuthenticationAlgorithm AuthenticationAlgorithm = 4;
-    Dot11CipherSuite CipherSuite = 5;
+    repeated Dot11CipherSuiteConfiguration PairwiseCipherSuites = 4;
+    repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 5;
     repeated Dot11FrequencyBand FrequencyBands = 6;
 }
 
 message Dot11AccessPointCapabilities
 {
-    repeated Microsoft.Net.Wifi.Dot11FrequencyBand FrequencyBands = 1;
+    repeated Microsoft.Net.Wifi.Dot11SecurityProtocol SecurityProtocols = 1;
     repeated Microsoft.Net.Wifi.Dot11PhyType PhyTypes = 2;
-    repeated Microsoft.Net.Wifi.Dot11AkmSuite AkmSuites = 3;
+    repeated Microsoft.Net.Wifi.Dot11FrequencyBand FrequencyBands = 3;
     repeated Microsoft.Net.Wifi.Dot11CipherSuite CipherSuites = 4;
+    repeated Microsoft.Net.Wifi.Dot11AkmSuite AkmSuites = 5;
 }
 
 enum Dot11AccessPointState

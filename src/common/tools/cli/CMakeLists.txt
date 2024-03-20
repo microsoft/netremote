@@ -29,6 +29,8 @@ target_link_libraries(${PROJECT_NAME}-cli
         plog::plog
     PUBLIC
         ${PROJECT_NAME}-client
+        wifi-core
+        wifi-core-adapter-dot11
 )
 
 install(

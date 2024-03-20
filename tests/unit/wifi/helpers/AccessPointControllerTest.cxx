@@ -6,6 +6,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -72,7 +73,7 @@ AccessPointControllerTest::SetOperationalState(AccessPointOperationalState opera
 }
 
 AccessPointOperationStatus
-AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
+AccessPointControllerTest::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
 {
     assert(AccessPoint != nullptr);
 
@@ -80,7 +81,7 @@ AccessPointControllerTest::SetProtocol(Ieee80211Protocol ieeeProtocol) noexcept
         return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
-    AccessPoint->Protocol = ieeeProtocol;
+    AccessPoint->PhyType = ieeePhyType;
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
@@ -105,6 +106,35 @@ AccessPointControllerTest::SetFrequencyBands(std::vector<Ieee80211FrequencyBand>
     }
 
     AccessPoint->FrequencyBands = std::move(frequencyBands);
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
+AccessPointOperationStatus
+AccessPointControllerTest::SetAuthenticationAlgorithms([[maybe_unused]] std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept
+{
+    assert(AccessPoint != nullptr);
+
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    // TODO: does AccessPointCapabilities need to reflect Ieee80211AuthenticationAlgorithms?
+    // If so, ensure authenticationAlgorithms is subset of those in AccessPointCapabilities.AuthenticationAlgorithms.
+
+    AccessPoint->AuthenticationAlgorithms = std::move(authenticationAlgorithms);
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
+AccessPointOperationStatus
+AccessPointControllerTest::SetPairwiseCipherSuites(std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> pairwiseCipherSuites) noexcept
+{
+    assert(AccessPoint != nullptr);
+
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    AccessPoint->CipherSuites = std::move(pairwiseCipherSuites);
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 

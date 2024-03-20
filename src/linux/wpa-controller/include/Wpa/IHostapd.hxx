@@ -5,11 +5,22 @@
 #include <exception>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
+#include <Wpa/ProtocolWpa.hxx>
 
 namespace Wpa
 {
+/**
+ * @brief Syntax sugar for specifying when configuration change should be enforced.
+ */
+enum class EnforceConfigurationChange {
+    Now,
+    Defer,
+};
+
 /**
  * @brief Interface for interacting with the hostapd daemon.
  *
@@ -30,42 +41,44 @@ struct IHostapd
      * Prevent copying and moving of IHostapd objects.
      */
     IHostapd(const IHostapd&) = delete;
-    IHostapd& operator=(const IHostapd&) = delete;
+
     IHostapd(IHostapd&&) = delete;
-    IHostapd& operator=(IHostapd&&) = delete;
+
+    IHostapd&
+    operator=(const IHostapd&) = delete;
+
+    IHostapd&
+    operator=(IHostapd&&) = delete;
 
     /**
      * @brief Enables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Enable() = 0;
 
     /**
      * @brief Disables the interface for use.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Disable() = 0;
 
     /**
      * @brief Terminates the process hosting the daemon.
-     *
-     * @return true
-     * @return false
      */
-    virtual bool
+    virtual void
     Terminate() = 0;
 
     /**
      * @brief Checks connectivity to the hostapd daemon.
      */
-    virtual bool
+    virtual void
     Ping() = 0;
+
+    /**
+     * @brief Reloads the interface. This will cause any settings that have been changed to take effect.
+     */
+    virtual void
+    Reload() = 0;
 
     /**
      * @brief Get the name of the interface hostapd is managing.
@@ -87,32 +100,75 @@ struct IHostapd
      * @brief Get a property value for the interface.
      *
      * @param propertyName The name of the property to retrieve.
-     * @param propertyValue The string to store the property value in.
-     * @return true If the property value was obtained and its value is in 'propertyValue'.
-     * @return false If t he property value could not be obtained due to an error.
+     * @return std::string The property string value.
      */
-    virtual bool
-    GetProperty(std::string_view propertyName, std::string& propertyValue) = 0;
+    virtual std::string
+    GetProperty(std::string_view propertyName) = 0;
 
     /**
      * @brief Set a property on the interface.
      *
      * @param propertyName The name of the property to set.
      * @param propertyValue The value of the property to set.
-     * @return true The property was set successfully.
-     * @return false The property was not set successfully.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
-    virtual bool
-    SetProperty(std::string_view propertyName, std::string_view propertyValue) = 0;
+    virtual void
+    SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
-     * @brief Reloads the interface.
+     * @brief Set the ssid for the interface.
      *
-     * @return true
-     * @return false
+     * @param ssid The ssid to set.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
-    virtual bool
-    Reload() = 0;
+    virtual void
+    SetSsid(std::string_view ssid, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the authentication algorithm(s) for the interface.
+     *
+     * @param algorithms The set of allowed authentication algorithms.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetAuthenticationAlgorithms(std::vector<WpaAuthenticationAlgorithm> algorithms, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the WPA protocol(s) for the interface.
+     *
+     * @param protocols The protocols to set.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetWpaSecurityProtocols(std::vector<WpaSecurityProtocol> protocols, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed key management algorithms for the interfacallowed key management algorithms for the interface.
+     *
+     * @param keyManagements The key management value(s) to set.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed pairwise cipher suites for the interface.
+     *
+     * @param protocol The WPA protocol to set the cipher suites for.
+     * @param ciphers The pairwise ciphers to allow.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetPairwiseCipherSuites(WpaSecurityProtocol protocol, std::vector<WpaCipher> ciphers, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the allowed pairwise cipher suites for the interface.
+     *
+     * @param protocolCipherMap Map specifying the pairwise ciphers to allow for each protocol.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**

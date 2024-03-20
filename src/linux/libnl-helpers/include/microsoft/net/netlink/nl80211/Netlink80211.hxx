@@ -3,6 +3,7 @@
 #define NETLINK_82011_HXX
 
 #include <cstdint>
+#include <initializer_list>
 #include <string_view>
 #include <unordered_map>
 
@@ -31,6 +32,14 @@ static const std::unordered_map<Nl80211MulticastGroup, std::string_view> Nl80211
     { Nl80211MulticastGroup::Nan, NL80211_MULTICAST_GROUP_NAN },
 };
 // NOLINTEND(cert-err58-cpp)
+
+/**
+ * @brief List of interface types that indicate support for access point operation.
+ */
+constexpr std::initializer_list<nl80211_iftype> Nl80211AccessPointInterfaceTypes = {
+    nl80211_iftype::NL80211_IFTYPE_AP,
+    nl80211_iftype::NL80211_IFTYPE_AP_VLAN,
+};
 
 /**
  * @brief Convert an nl80211_commands enum value to a string.

@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "detail/WpaDaemonManager.hxx"
 #include <Wpa/WpaCore.hxx>
 
 /**

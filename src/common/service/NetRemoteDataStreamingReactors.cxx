@@ -18,6 +18,16 @@
 
 using logging::FunctionTracer;
 
+/**
+ * @brief Helper wrapper structure to trace function entry and exit with a verbose log level.
+ */
+struct FunctionTracerVerbose :
+    public FunctionTracer
+{
+    FunctionTracerVerbose(std::source_location location = std::source_location::current()) :
+        FunctionTracer(plog::Severity::verbose, {}, {}, false, location) {}
+};
+
 namespace Microsoft::Net::Remote::Service::Reactors::Helpers
 {
 DataGenerator::DataGenerator()
@@ -59,7 +69,7 @@ DataStreamReader::DataStreamReader(DataStreamUploadResult* result) :
 void
 DataStreamReader::OnReadDone(bool isOk)
 {
-    const FunctionTracer traceMe{};
+    const FunctionTracerVerbose traceMe{};
 
     if (isOk) {
         m_numberOfDataBlocksReceived++;
@@ -134,7 +144,7 @@ DataStreamWriter::DataStreamWriter(const DataStreamDownloadRequest* request) :
 void
 DataStreamWriter::OnWriteDone(bool isOk)
 {
-    const FunctionTracer traceMe{};
+    const FunctionTracerVerbose traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -191,7 +201,7 @@ DataStreamWriter::OnDone()
 void
 DataStreamWriter::NextWrite()
 {
-    const FunctionTracer traceMe{};
+    const FunctionTracerVerbose traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -256,7 +266,7 @@ DataStreamReaderWriter::DataStreamReaderWriter()
 void
 DataStreamReaderWriter::OnReadDone(bool isOk)
 {
-    const FunctionTracer traceMe{};
+    const FunctionTracerVerbose traceMe{};
 
     if (isOk) {
         m_numberOfDataBlocksReceived++;
@@ -276,7 +286,7 @@ DataStreamReaderWriter::OnReadDone(bool isOk)
 void
 DataStreamReaderWriter::OnWriteDone(bool isOk)
 {
-    const FunctionTracer traceMe{};
+    const FunctionTracerVerbose traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.
@@ -326,7 +336,7 @@ DataStreamReaderWriter::OnDone()
 void
 DataStreamReaderWriter::NextWrite()
 {
-    const FunctionTracer traceMe{};
+    const FunctionTracerVerbose traceMe{};
 
     // Client may have canceled the RPC, so check for cancelation to prevent writing more data
     // when we shouldn't.

@@ -1,5 +1,6 @@
 
 #include <memory>
+#include <optional>
 #include <utility>
 
 #include <catch2/catch_test_macros.hpp>
@@ -45,8 +46,9 @@ TEST_CASE("Destroy an AccessPointFactoryLinux instance", "[wifi][core][ap][linux
 
     SECTION("Destroy doesn't cause a crash")
     {
-        AccessPointFactoryLinux accessPointFactory{ std::make_unique<Test::AccessPointControllerFactoryTest>() };
-        REQUIRE_NOTHROW(accessPointFactory.~AccessPointFactoryLinux());
+        std::optional<AccessPointFactoryLinux> accessPointFactory{};
+        accessPointFactory.emplace(std::make_unique<Test::AccessPointControllerFactoryTest>());
+        REQUIRE_NOTHROW(accessPointFactory.reset());
     }
 }
 

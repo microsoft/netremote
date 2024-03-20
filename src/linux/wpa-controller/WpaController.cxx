@@ -15,6 +15,7 @@
 #include <Wpa/WpaController.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
+#include <magic_enum.hpp>
 #include <plog/Log.h>
 
 using namespace Wpa;
@@ -34,6 +35,14 @@ WpaController::WpaController(std::string_view interfaceName, WpaType type, std::
     m_interfaceName(interfaceName),
     m_controlSocketPath(std::move(controlSocketPath))
 {
+}
+
+WpaController::~WpaController()
+{
+    if (m_controlSocketCommand != nullptr) {
+        wpa_ctrl_close(m_controlSocketCommand);
+        m_controlSocketCommand = nullptr;
+    }
 }
 
 WpaType
@@ -73,6 +82,8 @@ WpaController::GetCommandControlSocket()
         LOGE << std::format("Failed to open control socket for {} interface at {}.", m_interfaceName, controlSocketPath.c_str());
         return nullptr;
     }
+
+    LOGD << std::format("Opened {} control socket for {} interface at {}.", magic_enum::enum_name(m_type), m_interfaceName, controlSocketPath.c_str());
 
     // Update the member and return it.
     m_controlSocketCommand = controlSocket;

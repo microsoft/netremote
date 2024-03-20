@@ -34,7 +34,7 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
 {
     // Parse the attribute message.
     std::array<struct nlattr *, NL80211_BAND_ATTR_MAX + 1> wiphyBandAttributes{};
-    int ret = nla_parse(std::data(wiphyBandAttributes), std::size(wiphyBandAttributes), static_cast<struct nlattr *>(nla_data(wiphyBand)), nla_len(wiphyBand), nullptr);
+    int ret = nla_parse(std::data(wiphyBandAttributes), std::size(wiphyBandAttributes) - 1, static_cast<struct nlattr *>(nla_data(wiphyBand)), nla_len(wiphyBand), nullptr);
     if (ret < 0) {
         LOGE << std::format("Failed to parse wiphy band attributes with error {} ({})", ret, nl_geterror(ret));
         return std::nullopt;
@@ -76,7 +76,7 @@ Nl80211WiphyBand::Parse(struct nlattr *wiphyBand) noexcept
         nla_for_each_nested(bitRate, wiphyBandAttributes[NL80211_BAND_ATTR_RATES], remainingBitRates)
         {
             std::array<struct nlattr *, NL80211_BITRATE_ATTR_MAX + 1> bitRateAttributes{};
-            ret = nla_parse(std::data(bitRateAttributes), std::size(bitRateAttributes), static_cast<struct nlattr *>(nla_data(bitRate)), nla_len(bitRate), nullptr);
+            ret = nla_parse(std::data(bitRateAttributes), std::size(bitRateAttributes) - 1, static_cast<struct nlattr *>(nla_data(bitRate)), nla_len(bitRate), nullptr);
             if (ret < 0) {
                 LOGW << std::format("Failed to parse wiphy band bit rate attributes with error {} ({})", ret, nl_geterror(ret));
                 return std::nullopt;

@@ -3,8 +3,10 @@
 #define NET_REMOTE_CLI_HANDLER_HXX
 
 #include <memory>
+#include <string_view>
 
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -22,12 +24,17 @@ struct NetRemoteCliHandler
     virtual ~NetRemoteCliHandler() = default;
 
     /**
-     * Prevent copying and moving of NetRemoteCliHandler objects. 
+     * Prevent copying and moving of NetRemoteCliHandler objects.
      */
     NetRemoteCliHandler(const NetRemoteCliHandler&) = delete;
-    NetRemoteCliHandler& operator=(const NetRemoteCliHandler&) = delete;
+
     NetRemoteCliHandler(NetRemoteCliHandler&&) = delete;
-    NetRemoteCliHandler& operator=(NetRemoteCliHandler&&) = delete;
+
+    NetRemoteCliHandler&
+    operator=(const NetRemoteCliHandler&) = delete;
+
+    NetRemoteCliHandler&
+    operator=(NetRemoteCliHandler&&) = delete;
 
     /**
      * @brief Construct a new NetRemoteCliHandler object.
@@ -54,9 +61,28 @@ struct NetRemoteCliHandler
 
     /**
      * @brief Handle a command request to enumerate available Wi-Fi access points.
+     *
+     * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    HandleCommandWifiEnumerateAccessPoints();
+    HandleCommandWifiAccessPointsEnumerate(bool detailedOutput);
+
+    /**
+     * @brief Handle a command to enable a Wi-Fi access point.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     * @param ieee80211AccessPointConfiguration The optional configuration to apply to the access point.
+     */
+    void
+    HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
+
+    /**
+     * @brief Handle a command to disable a Wi-Fi access point.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     */
+    void
+    HandleCommandWifiAccessPointDisable(std::string_view accessPointId);
 
 private:
     /**

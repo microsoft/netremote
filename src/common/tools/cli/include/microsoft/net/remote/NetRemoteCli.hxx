@@ -8,6 +8,7 @@
 #include <microsoft/net/remote/NetRemoteCliData.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -92,7 +93,25 @@ private:
      * @return CLI::App*
      */
     CLI::App*
-    AddSubcommandWifiEnumerateAccessPoints(CLI::App* parent);
+    AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent);
+
+    /**
+     * @brief Add the 'wifi ap-enable' sub-command.
+     *
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandWifiAccessPointEnable(CLI::App* parent);
+
+    /**
+     * @brief Add the 'wifi ap-disable' sub-command.
+     *
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandWifiAccessPointDisable(CLI::App* parent);
 
     /**
      * @brief Handle the 'server' option.
@@ -104,9 +123,34 @@ private:
 
     /**
      * @brief Handle the 'wifi enumerate-access-points' command.
+     *
+     * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).
      */
     void
-    OnWifiEnumerateAccessPoints();
+    OnWifiAccessPointsEnumerate(bool detailedOutput = false);
+
+    /**
+     * @brief Invoked when all processing for the 'wifi ap-enable' command is complete.
+     */
+    void
+    WifiAccessPointEnableCallback();
+
+    /**
+     * @brief Handle the 'wifi ap-enable' command.
+     *
+     * @param accessPointId The identifier of the access point to enable.
+     * @param ieee80211AccessPointConfiguration Optional configuration for the access point to enable.
+     */
+    void
+    OnWifiAccessPointEnable(std::string_view accessPointId, const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
+
+    /**
+     * @brief Handle the 'wifi ap-disable' command.
+     *
+     * @param accessPointId The identifier of the access point to disable.
+     */
+    void
+    OnWifiAccessPointDisable(std::string_view accessPointId);
 
 private:
     std::shared_ptr<NetRemoteCliData> m_cliData;
@@ -117,7 +161,9 @@ private:
     // The following are helper references to the subcommands of m_cliApp; the memory is managed by CLI11.
     CLI::Option* m_cliAppServerAddress{ nullptr };
     CLI::App* m_cliAppWifi{ nullptr };
-    CLI::App* m_cliAppWifiEnumerateAccessPoints{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointsEnumerate{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointEnable{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointDisable{ nullptr };
 };
 } // namespace Microsoft::Net::Remote
 

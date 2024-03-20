@@ -60,7 +60,7 @@ struct AccessPointOperationStatus
             }
             pos = OperationName.find_last_of(':');
             if (pos != std::string::npos) {
-                OperationName.erase(0, pos);
+                OperationName.erase(0, pos + 1);
             }
         }
     }

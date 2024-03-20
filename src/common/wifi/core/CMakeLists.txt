@@ -24,6 +24,7 @@ target_sources(wifi-core
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/IAccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211AccessPointCapabilities.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/Ieee80211AccessPointConfiguration.hxx
 )
 
 target_link_libraries(wifi-core
