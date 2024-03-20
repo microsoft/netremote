@@ -24,7 +24,7 @@ struct Nl80211Interface
     std::string Name;
     nl80211_iftype Type{ nl80211_iftype::NL80211_IFTYPE_UNSPECIFIED };
     uint32_t Index{ 0 };
-    uint32_t WiphyIndex;
+    uint32_t WiphyIndex{ 0 };
 
     Nl80211Interface() = default;
 
@@ -88,7 +88,7 @@ struct Nl80211Interface
 
     /**
      * @brief Indicates if the interface supports operating as an access point.
-     * 
+     *
      * @return true The interface can be used as an access point.
      * @return false The interface cannot be used as an access point.
      */
