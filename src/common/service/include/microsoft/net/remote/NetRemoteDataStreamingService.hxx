@@ -55,6 +55,8 @@ private:
      * @brief Allows the client to ping the server for availability.
      *
      * @param context
+     * @param request
+     * @param response
      * @return grpc::ServerUnaryReactor*
      */
     grpc::ServerUnaryReactor*

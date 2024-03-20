@@ -149,9 +149,16 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
         DataStreamOperationStatus operationStatus{};
         std::span<uint32_t> lostDataBlockSequenceNumbers{};
         const grpc::Status status = dataStreamReader.Await(&numberOfDataBlocksReceived, &operationStatus, lostDataBlockSequenceNumbers);
-        REQUIRE(status.error_code() == grpc::StatusCode::CANCELLED);
-        REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
-        REQUIRE(lostDataBlockSequenceNumbers.empty());
+
+        REQUIRE((status.error_code() == grpc::StatusCode::CANCELLED || status.error_code() == grpc::StatusCode::OK));
+
+        if (status.error_code() == grpc::StatusCode::CANCELLED) {
+            REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeSucceeded);
+            REQUIRE(lostDataBlockSequenceNumbers.empty());
+        // The cancelation may cause a write failure before the server's OnCancel callback is invoked
+        } else if (status.error_code() == grpc::StatusCode::OK) {
+            REQUIRE(operationStatus.code() == DataStreamOperationStatusCodeFailed);
+        }
     }
 }
 
