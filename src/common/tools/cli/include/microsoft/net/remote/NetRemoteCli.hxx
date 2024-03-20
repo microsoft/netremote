@@ -130,6 +130,12 @@ private:
     OnWifiAccessPointsEnumerate(bool detailedOutput = false);
 
     /**
+     * @brief Invoked when all processing for the 'wifi ap-enable' command is complete.
+     */
+    void
+    WifiAccessPointEnableCallback();
+
+    /**
      * @brief Handle the 'wifi ap-enable' command.
      *
      * @param accessPointId The identifier of the access point to enable.
