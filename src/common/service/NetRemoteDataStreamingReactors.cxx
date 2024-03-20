@@ -155,7 +155,11 @@ DataStreamWriter::OnWriteDone(bool isOk)
 
     // Check for a failed status code from HandleWriteFailure since that invoked a final write, thus causing this callback to be invoked.
     if (m_writeStatus.code() == DataStreamOperationStatusCode::DataStreamOperationStatusCodeFailed) {
-        Finish(::grpc::Status::OK);
+        bool isCompletedExpected{ false };
+        if (m_isCompleted.compare_exchange_strong(isCompletedExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
+            Finish(grpc::Status::OK);
+        }
+
         return;
     }
 
@@ -180,7 +184,10 @@ DataStreamWriter::OnCancel()
     // The RPC is canceled by the client, so call Finish to complete it from the server perspective.
     bool isCanceledExpected{ false };
     if (m_isCanceled.compare_exchange_strong(isCanceledExpected, true, std::memory_order_relaxed, std::memory_order_relaxed)) {
-        Finish(grpc::Status::CANCELLED);
+        // It's possible that Finish was already called due to a write failure, so don't call Finish again in that case.
+        if (!m_isCompleted.load(std::memory_order_relaxed)) {
+            Finish(grpc::Status::CANCELLED);
+        }
     }
 }
 
