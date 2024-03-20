@@ -2,6 +2,7 @@
 #include <format>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -132,29 +133,58 @@ NetRemoteCli::WifiAccessPointEnableCallback()
 
 namespace detail
 {
-const std::map<std::string, Ieee80211PhyType> Ieee80211PhyTypeNames{
-    { "a", Ieee80211PhyType::A },
-    { "b", Ieee80211PhyType::B },
-    { "g", Ieee80211PhyType::G },
-    { "n", Ieee80211PhyType::N },
-    { "ac", Ieee80211PhyType::AC },
-    { "ax", Ieee80211PhyType::AX },
-};
-const std::map<std::string, Ieee80211FrequencyBand> Ieee80211FrequencyBandNames{
-    { "2", Ieee80211FrequencyBand::TwoPointFourGHz },
-    { "2.4", Ieee80211FrequencyBand::TwoPointFourGHz },
-    { "5", Ieee80211FrequencyBand::FiveGHz },
-    { "5.0", Ieee80211FrequencyBand::FiveGHz },
-    { "6", Ieee80211FrequencyBand::SixGHz },
-    { "6.0", Ieee80211FrequencyBand::SixGHz },
-};
-const std::map<std::string, Ieee80211AuthenticationAlgorithm> Ieee80211AuthenticationAlgorithmNames{
-    { "open", Ieee80211AuthenticationAlgorithm::OpenSystem },
-    { "open-system", Ieee80211AuthenticationAlgorithm::OpenSystem },
-    { "shared", Ieee80211AuthenticationAlgorithm::SharedKey },
-    { "shared-key", Ieee80211AuthenticationAlgorithm::SharedKey },
-    { "skey", Ieee80211AuthenticationAlgorithm::SharedKey },
-};
+const std::map<std::string, Ieee80211PhyType>&
+Ieee80211PhyTypeNames()
+{
+    try {
+        static const std::map<std::string, Ieee80211PhyType> ieee80211PhyTypeNames{
+            { "a", Ieee80211PhyType::A },
+            { "b", Ieee80211PhyType::B },
+            { "g", Ieee80211PhyType::G },
+            { "n", Ieee80211PhyType::N },
+            { "ac", Ieee80211PhyType::AC },
+            { "ax", Ieee80211PhyType::AX },
+        };
+        return ieee80211PhyTypeNames;
+    } catch (...) {
+        throw std::runtime_error("Failed to create PHY type names");
+    }
+}
+
+const std::map<std::string, Ieee80211FrequencyBand>&
+Ieee80211FrequencyBandNames()
+{
+    try {
+        static const std::map<std::string, Ieee80211FrequencyBand> ieee80211FrequencyBandNames{
+            { "2", Ieee80211FrequencyBand::TwoPointFourGHz },
+            { "2.4", Ieee80211FrequencyBand::TwoPointFourGHz },
+            { "5", Ieee80211FrequencyBand::FiveGHz },
+            { "5.0", Ieee80211FrequencyBand::FiveGHz },
+            { "6", Ieee80211FrequencyBand::SixGHz },
+            { "6.0", Ieee80211FrequencyBand::SixGHz },
+        };
+        return ieee80211FrequencyBandNames;
+    } catch (...) {
+        throw std::runtime_error("Failed to create frequency band names");
+    }
+}
+
+const std::map<std::string, Ieee80211AuthenticationAlgorithm>&
+Ieee80211AuthenticationAlgorithmNames()
+{
+    try {
+        static const std::map<std::string, Ieee80211AuthenticationAlgorithm> ieee80211AuthenticationAlgorithmNames{
+            { "open", Ieee80211AuthenticationAlgorithm::OpenSystem },
+            { "open-system", Ieee80211AuthenticationAlgorithm::OpenSystem },
+            { "shared", Ieee80211AuthenticationAlgorithm::SharedKey },
+            { "shared-key", Ieee80211AuthenticationAlgorithm::SharedKey },
+            { "skey", Ieee80211AuthenticationAlgorithm::SharedKey },
+        };
+        return ieee80211AuthenticationAlgorithmNames;
+    } catch (...) {
+        throw std::runtime_error{ "Failed to create authentication algorithm names" };
+    }
+}
 } // namespace detail
 
 CLI::App*
@@ -165,11 +195,11 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
     cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
     cliAppWifiAccessPointEnable->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
     cliAppWifiAccessPointEnable->add_option("--phy,--phyType,", m_cliData->WifiAccessPointPhyType, "The PHY type of the access point to enable")
-        ->transform(CLI::CheckedTransformer(detail::Ieee80211PhyTypeNames, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211PhyTypeNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->add_option("--freq,--freqs,--frequencies,--frequencyBand,--frequencyBands,--band,--bands", m_cliData->WifiAccessPointFrequencyBands, "The frequency bands of the access point to enable")
-        ->transform(CLI::CheckedTransformer(detail::Ieee80211FrequencyBandNames));
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211FrequencyBandNames()));
     cliAppWifiAccessPointEnable->add_option("--auth,--auths,--authAlg,--authAlgs,--authentication,--authenticationAlgorithm,--authenticationAlgorithms", m_cliData->WifiAccessPointAuthenticationAlgorithms, "The authentication algorithms of the access point to enable")
-        ->transform(CLI::CheckedTransformer(detail::Ieee80211AuthenticationAlgorithmNames, CLI::ignore_case));
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211AuthenticationAlgorithmNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
     });
