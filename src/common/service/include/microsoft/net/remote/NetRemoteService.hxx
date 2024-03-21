@@ -140,6 +140,16 @@ protected:
     WifiAccessPointEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
+     * @brief Disable an access point. This will take the access point offline, making it unavailable for use by clients.
+     *
+     * @param accessPointId The access point identifier.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointDisableImpl(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
      * @brief Set the active PHY type of the access point. The access point must be enabled. This will cause
      * the access point to temporarily go offline while the change is being applied.
      *

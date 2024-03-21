@@ -1,9 +1,10 @@
 
+#include <algorithm>
 #include <cstddef>
 #include <format>
+#include <iostream>
 #include <iterator>
 #include <memory>
-#include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -17,6 +18,7 @@
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 #include <plog/Log.h>
 
@@ -48,6 +50,7 @@ template <PrintOption printOption = PrintOption::None>
 constexpr std::string_view
 Dot11FrequencyBandToString(Dot11FrequencyBand frequencyBand)
 {
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #define TWO_POINT_4  "2.4"
 #define FIVE_POINT_0 "5.0"
 #define SIX_POINT_0  "6.0"
@@ -83,6 +86,7 @@ Dot11FrequencyBandToString(Dot11FrequencyBand frequencyBand)
 #undef SIX_POINT_0
 #undef GHZ
 #undef QQ
+    // NOLINTEND(cppcoreguidelines-macro-usage)
 }
 
 /**
@@ -234,12 +238,12 @@ NetRemoteAccessPointCapabilitiesToString(const Dot11AccessPointCapabilities& acc
 {
     if (!detailedOutput) {
         return NetRemoteAccessPointCapabilitiesToStringBrief(accessPointCapabilities);
-    } else {
-        const auto indent0 = std::string((indentationLevel + 0) * indentation, ' ');
-        const auto indent1 = std::string((indentationLevel + 1) * indentation, ' ');
-
-        return NetRemoteAccessPointCapabilitiesToStringDetailed(accessPointCapabilities, indent0, indent1);
     }
+
+    const auto indent0 = std::string((indentationLevel + 0) * indentation, ' ');
+    const auto indent1 = std::string((indentationLevel + 1) * indentation, ' ');
+
+    return NetRemoteAccessPointCapabilitiesToStringDetailed(accessPointCapabilities, indent0, indent1);
 }
 } // namespace detail
 
@@ -252,12 +256,20 @@ NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)
 
     auto status = m_connection->Client->WifiAccessPointsEnumerate(&clientContext, request, &result);
     if (!status.ok()) {
-        LOGE << std::format("Failed to enumerate WiFi access points, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        std::cerr << std::format("Failed to enumerate wifi access points ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+    if (!result.has_status()) {
+        std::cerr << "Failed to enumerate wifi access points, no status returned\n";
+        return;
+    }
+    if (result.status().code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+        std::cerr << std::format("Failed to enumerate wifi access points ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
         return;
     }
 
-    if (result.accesspoints().empty()) {
-        LOGI << "No access points found";
+    if (std::empty(result.accesspoints())) {
+        std::cout << "No access points found\n";
         return;
     }
 
@@ -270,7 +282,7 @@ NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)
         }
         ss << ((detailedOutput) ? "\n" : ": ")
            << detail::NetRemoteAccessPointCapabilitiesToString(accessPoint.capabilities(), detailedOutput);
-        LOGI << ss.str();
+        std::cout << ss.str() << '\n';
     }
 }
 
@@ -328,9 +340,19 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
 
     auto status = m_connection->Client->WifiAccessPointEnable(&clientContext, request, &result);
     if (!status.ok()) {
-        LOGE << std::format("Failed to enable WiFi access point, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        std::cerr << std::format("Failed to enable wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(result.status().code()), result.status().message());
         return;
     }
+    if (!result.has_status()) {
+        std::cerr << std::format("Failed to enable wifi access point '{}', no status returned\n", accessPointId);
+        return;
+    }
+    if (result.status().code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+        std::cerr << std::format("Failed to enable wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+
+    std::cout << std::format("Successfully enabled wifi access point '{}'\n", accessPointId);
 }
 
 void
@@ -344,9 +366,19 @@ NetRemoteCliHandlerOperations::WifiAccessPointDisable(std::string_view accessPoi
 
     auto status = m_connection->Client->WifiAccessPointDisable(&clientContext, request, &result);
     if (!status.ok()) {
-        LOGE << std::format("Failed to disable WiFi access point, error={} details={} message={}", magic_enum::enum_name(status.error_code()), status.error_details(), status.error_message());
+        std::cerr << std::format("Failed to disable wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(status.error_code()), status.error_message());
         return;
     }
+    if (!result.has_status()) {
+        std::cerr << std::format("Failed to disable wifi access point '{}', no status returned\n", accessPointId);
+        return;
+    }
+    if (result.status().code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+        std::cerr << std::format("Failed to disable wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+
+    std::cout << std::format("Successfully disabled wifi access point '{}'\n", accessPointId);
 }
 
 std::unique_ptr<INetRemoteCliHandlerOperations>
