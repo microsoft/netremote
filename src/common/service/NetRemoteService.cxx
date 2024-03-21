@@ -316,35 +316,9 @@ NetRemoteService::WifiAccessPointDisable([[maybe_unused]] grpc::ServerContext* c
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    // Create an AP controller for the requested AP.
-    auto accessPointController = detail::TryGetAccessPointController(request, result, m_accessPointManager);
-    if (accessPointController == nullptr) {
-        return grpc::Status::OK;
-    }
-
-    // Obtain current operational state.
-    AccessPointOperationalState operationalState{};
-    auto operationStatus = accessPointController->GetOperationalState(operationalState);
-    if (!operationStatus) {
-        return HandleFailure(request, result, operationStatus.Code, std::format("Failed to get operational state for access point {}", request->accesspointid()));
-    }
-
-    // Disable the access point if it's not already disabled.
-    if (operationalState != AccessPointOperationalState::Disabled) {
-        // Disable the access point.
-        operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Disabled);
-        if (!operationStatus) {
-            return HandleFailure(request, result, operationStatus.Code, std::format("Failed to set operational state to 'disabled' for access point {}", request->accesspointid()));
-        }
-    } else {
-        LOGI << std::format("Access point {} is in 'disabled' operational state", request->accesspointid());
-    }
-
-    WifiAccessPointOperationStatus status{};
-    status.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
-
+    auto wifiOperationStatus = WifiAccessPointDisableImpl(request->accesspointid());
     result->set_accesspointid(request->accesspointid());
-    *result->mutable_status() = std::move(status);
+    *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
 }
@@ -509,6 +483,49 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
         }
     } else {
         LOGI << std::format("Access point {} is already enabled", accessPointId);
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointDisableImpl(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Obtain current operational state.
+    AccessPointOperationalState operationalState{};
+    operationStatus = accessPointController->GetOperationalState(operationalState);
+    if (!operationStatus) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to get operational state for access point {}", accessPointId));
+        return wifiOperationStatus;
+    }
+
+    // Disable the access point if it's not already disabled.
+    if (operationalState != AccessPointOperationalState::Disabled) {
+        // Disable the access point.
+        operationStatus = accessPointController->SetOperationalState(AccessPointOperationalState::Disabled);
+        if (!operationStatus) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to set operational state to 'disabled' for access point {}", accessPointId));
+            return wifiOperationStatus;
+        }
+    } else {
+        LOGI << std::format("Access point {} is already in 'disabled' operational state", accessPointId);
     }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
