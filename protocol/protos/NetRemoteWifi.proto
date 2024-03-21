@@ -19,7 +19,8 @@ message WifiAccessPointsEnumerateRequest
 
 message WifiAccessPointsEnumerateResult
 {
-    repeated Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateResultItem AccessPoints = 1;
+    WifiAccessPointOperationStatus Status = 1;
+    repeated Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateResultItem AccessPoints = 2;
 }
 
 enum WifiAccessPointOperationStatusCode

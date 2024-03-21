@@ -279,10 +279,10 @@ NetRemoteService::WifiAccessPointsEnumerate([[maybe_unused]] grpc::ServerContext
 
     // List all known access points.
     auto accessPoints = m_accessPointManager->GetAllAccessPoints();
+
+    // Convert neutral types to dot11 API types.
     std::vector<WifiAccessPointsEnumerateResultItem> accessPointResultItems(std::size(accessPoints));
-    std::ranges::transform(accessPoints, std::begin(accessPointResultItems), [](auto& accessPointWeak) {
-        return detail::IAccessPointWeakToNetRemoteAccessPointResultItem(accessPointWeak);
-    });
+    std::ranges::transform(accessPoints, std::begin(accessPointResultItems), detail::IAccessPointWeakToNetRemoteAccessPointResultItem);
 
     // Remove any invalid items.
     accessPointResultItems.erase(std::begin(std::ranges::remove_if(accessPointResultItems, detail::NetRemoteAccessPointResultItemIsInvalid)), std::end(accessPointResultItems));
@@ -292,6 +292,8 @@ NetRemoteService::WifiAccessPointsEnumerate([[maybe_unused]] grpc::ServerContext
         std::make_move_iterator(std::begin(accessPointResultItems)),
         std::make_move_iterator(std::end(accessPointResultItems))
     };
+
+    response->mutable_status()->set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     return grpc::Status::OK;
 }
