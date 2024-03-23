@@ -119,6 +119,57 @@ Ieee80211SecurityProtocolToWpaSecurityProtocol(Ieee80211SecurityProtocol ieee802
     }
 }
 
+Wpa::WpaKeyManagement
+Ieee80211AkmSuiteToWpaKeyManagement(Ieee80211AkmSuite ieee80211AkmSuite) noexcept
+{
+    switch (ieee80211AkmSuite) {
+    case Ieee80211AkmSuite::Ieee8021x:
+        return WpaKeyManagement::Ieee80211x;
+    case Ieee80211AkmSuite::Psk:
+        return WpaKeyManagement::Psk;
+    case Ieee80211AkmSuite::Ft8021x:
+        return WpaKeyManagement::FtIeee8021x;
+    case Ieee80211AkmSuite::FtPsk:
+        return WpaKeyManagement::FtPsk;
+    case Ieee80211AkmSuite::Ieee8021xSha256:
+        return WpaKeyManagement::Ieee8021xSha256;
+    case Ieee80211AkmSuite::PskSha256:
+        return WpaKeyManagement::PskSha256;
+    case Ieee80211AkmSuite::Sae:
+        return WpaKeyManagement::Sae;
+    case Ieee80211AkmSuite::FtSae:
+        return WpaKeyManagement::FtSae;
+    case Ieee80211AkmSuite::Ieee8021xSuiteB:
+        return WpaKeyManagement::Ieee80211xSuiteB;
+    case Ieee80211AkmSuite::Ieee8011xSuiteB192:
+        return WpaKeyManagement::Ieee80211xSuiteB192;
+    case Ieee80211AkmSuite::Ft8021xSha384:
+        return WpaKeyManagement::FtIeee8021xSha384;
+    case Ieee80211AkmSuite::FilsSha256:
+        return WpaKeyManagement::FilsSha256;
+    case Ieee80211AkmSuite::FilsSha384:
+        return WpaKeyManagement::FilsSha384;
+    case Ieee80211AkmSuite::FtFilsSha256:
+        return WpaKeyManagement::FtFilsSha256;
+    case Ieee80211AkmSuite::FtFilsSha384:
+        return WpaKeyManagement::FilsSha384;
+    case Ieee80211AkmSuite::Owe:
+        return WpaKeyManagement::Owe;
+    case Ieee80211AkmSuite::Reserved0:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::Tdls:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::ApPeerKey:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::FtPskSha384:
+        [[fallthrough]];
+    case Ieee80211AkmSuite::PskSha384:
+        [[fallthrough]];
+    default:
+        return WpaKeyManagement::Unknown;
+    }
+}
+
 WpaCipher
 Ieee80211CipherSuiteToWpaCipher(Ieee80211CipherSuite ieee80211CipherSuite) noexcept
 {

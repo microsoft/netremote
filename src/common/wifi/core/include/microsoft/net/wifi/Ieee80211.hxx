@@ -179,6 +179,7 @@ static constexpr uint8_t Ieee80211AkmSuiteIdFtFilsSha384 = 17;
 static constexpr uint8_t Ieee80211AkmSuiteIdOwe = 18;
 static constexpr uint8_t Ieee80211AkmSuiteIdFtPskSha384 = 19;
 static constexpr uint8_t Ieee80211AkmSuiteIdPskSha384 = 20;
+static constexpr uint8_t Ieee80211AkmSuiteIdPasn = 21;
 
 /**
  * @brief IEEE 802.11 Authentication and Key Management (AKM) Suites.
@@ -186,6 +187,7 @@ static constexpr uint8_t Ieee80211AkmSuiteIdPskSha384 = 20;
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.3, Table 9-151.
  */
 enum class Ieee80211AkmSuite : uint32_t {
+    Unknown = MakeIeeeSuite(OuiInvalid, 0),
     Reserved0 = MakeIeee80211Suite(Ieee80211AkmSuiteIdReserved0),
     Ieee8021x = MakeIeee80211Suite(Ieee80211AkmSuiteId8021x),
     Psk = MakeIeee80211Suite(Ieee80211AkmSuiteIdPsk),
@@ -207,6 +209,7 @@ enum class Ieee80211AkmSuite : uint32_t {
     Owe = MakeIeee80211Suite(Ieee80211AkmSuiteIdOwe),
     FtPskSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdFtPskSha384),
     PskSha384 = MakeIeee80211Suite(Ieee80211AkmSuiteIdPskSha384),
+    Pasn = MakeIeee80211Suite(Ieee80211AkmSuiteIdPasn),
 };
 
 /**
@@ -214,6 +217,7 @@ enum class Ieee80211AkmSuite : uint32_t {
  * only supports enums with values up to UINT16_MAX-1, and the AKM suite underlying type is uint32_t, so cannot be used.
  */
 constexpr std::initializer_list<uint32_t> AllIeee80211Akms{
+    std::to_underlying(Ieee80211AkmSuite::Unknown),
     std::to_underlying(Ieee80211AkmSuite::Reserved0),
     std::to_underlying(Ieee80211AkmSuite::Ieee8021x),
     std::to_underlying(Ieee80211AkmSuite::Psk),
@@ -235,6 +239,7 @@ constexpr std::initializer_list<uint32_t> AllIeee80211Akms{
     std::to_underlying(Ieee80211AkmSuite::Owe),
     std::to_underlying(Ieee80211AkmSuite::FtPskSha384),
     std::to_underlying(Ieee80211AkmSuite::PskSha384),
+    std::to_underlying(Ieee80211AkmSuite::Pasn),
 };
 
 /**

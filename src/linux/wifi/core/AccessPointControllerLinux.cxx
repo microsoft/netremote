@@ -32,6 +32,7 @@ using namespace Microsoft::Net::Wifi;
 
 using Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy;
 using Wpa::EnforceConfigurationChange;
+using Wpa::HostapdException;
 
 AccessPointControllerLinux::AccessPointControllerLinux(std::string_view interfaceName) :
     AccessPointController(interfaceName),
@@ -261,6 +262,35 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
     } catch (Wpa::HostapdException& ex) {
         status.Code = AccessPointOperationStatusCode::InternalError;
         status.Details = std::format("failed to set authentication algorithms - {}", ex.what());
+        return status;
+    }
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
+
+    return status;
+}
+
+AccessPointOperationStatus
+AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    // Ensure at least one akm suite is requested.
+    if (std::empty(akmSuites)) {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Details = "no akm suites specified";
+        return status;
+    }
+
+    std::vector<Wpa::WpaKeyManagement> wpaKeyManagements(std::size(akmSuites));
+    std::ranges::transform(akmSuites, std::begin(wpaKeyManagements), Ieee80211AkmSuiteToWpaKeyManagement);
+
+    try {
+        m_hostapd.SetKeyManagement(wpaKeyManagements, EnforceConfigurationChange::Now);
+    } catch (HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set akm suites - {}", ex.what());
         return status;
     }
 

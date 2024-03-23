@@ -103,6 +103,15 @@ struct IAccessPointController
     SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept = 0;
 
     /**
+     * @brief Set the authentication and key management (akm) suites the access point should enable.
+     *
+     * @param akmSuites The akm suites to be allowed.
+     * @return AccessPointOperationStatus
+     */
+    virtual AccessPointOperationStatus
+    SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites) noexcept = 0;
+
+    /**
      * @brief Set the pairwise cipher suites the access point should enable. These are used to encrypt unicast packets.
      *
      * @param pairwiseCipherSuites The pairwise cipher suites to enable.
