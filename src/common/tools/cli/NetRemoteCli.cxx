@@ -185,6 +185,39 @@ Ieee80211AuthenticationAlgorithmNames()
         throw std::runtime_error{ "Failed to create authentication algorithm names" };
     }
 }
+
+const std::map<std::string, Ieee80211AkmSuite>&
+Ieee80211AkmSuiteNames()
+{
+    try {
+        static const std::map<std::string, Ieee80211AkmSuite> ieee80211AkmSuiteNames{
+            { "8021x", Ieee80211AkmSuite::Ieee8021x },
+            { "psk" , Ieee80211AkmSuite::Psk },
+            { "ft8021x" , Ieee80211AkmSuite::Ft8021x },
+            { "ftpsk", Ieee80211AkmSuite::FtPsk },
+            { "8021xsha256", Ieee80211AkmSuite::Ieee8021xSha256 },
+            { "psksha256", Ieee80211AkmSuite::PskSha256 },
+            { "tdls", Ieee80211AkmSuite::Tdls },
+            { "sae", Ieee80211AkmSuite::Sae },
+            { "ftsae", Ieee80211AkmSuite::FtSae },
+            { "appeerkey", Ieee80211AkmSuite::ApPeerKey },
+            { "8021xsuiteb", Ieee80211AkmSuite::Ieee8021xSuiteB },
+            { "8021xsuiteb192", Ieee80211AkmSuite::Ieee8011xSuiteB192 },
+            { "ft8021xsha384", Ieee80211AkmSuite::Ft8021xSha384 },
+            { "filssha256", Ieee80211AkmSuite::FilsSha256 },
+            { "filssha384", Ieee80211AkmSuite::FilsSha384 },
+            { "ftfilssha256", Ieee80211AkmSuite::FtFilsSha256 },
+            { "ftfilssha384", Ieee80211AkmSuite::FtFilsSha384 },
+            { "owe", Ieee80211AkmSuite::Owe },
+            { "ftpsksha384", Ieee80211AkmSuite::FtPskSha384 },
+            { "psksha384" , Ieee80211AkmSuite::PskSha384 },
+            { "pasn", Ieee80211AkmSuite::Pasn },
+        };
+        return ieee80211AkmSuiteNames;
+    } catch (...) {
+        throw std::runtime_error{ "Failed to create AKM suite names" };
+    }
+}
 } // namespace detail
 
 CLI::App*
@@ -200,6 +233,8 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
         ->transform(CLI::CheckedTransformer(detail::Ieee80211FrequencyBandNames()));
     cliAppWifiAccessPointEnable->add_option("--auth,--auths,--authAlg,--authAlgs,--authentication,--authenticationAlgorithm,--authenticationAlgorithms", m_cliData->WifiAccessPointAuthenticationAlgorithms, "The authentication algorithms of the access point to enable")
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AuthenticationAlgorithmNames(), CLI::ignore_case));
+    cliAppWifiAccessPointEnable->add_option("--akm,--akms,--akmSuite,--akmSuites,--keyManagement,--keyManagements", m_cliData->WifiAccessPointAkmSuites, "The AKM suites of the access point to enable")
+        ->transform(CLI::CheckedTransformer(detail::Ieee80211AkmSuiteNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
     });

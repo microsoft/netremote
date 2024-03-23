@@ -27,6 +27,7 @@ struct NetRemoteCliData
     Microsoft::Net::Wifi::Ieee80211PhyType WifiAccessPointPhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> WifiAccessPointFrequencyBands{};
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> WifiAccessPointAuthenticationAlgorithms{};
+    std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> WifiAccessPointAkmSuites{};
 };
 } // namespace Microsoft::Net::Remote
 
