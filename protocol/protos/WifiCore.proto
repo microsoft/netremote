@@ -105,6 +105,7 @@ enum Dot11AkmSuite
     Dot11AkmSuiteOwe = 19;
     Dot11AkmSuiteFtPskSha384 = 20;
     Dot11AkmSuitePskSha384 = 21;
+    Dot11AkmSuitePasn = 22;
 }
 
 // 802.11 Cipher suites.

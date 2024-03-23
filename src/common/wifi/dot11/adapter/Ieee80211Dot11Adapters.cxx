@@ -363,6 +363,8 @@ ToDot11AkmSuite(const Ieee80211AkmSuite ieee80211AkmSuite) noexcept
         return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
     case Ieee80211AkmSuite::PskSha384:
         return Dot11AkmSuite::Dot11AkmSuitePskSha384;
+    case Ieee80211AkmSuite::Pasn:
+        return Dot11AkmSuite::Dot11AkmSuitePasn;
     default:
         return Dot11AkmSuite::Dot11AkmSuiteUnknown;
     }
@@ -414,8 +416,10 @@ FromDot11AkmSuite(const Dot11AkmSuite dot11AkmSuite) noexcept
         return Ieee80211AkmSuite::FtPskSha384;
     case Dot11AkmSuite::Dot11AkmSuitePskSha384:
         return Ieee80211AkmSuite::PskSha384;
+    case Dot11AkmSuite::Dot11AkmSuitePasn:
+        return Ieee80211AkmSuite::Pasn;
     default:
-        return Ieee80211AkmSuite::Reserved0; // FIXME: this needs to be an invalid value instead
+        return Ieee80211AkmSuite::Unknown;
     }
 }
 
