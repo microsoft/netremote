@@ -49,27 +49,36 @@ Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm(Ieee80211Authentica
 
 /**
  * @brief Convert a Ieee80211SecurityProtocol to a WpaSecurityProtocol.
- * 
+ *
  * @param ieee80211SecurityProtocol The Ieee80211SecurityProtocol to convert.
- * @return Wpa::WpaSecurityProtocol 
+ * @return Wpa::WpaSecurityProtocol
  */
 Wpa::WpaSecurityProtocol
 Ieee80211SecurityProtocolToWpaSecurityProtocol(Ieee80211SecurityProtocol ieee80211SecurityProtocol) noexcept;
 
 /**
+ * @brief Convert a Ieee80211AkmSuite to a WpaKeyManagement.
+ *
+ * @param ieee80211AkmSuite The Ieee80211AkmSuite to convert.
+ * @return Wpa::WpaKeyManagement
+ */
+Wpa::WpaKeyManagement
+Ieee80211AkmSuiteToWpaKeyManagement(Ieee80211AkmSuite ieee80211AkmSuite) noexcept;
+
+/**
  * @brief Convert a Ieee80211CipherSuite to a WpaCipher.
- * 
+ *
  * @param ieee80211CipherSuite The Ieee80211CipherSuite to convert.
- * @return Wpa::WpaCipher 
+ * @return Wpa::WpaCipher
  */
 Wpa::WpaCipher
 Ieee80211CipherSuiteToWpaCipher(Ieee80211CipherSuite ieee80211CipherSuite) noexcept;
 
 /**
  * @brief Convert a map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to a map of WpaSecurityProtocol to list of WpaCipher.
- * 
+ *
  * @param ieee80211CipherSuiteConfigurations The map of Ieee80211SecurityProtocol to list of Ieee80211CipherSuite to convert.
- * @return std::unordered_map<Wpa::WpaSecurityProtocol, std::vector<Wpa::WpaCipher>> 
+ * @return std::unordered_map<Wpa::WpaSecurityProtocol, std::vector<Wpa::WpaCipher>>
  */
 std::unordered_map<Wpa::WpaSecurityProtocol, std::vector<Wpa::WpaCipher>>
 Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuiteConfigurations) noexcept;

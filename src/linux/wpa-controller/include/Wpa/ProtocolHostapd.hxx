@@ -233,6 +233,7 @@ enum class WpaAlgorithm : uint32_t {
  * Values obtained from hostap/src/common/defs.h.
  */
 enum class WpaKeyManagement : uint32_t {
+    Unknown = 0U,
     Ieee80211x = (1U << 0U),
     Psk = (1U << 1U),
     None = (1U << 2U),
@@ -266,7 +267,8 @@ enum class WpaKeyManagement : uint32_t {
  *
  * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
  */
-inline constexpr std::array<WpaKeyManagement, 26> AllWpaKeyManagements = {
+inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
+    WpaKeyManagement::Unknown,
     WpaKeyManagement::Ieee80211x,
     WpaKeyManagement::Psk,
     WpaKeyManagement::None,
@@ -670,7 +672,7 @@ WpaCipherPropertyName(WpaSecurityProtocol WpaSecurityProtocol) noexcept
     case WpaSecurityProtocol::Wpa:
         return ProtocolHostapd::PropertyNameWpaPairwise;
     case WpaSecurityProtocol::Wpa2:
-    // case WpaSecurityProtocol::Wpa3: // duplicate case value not allowed
+        // case WpaSecurityProtocol::Wpa3: // duplicate case value not allowed
         return ProtocolHostapd::PropertyNameRsnPairwise;
     default:
         return ProtocolHostapd::PropertyNameInvalid;
