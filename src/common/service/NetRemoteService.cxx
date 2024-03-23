@@ -438,6 +438,14 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
+        if (dot11AccessPointConfiguration->akmsuites_size() > 0) {
+            auto dot11AkmSuites = ToDot11AkmSuites(*dot11AccessPointConfiguration);
+            wifiOperationStatus = WifiAccessPointSetAkmSuitesImpl(accessPointId, dot11AkmSuites, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
         if (dot11AccessPointConfiguration->pairwiseciphersuites_size() > 0) {
             auto dot11PairwiseCipherSuites = ToDot11CipherSuiteConfigurations(dot11AccessPointConfiguration->pairwiseciphersuites());
             wifiOperationStatus = WifiAccessPointSetPairwiseCipherSuitesImpl(accessPointId, dot11PairwiseCipherSuites, accessPointController);
@@ -696,6 +704,57 @@ NetRemoteService::WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_vie
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set authentication algorithms for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetAkmSuitesImpl(std::string_view accessPointId, std::vector<Dot11AkmSuite>& dot11AkmSuites, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (std::empty(dot11AkmSuites)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No akm suites provided");
+        return wifiOperationStatus;
+    }
+    if (std::ranges::contains(dot11AkmSuites, Dot11AkmSuite::Dot11AkmSuiteUnknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid akm suite provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Convert to 802.11 neutral type.
+    std::vector<Ieee80211AkmSuite> ieee80211AkmSuites(static_cast<std::size_t>(std::size(dot11AkmSuites)));
+    std::ranges::transform(dot11AkmSuites, std::begin(ieee80211AkmSuites), FromDot11AkmSuite);
+    if (std::ranges::contains(ieee80211AkmSuites, Ieee80211AkmSuite::Unknown)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Invalid akm suite provided");
+        return wifiOperationStatus;
+    }
+
+    // Set the algorithms.
+    operationStatus = accessPointController->SetAkmSuites(std::move(ieee80211AkmSuites));
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set akm suites for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
 

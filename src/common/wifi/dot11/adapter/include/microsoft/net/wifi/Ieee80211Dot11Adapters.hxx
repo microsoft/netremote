@@ -168,6 +168,15 @@ Dot11AkmSuite
 ToDot11AkmSuite(Ieee80211AkmSuite ieee80211AkmSuite) noexcept;
 
 /**
+ * @brief Obtain a vector of Dot11AkmSuites from the specified Dot11AccessPointConfiguration.
+ *
+ * @param dot11AccessPointConfiguration The Dot11AccessPointConfiguration to extract the Dot11AkmSuites from.
+ * @return std::vector<Dot11AkmSuite>
+ */
+std::vector<Dot11AkmSuite>
+ToDot11AkmSuites(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept;
+
+/**
  * @brief Convert the specified Dot11AkmSuite to the equivalent IEEE 802.11 AKM suite algorithm.
  *
  * @param dot11AkmSuite The Dot11AkmSuite to convert.

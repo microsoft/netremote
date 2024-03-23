@@ -164,8 +164,9 @@ message Dot11AccessPointConfiguration
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
     repeated Dot11CipherSuiteConfiguration PairwiseCipherSuites = 4;
-    repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 5;
-    repeated Dot11FrequencyBand FrequencyBands = 6;
+    repeated Dot11AkmSuite AkmSuites = 5;
+    repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 6;
+    repeated Dot11FrequencyBand FrequencyBands = 7;
 }
 
 message Dot11AccessPointCapabilities

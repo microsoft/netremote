@@ -216,6 +216,13 @@ constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
 constexpr auto toDot11CipherSuite = [](const auto& cipherSuite) {
     return static_cast<Dot11CipherSuite>(cipherSuite);
 };
+
+/**
+ * @brief Convert an int-typed Dot11AkmSuite to its proper enum type.
+ */
+constexpr auto toDot11AkmSuite = [](const auto& akmSuite) {
+    return static_cast<Dot11AkmSuite>(akmSuite);
+};
 } // namespace detail
 
 std::vector<Dot11AuthenticationAlgorithm>
@@ -368,6 +375,15 @@ ToDot11AkmSuite(const Ieee80211AkmSuite ieee80211AkmSuite) noexcept
     default:
         return Dot11AkmSuite::Dot11AkmSuiteUnknown;
     }
+}
+
+std::vector<Dot11AkmSuite>
+ToDot11AkmSuites(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept
+{
+    std::vector<Dot11AkmSuite> dot11AkmSuites(static_cast<std::size_t>(std::size(dot11AccessPointConfiguration.akmsuites())));
+    std::ranges::transform(dot11AccessPointConfiguration.akmsuites(), std::begin(dot11AkmSuites), detail::toDot11AkmSuite);
+
+    return dot11AkmSuites;
 }
 
 Ieee80211AkmSuite
