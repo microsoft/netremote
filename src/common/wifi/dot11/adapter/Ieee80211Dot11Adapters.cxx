@@ -386,6 +386,15 @@ ToDot11AkmSuites(const Dot11AccessPointConfiguration& dot11AccessPointConfigurat
     return dot11AkmSuites;
 }
 
+std::vector<Dot11AkmSuite>
+ToDot11AkmSuites(const std::vector<Ieee80211AkmSuite>& ieee80211AkmSuites) noexcept
+{
+    std::vector<Dot11AkmSuite> dot11AkmSuites(static_cast<std::size_t>(std::size(ieee80211AkmSuites)));
+    std::ranges::transform(ieee80211AkmSuites, std::begin(dot11AkmSuites), ToDot11AkmSuite);
+
+    return dot11AkmSuites;
+}
+
 Ieee80211AkmSuite
 FromDot11AkmSuite(const Dot11AkmSuite dot11AkmSuite) noexcept
 {
