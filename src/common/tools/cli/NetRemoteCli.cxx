@@ -74,10 +74,13 @@ NetRemoteCli::CreateParser() noexcept
 
     app->require_subcommand();
 
+    const std::string serverAddressDefault{ Protocol::NetRemoteProtocol::AddressDefault };
     auto* optionServer = app->add_option_function<std::string>("-s,--server", [this](const std::string& serverAddress) {
         OnServerAddressChanged(serverAddress);
     });
     optionServer->description("The address of the netremote server to connect to, with format '<hostname>[:port]'");
+    optionServer->default_val(serverAddressDefault)->run_callback_for_default()->force_callback();
+    optionServer->default_str(serverAddressDefault);
 
     m_cliAppServerAddress = optionServer;
     m_cliAppWifi = AddSubcommandWifi(app.get());
@@ -279,6 +282,7 @@ NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
         serverAddress += std::format("{}{}", NetRemoteProtocol::PortSeparator, NetRemoteProtocol::PortDefault);
     }
 
+    LOGI << std::format("Connecting to server {}", serverAddress);
     m_cliData->ServerAddress = std::move(serverAddress);
 
     auto connection = NetRemoteServerConnection::TryEstablishConnection(m_cliData->ServerAddress);
