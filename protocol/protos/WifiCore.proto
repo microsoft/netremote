@@ -152,6 +152,36 @@ message Dot11SharedKey
     }
 }
 
+message Dot11AuthenticationDataPsk
+{
+    Dot11SharedKey Psk = 1;
+}
+
+// 802.11 Authentication Password.
+//
+// Maps to that defined in IEEE 802.11-2020, Section 12.4, 'Authentication using a password' and 12.4.3, 'Representation
+// of a password' (specifically, Dot11RSNAConfigPasswordValueEntry).
+message Dot11RsnaPassword
+{
+    Dot11SharedKey Credential = 1;
+    Dot11MacAddress PeerMacAddress = 2;
+    string PasswordId = 3;
+}
+
+message Dot11AuthenticationDataSae
+{
+    repeated Dot11RsnaPassword Passwords = 1;
+}
+
+message Dot11AuthenticationData
+{
+    oneof Value
+    {
+        Dot11AuthenticationDataPsk Psk = 1;
+        Dot11AuthenticationDataSae Sae = 2;
+    }
+}
+
 message Dot11CipherSuiteConfiguration
 {
     Dot11SecurityProtocol SecurityProtocol = 1;
@@ -163,10 +193,11 @@ message Dot11AccessPointConfiguration
     Dot11Ssid Ssid = 1;
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
-    repeated Dot11CipherSuiteConfiguration PairwiseCipherSuites = 4;
-    repeated Dot11AkmSuite AkmSuites = 5;
-    repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 6;
-    repeated Dot11FrequencyBand FrequencyBands = 7;
+    Dot11AuthenticationData AuthenticationData = 4;
+    repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 5;
+    repeated Dot11CipherSuiteConfiguration PairwiseCipherSuites = 6;
+    repeated Dot11AkmSuite AkmSuites = 7;
+    repeated Dot11FrequencyBand FrequencyBands = 8;
 }
 
 message Dot11AccessPointCapabilities
