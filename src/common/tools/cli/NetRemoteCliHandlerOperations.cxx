@@ -310,6 +310,15 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
             dot11AccessPointConfiguration.set_phytype(dot11PhyType);
         }
 
+        // Populate AKM suites if present.
+        if (!std::empty(ieee80211AccessPointConfiguration->AkmSuites)) {
+            auto dot11AkmSuites = ToDot11AkmSuites(ieee80211AccessPointConfiguration->AkmSuites);
+            *dot11AccessPointConfiguration.mutable_akmsuites() = {
+                std::make_move_iterator(std::begin(dot11AkmSuites)),
+                std::make_move_iterator(std::end(dot11AkmSuites))
+            };
+        }
+
         // Populate pairwise cipher suites if present.
         if (!std::empty(ieee80211AccessPointConfiguration->PairwiseCipherSuites)) {
             auto dot11PairwiseCipherSuites = ToDot11CipherSuiteConfigurations(ieee80211AccessPointConfiguration->PairwiseCipherSuites);

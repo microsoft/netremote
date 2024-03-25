@@ -216,6 +216,13 @@ constexpr auto toDot11FrequencyBand = [](const auto& frequencyBand) {
 constexpr auto toDot11CipherSuite = [](const auto& cipherSuite) {
     return static_cast<Dot11CipherSuite>(cipherSuite);
 };
+
+/**
+ * @brief Convert an int-typed Dot11AkmSuite to its proper enum type.
+ */
+constexpr auto toDot11AkmSuite = [](const auto& akmSuite) {
+    return static_cast<Dot11AkmSuite>(akmSuite);
+};
 } // namespace detail
 
 std::vector<Dot11AuthenticationAlgorithm>
@@ -363,9 +370,29 @@ ToDot11AkmSuite(const Ieee80211AkmSuite ieee80211AkmSuite) noexcept
         return Dot11AkmSuite::Dot11AkmSuiteFtPskSha384;
     case Ieee80211AkmSuite::PskSha384:
         return Dot11AkmSuite::Dot11AkmSuitePskSha384;
+    case Ieee80211AkmSuite::Pasn:
+        return Dot11AkmSuite::Dot11AkmSuitePasn;
     default:
         return Dot11AkmSuite::Dot11AkmSuiteUnknown;
     }
+}
+
+std::vector<Dot11AkmSuite>
+ToDot11AkmSuites(const Dot11AccessPointConfiguration& dot11AccessPointConfiguration) noexcept
+{
+    std::vector<Dot11AkmSuite> dot11AkmSuites(static_cast<std::size_t>(std::size(dot11AccessPointConfiguration.akmsuites())));
+    std::ranges::transform(dot11AccessPointConfiguration.akmsuites(), std::begin(dot11AkmSuites), detail::toDot11AkmSuite);
+
+    return dot11AkmSuites;
+}
+
+std::vector<Dot11AkmSuite>
+ToDot11AkmSuites(const std::vector<Ieee80211AkmSuite>& ieee80211AkmSuites) noexcept
+{
+    std::vector<Dot11AkmSuite> dot11AkmSuites(static_cast<std::size_t>(std::size(ieee80211AkmSuites)));
+    std::ranges::transform(ieee80211AkmSuites, std::begin(dot11AkmSuites), ToDot11AkmSuite);
+
+    return dot11AkmSuites;
 }
 
 Ieee80211AkmSuite
@@ -414,8 +441,10 @@ FromDot11AkmSuite(const Dot11AkmSuite dot11AkmSuite) noexcept
         return Ieee80211AkmSuite::FtPskSha384;
     case Dot11AkmSuite::Dot11AkmSuitePskSha384:
         return Ieee80211AkmSuite::PskSha384;
+    case Dot11AkmSuite::Dot11AkmSuitePasn:
+        return Ieee80211AkmSuite::Pasn;
     default:
-        return Ieee80211AkmSuite::Reserved0; // FIXME: this needs to be an invalid value instead
+        return Ieee80211AkmSuite::Unknown;
     }
 }
 
