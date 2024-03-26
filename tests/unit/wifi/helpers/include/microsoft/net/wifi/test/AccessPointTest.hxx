@@ -12,6 +12,7 @@
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Wifi::Test
 {
@@ -28,6 +29,7 @@ struct AccessPointTest final :
     std::string InterfaceName;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
+    Microsoft::Net::Wifi::Ieee80211AuthenticationData AuthenticationData;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
     std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> AkmSuites;

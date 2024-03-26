@@ -271,6 +271,19 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
 }
 
 AccessPointOperationStatus
+AccessPointControllerLinux::SetAuthenticationData([[maybe_unused]] Ieee80211AuthenticationData authenticationData) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    // TODO: implement this
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
+
+    return status;
+}
+
+AccessPointOperationStatus
 AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };

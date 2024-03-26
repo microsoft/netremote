@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -23,6 +24,7 @@ struct Ieee80211AccessPointConfiguration
     std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> PairwiseCipherSuites;
     std::vector<Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
     std::vector<Ieee80211FrequencyBand> FrequencyBands;
+    Ieee80211AuthenticationData AuthenticationData;
 };
 } // namespace Microsoft::Net::Wifi
 

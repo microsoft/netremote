@@ -186,6 +186,18 @@ protected:
     WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11AuthenticationAlgorithm>& dot11AuthenticationAlgorithms, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
+     * @brief Set the active authentication data of the access point. If the access point is online, this will cause it to
+     * temporarily go offline while the change is being applied.
+     * 
+     * @param accessPointId The access point identifier.
+     * @param dot11AuthenticationData The new authentication data to set.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetAuthenticationDataImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AuthenticationData& dot11AuthenticationData, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
      * @brief Set the active AKM suites of the access point. If the access point is online, this will cause it to
      * temporarily go offline while the change is being applied.
      *

@@ -10,6 +10,7 @@
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -247,6 +248,114 @@ FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtoco
  */
 Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept;
+
+/**
+ * @brief Convert the specified Dot11MacAddress to the equivalent IEEE 802.11 mac address.
+ *
+ * @param dot11MacAddress The Dot11MacAddress to convert.
+ * @return Ieee80211MacAddress
+ */
+Ieee80211MacAddress
+FromDot11MacAddress(const Dot11MacAddress& dot11MacAddress) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 mac address to the equivalent Dot11MacAddress.
+ *
+ * @param ieee80211MacAddress The IEEE 802.11 mac address to convert.
+ * @return Dot11MacAddress
+ */
+Dot11MacAddress
+ToDot11MacAddress(const Ieee80211MacAddress& ieee80211MacAddress) noexcept;
+
+/**
+ * @brief Convert the specified Dot11SharedKey to the equivalent IEEE 802.11 shared key.
+ *
+ * @param dot11SharedKey The Dot11SharedKey to convert.
+ * @return Ieee80211SharedKey
+ */
+Ieee80211SharedKey
+FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 shared key to the equivalent Dot11SharedKey.
+ *
+ * @param ieee80211SharedKey The IEEE 802.11 shared key to convert.
+ * @return Dot11SharedKey
+ */
+Dot11SharedKey
+ToDot11SharedKey(const Ieee80211SharedKey& ieee80211SharedKey) noexcept;
+
+/**
+ * @brief Convert the specified Dot11RsnaPassword to the equivalent IEEE 802.11 RSNA password.
+ *
+ * @param dot11RsnaPassword The Dot11RsnaPassword to convert.
+ * @return Ieee80211RsnaPassword
+ */
+Ieee80211RsnaPassword
+FromDot11RsnaPassword(const Dot11RsnaPassword& dot11RsnaPassword) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 RSNA password to the equivalent Dot11RsnaPassword.
+ *
+ * @param ieee80211RsnaPassword The IEEE 802.11 RSNA password to convert.
+ * @return Dot11RsnaPassword
+ */
+Dot11RsnaPassword
+ToDot11RsnaPassword(const Ieee80211RsnaPassword& ieee80211RsnaPassword) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AuthenticationDataPsk to the equivalent IEEE 802.11 authentication data.
+ *
+ * @param dot11AuthenticationDataPsk The Dot11AuthenticationDataPsk to convert.
+ * @return Ieee80211AuthenticationDataPsk
+ */
+Ieee80211AuthenticationDataPsk
+FromDot11AuthenticationDataPsk(const Dot11AuthenticationDataPsk& dot11AuthenticationDataPsk) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 authentication data to the equivalent Dot11AuthenticationDataPsk.
+ *
+ * @param ieee80211AuthenticationDataPsk The IEEE 802.11 authentication data to convert.
+ * @return Dot11AuthenticationDataPsk
+ */
+Dot11AuthenticationDataPsk
+ToDot11AuthenticationDataPsk(const Ieee80211AuthenticationDataPsk& ieee80211AuthenticationDataPsk) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AuthenticationDataSae to the equivalent IEEE 802.11 authentication data.
+ *
+ * @param dot11AuthenticationDataSae The Dot11AuthenticationDataSae to convert.
+ * @return Ieee80211AuthenticationDataSae
+ */
+Ieee80211AuthenticationDataSae
+FromDot11AuthenticationDataSae(const Dot11AuthenticationDataSae& dot11AuthenticationDataSae) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 authentication data to the equivalent Dot11AuthenticationDataSae.
+ *
+ * @param ieee80211AuthenticationDataSae The IEEE 802.11 authentication data to convert.
+ * @return Dot11AuthenticationDataSae
+ */
+Dot11AuthenticationDataSae
+ToDot11AuthenticationDataSae(const Ieee80211AuthenticationDataSae& ieee80211AuthenticationDataSae) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AuthenticationData to the equivalent IEEE 802.11 authentication data.
+ *
+ * @param dot11AuthenticationData The Dot11AuthenticationData to convert.
+ * @return Ieee80211AuthenticationData
+ */
+Ieee80211AuthenticationData
+FromDot11AuthenticationData(const Dot11AuthenticationData& dot11AuthenticationData) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.11 authentication data to the equivalent Dot11AuthenticationData.
+ *
+ * @param ieee80211AuthenticationData The IEEE 802.11 authentication data to convert.
+ * @return Dot11AuthenticationData
+ */
+Dot11AuthenticationData
+ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211AuthenticationData) noexcept;
 
 } // namespace Microsoft::Net::Wifi
 

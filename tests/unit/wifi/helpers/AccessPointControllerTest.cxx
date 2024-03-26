@@ -126,6 +126,19 @@ AccessPointControllerTest::SetAuthenticationAlgorithms(std::vector<Ieee80211Auth
 }
 
 AccessPointOperationStatus
+AccessPointControllerTest::SetAuthenticationData(Ieee80211AuthenticationData authenticationData) noexcept
+{
+    assert(AccessPoint != nullptr);
+
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    AccessPoint->AuthenticationData = std::move(authenticationData);
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
+AccessPointOperationStatus
 AccessPointControllerTest::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuites) noexcept
 {
     assert(AccessPoint != nullptr);
