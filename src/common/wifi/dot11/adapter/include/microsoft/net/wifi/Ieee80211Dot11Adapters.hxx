@@ -10,6 +10,7 @@
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -247,6 +248,15 @@ FromDot11CipherSuiteConfigurations(const std::unordered_map<Dot11SecurityProtoco
  */
 Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AuthenticationData to the equivalent IEEE 802.11 authentication data.
+ *
+ * @param dot11AuthenticationData The Dot11AuthenticationData to convert.
+ * @return Ieee80211AuthenticationData
+ */
+Ieee80211AuthenticationData
+FromDot11AuthenticationData(const Dot11AuthenticationData& dot11AuthenticationData) noexcept;
 
 } // namespace Microsoft::Net::Wifi
 

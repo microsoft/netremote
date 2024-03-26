@@ -13,6 +13,7 @@
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -99,6 +100,15 @@ struct AccessPointControllerLinux :
      */
     AccessPointOperationStatus
     SetAuthenticationAlgorithms(std::vector<Ieee80211AuthenticationAlgorithm> authenticationAlgorithms) noexcept override;
+
+    /**
+     * @brief Set the authentication data the access point should use.
+     *
+     * @param authenticationData The authentication data to be set.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetAuthenticationData(Ieee80211AuthenticationData authenticationData) noexcept override;
 
     /**
      * @brief Set the authentication and key management (akm) suites the access point should enable.
