@@ -631,6 +631,16 @@ FromDot11MacAddress(const Dot11MacAddress& dot11MacAddress) noexcept
     return ieee80211MacAddress;
 }
 
+Dot11MacAddress
+ToDot11MacAddress(const Ieee80211MacAddress& ieee80211MacAddress) noexcept
+{
+    Dot11MacAddress dot11MacAddress{};
+
+    dot11MacAddress.mutable_value()->assign(std::cbegin(ieee80211MacAddress), std::cend(ieee80211MacAddress));
+
+    return dot11MacAddress;
+}
+
 Ieee80211SharedKey
 FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept
 {
@@ -651,6 +661,16 @@ FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept
     return ieee80211SharedKey;
 }
 
+Dot11SharedKey
+ToDot11SharedKey(const Ieee80211SharedKey& ieee80211SharedKey) noexcept
+{
+    Dot11SharedKey dot11SharedKey{};
+
+    dot11SharedKey.mutable_data()->assign(std::cbegin(ieee80211SharedKey.Data), std::cend(ieee80211SharedKey.Data));
+
+    return dot11SharedKey;
+}
+
 Ieee80211RsnaPassword
 FromDot11RsnaPassword(const Dot11RsnaPassword& dot11RsnaPassword) noexcept
 {
@@ -669,6 +689,23 @@ FromDot11RsnaPassword(const Dot11RsnaPassword& dot11RsnaPassword) noexcept
     return ieee80211RsnaPassword;
 }
 
+Dot11RsnaPassword
+ToDot11RsnaPassword(const Ieee80211RsnaPassword& ieee80211RsnaPassword) noexcept
+{
+    Dot11RsnaPassword dot11RsnaPassword{};
+
+    *dot11RsnaPassword.mutable_credential() = ToDot11SharedKey(ieee80211RsnaPassword.Credential);
+
+    if (ieee80211RsnaPassword.PeerMacAddress.has_value()) {
+        *dot11RsnaPassword.mutable_peermacaddress() = ToDot11MacAddress(ieee80211RsnaPassword.PeerMacAddress.value());
+    }
+    if (ieee80211RsnaPassword.PasswordId.has_value()) {
+        dot11RsnaPassword.set_passwordid(ieee80211RsnaPassword.PasswordId.value());
+    }
+
+    return dot11RsnaPassword;
+}
+
 Ieee80211AuthenticationDataPsk
 FromDot11AuthenticationDataPsk(const Dot11AuthenticationDataPsk& dot11AuthenticationDataPsk) noexcept
 {
@@ -681,6 +718,16 @@ FromDot11AuthenticationDataPsk(const Dot11AuthenticationDataPsk& dot11Authentica
     return ieee80211AuthenticationDataPsk;
 }
 
+Dot11AuthenticationDataPsk
+ToDot11AuthenticationDataPsk(const Ieee80211AuthenticationDataPsk& ieee80211AuthenticationDataPsk) noexcept
+{
+    Dot11AuthenticationDataPsk dot11AuthenticationDataPsk{};
+
+    *dot11AuthenticationDataPsk.mutable_key() = ToDot11SharedKey(ieee80211AuthenticationDataPsk.Key);
+
+    return dot11AuthenticationDataPsk;
+}
+
 Ieee80211AuthenticationDataSae
 FromDot11AuthenticationDataSae(const Dot11AuthenticationDataSae& dot11AuthenticationDataSae) noexcept
 {
@@ -691,6 +738,21 @@ FromDot11AuthenticationDataSae(const Dot11AuthenticationDataSae& dot11Authentica
     ieee80211AuthenticationDataSae.Passwords = std::move(ieee80211RsnaPasswords);
 
     return ieee80211AuthenticationDataSae;
+}
+
+Dot11AuthenticationDataSae
+ToDot11AuthenticationDataSae(const Ieee80211AuthenticationDataSae& ieee80211AuthenticationDataSae) noexcept
+{
+    Dot11AuthenticationDataSae dot11AuthenticationDataSae{};
+
+    std::vector<Dot11RsnaPassword> dot11RsnaPasswords(std::size(ieee80211AuthenticationDataSae.Passwords));
+    std::ranges::transform(ieee80211AuthenticationDataSae.Passwords, std::begin(dot11RsnaPasswords), ToDot11RsnaPassword);
+    *dot11AuthenticationDataSae.mutable_passwords() = {
+        std::make_move_iterator(std::begin(dot11RsnaPasswords)),
+        std::make_move_iterator(std::end(dot11RsnaPasswords))
+    };
+
+    return dot11AuthenticationDataSae;
 }
 
 Ieee80211AuthenticationData
@@ -706,6 +768,21 @@ FromDot11AuthenticationData(const Dot11AuthenticationData& dot11AuthenticationDa
     }
 
     return ieee80211AuthenticationData;
+}
+
+Dot11AuthenticationData
+ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211AuthenticationData) noexcept
+{
+    Dot11AuthenticationData dot11AuthenticationData{};
+
+    if (ieee80211AuthenticationData.Psk.has_value()) {
+        *dot11AuthenticationData.mutable_psk() = ToDot11AuthenticationDataPsk(ieee80211AuthenticationData.Psk.value());
+    }
+    if (ieee80211AuthenticationData.Sae.has_value()) {
+        *dot11AuthenticationData.mutable_sae() = ToDot11AuthenticationDataSae(ieee80211AuthenticationData.Sae.value());
+    }
+
+    return dot11AuthenticationData;
 }
 
 } // namespace Microsoft::Net::Wifi
