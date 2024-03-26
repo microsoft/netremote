@@ -438,6 +438,13 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
+        if (dot11AccessPointConfiguration->authenticationdata().has_psk() || dot11AccessPointConfiguration->authenticationdata().has_sae()) {
+            wifiOperationStatus = WifiAccessPointSetAuthenticationDataImpl(accessPointId, dot11AccessPointConfiguration->authenticationdata(), accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
         if (dot11AccessPointConfiguration->akmsuites_size() > 0) {
             auto dot11AkmSuites = ToDot11AkmSuites(*dot11AccessPointConfiguration);
             wifiOperationStatus = WifiAccessPointSetAkmSuitesImpl(accessPointId, dot11AkmSuites, accessPointController);
@@ -704,6 +711,72 @@ NetRemoteService::WifiAccessPointSetAuthenticationAlgorithsmImpl(std::string_vie
     if (!operationStatus.Succeeded()) {
         wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
         wifiOperationStatus.set_message(std::format("Failed to set authentication algorithms for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view accessPointId, const Dot11AuthenticationData& dot11AuthenticationData, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (!dot11AuthenticationData.has_psk() && !dot11AuthenticationData.has_sae()) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No authentication data provided");
+        return wifiOperationStatus;
+    }
+    if (dot11AuthenticationData.has_psk() && dot11AuthenticationData.has_sae()) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Both PSK and SAE authentication data provided");
+        return wifiOperationStatus;
+    }
+    if (dot11AuthenticationData.has_psk()) {
+        const auto& dataPsk = dot11AuthenticationData.psk();
+        if (!dataPsk.has_key()) {
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+            wifiOperationStatus.set_message("No PSK key provided");
+            return wifiOperationStatus;
+        }
+        const auto& pskKey = dataPsk.key();
+        if (!pskKey.has_data() && !pskKey.has_passphrase()) {
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+            wifiOperationStatus.set_message("No PSK key data or passphrase provided");
+            return wifiOperationStatus;
+        }
+    } else if (dot11AuthenticationData.has_sae()) {
+        const auto& dataSae = dot11AuthenticationData.sae();
+        if (std::empty(dataSae.passwords())) {
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+            wifiOperationStatus.set_message("No SAE passwords provided");
+            return wifiOperationStatus;
+        }
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Convert to 802.11 neutral type.
+    auto ieee80211AuthenticationData = FromDot11AuthenticationData(dot11AuthenticationData);
+
+    // Set the authentication data.
+    operationStatus = accessPointController->SetAuthenticationData(std::move(ieee80211AuthenticationData));
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set authentication data for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
 
