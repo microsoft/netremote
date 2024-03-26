@@ -154,7 +154,7 @@ message Dot11SharedKey
 
 message Dot11AuthenticationDataPsk
 {
-    Dot11SharedKey Psk = 1;
+    Dot11SharedKey Key = 1;
 }
 
 // 802.11 Authentication Password.
