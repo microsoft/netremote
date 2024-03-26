@@ -2,6 +2,7 @@
 #ifndef IEEE_80211_AUTHENTICATION_HXX
 #define IEEE_80211_AUTHENTICATION_HXX
 
+#include <cstddef>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -11,6 +12,9 @@
 
 namespace Microsoft::Net::Wifi
 {
+constexpr std::size_t Ieee80211PskLengthMinimum{ 8 };
+constexpr std::size_t Ieee80211PskLengthMaximum{ 63 };
+
 struct Ieee80211SharedKey
 {
     std::vector<std::uint8_t> Data;
@@ -25,7 +29,7 @@ struct Ieee80211RsnaPassword
 
 struct Ieee80211AuthenticationDataPsk
 {
-    Ieee80211SharedKey Psk;
+    Ieee80211SharedKey Key;
 };
 
 struct Ieee80211AuthenticationDataSae

@@ -618,4 +618,94 @@ ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211
     return dot11Capabilities;
 }
 
+Ieee80211MacAddress
+FromDot11MacAddress(const Dot11MacAddress& dot11MacAddress) noexcept
+{
+    Ieee80211MacAddress ieee80211MacAddress{};
+
+    const auto& value = dot11MacAddress.value();
+    if (std::size(value) >= std::size(ieee80211MacAddress)) {
+        std::ranges::copy_n(std::cbegin(value), std::size(ieee80211MacAddress), std::begin(ieee80211MacAddress));
+    }
+
+    return ieee80211MacAddress;
+}
+
+Ieee80211SharedKey
+FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept
+{
+    Ieee80211SharedKey ieee80211SharedKey{};
+
+    if (dot11SharedKey.has_data()) {
+        const auto& keyData = dot11SharedKey.data();
+        ieee80211SharedKey.Data.assign(std::cbegin(keyData), std::cend(keyData));
+    } else if (dot11SharedKey.has_passphrase()) {
+        const auto& keyPassphrase = dot11SharedKey.passphrase();
+        const auto keyPassphraseSize = std::size(keyPassphrase);
+        if (keyPassphraseSize >= Ieee80211PskLengthMinimum && keyPassphraseSize <= Ieee80211PskLengthMaximum) {
+            // The last character of the passphrase is a null terminator, which must not be included.
+            ieee80211SharedKey.Data.assign(std::cbegin(keyPassphrase), std::cend(keyPassphrase) - 1);
+        }
+    }
+
+    return ieee80211SharedKey;
+}
+
+Ieee80211RsnaPassword
+FromDot11RsnaPassword(const Dot11RsnaPassword& dot11RsnaPassword) noexcept
+{
+    Ieee80211RsnaPassword ieee80211RsnaPassword{};
+
+    if (dot11RsnaPassword.has_credential()) {
+        ieee80211RsnaPassword.Credential = FromDot11SharedKey(dot11RsnaPassword.credential());
+    }
+    if (dot11RsnaPassword.has_peermacaddress()) {
+        ieee80211RsnaPassword.PeerMacAddress = FromDot11MacAddress(dot11RsnaPassword.peermacaddress());
+    }
+    if (!std::empty(dot11RsnaPassword.passwordid())) {
+        ieee80211RsnaPassword.PasswordId = dot11RsnaPassword.passwordid();
+    }
+
+    return ieee80211RsnaPassword;
+}
+
+Ieee80211AuthenticationDataPsk
+FromDot11AuthenticationDataPsk(const Dot11AuthenticationDataPsk& dot11AuthenticationDataPsk) noexcept
+{
+    Ieee80211AuthenticationDataPsk ieee80211AuthenticationDataPsk{};
+
+    if (dot11AuthenticationDataPsk.has_key()) {
+        ieee80211AuthenticationDataPsk.Key = FromDot11SharedKey(dot11AuthenticationDataPsk.key());
+    }
+
+    return ieee80211AuthenticationDataPsk;
+}
+
+Ieee80211AuthenticationDataSae
+FromDot11AuthenticationDataSae(const Dot11AuthenticationDataSae& dot11AuthenticationDataSae) noexcept
+{
+    Ieee80211AuthenticationDataSae ieee80211AuthenticationDataSae{};
+
+    std::vector<Ieee80211RsnaPassword> ieee80211RsnaPasswords(static_cast<std::size_t>(dot11AuthenticationDataSae.passwords_size()));
+    std::ranges::transform(dot11AuthenticationDataSae.passwords(), std::begin(ieee80211RsnaPasswords), FromDot11RsnaPassword);
+    ieee80211AuthenticationDataSae.Passwords = std::move(ieee80211RsnaPasswords);
+
+    return ieee80211AuthenticationDataSae;
+}
+
+Ieee80211AuthenticationData
+FromDot11AuthenticationData(const Dot11AuthenticationData& dot11AuthenticationData) noexcept
+{
+    Ieee80211AuthenticationData ieee80211AuthenticationData{};
+
+    if (dot11AuthenticationData.has_psk()) {
+        ieee80211AuthenticationData.Psk = FromDot11AuthenticationDataPsk(dot11AuthenticationData.psk());
+    }
+    if (dot11AuthenticationData.has_sae()) {
+        ieee80211AuthenticationData.Sae = FromDot11AuthenticationDataSae(dot11AuthenticationData.sae());
+    }
+
+    return ieee80211AuthenticationData;
+}
+
 } // namespace Microsoft::Net::Wifi

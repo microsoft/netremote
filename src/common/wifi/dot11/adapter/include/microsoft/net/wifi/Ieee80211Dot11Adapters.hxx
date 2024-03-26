@@ -250,6 +250,51 @@ Dot11AccessPointCapabilities
 ToDot11AccessPointCapabilities(const Ieee80211AccessPointCapabilities& ieee80211AccessPointCapabilities) noexcept;
 
 /**
+ * @brief Convert the specified Dot11MacAddress to the equivalent IEEE 802.11 mac address.
+ * 
+ * @param dot11MacAddress The Dot11MacAddress to convert.
+ * @return Ieee80211MacAddress 
+ */
+Ieee80211MacAddress
+FromDot11MacAddress(const Dot11MacAddress& dot11MacAddress) noexcept;
+
+/**
+ * @brief Convert the specified Dot11SharedKey to the equivalent IEEE 802.11 shared key.
+ * 
+ * @param dot11SharedKey The Dot11SharedKey to convert.
+ * @return Ieee80211SharedKey 
+ */
+Ieee80211SharedKey
+FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept;
+
+/**
+ * @brief Convert the specified Dot11RsnaPassword to the equivalent IEEE 802.11 RSNA password.
+ * 
+ * @param dot11RsnaPassword The Dot11RsnaPassword to convert.
+ * @return Ieee80211RsnaPassword 
+ */
+Ieee80211RsnaPassword
+FromDot11RsnaPassword(const Dot11RsnaPassword& dot11RsnaPassword) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AuthenticationDataPsk to the equivalent IEEE 802.11 authentication data.
+ * 
+ * @param dot11AuthenticationDataPsk The Dot11AuthenticationDataPsk to convert.
+ * @return Ieee80211AuthenticationDataPsk 
+ */
+Ieee80211AuthenticationDataPsk
+FromDot11AuthenticationDataPsk(const Dot11AuthenticationDataPsk& dot11AuthenticationDataPsk) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AuthenticationDataSae to the equivalent IEEE 802.11 authentication data.
+ * 
+ * @param dot11AuthenticationDataSae The Dot11AuthenticationDataSae to convert.
+ * @return Ieee80211AuthenticationDataSae 
+ */
+Ieee80211AuthenticationDataSae
+FromDot11AuthenticationDataSae(const Dot11AuthenticationDataSae& dot11AuthenticationDataSae) noexcept;
+
+/**
  * @brief Convert the specified Dot11AuthenticationData to the equivalent IEEE 802.11 authentication data.
  *
  * @param dot11AuthenticationData The Dot11AuthenticationData to convert.
