@@ -405,6 +405,16 @@ static constexpr auto BssidNumOctets = 6;
 using Ieee80211Bssid = std::array<uint8_t, BssidNumOctets>;
 
 /**
+ * @brief Number of octets per MAC address.
+ */
+static constexpr auto MacAddressNumOctets = 6;
+
+/**
+ * @brief MAC address type.
+ */
+using Ieee80211MacAddress = std::array<uint8_t, MacAddressNumOctets>;
+
+/**
  * @brief Information about a BSS.
  */
 struct Ieee80211Bss
