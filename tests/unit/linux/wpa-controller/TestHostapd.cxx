@@ -675,3 +675,56 @@ TEST_CASE("Send SetAuthenticationAlgorithms() command (root)", "[wpa][hostapd][c
         REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem, WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Defer));
     }
 }
+
+TEST_CASE("Send SetSaePasswords() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    static constexpr std::initializer_list<uint8_t> AsciiPassword{ 0x70, 0x61, 0x73, 0x73, 0x77, 0x6F, 0x72, 0x64 };
+
+    static const SaePassword SaePasswordValid1{
+        .Credential = AsciiPassword,
+        .PasswordId = std::nullopt,
+        .PeerMacAddress = std::nullopt,
+        .VlanId = std::nullopt,
+    };
+
+    static const SaePassword SaePasswordValid2{
+        .Credential = AsciiPassword,
+        .PasswordId = "someid",
+        .PeerMacAddress = std::nullopt,
+        .VlanId = std::nullopt,
+    };
+
+    static const SaePassword SaePasswordValid3{
+        .Credential = AsciiPassword,
+        .PasswordId = "someid",
+        .PeerMacAddress = "00:11:22:33:44:55",
+        .VlanId = std::nullopt,
+    };
+
+    static const SaePassword SaePasswordValidComplete{
+        .Credential = AsciiPassword,
+        .PasswordId = "someid",
+        .PeerMacAddress = "00:11:22:33:44:55",
+        .VlanId = 1,
+    };
+
+    static const std::vector<SaePassword> SaePasswordsValid{ SaePasswordValid1, SaePasswordValid2, SaePasswordValid3, SaePasswordValidComplete };
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetSaePasswords({ SaePasswordValidComplete }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetSaePasswords({ SaePasswordValidComplete }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid inputs")
+    {
+        for (auto& saePassword : SaePasswordsValid) {
+            REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Defer));
+        }
+    }
+}
