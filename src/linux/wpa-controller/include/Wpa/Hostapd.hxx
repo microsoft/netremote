@@ -145,6 +145,24 @@ struct Hostapd :
     void
     SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolPairwiseCipherMap, EnforceConfigurationChange enforceConfigurationChange) override;
 
+    /**
+     * @brief Set the accepted SAE passwords for the interface.
+     *
+     * @param saePasswords The SAE passwords to set.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    void
+    SetSaePasswords(std::vector<SaePassword> saePasswords, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Now) override;
+
+    /**
+     * @brief Add an SAE password.
+     *
+     * @param saePassword The SAE password to add.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Defer) override;
+
 private:
     const std::string m_interface;
     WpaController m_controller;

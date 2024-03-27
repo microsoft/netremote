@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -501,6 +502,12 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameWpaPsk = "wpa_psk";
     static constexpr auto PropertyNameRsnPairwise = "rsn_pairwise";
 
+    static constexpr auto PropertyNameSaePassword = "sae_password";
+    static constexpr auto PropertyValueSaePasswordKeyPeerMac = "mac";
+    static constexpr auto PropertyValueSaePasswordKeyPasswordId = "id";
+    static constexpr auto PropertyValueSaePasswordKeyVlanId = "vlanid";
+    static constexpr auto PropertyValueSaePasswordClearAll = "";
+
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
     static constexpr auto ResponseStatusPropertyKeyState = PropertyNameState;
@@ -702,6 +709,17 @@ WpaAuthenticationAlgorithmPropertyValue(WpaAuthenticationAlgorithm wpaAuthentica
 {
     return std::to_underlying(wpaAuthenticationAlgorithm);
 }
+
+/**
+ * @brief SAE password entry.
+ */
+struct SaePassword
+{
+    std::vector<uint8_t> Credential;
+    std::optional<std::string> PasswordId;
+    std::optional<std::string> PeerMacAddress;
+    std::optional<int32_t> VlanId;  
+};
 } // namespace Wpa
 
 #endif // HOSTAPD_PROTOCOL_HXX
