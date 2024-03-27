@@ -364,13 +364,16 @@ Hostapd::AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enfo
 
         saePasswordValueBuilder << credentialValue;
         if (saePassword.PasswordId.has_value()) {
-            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaePasswordKeyPasswordId << ProtocolHostapd::KeyValueDelimiter << saePassword.PasswordId.value();
+            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaeKeyValueSeparator
+                                    << ProtocolHostapd::PropertyValueSaePasswordKeyPasswordId << ProtocolHostapd::KeyValueDelimiter << saePassword.PasswordId.value();
         }
         if (saePassword.PeerMacAddress.has_value()) {
-            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaePasswordKeyPeerMac << ProtocolHostapd::KeyValueDelimiter << saePassword.PeerMacAddress.value();
+            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaeKeyValueSeparator
+                                    << ProtocolHostapd::PropertyValueSaePasswordKeyPeerMac << ProtocolHostapd::KeyValueDelimiter << saePassword.PeerMacAddress.value();
         }
         if (saePassword.VlanId.has_value()) {
-            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaePasswordKeyVlanId << ProtocolHostapd::KeyValueDelimiter << saePassword.VlanId.value();
+            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaeKeyValueSeparator
+                                    << ProtocolHostapd::PropertyValueSaePasswordKeyVlanId << ProtocolHostapd::KeyValueDelimiter << saePassword.VlanId.value();
         }
 
         saePasswordValue = saePasswordValueBuilder.str();

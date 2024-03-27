@@ -507,6 +507,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyValueSaePasswordKeyPasswordId = "id";
     static constexpr auto PropertyValueSaePasswordKeyVlanId = "vlanid";
     static constexpr auto PropertyValueSaePasswordClearAll = "";
+    static constexpr auto PropertyValueSaeKeyValueSeparator = "|";
 
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
