@@ -2,12 +2,15 @@
 #ifndef IEEE_80211_WPA_ADAPTERS_HXX
 #define IEEE_80211_WPA_ADAPTERS_HXX
 
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -82,6 +85,24 @@ Ieee80211CipherSuiteToWpaCipher(Ieee80211CipherSuite ieee80211CipherSuite) noexc
  */
 std::unordered_map<Wpa::WpaSecurityProtocol, std::vector<Wpa::WpaCipher>>
 Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuiteConfigurations) noexcept;
+
+/**
+ * @brief Convert a Ieee80211SharedKey to a wpa credential.
+ *
+ * @param ieee80211SharedKey The Ieee80211SharedKey to convert.
+ * @return std::vector<uint8_t>
+ */
+std::vector<uint8_t>
+Ieee80211SharedKeyToWpaCredential(const Ieee80211SharedKey& ieee80211SharedKey) noexcept;
+
+/**
+ * @brief Convert a Ieee80211RsnaPassword to a WpaSaePassword.
+ *
+ * @param ieee80211RsnaPassword The Ieee80211RsnaPassword to convert.
+ * @return Wpa::SaePassword
+ */
+Wpa::SaePassword
+Ieee80211RsnaPasswordToWpaSaePassword(const Ieee80211RsnaPassword& ieee80211RsnaPassword) noexcept;
 } // namespace Microsoft::Net::Wifi
 
 #endif // IEEE_80211_WPA_ADAPTERS_HXX
