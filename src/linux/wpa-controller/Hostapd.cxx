@@ -332,3 +332,56 @@ Hostapd::SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::ve
         }
     }
 }
+
+void
+Hostapd::SetSaePasswords(std::vector<SaePassword> saePasswords, EnforceConfigurationChange enforceConfigurationChange)
+{
+    try {
+        // First set the special value which clears all saved passwords.
+        SetProperty(ProtocolHostapd::PropertyNameSaePassword, ProtocolHostapd::PropertyValueSaePasswordClearAll, EnforceConfigurationChange::Defer);
+
+        // Now set the new passwords, deferring the configuration change (if requested) until the end.
+        for (const auto& saePassword : saePasswords) {
+            AddSaePassword(saePassword, EnforceConfigurationChange::Defer);
+        }
+
+        // Now that all passwords are set, enforce the configuration change if requested.
+        if (enforceConfigurationChange == EnforceConfigurationChange::Now) {
+            Reload();
+        }
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set sae passwords ({})", e.what()));
+    }
+}
+
+void
+Hostapd::AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange)
+{
+    std::string credentialValue(std::cbegin(saePassword.Credential), std::cend(saePassword.Credential));
+    std::string saePasswordValue;
+    {
+        std::ostringstream saePasswordValueBuilder{};
+
+        saePasswordValueBuilder << credentialValue;
+        if (saePassword.PasswordId.has_value()) {
+            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaeKeyValueSeparator
+                                    << ProtocolHostapd::PropertyValueSaePasswordKeyPasswordId << ProtocolHostapd::KeyValueDelimiter << saePassword.PasswordId.value();
+        }
+        if (saePassword.PeerMacAddress.has_value()) {
+            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaeKeyValueSeparator
+                                    << ProtocolHostapd::PropertyValueSaePasswordKeyPeerMac << ProtocolHostapd::KeyValueDelimiter << saePassword.PeerMacAddress.value();
+        }
+        if (saePassword.VlanId.has_value()) {
+            saePasswordValueBuilder << ProtocolHostapd::PropertyValueSaeKeyValueSeparator
+                                    << ProtocolHostapd::PropertyValueSaePasswordKeyVlanId << ProtocolHostapd::KeyValueDelimiter << saePassword.VlanId.value();
+        }
+
+        saePasswordValue = saePasswordValueBuilder.str();
+    }
+
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameSaePassword, saePasswordValue, enforceConfigurationChange);
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to add sae password ({})", e.what()));
+    }
+}

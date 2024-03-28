@@ -50,6 +50,16 @@ struct WpaController
      */
     WpaController(std::string_view interfaceName, WpaType type, std::filesystem::path controlSocketPath);
 
+    WpaController(const WpaController&) = delete;
+
+    WpaController(WpaController&&) = delete;
+
+    WpaController&
+    operator=(const WpaController&) = delete;
+
+    WpaController&
+    operator=(WpaController&&) = delete;
+
     /**
      * @brief Destroy the WpaController object.
      */

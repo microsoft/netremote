@@ -2,7 +2,9 @@
 #ifndef I_HOSTAPD_HXX
 #define I_HOSTAPD_HXX
 
+#include <cstdint>
 #include <exception>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -169,6 +171,24 @@ struct IHostapd
      */
     virtual void
     SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the accepted SAE passwords for the interface.
+     *
+     * @param saePasswords The SAE passwords to set.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetSaePasswords(std::vector<SaePassword> saePasswords, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Add an SAE password.
+     *
+     * @param saePassword The SAE password to add.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**

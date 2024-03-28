@@ -1,5 +1,6 @@
 
 #include <chrono> // NOLINT
+#include <cstdint>
 #include <initializer_list>
 #include <limits>
 #include <optional>
@@ -8,6 +9,8 @@
 #include <string_view>
 #include <thread>
 #include <type_traits>
+#include <unordered_map>
+#include <vector>
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
@@ -604,8 +607,6 @@ TEST_CASE("Send SetPairwiseCipherSuites() command (root)", "[wpa][hostapd][clien
     {
         std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap{};
 
-        std::vector<WpaKeyManagement> keyManagementValidValues{};
-
         for (const auto WpaSecurityProtocol : magic_enum::enum_values<WpaSecurityProtocol>() | std::views::filter(IsWpaSecurityProtocolSupported)) {
             for (const auto wpaCipher : WpaCiphersAll | std::views::filter(IsWpaCipherSupported)) {
                 protocolCipherMap[WpaSecurityProtocol].push_back(wpaCipher);
@@ -673,5 +674,91 @@ TEST_CASE("Send SetAuthenticationAlgorithms() command (root)", "[wpa][hostapd][c
     {
         REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem, WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Now));
         REQUIRE_NOTHROW(hostapd.SetAuthenticationAlgorithms({ WpaAuthenticationAlgorithm::OpenSystem, WpaAuthenticationAlgorithm::OpenSystem }, EnforceConfigurationChange::Defer));
+    }
+}
+
+namespace Wpa::Test
+{
+constexpr std::initializer_list<uint8_t> AsciiPassword{ 0x70, 0x61, 0x73, 0x73, 0x77, 0x6F, 0x72, 0x64 };
+constexpr auto PasswordIdValid{ "someid" };
+constexpr auto PeerMacAddressValid{ "00:11:22:33:44:55" };
+constexpr int32_t VlanIdValid{ 1 };
+
+// NOLINTBEGIN(cert-err58-cpp)
+
+const SaePassword SaePasswordValid1{
+    .Credential = AsciiPassword,
+    .PasswordId = std::nullopt,
+    .PeerMacAddress = std::nullopt,
+    .VlanId = std::nullopt,
+};
+
+const SaePassword SaePasswordValid2{
+    .Credential = AsciiPassword,
+    .PasswordId = PasswordIdValid,
+    .PeerMacAddress = std::nullopt,
+    .VlanId = std::nullopt,
+};
+
+const SaePassword SaePasswordValid3{
+    .Credential = AsciiPassword,
+    .PasswordId = PasswordIdValid,
+    .PeerMacAddress = PeerMacAddressValid,
+    .VlanId = std::nullopt,
+};
+
+const SaePassword SaePasswordValidComplete{
+    .Credential = AsciiPassword,
+    .PasswordId = PasswordIdValid,
+    .PeerMacAddress = PeerMacAddressValid,
+    .VlanId = VlanIdValid,
+};
+
+const std::vector<SaePassword> SaePasswordsValid{ SaePasswordValid1, SaePasswordValid2, SaePasswordValid3, SaePasswordValidComplete };
+
+// NOLINTEND(cert-err58-cpp)
+} // namespace Wpa::Test
+
+TEST_CASE("Send AddSaePassword() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+    using namespace Wpa::Test;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.AddSaePassword(SaePasswordValidComplete, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddSaePassword(SaePasswordValidComplete, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid inputs")
+    {
+        for (const auto& saePassword : SaePasswordsValid) {
+            REQUIRE_NOTHROW(hostapd.AddSaePassword(saePassword, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.AddSaePassword(saePassword, EnforceConfigurationChange::Defer));
+        }
+    }
+}
+
+TEST_CASE("Send SetSaePasswords() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+    using namespace Wpa::Test;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetSaePasswords({ SaePasswordValidComplete }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetSaePasswords({ SaePasswordValidComplete }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with valid inputs")
+    {
+        for (const auto& saePassword : SaePasswordsValid) {
+            REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Defer));
+        }
     }
 }
