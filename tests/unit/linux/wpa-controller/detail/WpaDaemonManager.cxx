@@ -15,33 +15,10 @@
 #include <magic_enum.hpp>
 #include <plog/Log.h>
 
+#include "hostapd.conf.format.hxx"
+
 namespace detail
 {
-/**
- * @brief Default hostapd configuration file contents.
- *
- * This configuration file supports WPA2 with typical security settings. It is
- * meant to be used with a virtualized wlan device created with the
- * mac80211_hwsim kernel module. The intention is to use this for basic control
- * socket tests, not to exercise specifically wlan functionality.
- *
- * This string must be formatted with std::format() to provide the interface
- * name as the first interpolation argument.
- */
-static constexpr auto WpaDaemonHostapdConfigurationFileContentsFormat = R"CONFIG(
-interface={}
-driver=nl80211
-ctrl_interface=/var/run/hostapd
-ssid=wificontrollertest
-hw_mode=g
-channel=1
-auth_algs=3
-wpa=2
-wpa_passphrase=password
-wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
-wpa_pairwise=TKIP CCMP
-rsn_pairwise=CCMP
-)CONFIG";
 
 /**
  * @brief Write the default configuration file contents for the specified wpa

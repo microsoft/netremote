@@ -14,6 +14,7 @@ target_sources(wpa-controller-test-unit
 target_include_directories(wpa-controller-test-unit
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 target_link_libraries(wpa-controller-test-unit
@@ -23,6 +24,12 @@ target_link_libraries(wpa-controller-test-unit
         plog::plog
         strings
         wpa-controller
+)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/detail/config/hostapd.conf.format.hxx.in
+    ${CMAKE_CURRENT_BINARY_DIR}/hostapd.conf.format.hxx
+    @ONLY
 )
 
 catch_discover_tests(wpa-controller-test-unit)
