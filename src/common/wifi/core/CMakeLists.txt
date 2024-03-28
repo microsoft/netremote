@@ -11,6 +11,7 @@ target_sources(wifi-core
         AccessPointController.cxx
         AccessPointOperationStatus.cxx
         AccessPointOperationStatusLogOnExit.cxx
+        Ieee80211.cxx
         Ieee80211AccessPointCapabilities.cxx
     PUBLIC
     FILE_SET HEADERS

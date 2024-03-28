@@ -1,4 +1,7 @@
 
+#include <array>
+#include <cstdint>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -19,6 +22,7 @@
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 #include <microsoft/net/wifi/test/AccessPointManagerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
 
@@ -28,6 +32,10 @@ namespace Microsoft::Net::Remote::Test
 {
 constexpr auto AllPhyTypes = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211PhyType>();
 constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211FrequencyBand>();
+
+constexpr auto PasswordIdValid{ "someid" };
+constexpr std::initializer_list<uint8_t> AsciiPasswordData{ 0x70, 0x61, 0x73, 0x73, 0x77, 0x6F, 0x72, 0x64 };
+constexpr std::array<uint8_t, 6> MacAddressDefault{ 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
 } // namespace Microsoft::Net::Remote::Test
 
 using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
@@ -124,6 +132,11 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         dot11CipherSuiteConfigurationWpa1.set_securityprotocol(Dot11SecurityProtocol::Dot11SecurityProtocolWpa);
         dot11CipherSuiteConfigurationWpa1.mutable_ciphersuites()->Add(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
 
+        Dot11RsnaPassword dot11RsnaPassword{};
+        *dot11RsnaPassword.mutable_credential()->mutable_data() = { std::cbegin(AsciiPasswordData), std::cend(AsciiPasswordData) };
+        *dot11RsnaPassword.mutable_peermacaddress()->mutable_value() = { std::cbegin(MacAddressDefault), std::cend(MacAddressDefault) };
+        dot11RsnaPassword.set_passwordid(PasswordIdValid);
+
         Dot11AccessPointConfiguration apConfiguration{};
         apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
         apConfiguration.mutable_ssid()->set_name(SsidName);
@@ -131,6 +144,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         apConfiguration.mutable_authenticationalgorithms()->Add(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
+        apConfiguration.mutable_authenticationdata()->mutable_sae()->mutable_passwords()->Add(std::move(dot11RsnaPassword));
 
         WifiAccessPointEnableRequest request{};
         request.set_accesspointid(InterfaceName1);

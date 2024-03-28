@@ -415,6 +415,15 @@ static constexpr auto MacAddressNumOctets = 6;
 using Ieee80211MacAddress = std::array<uint8_t, MacAddressNumOctets>;
 
 /**
+ * @brief Convert a MAC address to a string.
+ *
+ * @param macAddress The MAC address to convert.
+ * @return std::string
+ */
+std::string
+Ieee80211MacAddressToString(const Ieee80211MacAddress& macAddress);
+
+/**
  * @brief Information about a BSS.
  */
 struct Ieee80211Bss

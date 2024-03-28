@@ -1,11 +1,14 @@
 
+#include <cstdint>
 #include <format>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <Wpa/ProtocolHostapd.hxx>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 #include <plog/Log.h>
 
 #include "Ieee80211WpaAdapters.hxx"
@@ -222,4 +225,27 @@ Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211Securit
 
     return wpaCipherSuites;
 }
+
+std::vector<uint8_t>
+Ieee80211SharedKeyToWpaCredential(const Ieee80211SharedKey& ieee80211SharedKey) noexcept
+{
+    return ieee80211SharedKey.Data;
+}
+
+SaePassword
+Ieee80211RsnaPasswordToWpaSaePassword(const Ieee80211RsnaPassword& ieee80211RsnaPassword) noexcept
+{
+    SaePassword wpaSaePassword{};
+
+    wpaSaePassword.Credential = Ieee80211SharedKeyToWpaCredential(ieee80211RsnaPassword.Credential);
+    if (ieee80211RsnaPassword.PasswordId.has_value()) {
+        wpaSaePassword.PasswordId = *ieee80211RsnaPassword.PasswordId;
+    }
+    if (ieee80211RsnaPassword.PeerMacAddress.has_value()) {
+        wpaSaePassword.PeerMacAddress = Ieee80211MacAddressToString(ieee80211RsnaPassword.PeerMacAddress.value());
+    }
+
+    return wpaSaePassword;
+}
+
 } // namespace Microsoft::Net::Wifi

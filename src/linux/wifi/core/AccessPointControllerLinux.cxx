@@ -276,7 +276,32 @@ AccessPointControllerLinux::SetAuthenticationData([[maybe_unused]] Ieee80211Auth
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
-    // TODO: implement this
+    // Ensure at least one set of authentication data is requested.
+    if (!authenticationData.Psk.has_value() && !authenticationData.Sae.has_value()) {
+        status.Code = AccessPointOperationStatusCode::InvalidParameter;
+        status.Details = "no authentication data specified";
+        return status;
+    }
+
+    if (authenticationData.Psk.has_value()) {
+        status.Code = AccessPointOperationStatusCode::OperationNotSupported;
+        status.Details = "PSK authentication data is not yet implemented";
+        return status;
+    }
+
+    if (authenticationData.Sae.has_value()) {
+        const auto& ieee80211AuthenticationDataSae = authenticationData.Sae.value();
+        std::vector<Wpa::SaePassword> wpaSaePasswords(std::size(ieee80211AuthenticationDataSae.Passwords));
+        std::ranges::transform(ieee80211AuthenticationDataSae.Passwords, std::begin(wpaSaePasswords), Ieee80211RsnaPasswordToWpaSaePassword);
+
+        try {
+            m_hostapd.SetSaePasswords(std::move(wpaSaePasswords), EnforceConfigurationChange::Now);
+        } catch (const HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Details = std::format("failed to set SAE passwords - {}", ex.what());
+            return status;
+        }
+    }
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
 
