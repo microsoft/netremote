@@ -1,5 +1,6 @@
 
 #include <chrono> // NOLINT
+#include <cstdint>
 #include <initializer_list>
 #include <limits>
 #include <optional>
@@ -8,6 +9,8 @@
 #include <string_view>
 #include <thread>
 #include <type_traits>
+#include <unordered_map>
+#include <vector>
 
 #include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
@@ -604,8 +607,6 @@ TEST_CASE("Send SetPairwiseCipherSuites() command (root)", "[wpa][hostapd][clien
     {
         std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap{};
 
-        std::vector<WpaKeyManagement> keyManagementValidValues{};
-
         for (const auto WpaSecurityProtocol : magic_enum::enum_values<WpaSecurityProtocol>() | std::views::filter(IsWpaSecurityProtocolSupported)) {
             for (const auto wpaCipher : WpaCiphersAll | std::views::filter(IsWpaCipherSupported)) {
                 protocolCipherMap[WpaSecurityProtocol].push_back(wpaCipher);
@@ -683,6 +684,8 @@ constexpr auto PasswordIdValid{ "someid" };
 constexpr auto PeerMacAddressValid{ "00:11:22:33:44:55" };
 constexpr int32_t VlanIdValid{ 1 };
 
+// NOLINTBEGIN(cert-err58-cpp)
+
 const SaePassword SaePasswordValid1{
     .Credential = AsciiPassword,
     .PasswordId = std::nullopt,
@@ -712,6 +715,8 @@ const SaePassword SaePasswordValidComplete{
 };
 
 const std::vector<SaePassword> SaePasswordsValid{ SaePasswordValid1, SaePasswordValid2, SaePasswordValid3, SaePasswordValidComplete };
+
+// NOLINTEND(cert-err58-cpp)
 } // namespace Wpa::Test
 
 TEST_CASE("Send AddSaePassword() command (root)", "[wpa][hostapd][client][remote]")
@@ -729,7 +734,7 @@ TEST_CASE("Send AddSaePassword() command (root)", "[wpa][hostapd][client][remote
 
     SECTION("Succeeds with valid inputs")
     {
-        for (auto& saePassword : SaePasswordsValid) {
+        for (const auto& saePassword : SaePasswordsValid) {
             REQUIRE_NOTHROW(hostapd.AddSaePassword(saePassword, EnforceConfigurationChange::Now));
             REQUIRE_NOTHROW(hostapd.AddSaePassword(saePassword, EnforceConfigurationChange::Defer));
         }
@@ -751,7 +756,7 @@ TEST_CASE("Send SetSaePasswords() command (root)", "[wpa][hostapd][client][remot
 
     SECTION("Succeeds with valid inputs")
     {
-        for (auto& saePassword : SaePasswordsValid) {
+        for (const auto& saePassword : SaePasswordsValid) {
             REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Now));
             REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Defer));
         }

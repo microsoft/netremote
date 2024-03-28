@@ -160,7 +160,7 @@ struct Hostapd :
      * @param saePassword The SAE password to add.
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
-    virtual void
+    void
     AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Defer) override;
 
 private:
