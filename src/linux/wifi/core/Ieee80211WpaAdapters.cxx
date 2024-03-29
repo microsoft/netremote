@@ -1,7 +1,6 @@
 
 #include <cstdint>
 #include <format>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -39,26 +38,6 @@ IeeePhyTypeToHostapdHwMode(Ieee80211PhyType ieeePhyType) noexcept
         return HostapdHwMode::Ieee80211a; // TODO: Assuming a, although hostapd docs don't mention it
     default:
         return HostapdHwMode::Unknown;
-    }
-}
-
-std::string
-HostapdHwModeToPropertyValue(HostapdHwMode hwMode) noexcept
-{
-    switch (hwMode) {
-    case HostapdHwMode::Ieee80211b:
-        return ProtocolHostapd::PropertyHwModeValueB;
-    case HostapdHwMode::Ieee80211g:
-        return ProtocolHostapd::PropertyHwModeValueG;
-    case HostapdHwMode::Ieee80211a:
-        return ProtocolHostapd::PropertyHwModeValueA;
-    case HostapdHwMode::Ieee80211ad:
-        return ProtocolHostapd::PropertyHwModeValueAD;
-    case HostapdHwMode::Ieee80211any:
-        return ProtocolHostapd::PropertyHwModeValueAny;
-    default: // case HostapdHwMode::Unknown
-        LOGE << std::format("Invalid hostapd hw_mode value {}", magic_enum::enum_name(hwMode));
-        return "invalid";
     }
 }
 
