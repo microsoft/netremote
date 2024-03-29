@@ -10,6 +10,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include <Wpa/ProtocolWpa.hxx>
@@ -538,9 +539,9 @@ struct ProtocolHostapd :
 /**
  * @brief Convert a ManagementFrameProtection value to the corresponding property value string expected by hostapd. The
  * return value may be used for the hostapd property 'ieee80211w'.
- * 
+ *
  * @param managementFrameProtection The ManagementFrameProtection value to convert.
- * @return constexpr std::string_view 
+ * @return constexpr std::string_view
  */
 constexpr std::string_view
 ManagementFrameProtectionToPropertyValue(ManagementFrameProtection managementFrameProtection) noexcept
@@ -562,9 +563,9 @@ ManagementFrameProtectionToPropertyValue(ManagementFrameProtection managementFra
 /**
  * @brief Convert a HostapdHwMode value to the corresponding property value string expected by hostapd. The
  * return value may be used for the hostapd property 'hw_mode'.
- * 
+ *
  * @param hwMode The HostapdHwMode value to convert.
- * @return constexpr std::string_view 
+ * @return constexpr std::string_view
  */
 constexpr std::string_view
 HostapdHwModePropertyValue(HostapdHwMode hwMode) noexcept
@@ -778,6 +779,18 @@ WpaAuthenticationAlgorithmPropertyValue(WpaAuthenticationAlgorithm wpaAuthentica
     return std::to_underlying(wpaAuthenticationAlgorithm);
 }
 
+static constexpr std::size_t WpaPskSecretLength = 64;
+static constexpr std::size_t WpaPskPassphraseLengthMin = 8;
+static constexpr std::size_t WpaPskPassphraseLengthMax = 63;
+
+using WpaPskPassphraseT = std::string;
+using WpaPskSecretT = std::array<char, WpaPskSecretLength>;
+
+/**
+ * @brief Pre-shared key (PSK).
+ */
+using WpaPreSharedKey = std::variant<WpaPskPassphraseT, WpaPskSecretT>;
+
 /**
  * @brief SAE password entry.
  */
@@ -786,7 +799,7 @@ struct SaePassword
     std::vector<uint8_t> Credential;
     std::optional<std::string> PasswordId;
     std::optional<std::string> PeerMacAddress;
-    std::optional<int32_t> VlanId;  
+    std::optional<int32_t> VlanId;
 };
 } // namespace Wpa
 

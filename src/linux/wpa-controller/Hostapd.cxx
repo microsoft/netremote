@@ -334,6 +334,42 @@ Hostapd::SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::ve
 }
 
 void
+Hostapd::SetPresharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange)
+{
+    std::string_view pskProperty;
+    std::string pskPropertyValue;
+
+    if (std::holds_alternative<WpaPskPassphraseT>(preSharedKey)) {
+        const auto& pskValue = std::get<WpaPskPassphraseT>(preSharedKey);
+
+        auto pskPassphrase = std::string(std::cbegin(pskValue), std::cend(pskValue));
+        const auto pskPassphraseLength = std::size(pskPassphrase);
+        if (pskPassphraseLength < WpaPskPassphraseLengthMin || pskPassphraseLength > WpaPskPassphraseLengthMax) {
+            throw HostapdException(std::format("Invalid WPA passphrase length {} (must be {}-{} characters)", pskPassphraseLength, WpaPskPassphraseLengthMin, WpaPskPassphraseLengthMax));
+        }
+
+        pskProperty = ProtocolHostapd::PropertyNameWpaPassphrase;
+        pskPropertyValue = std::move(pskPassphrase);
+    } else if (std::holds_alternative<WpaPskSecretT>(preSharedKey)) {
+        const auto& pskValue = std::get<WpaPskSecretT>(preSharedKey);
+        auto pskSecret = std::string(std::cbegin(pskValue), std::cend(pskValue));
+        pskProperty = ProtocolHostapd::PropertyNameWpaPsk;
+        pskPropertyValue = std::move(pskSecret);
+    } else {
+        throw HostapdException("Invalid WPA pre-shared key type");
+    }
+
+    try {
+        SetProperty(pskProperty, pskPropertyValue, enforceConfigurationChange);
+        if (enforceConfigurationChange == EnforceConfigurationChange::Now) {
+            Reload();
+        }
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set pre-shared key ({})", e.what()));
+    }
+}
+
+void
 Hostapd::SetSaePasswords(std::vector<SaePassword> saePasswords, EnforceConfigurationChange enforceConfigurationChange)
 {
     try {
