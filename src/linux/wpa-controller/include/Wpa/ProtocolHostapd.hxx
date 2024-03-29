@@ -313,7 +313,7 @@ static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementFt =
  * @brief Management frame protection levels.
  */
 enum class ManagementFrameProtection : uint8_t {
-    Unknown = 0xFFU,
+    Unknown = 0x80U,
     None = 0x00U,
     Optional = 0x01U,
     Required = 0x02U,
