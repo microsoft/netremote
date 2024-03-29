@@ -8,6 +8,7 @@
 
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <microsoft/net/wifi/Ieee80211Authentication.hxx>
 
 namespace Microsoft::Net::Remote
 {
@@ -25,6 +26,7 @@ struct NetRemoteCliData
     std::string WifiAccessPointId{};
     std::string WifiAccessPointSsid{};
     Microsoft::Net::Wifi::Ieee80211PhyType WifiAccessPointPhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
+    Microsoft::Net::Wifi::Ieee80211AuthenticationData WifiAccessPointAuthenticationData;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> WifiAccessPointFrequencyBands{};
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> WifiAccessPointAuthenticationAlgorithms{};
     std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> WifiAccessPointAkmSuites{};
