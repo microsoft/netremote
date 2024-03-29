@@ -3,7 +3,6 @@
 #define IEEE_80211_WPA_ADAPTERS_HXX
 
 #include <cstdint>
-#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
@@ -22,15 +21,6 @@ namespace Microsoft::Net::Wifi
  */
 Wpa::HostapdHwMode
 IeeePhyTypeToHostapdHwMode(Ieee80211PhyType ieeePhyType) noexcept;
-
-/**
- * @brief Get a string representation of a HostapdHwMode.
- *
- * @param hwMode The HostapdHwMode value to convert.
- * @return std::string
- */
-std::string
-HostapdHwModeToPropertyValue(Wpa::HostapdHwMode hwMode) noexcept;
 
 /**
  * @brief Get a string representation of a Ieee80211FrequencyBand.

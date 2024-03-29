@@ -309,6 +309,16 @@ static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementFt =
     std::to_underlying(WpaKeyManagement::FtFilsSha256) |
     std::to_underlying(WpaKeyManagement::FtFilsSha384);
 
+/**
+ * @brief Management frame protection levels.
+ */
+enum class ManagementFrameProtection : uint8_t {
+    Unknown,
+    None,
+    Optional,
+    Required,
+};
+
 struct MulticastListenerDiscoveryProtocolInfo
 {
     int Id;
@@ -490,6 +500,11 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
     static constexpr auto PropertyNameState = "state";
 
+    static constexpr auto PropertyNameIeee80211W = "ieee80211w";
+    static constexpr auto PropertyValueIeee80211WNone = "0";
+    static constexpr auto PropertyValueIeee80211WOptional = "1";
+    static constexpr auto PropertyValueIeee80211WRequired = "2";
+
     // Indexed property names for BSS entries in the "STATUS" response.
     static constexpr auto PropertyNameBss = "bss";
     static constexpr auto PropertyNameBssBssid = "bssid";
@@ -519,6 +534,58 @@ struct ProtocolHostapd :
     static constexpr auto ResponseStatusPropertyKeyIeee80211AX = PropertyNameIeee80211AX;
     static constexpr auto ResponseStatusPropertyKeyDisableAX = PropertyNameDisable11AX;
 };
+
+/**
+ * @brief Convert a ManagementFrameProtection value to the corresponding property value string expected by hostapd. The
+ * return value may be used for the hostapd property 'ieee80211w'.
+ * 
+ * @param managementFrameProtection The ManagementFrameProtection value to convert.
+ * @return constexpr std::string_view 
+ */
+constexpr std::string_view
+ManagementFrameProtectionToPropertyValue(ManagementFrameProtection managementFrameProtection) noexcept
+{
+    switch (managementFrameProtection) {
+    case ManagementFrameProtection::None:
+        return ProtocolHostapd::PropertyValueIeee80211WNone;
+    case ManagementFrameProtection::Optional:
+        return ProtocolHostapd::PropertyValueIeee80211WOptional;
+    case ManagementFrameProtection::Required:
+        return ProtocolHostapd::PropertyValueIeee80211WRequired;
+    case ManagementFrameProtection::Unknown:
+        [[fallthrough]];
+    default:
+        return "UNKNOWN";
+    }
+}
+
+/**
+ * @brief Convert a HostapdHwMode value to the corresponding property value string expected by hostapd. The
+ * return value may be used for the hostapd property 'hw_mode'.
+ * 
+ * @param hwMode The HostapdHwMode value to convert.
+ * @return constexpr std::string_view 
+ */
+constexpr std::string_view
+HostapdHwModePropertyValue(HostapdHwMode hwMode) noexcept
+{
+    switch (hwMode) {
+    case HostapdHwMode::Ieee80211b:
+        return ProtocolHostapd::PropertyHwModeValueB;
+    case HostapdHwMode::Ieee80211g:
+        return ProtocolHostapd::PropertyHwModeValueG;
+    case HostapdHwMode::Ieee80211a:
+        return ProtocolHostapd::PropertyHwModeValueA;
+    case HostapdHwMode::Ieee80211ad:
+        return ProtocolHostapd::PropertyHwModeValueAD;
+    case HostapdHwMode::Ieee80211any:
+        return ProtocolHostapd::PropertyHwModeValueAny;
+    case HostapdHwMode::Unknown:
+        [[fallthrough]];
+    default:
+        return "UNKNOWN";
+    }
+}
 
 /**
  * @brief Converts a string to a HostapdInterfaceState.

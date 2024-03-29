@@ -150,7 +150,7 @@ AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
 
     // Add the hw_mode property.
     const auto hwMode = IeeePhyTypeToHostapdHwMode(ieeePhyType);
-    const auto hwModeValue = HostapdHwModeToPropertyValue(hwMode);
+    const auto hwModeValue = HostapdHwModePropertyValue(hwMode);
     propertiesToSet.emplace_back(Wpa::ProtocolHostapd::PropertyNameHwMode, hwModeValue);
 
     // Additively set other hostapd properties based on the protocol.
