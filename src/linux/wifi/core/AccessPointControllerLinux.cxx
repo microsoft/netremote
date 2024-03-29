@@ -229,10 +229,33 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
 
     // Set the hostapd "setband" property.
     try {
-        m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Now);
+        m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
     } catch (const Wpa::HostapdException& ex) {
         status.Code = AccessPointOperationStatusCode::InternalError;
         status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", propertyKeyToSet, propertyValueToSet, ex.what());
+        return status;
+    }
+
+    // If 6GHz is included, enable protected management frames, which are required.
+    if (std::ranges::contains(frequencyBands, Ieee80211FrequencyBand::SixGHz)) {
+        propertyKeyToSet = Wpa::ProtocolHostapd::PropertyNameIeee80211W;
+        propertyValueToSet = Wpa::ManagementFrameProtectionToPropertyValue(Wpa::ManagementFrameProtection::Required);
+
+        try {
+            m_hostapd.SetProperty(propertyKeyToSet, propertyValueToSet, EnforceConfigurationChange::Defer);
+        } catch (const Wpa::HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Details = std::format("failed to enable protected management frames for 6GHz - {}", ex.what());
+            return status;
+        }
+    }
+
+    // Reload the hostapd configuration to pick up the changes.
+    try {
+        m_hostapd.Reload();
+    } catch (const HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to reload hostapd configuration for frequency band change - {}", ex.what());
         return status;
     }
 
