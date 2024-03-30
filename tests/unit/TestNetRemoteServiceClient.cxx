@@ -34,7 +34,7 @@ constexpr auto AllPhyTypes = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee8
 constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211FrequencyBand>();
 
 constexpr auto PasswordIdValid{ "someid" };
-constexpr std::initializer_list<uint8_t> AsciiPasswordData{ 0x70, 0x61, 0x73, 0x73, 0x77, 0x6F, 0x72, 0x64 };
+constexpr auto AsciiPassword{ "password" };
 constexpr std::array<uint8_t, 6> MacAddressDefault{ 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
 } // namespace Microsoft::Net::Remote::Test
 
@@ -133,7 +133,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         dot11CipherSuiteConfigurationWpa1.mutable_ciphersuites()->Add(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
 
         Dot11RsnaPassword dot11RsnaPassword{};
-        *dot11RsnaPassword.mutable_credential()->mutable_data() = { std::cbegin(AsciiPasswordData), std::cend(AsciiPasswordData) };
+        *dot11RsnaPassword.mutable_credential() = AsciiPassword;
         *dot11RsnaPassword.mutable_peermacaddress()->mutable_value() = { std::cbegin(MacAddressDefault), std::cend(MacAddressDefault) };
         dot11RsnaPassword.set_passwordid(PasswordIdValid);
 

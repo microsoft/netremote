@@ -792,11 +792,30 @@ using WpaPskSecretT = std::array<char, WpaPskSecretLength>;
 using WpaPreSharedKey = std::variant<WpaPskPassphraseT, WpaPskSecretT>;
 
 /**
+ * @brief Get the hostapd property value for the specified WpaPreSharedKey. The returned value
+ * may be used for the hostapd property 'wpa_psk' or 'wpa_passphrase'.
+ *
+ * @param wpaPreSharedKey The WpaPreSharedKey to get the property value for.
+ * @return std::string
+ */
+std::string
+WpaPreSharedKeyPropertyValue(const WpaPreSharedKey& wpaPreSharedKey);
+
+/**
+ * @brief Get the hostapd property and corresponding value for the specified WpaPreSharedKey.
+ *
+ * @param wpaPreSharedKey The WpaPreSharedKey to get the property key and value for.
+ * @return std::pair<std::string_view, std::string>
+ */
+std::pair<std::string_view, std::string>
+WpaPreSharedKeyPropertyKeyAndValue(const WpaPreSharedKey& wpaPreSharedKey);
+
+/**
  * @brief SAE password entry.
  */
 struct SaePassword
 {
-    std::vector<uint8_t> Credential;
+    std::string Credential;
     std::optional<std::string> PasswordId;
     std::optional<std::string> PeerMacAddress;
     std::optional<int32_t> VlanId;

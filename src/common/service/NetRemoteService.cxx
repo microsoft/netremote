@@ -737,13 +737,13 @@ NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view acce
     }
     if (dot11AuthenticationData.has_psk()) {
         const auto& dataPsk = dot11AuthenticationData.psk();
-        if (!dataPsk.has_key()) {
+        if (!dataPsk.has_psk()) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
             wifiOperationStatus.set_message("No PSK key provided");
             return wifiOperationStatus;
         }
-        const auto& pskKey = dataPsk.key();
-        if (!pskKey.has_data() && !pskKey.has_passphrase()) {
+        const auto& psk = dataPsk.psk();
+        if (!psk.has_data() && !psk.has_passphrase()) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
             wifiOperationStatus.set_message("No PSK key data or passphrase provided");
             return wifiOperationStatus;

@@ -77,13 +77,13 @@ std::unordered_map<Wpa::WpaSecurityProtocol, std::vector<Wpa::WpaCipher>>
 Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>>& ieee80211CipherSuiteConfigurations) noexcept;
 
 /**
- * @brief Convert a Ieee80211SharedKey to a wpa credential.
+ * @brief Convert a Ieee80211RsnaPsk to a WpaPreSharedKey.
  *
- * @param ieee80211SharedKey The Ieee80211SharedKey to convert.
- * @return std::vector<uint8_t>
+ * @param ieee80211RsnaPsk The Ieee80211RsnaPsk to convert.
+ * @return WpaPreSharedKey
  */
-std::vector<uint8_t>
-Ieee80211SharedKeyToWpaCredential(const Ieee80211SharedKey& ieee80211SharedKey) noexcept;
+Wpa::WpaPreSharedKey
+Ieee80211RsnaPskToWpaSharedKey(const Ieee80211RsnaPsk& ieee80211RsnaPsk) noexcept;
 
 /**
  * @brief Convert a Ieee80211RsnaPassword to a WpaSaePassword.
