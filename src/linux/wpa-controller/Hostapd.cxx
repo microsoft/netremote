@@ -334,7 +334,7 @@ Hostapd::SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::ve
 }
 
 void
-Hostapd::SetPresharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange)
+Hostapd::SetPreSharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange)
 {
     auto [pskPropertyName, pskPropertyValue] = WpaPreSharedKeyPropertyKeyAndValue(preSharedKey);
 
