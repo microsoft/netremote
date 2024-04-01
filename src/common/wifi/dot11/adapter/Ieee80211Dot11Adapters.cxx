@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <charconv>
 #include <cstdlib>
 #include <iterator>
 #include <ranges>
@@ -662,8 +663,12 @@ FromDot11RsnaPsk(const Dot11RsnaPsk& dot11RsnaPsk) noexcept
             const auto& pskHex = pskValue.hex();
             // Ensure the hex string is at least twice the length of the value array (2 hex characters per byte).
             if (std::size(pskHex) >= std::size(ieee80211RsnaPsk.Value()) * 2) {
-                ieee80211RsnaPsk.emplace<1>();
-                // TODO: truncate pskHex with range view, then convert from hex string to uint8_t array.
+                std::string_view pskHexView{ pskHex };
+                std::vector<uint8_t> pskValueRawV(std::size(pskValueRaw));
+                for (std::size_t i = 0; i < std::size(pskValueRaw); i++) {
+                    const auto byteAsHex = pskHexView.substr(i * 2, 2); // 2 hex chars
+                    std::from_chars(std::cbegin(byteAsHex), std::cend(byteAsHex), pskValueRaw[i], 16);
+                }
             }
         } else if (pskValue.has_raw()) {
             const auto& pskRaw = pskValue.raw();
