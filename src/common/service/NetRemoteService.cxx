@@ -730,25 +730,52 @@ NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view acce
         wifiOperationStatus.set_message("No authentication data provided");
         return wifiOperationStatus;
     }
-    if (dot11AuthenticationData.has_psk() && dot11AuthenticationData.has_sae()) {
-        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        wifiOperationStatus.set_message("Both PSK and SAE authentication data provided");
-        return wifiOperationStatus;
-    }
+
     if (dot11AuthenticationData.has_psk()) {
         const auto& dataPsk = dot11AuthenticationData.psk();
         if (!dataPsk.has_psk()) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-            wifiOperationStatus.set_message("No PSK key provided");
+            wifiOperationStatus.set_message("No PSK data provided");
             return wifiOperationStatus;
         }
         const auto& psk = dataPsk.psk();
-        if (!psk.has_data() && !psk.has_passphrase()) {
+        if (!psk.has_passphrase() && !psk.has_value()) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-            wifiOperationStatus.set_message("No PSK key data or passphrase provided");
+            wifiOperationStatus.set_message("No PSK value or passphrase provided");
             return wifiOperationStatus;
         }
+        if (psk.has_passphrase()) {
+            const auto& pskPassphrase = psk.passphrase();
+            if (std::empty(pskPassphrase)) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message("No PSK passphrase provided (empty)");
+                return wifiOperationStatus;
+            }
+        } else if (psk.has_value()) {
+            const auto& pskValue = psk.value();
+            if (!pskValue.has_hex() && !pskValue.has_raw()) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message("No PSK value data provided");
+                return wifiOperationStatus;
+            }
+            if (pskValue.has_hex()) {
+                const auto& pskHex = pskValue.hex();
+                if (std::size(pskHex) != Ieee80211RsnaPskLength * 2) {
+                    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                    wifiOperationStatus.set_message(std::format("Invalid PSK hex value provided (not {} characters)", Ieee80211RsnaPskLength * 2));
+                    return wifiOperationStatus;
+                }
+            } else if (pskValue.has_raw()) {
+                const auto& pskRaw = pskValue.raw();
+                if (std::size(pskRaw) != Ieee80211RsnaPskLength) {
+                    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                    wifiOperationStatus.set_message(std::format("Invalid PSK raw value provided (not {} bytes)", Ieee80211RsnaPskLength));
+                    return wifiOperationStatus;
+                }
+            }
+        }
     }
+
     if (dot11AuthenticationData.has_sae()) {
         const auto& dataSae = dot11AuthenticationData.sae();
         if (std::empty(dataSae.passwords())) {

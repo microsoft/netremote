@@ -1,4 +1,5 @@
 
+#include <cassert>
 #include <cstdint>
 #include <format>
 #include <string_view>
@@ -216,10 +217,16 @@ Ieee80211RsnaPskToWpaSharedKey(const Ieee80211RsnaPsk& ieee80211RsnaPsk) noexcep
         wpaPreSharedKey.emplace<0>(std::move(pskPassphrase));
         break;
     }
-    case Ieee80211RsnaPskEncoding::Secret: {
-        const auto& pskSecret = ieee80211RsnaPsk.Secret();
-        auto& wpaSecret = wpaPreSharedKey.emplace<1>();
-        wpaSecret = pskSecret;
+    case Ieee80211RsnaPskEncoding::Value: {
+        auto pskValueHex = ieee80211RsnaPsk.ToHexEncodedValue();
+        auto& wpaPskValueHex = wpaPreSharedKey.emplace<1>();
+
+        assert(std::size(pskValueHex) == std::size(wpaPskValueHex));
+        if (std::size(pskValueHex) == std::size(wpaPskValueHex)) {
+            std::ranges::copy(wpaPskValueHex, std::begin(pskValueHex));
+        } else {
+            LOGF << std::format("Invalid psk value length '{}'; expected '{}'", std::size(pskValueHex), std::size(wpaPskValueHex));
+        }
         break;
     }
     default:

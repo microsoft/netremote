@@ -143,18 +143,22 @@ message Dot11MacAddress
     bytes Value = 1;
 }
 
-message Dot11RsnaPsk
+message Dot11RsnaPskDataValue
 {
-    oneof Value
+    oneof Data
     {
-        string Passphrase = 1;
-        bytes Data = 2;
+        string Hex = 1;
+        bytes Raw = 2;
     }
 }
 
-message Dot11AuthenticationDataPsk
+message Dot11RsnaPsk
 {
-    Dot11RsnaPsk Psk = 1;
+    oneof Data
+    {
+        string Passphrase = 1;
+        Dot11RsnaPskDataValue Value = 2;
+    }
 }
 
 // 802.11 Authentication Password.
@@ -166,6 +170,11 @@ message Dot11RsnaPassword
     string Credential = 1;
     string PasswordId = 2;
     Dot11MacAddress PeerMacAddress = 3;
+}
+
+message Dot11AuthenticationDataPsk
+{
+    Dot11RsnaPsk Psk = 1;
 }
 
 message Dot11AuthenticationDataSae
