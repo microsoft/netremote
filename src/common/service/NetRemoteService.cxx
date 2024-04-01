@@ -748,7 +748,8 @@ NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view acce
             wifiOperationStatus.set_message("No PSK key data or passphrase provided");
             return wifiOperationStatus;
         }
-    } else if (dot11AuthenticationData.has_sae()) {
+    }
+    if (dot11AuthenticationData.has_sae()) {
         const auto& dataSae = dot11AuthenticationData.sae();
         if (std::empty(dataSae.passwords())) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);

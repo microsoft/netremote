@@ -175,11 +175,8 @@ message Dot11AuthenticationDataSae
 
 message Dot11AuthenticationData
 {
-    oneof Value
-    {
-        Dot11AuthenticationDataPsk Psk = 1;
-        Dot11AuthenticationDataSae Sae = 2;
-    }
+    Dot11AuthenticationDataPsk Psk = 1;
+    Dot11AuthenticationDataSae Sae = 2;
 }
 
 message Dot11CipherSuiteConfiguration
