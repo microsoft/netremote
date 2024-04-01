@@ -130,6 +130,9 @@ NetRemoteCli::WifiAccessPointEnableCallback()
     if (m_cliData->WifiAccessPointPhyType != Ieee80211PhyType::Unknown) {
         ieee80211AccessPointConfiguration.PhyType = m_cliData->WifiAccessPointPhyType;
     }
+    if (m_cliData->WifiAccessPointAuthenticationData.Psk.has_value()) {
+        ieee80211AccessPointConfiguration.AuthenticationData.Psk = m_cliData->WifiAccessPointAuthenticationData.Psk.value();
+    }
     if (m_cliData->WifiAccessPointAuthenticationData.Sae.has_value()) {
         ieee80211AccessPointConfiguration.AuthenticationData.Sae = m_cliData->WifiAccessPointAuthenticationData.Sae.value();
     }

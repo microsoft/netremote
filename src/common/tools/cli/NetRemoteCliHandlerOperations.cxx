@@ -346,6 +346,14 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
             };
         }
 
+        // Populate PSK authentication data if present.
+        if (ieee80211AccessPointConfiguration->AuthenticationData.Psk.has_value()) {
+            const auto& authenticationDataPsk = ieee80211AccessPointConfiguration->AuthenticationData.Psk.value();
+            auto dot11AuthenticationDataPsk = ToDot11AuthenticationDataPsk(authenticationDataPsk);
+
+            *dot11AccessPointConfiguration.mutable_authenticationdata()->mutable_psk() = std::move(dot11AuthenticationDataPsk);
+        }
+
         // Populate SAE authentication data if present.
         if (ieee80211AccessPointConfiguration->AuthenticationData.Sae.has_value()) {
             const auto& authenticationDataSae = ieee80211AccessPointConfiguration->AuthenticationData.Sae.value();
