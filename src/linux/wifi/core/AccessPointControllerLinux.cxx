@@ -307,9 +307,16 @@ AccessPointControllerLinux::SetAuthenticationData([[maybe_unused]] Ieee80211Auth
     }
 
     if (authenticationData.Psk.has_value()) {
-        status.Code = AccessPointOperationStatusCode::OperationNotSupported;
-        status.Details = "PSK authentication data is not yet implemented";
-        return status;
+        const auto& ieee80211AuthenticationDataPsk = authenticationData.Psk.value();
+        auto wpaPreSharedKey = Ieee80211RsnaPskToWpaSharedKey(ieee80211AuthenticationDataPsk.Psk);
+
+        try {
+            m_hostapd.SetPreSharedKey(wpaPreSharedKey, EnforceConfigurationChange::Now);
+        } catch (const HostapdException& ex) {
+            status.Code = AccessPointOperationStatusCode::InternalError;
+            status.Details = std::format("failed to set PSK authentication data - {}", ex.what());
+            return status;
+        }
     }
 
     if (authenticationData.Sae.has_value()) {
