@@ -268,22 +268,22 @@ Dot11MacAddress
 ToDot11MacAddress(const Ieee80211MacAddress& ieee80211MacAddress) noexcept;
 
 /**
- * @brief Convert the specified Dot11SharedKey to the equivalent IEEE 802.11 shared key.
- *
- * @param dot11SharedKey The Dot11SharedKey to convert.
- * @return Ieee80211SharedKey
+ * @brief Convert the specified Dot11RsnaPsk to the equivalent IEEE 802.11 shared key.
+ * 
+ * @param Dot11RsnaPsk The Dot11RsnaPsk to convert.
+ * @return Ieee80211RsnaPsk 
  */
-Ieee80211SharedKey
-FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept;
+Ieee80211RsnaPsk
+FromDot11RsnaPsk(const Dot11RsnaPsk& Dot11RsnaPsk) noexcept;
 
 /**
- * @brief Convert the specified IEEE 802.11 shared key to the equivalent Dot11SharedKey.
+ * @brief Convert the specified IEEE 802.11 shared key to the equivalent Dot11RsnaPsk.
  *
- * @param ieee80211SharedKey The IEEE 802.11 shared key to convert.
- * @return Dot11SharedKey
+ * @param ieee80211RnsaPsk The IEEE 802.11 shared key to convert.
+ * @return Dot11RsnaPsk
  */
-Dot11SharedKey
-ToDot11SharedKey(const Ieee80211SharedKey& ieee80211SharedKey) noexcept;
+Dot11RsnaPsk
+ToDot11RsnaPsk(const Ieee80211RsnaPsk& ieee80211RnsaPsk) noexcept;
 
 /**
  * @brief Convert the specified Dot11RsnaPassword to the equivalent IEEE 802.11 RSNA password.

@@ -334,6 +334,21 @@ Hostapd::SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::ve
 }
 
 void
+Hostapd::SetPresharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange)
+{
+    auto [pskPropertyName, pskPropertyValue] = WpaPreSharedKeyPropertyKeyAndValue(preSharedKey);
+
+    try {
+        SetProperty(pskPropertyName, pskPropertyValue, enforceConfigurationChange);
+        if (enforceConfigurationChange == EnforceConfigurationChange::Now) {
+            Reload();
+        }
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set pre-shared key ({})", e.what()));
+    }
+}
+
+void
 Hostapd::SetSaePasswords(std::vector<SaePassword> saePasswords, EnforceConfigurationChange enforceConfigurationChange)
 {
     try {

@@ -205,10 +205,28 @@ Ieee80211CipherSuitesToWpaCipherSuites(const std::unordered_map<Ieee80211Securit
     return wpaCipherSuites;
 }
 
-std::vector<uint8_t>
-Ieee80211SharedKeyToWpaCredential(const Ieee80211SharedKey& ieee80211SharedKey) noexcept
+WpaPreSharedKey
+Ieee80211RsnaPskToWpaSharedKey(const Ieee80211RsnaPsk& ieee80211RsnaPsk) noexcept
 {
-    return ieee80211SharedKey.Data;
+    WpaPreSharedKey wpaPreSharedKey{};
+
+    switch (ieee80211RsnaPsk.Encoding()) {
+    case Ieee80211RsnaPskEncoding::Passphrase: {
+        const auto& pskPassphrase = ieee80211RsnaPsk.Passphrase();
+        wpaPreSharedKey.emplace<0>(std::move(pskPassphrase));
+        break;
+    }
+    case Ieee80211RsnaPskEncoding::Secret: {
+        const auto& pskSecret = ieee80211RsnaPsk.Secret();
+        auto& wpaSecret = wpaPreSharedKey.emplace<1>();
+        wpaSecret = pskSecret;
+        break;
+    }
+    default:
+        break;
+    }
+
+    return wpaPreSharedKey;
 }
 
 SaePassword
@@ -216,9 +234,10 @@ Ieee80211RsnaPasswordToWpaSaePassword(const Ieee80211RsnaPassword& ieee80211Rsna
 {
     SaePassword wpaSaePassword{};
 
-    wpaSaePassword.Credential = Ieee80211SharedKeyToWpaCredential(ieee80211RsnaPassword.Credential);
+    wpaSaePassword.Credential = ieee80211RsnaPassword.Credential;
+
     if (ieee80211RsnaPassword.PasswordId.has_value()) {
-        wpaSaePassword.PasswordId = *ieee80211RsnaPassword.PasswordId;
+        wpaSaePassword.PasswordId = ieee80211RsnaPassword.PasswordId.value();
     }
     if (ieee80211RsnaPassword.PeerMacAddress.has_value()) {
         wpaSaePassword.PeerMacAddress = Ieee80211MacAddressToString(ieee80211RsnaPassword.PeerMacAddress.value());

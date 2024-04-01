@@ -173,6 +173,17 @@ struct IHostapd
     SetPairwiseCipherSuites(std::unordered_map<WpaSecurityProtocol, std::vector<WpaCipher>> protocolCipherMap, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
+     * @brief Set the pre-shared key for the interface.
+     *
+     * One of either a 8-63 character passphrase, or a 64-character hex string may be specified.
+     *
+     * @param preSharedKey The pre-shared key to set.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
+     */
+    virtual void
+    SetPresharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
      * @brief Set the accepted SAE passwords for the interface.
      *
      * @param saePasswords The SAE passwords to set.

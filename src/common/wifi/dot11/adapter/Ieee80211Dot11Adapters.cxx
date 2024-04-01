@@ -641,34 +641,55 @@ ToDot11MacAddress(const Ieee80211MacAddress& ieee80211MacAddress) noexcept
     return dot11MacAddress;
 }
 
-Ieee80211SharedKey
-FromDot11SharedKey(const Dot11SharedKey& dot11SharedKey) noexcept
+Ieee80211RsnaPsk
+FromDot11RsnaPsk(const Dot11RsnaPsk& Dot11RsnaPsk) noexcept
 {
-    Ieee80211SharedKey ieee80211SharedKey{};
+    Ieee80211RsnaPsk ieee80211RsnaPsk{};
 
-    if (dot11SharedKey.has_data()) {
-        const auto& keyData = dot11SharedKey.data();
-        ieee80211SharedKey.Data.assign(std::cbegin(keyData), std::cend(keyData));
-    } else if (dot11SharedKey.has_passphrase()) {
-        const auto& keyPassphrase = dot11SharedKey.passphrase();
+    if (Dot11RsnaPsk.has_data()) {
+        const auto& keyData = Dot11RsnaPsk.data();
+        if (std::size(keyData) >= Ieee80211RsnaPskSecretLength) {
+            // Ensure the variant holds the correct type by calling emplace with the corresponding index. Unfortunately
+            // since the underlying type is a std::array which doesn't have a constructor, it can't be initialized with
+            // a container (e.g. keyData) via emplace args, so the data is explicitly copied with copy_n below, which is
+            // what would happen for "array construction" anyway.
+            auto& pskSecret = ieee80211RsnaPsk.emplace<1>();
+            std::ranges::copy_n(std::cbegin(keyData), Ieee80211RsnaPskSecretLength, std::begin(pskSecret));
+        }
+    } else if (Dot11RsnaPsk.has_passphrase()) {
+        const auto& keyPassphrase = Dot11RsnaPsk.passphrase();
         const auto keyPassphraseSize = std::size(keyPassphrase);
-        if (keyPassphraseSize >= Ieee80211PskLengthMinimum && keyPassphraseSize <= Ieee80211PskLengthMaximum) {
-            // The last character of the passphrase is a null terminator, which must not be included.
-            ieee80211SharedKey.Data.assign(std::cbegin(keyPassphrase), std::cend(keyPassphrase) - 1);
+        if (keyPassphraseSize >= Ieee80211RsnaPskPassphraseLengthMinimum && keyPassphraseSize <= Ieee80211RsnaPskPassphraseLengthMaximum) {
+            std::string pskPassphrase(std::cbegin(keyPassphrase), std::cend(keyPassphrase));
+            ieee80211RsnaPsk = std::move(pskPassphrase);
         }
     }
 
-    return ieee80211SharedKey;
+    return ieee80211RsnaPsk;
 }
 
-Dot11SharedKey
-ToDot11SharedKey(const Ieee80211SharedKey& ieee80211SharedKey) noexcept
+Dot11RsnaPsk
+ToDot11RsnaPsk(const Ieee80211RsnaPsk& ieee80211RnsaPsk) noexcept
 {
-    Dot11SharedKey dot11SharedKey{};
+    Dot11RsnaPsk Dot11RsnaPsk{};
 
-    dot11SharedKey.mutable_data()->assign(std::cbegin(ieee80211SharedKey.Data), std::cend(ieee80211SharedKey.Data));
+    switch (ieee80211RnsaPsk.Encoding()) {
+    case Ieee80211RsnaPskEncoding::Passphrase: {
+        const auto& pskPassphrase = ieee80211RnsaPsk.Passphrase();
+        *Dot11RsnaPsk.mutable_passphrase() = pskPassphrase;
+        break;
+    }
+    case Ieee80211RsnaPskEncoding::Secret: {
+        const auto& pskSecret = ieee80211RnsaPsk.Secret();
+        Dot11RsnaPsk.mutable_data()->assign(std::cbegin(pskSecret), std::cend(pskSecret));
+        break;
+    }
+    default: {
+        break;
+    }
+    }
 
-    return dot11SharedKey;
+    return Dot11RsnaPsk;
 }
 
 Ieee80211RsnaPassword
@@ -676,9 +697,8 @@ FromDot11RsnaPassword(const Dot11RsnaPassword& dot11RsnaPassword) noexcept
 {
     Ieee80211RsnaPassword ieee80211RsnaPassword{};
 
-    if (dot11RsnaPassword.has_credential()) {
-        ieee80211RsnaPassword.Credential = FromDot11SharedKey(dot11RsnaPassword.credential());
-    }
+    ieee80211RsnaPassword.Credential = dot11RsnaPassword.credential();
+
     if (dot11RsnaPassword.has_peermacaddress()) {
         ieee80211RsnaPassword.PeerMacAddress = FromDot11MacAddress(dot11RsnaPassword.peermacaddress());
     }
@@ -694,7 +714,7 @@ ToDot11RsnaPassword(const Ieee80211RsnaPassword& ieee80211RsnaPassword) noexcept
 {
     Dot11RsnaPassword dot11RsnaPassword{};
 
-    *dot11RsnaPassword.mutable_credential() = ToDot11SharedKey(ieee80211RsnaPassword.Credential);
+    *dot11RsnaPassword.mutable_credential() = ieee80211RsnaPassword.Credential;
 
     if (ieee80211RsnaPassword.PeerMacAddress.has_value()) {
         *dot11RsnaPassword.mutable_peermacaddress() = ToDot11MacAddress(ieee80211RsnaPassword.PeerMacAddress.value());
@@ -711,8 +731,8 @@ FromDot11AuthenticationDataPsk(const Dot11AuthenticationDataPsk& dot11Authentica
 {
     Ieee80211AuthenticationDataPsk ieee80211AuthenticationDataPsk{};
 
-    if (dot11AuthenticationDataPsk.has_key()) {
-        ieee80211AuthenticationDataPsk.Key = FromDot11SharedKey(dot11AuthenticationDataPsk.key());
+    if (dot11AuthenticationDataPsk.has_psk()) {
+        ieee80211AuthenticationDataPsk.Psk = FromDot11RsnaPsk(dot11AuthenticationDataPsk.psk());
     }
 
     return ieee80211AuthenticationDataPsk;
@@ -723,7 +743,7 @@ ToDot11AuthenticationDataPsk(const Ieee80211AuthenticationDataPsk& ieee80211Auth
 {
     Dot11AuthenticationDataPsk dot11AuthenticationDataPsk{};
 
-    *dot11AuthenticationDataPsk.mutable_key() = ToDot11SharedKey(ieee80211AuthenticationDataPsk.Key);
+    *dot11AuthenticationDataPsk.mutable_psk() = ToDot11RsnaPsk(ieee80211AuthenticationDataPsk.Psk);
 
     return dot11AuthenticationDataPsk;
 }

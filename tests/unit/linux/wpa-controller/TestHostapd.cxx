@@ -679,7 +679,7 @@ TEST_CASE("Send SetAuthenticationAlgorithms() command (root)", "[wpa][hostapd][c
 
 namespace Wpa::Test
 {
-constexpr std::initializer_list<uint8_t> AsciiPassword{ 0x70, 0x61, 0x73, 0x73, 0x77, 0x6F, 0x72, 0x64 };
+constexpr auto AsciiPassword{ "password" };
 constexpr auto PasswordIdValid{ "someid" };
 constexpr auto PeerMacAddressValid{ "00:11:22:33:44:55" };
 constexpr int32_t VlanIdValid{ 1 };

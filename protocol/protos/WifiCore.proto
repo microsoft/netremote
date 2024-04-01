@@ -143,7 +143,7 @@ message Dot11MacAddress
     bytes Value = 1;
 }
 
-message Dot11SharedKey
+message Dot11RsnaPsk
 {
     oneof Value
     {
@@ -154,7 +154,7 @@ message Dot11SharedKey
 
 message Dot11AuthenticationDataPsk
 {
-    Dot11SharedKey Key = 1;
+    Dot11RsnaPsk Psk = 1;
 }
 
 // 802.11 Authentication Password.
@@ -163,9 +163,9 @@ message Dot11AuthenticationDataPsk
 // of a password' (specifically, Dot11RSNAConfigPasswordValueEntry).
 message Dot11RsnaPassword
 {
-    Dot11SharedKey Credential = 1;
-    Dot11MacAddress PeerMacAddress = 2;
-    string PasswordId = 3;
+    string Credential = 1;
+    string PasswordId = 2;
+    Dot11MacAddress PeerMacAddress = 3;
 }
 
 message Dot11AuthenticationDataSae
