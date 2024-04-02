@@ -119,11 +119,15 @@ NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
 namespace detail
 {
 Ieee80211RsnaPassword
-ParseSaePasswordCliArgument(const std::string& saePasswordArg)
+ParseSaePasswordCliArgument(const std::tuple<std::string, std::optional<std::string>, std::optional<std::string>>& saePasswordArgument)
 {
-    Ieee80211RsnaPassword saePassword{};
-    // TODO: parse optional password id and peer mac address fields.
-    saePassword.Credential = saePasswordArg;
+    const auto& [password, passwordId, peerMacAddress] = saePasswordArgument; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+
+    Ieee80211RsnaPassword saePassword{
+        .Credential = password,
+        .PasswordId = passwordId,
+        .PeerMacAddress = peerMacAddress.and_then(Ieee80211MacAddressFromString)
+    };
 
     return saePassword;
 }
@@ -275,7 +279,7 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
     cliAppWifiAccessPointEnable->add_option("--akm,--akms,--akmSuite,--akmSuites,--keyManagement,--keyManagements", m_cliData->WifiAccessPointAkmSuites, "The AKM suites of the access point to enable")
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AkmSuiteNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->add_option("--passphrase,--pskPassphrase", m_cliData->WifiAccessPointPskPassphrase, "The PSK passphrase of the access point to enable");
-    cliAppWifiAccessPointEnable->add_option("--sae,--password,--passwords,--saePassword,--saePasswords", m_cliData->WifiAccessPointSaePasswords, "The SAE passwords of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--sae,--password,--passwords,--saePassword,--saePasswords", m_cliData->WifiAccessPointSaePasswords, "The SAE passwords of the access point to enable")->type_size(1, 3);
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
     });
