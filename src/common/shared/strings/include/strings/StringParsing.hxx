@@ -14,11 +14,11 @@ namespace Strings
 /**
  * @brief Parse a hex string into a container of bytes.
  *
- * @tparam ContainerT
- * @param hexString
- * @param result
- * @return true
- * @return false
+ * @tparam ContainerT The container type to store the parsed bytes.
+ * @param hexString The hex string to parse.
+ * @param result The container to store the parsed bytes.
+ * @return true If a valid hex string was parsed into the container.
+ * @return false If the hex string was invalid or the container was too small to store the parsed bytes.
  */
 // clang-format off
 template <std::ranges::range ContainerT>
