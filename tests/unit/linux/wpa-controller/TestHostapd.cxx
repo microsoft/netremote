@@ -388,6 +388,7 @@ TEST_CASE("Send SetWpaSecurityProtocols() command (root)", "[wpa][hostapd][clien
 {
     using namespace Wpa;
 
+    // NOLINTNEXTLINE
     static constexpr auto WpaSecurityProtocolInvalid = static_cast<WpaSecurityProtocol>(std::numeric_limits<std::underlying_type_t<WpaSecurityProtocol>>::max());
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
@@ -679,12 +680,20 @@ TEST_CASE("Send SetAuthenticationAlgorithms() command (root)", "[wpa][hostapd][c
 
 namespace Wpa::Test
 {
+// NOLINTBEGIN(cert-err58-cpp)
+// clang-format off
+constexpr auto PskPassphraseValid{ "password" };
+constexpr std::array<char, WpaPskValueLength> PskHexValid{ 
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+// clang-format on
+
 constexpr auto AsciiPassword{ "password" };
 constexpr auto PasswordIdValid{ "someid" };
 constexpr auto PeerMacAddressValid{ "00:11:22:33:44:55" };
 constexpr int32_t VlanIdValid{ 1 };
-
-// NOLINTBEGIN(cert-err58-cpp)
 
 const SaePassword SaePasswordValid1{
     .Credential = AsciiPassword,
@@ -718,6 +727,48 @@ const std::vector<SaePassword> SaePasswordsValid{ SaePasswordValid1, SaePassword
 
 // NOLINTEND(cert-err58-cpp)
 } // namespace Wpa::Test
+
+TEST_CASE("Send SetPreSharedKey() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+    using namespace Wpa::Test;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetPreSharedKey(PskHexValid, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetPreSharedKey(PskHexValid, EnforceConfigurationChange::Defer));
+
+        REQUIRE_NOTHROW(hostapd.SetPreSharedKey(PskPassphraseValid, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetPreSharedKey(PskPassphraseValid, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with passphrase inputs that are valid")
+    {
+        for (std::size_t i = WpaPskPassphraseLengthMin; i <= WpaPskPassphraseLengthMax; ++i) {
+            const auto pskPassphrase = std::string(i, 'a');
+            REQUIRE_NOTHROW(hostapd.SetPreSharedKey(pskPassphrase, EnforceConfigurationChange::Now));
+            REQUIRE_NOTHROW(hostapd.SetPreSharedKey(pskPassphrase, EnforceConfigurationChange::Defer));
+        }
+    }
+
+    SECTION("Fails with passphrase inputs that are too short")
+    {
+        for (std::size_t i = 0; i < WpaPskPassphraseLengthMin; ++i) {
+            const auto pskPassphrase = std::string(i, 'a');
+            REQUIRE_THROWS_AS(hostapd.SetPreSharedKey(pskPassphrase, EnforceConfigurationChange::Now), HostapdException);
+            REQUIRE_THROWS_AS(hostapd.SetPreSharedKey(pskPassphrase, EnforceConfigurationChange::Defer), HostapdException);
+        }
+    }
+
+    SECTION("Fails with passphrase input that is too long")
+    {
+        const auto pskPassphrase = std::string(WpaPskPassphraseLengthMax + 1, 'a');
+        REQUIRE_THROWS_AS(hostapd.SetPreSharedKey(pskPassphrase, EnforceConfigurationChange::Now), HostapdException);
+        REQUIRE_THROWS_AS(hostapd.SetPreSharedKey(pskPassphrase, EnforceConfigurationChange::Defer), HostapdException);
+    }
+}
 
 TEST_CASE("Send AddSaePassword() command (root)", "[wpa][hostapd][client][remote]")
 {
