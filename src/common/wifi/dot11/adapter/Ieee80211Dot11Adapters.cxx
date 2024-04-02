@@ -667,7 +667,7 @@ FromDot11RsnaPsk(const Dot11RsnaPsk& dot11RsnaPsk) noexcept
                 std::vector<uint8_t> pskValueRawV(std::size(pskValueRaw));
                 for (std::size_t i = 0; i < std::size(pskValueRaw); i++) {
                     const auto byteAsHex = pskHexView.substr(i * 2, 2); // 2 hex chars
-                    std::from_chars(std::cbegin(byteAsHex), std::cend(byteAsHex), pskValueRaw[i], 16);
+                    std::from_chars(std::data(byteAsHex), std::data(byteAsHex) + std::size(byteAsHex), pskValueRaw[i], 16);
                 }
             }
         } else if (pskValue.has_raw()) {

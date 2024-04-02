@@ -762,7 +762,7 @@ NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view acce
                 const auto& pskHex = pskValue.hex();
                 if (std::size(pskHex) != Ieee80211RsnaPskLength * 2) {
                     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-                    wifiOperationStatus.set_message(std::format("Invalid PSK hex value provided (not {} characters)", Ieee80211RsnaPskLength * 2));
+                    wifiOperationStatus.set_message(std::format("Invalid PSK hex value size '{}' provided (expected {} characters)", std::size(pskHex), Ieee80211RsnaPskLength * 2));
                     return wifiOperationStatus;
                 }
             } else if (pskValue.has_raw()) {
