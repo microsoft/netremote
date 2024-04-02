@@ -8,6 +8,7 @@
 #include <tuple>
 
 #include <microsoft/net/wifi/Ieee80211.hxx>
+#include <strings/StringParsing.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -29,15 +30,9 @@ Ieee80211MacAddressFromString(std::string macAddress)
         macAddress.erase(std::begin(eraseRange), std::end(eraseRange));
     }
 
-    if (std::size(macAddress) < std::tuple_size_v<Ieee80211MacAddress>) {
-        return std::nullopt;
-    }
-
     Ieee80211MacAddress result{};
-    std::string_view macAddressView{ macAddress };
-    for (std::size_t i = 0; i < std::size(macAddressView); i++) {
-        const auto byteAsHex = macAddressView.substr(i * 2, 2); // 2 hex chars
-        std::from_chars(std::data(byteAsHex), std::data(byteAsHex) + std::size(byteAsHex), result[i], 16);
+    if (!Strings::ParseHexString(macAddress, result)) {
+        return std::nullopt;
     }
 
     return result;
