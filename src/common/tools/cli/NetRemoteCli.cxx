@@ -118,14 +118,20 @@ NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
 
 namespace detail
 {
+/**
+ * @brief Thin wrapper to destructure the std::tuple used to parse SAE passwords.
+ * 
+ * @param saePasswordArgument The tuple containing the SAE password, password ID, and peer MAC address.
+ * @return Ieee80211RsnaPassword 
+ */
 Ieee80211RsnaPassword
-ParseSaePasswordCliArgument(const std::tuple<std::string, std::optional<std::string>, std::optional<std::string>>& saePasswordArgument)
+ParseSaePasswordCliArgument(std::tuple<std::string, std::optional<std::string>, std::optional<std::string>>& saePasswordArgument)
 {
     const auto& [password, passwordId, peerMacAddress] = saePasswordArgument; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
 
     Ieee80211RsnaPassword saePassword{
-        .Credential = password,
-        .PasswordId = passwordId,
+        .Credential = std::move(password),
+        .PasswordId = std::move(passwordId),
         .PeerMacAddress = peerMacAddress.and_then(Ieee80211MacAddressFromString)
     };
 

@@ -34,7 +34,7 @@ ParseHexString(const std::string& hexString, ContainerT& result)
     }
 
     std::string_view hexStringView{ hexString };
-    for (std::size_t i = 0; i < std::size(hexString); i++) {
+    for (std::size_t i = 0; i < std::size(result); i++) {
         const auto byteAsHex = hexStringView.substr(i * 2, 2); // 2 hex chars
         const auto byteConversionResult = std::from_chars(std::data(byteAsHex), std::data(byteAsHex) + std::size(byteAsHex), result[i], 16);
         if (byteConversionResult.ec != std::errc{}) {
