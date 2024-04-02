@@ -61,9 +61,9 @@ Wpa::WpaPreSharedKeyPropertyValue(const WpaPreSharedKey& wpaPreSharedKey)
     if (std::holds_alternative<WpaPskPassphraseT>(wpaPreSharedKey)) {
         const auto& pskPassphrase = std::get<WpaPskPassphraseT>(wpaPreSharedKey);
         return std::string(pskPassphrase);
-    } else if (std::holds_alternative<WpaPskSecretT>(wpaPreSharedKey)) {
-        const auto& pskSecret = std::get<WpaPskSecretT>(wpaPreSharedKey);
-        return std::string(std::data(pskSecret), std::size(pskSecret));
+    } else if (std::holds_alternative<WpaPskValueT>(wpaPreSharedKey)) {
+        const auto& pskValue = std::get<WpaPskValueT>(wpaPreSharedKey);
+        return std::string(std::data(pskValue), std::size(pskValue));
     } else {
         return std::string();
     }
@@ -76,7 +76,7 @@ Wpa::WpaPreSharedKeyPropertyKeyAndValue(const WpaPreSharedKey& wpaPreSharedKey)
 
     if (std::holds_alternative<WpaPskPassphraseT>(wpaPreSharedKey)) {
         propertyName = ProtocolHostapd::PropertyNameWpaPassphrase;
-    } else if (std::holds_alternative<WpaPskSecretT>(wpaPreSharedKey)) {
+    } else if (std::holds_alternative<WpaPskValueT>(wpaPreSharedKey)) {
         propertyName = ProtocolHostapd::PropertyNameWpaPsk;
     } else {
         propertyName = ProtocolHostapd::PropertyNameInvalid;

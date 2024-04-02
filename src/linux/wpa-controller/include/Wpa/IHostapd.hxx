@@ -181,7 +181,7 @@ struct IHostapd
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a configuration reload.
      */
     virtual void
-    SetPresharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange) = 0;
+    SetPreSharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChange enforceConfigurationChange) = 0;
 
     /**
      * @brief Set the accepted SAE passwords for the interface.

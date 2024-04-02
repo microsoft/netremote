@@ -13,6 +13,7 @@ target_sources(wifi-core
         AccessPointOperationStatusLogOnExit.cxx
         Ieee80211.cxx
         Ieee80211AccessPointCapabilities.cxx
+        Ieee80211Authentication.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_PUBLIC_INCLUDE}

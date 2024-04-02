@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <charconv>
 #include <cstdlib>
 #include <iterator>
 #include <ranges>
@@ -642,26 +643,40 @@ ToDot11MacAddress(const Ieee80211MacAddress& ieee80211MacAddress) noexcept
 }
 
 Ieee80211RsnaPsk
-FromDot11RsnaPsk(const Dot11RsnaPsk& Dot11RsnaPsk) noexcept
+FromDot11RsnaPsk(const Dot11RsnaPsk& dot11RsnaPsk) noexcept
 {
     Ieee80211RsnaPsk ieee80211RsnaPsk{};
 
-    if (Dot11RsnaPsk.has_data()) {
-        const auto& keyData = Dot11RsnaPsk.data();
-        if (std::size(keyData) >= Ieee80211RsnaPskSecretLength) {
-            // Ensure the variant holds the correct type by calling emplace with the corresponding index. Unfortunately
-            // since the underlying type is a std::array which doesn't have a constructor, it can't be initialized with
-            // a container (e.g. keyData) via emplace args, so the data is explicitly copied with copy_n below, which is
-            // what would happen for "array construction" anyway.
-            auto& pskSecret = ieee80211RsnaPsk.emplace<1>();
-            std::ranges::copy_n(std::cbegin(keyData), Ieee80211RsnaPskSecretLength, std::begin(pskSecret));
-        }
-    } else if (Dot11RsnaPsk.has_passphrase()) {
-        const auto& keyPassphrase = Dot11RsnaPsk.passphrase();
-        const auto keyPassphraseSize = std::size(keyPassphrase);
-        if (keyPassphraseSize >= Ieee80211RsnaPskPassphraseLengthMinimum && keyPassphraseSize <= Ieee80211RsnaPskPassphraseLengthMaximum) {
-            std::string pskPassphrase(std::cbegin(keyPassphrase), std::cend(keyPassphrase));
-            ieee80211RsnaPsk = std::move(pskPassphrase);
+    if (dot11RsnaPsk.has_passphrase()) {
+        const auto& pskPassphrase = dot11RsnaPsk.passphrase();
+        ieee80211RsnaPsk = pskPassphrase;
+    } else if (dot11RsnaPsk.has_value()) {
+        const auto& pskValue = dot11RsnaPsk.value();
+
+        // Ensure the variant holds the correct type by calling emplace with the corresponding index. Unfortunately
+        // since the underlying type is a std::array which doesn't have a constructor, it can't be initialized with
+        // a container via emplace args or variant constructor, so the data is explicitly copied with copy_n below,
+        // which is what would happen for "array construction" anyway.
+        auto& pskValueRaw = ieee80211RsnaPsk.emplace<1>();
+
+        if (pskValue.has_hex()) {
+            const auto& pskHex = pskValue.hex();
+            // Ensure the hex string is at least twice the length of the value array (2 hex characters per byte).
+            if (std::size(pskHex) >= std::size(ieee80211RsnaPsk.Value()) * 2) {
+                std::string_view pskHexView{ pskHex };
+                std::vector<uint8_t> pskValueRawV(std::size(pskValueRaw));
+                for (std::size_t i = 0; i < std::size(pskValueRaw); i++) {
+                    const auto byteAsHex = pskHexView.substr(i * 2, 2); // 2 hex chars
+                    std::from_chars(std::data(byteAsHex), std::data(byteAsHex) + std::size(byteAsHex), pskValueRaw[i], 16);
+                }
+            }
+        } else if (pskValue.has_raw()) {
+            const auto& pskRaw = pskValue.raw();
+            if (std::size(pskRaw) >= std::size(pskValueRaw)) {
+                std::ranges::copy_n(std::cbegin(pskRaw), static_cast<long>(std::size(pskValueRaw)), std::begin(pskValueRaw));
+            }
+        } else {
+            ieee80211RsnaPsk = {};
         }
     }
 
@@ -671,17 +686,17 @@ FromDot11RsnaPsk(const Dot11RsnaPsk& Dot11RsnaPsk) noexcept
 Dot11RsnaPsk
 ToDot11RsnaPsk(const Ieee80211RsnaPsk& ieee80211RnsaPsk) noexcept
 {
-    Dot11RsnaPsk Dot11RsnaPsk{};
+    Dot11RsnaPsk dot11RsnaPsk{};
 
     switch (ieee80211RnsaPsk.Encoding()) {
     case Ieee80211RsnaPskEncoding::Passphrase: {
         const auto& pskPassphrase = ieee80211RnsaPsk.Passphrase();
-        *Dot11RsnaPsk.mutable_passphrase() = pskPassphrase;
+        *dot11RsnaPsk.mutable_passphrase() = pskPassphrase;
         break;
     }
-    case Ieee80211RsnaPskEncoding::Secret: {
-        const auto& pskSecret = ieee80211RnsaPsk.Secret();
-        Dot11RsnaPsk.mutable_data()->assign(std::cbegin(pskSecret), std::cend(pskSecret));
+    case Ieee80211RsnaPskEncoding::Value: {
+        const auto& pskValue = ieee80211RnsaPsk.Value();
+        dot11RsnaPsk.mutable_value()->mutable_raw()->assign(std::cbegin(pskValue), std::cend(pskValue));
         break;
     }
     default: {
@@ -689,7 +704,7 @@ ToDot11RsnaPsk(const Ieee80211RsnaPsk& ieee80211RnsaPsk) noexcept
     }
     }
 
-    return Dot11RsnaPsk;
+    return dot11RsnaPsk;
 }
 
 Ieee80211RsnaPassword

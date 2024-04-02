@@ -779,17 +779,17 @@ WpaAuthenticationAlgorithmPropertyValue(WpaAuthenticationAlgorithm wpaAuthentica
     return std::to_underlying(wpaAuthenticationAlgorithm);
 }
 
-static constexpr std::size_t WpaPskSecretLength = 64;
+static constexpr std::size_t WpaPskValueLength = 64;
 static constexpr std::size_t WpaPskPassphraseLengthMin = 8;
 static constexpr std::size_t WpaPskPassphraseLengthMax = 63;
 
 using WpaPskPassphraseT = std::string;
-using WpaPskSecretT = std::array<char, WpaPskSecretLength>;
+using WpaPskValueT = std::array<char, WpaPskValueLength>;
 
 /**
  * @brief Pre-shared key (PSK).
  */
-using WpaPreSharedKey = std::variant<WpaPskPassphraseT, WpaPskSecretT>;
+using WpaPreSharedKey = std::variant<WpaPskPassphraseT, WpaPskValueT>;
 
 /**
  * @brief Get the hostapd property value for the specified WpaPreSharedKey. The returned value
