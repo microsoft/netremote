@@ -345,6 +345,22 @@ NetRemoteCliHandlerOperations::WifiAccessPointEnable(std::string_view accessPoin
                 std::make_move_iterator(std::end(dot11FrequencyBands))
             };
         }
+
+        // Populate PSK authentication data if present.
+        if (ieee80211AccessPointConfiguration->AuthenticationData.Psk.has_value()) {
+            const auto& authenticationDataPsk = ieee80211AccessPointConfiguration->AuthenticationData.Psk.value();
+            auto dot11AuthenticationDataPsk = ToDot11AuthenticationDataPsk(authenticationDataPsk);
+
+            *dot11AccessPointConfiguration.mutable_authenticationdata()->mutable_psk() = std::move(dot11AuthenticationDataPsk);
+        }
+
+        // Populate SAE authentication data if present.
+        if (ieee80211AccessPointConfiguration->AuthenticationData.Sae.has_value()) {
+            const auto& authenticationDataSae = ieee80211AccessPointConfiguration->AuthenticationData.Sae.value();
+            auto dot11AuthenticationDataSae = ToDot11AuthenticationDataSae(authenticationDataSae);
+
+            *dot11AccessPointConfiguration.mutable_authenticationdata()->mutable_sae() = std::move(dot11AuthenticationDataSae);
+        }
     }
 
     auto status = m_connection->Client->WifiAccessPointEnable(&clientContext, request, &result);

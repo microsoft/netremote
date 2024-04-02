@@ -116,10 +116,34 @@ NetRemoteCli::AddSubcommandWifiAccessPointsEnumerate(CLI::App* parent)
     return cliAppWifiAccessPointsEnumerate;
 }
 
+namespace detail
+{
+Ieee80211RsnaPassword
+ParseSaePasswordCliArgument(const std::string& saePasswordArg)
+{
+    Ieee80211RsnaPassword saePassword{};
+    // TODO: parse optional password id and peer mac address fields.
+    saePassword.Credential = saePasswordArg;
+
+    return saePassword;
+}
+} // namespace detail
+
 void
 NetRemoteCli::WifiAccessPointEnableCallback()
 {
     Ieee80211AccessPointConfiguration ieee80211AccessPointConfiguration{};
+
+    if (!std::empty(m_cliData->WifiAccessPointPskPassphrase)) {
+        auto& psk = ieee80211AccessPointConfiguration.AuthenticationData.Psk.emplace();
+        psk.Psk = m_cliData->WifiAccessPointPskPassphrase;
+    }
+
+    if (!std::empty(m_cliData->WifiAccessPointSaePasswords)) {
+        auto& sae = ieee80211AccessPointConfiguration.AuthenticationData.Sae.emplace();
+        sae.Passwords.resize(std::size(m_cliData->WifiAccessPointSaePasswords));
+        std::ranges::transform(m_cliData->WifiAccessPointSaePasswords, std::begin(sae.Passwords), detail::ParseSaePasswordCliArgument);
+    }
 
     if (!std::empty(m_cliData->WifiAccessPointSsid)) {
         ieee80211AccessPointConfiguration.Ssid = m_cliData->WifiAccessPointSsid;
@@ -250,6 +274,8 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AuthenticationAlgorithmNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->add_option("--akm,--akms,--akmSuite,--akmSuites,--keyManagement,--keyManagements", m_cliData->WifiAccessPointAkmSuites, "The AKM suites of the access point to enable")
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AkmSuiteNames(), CLI::ignore_case));
+    cliAppWifiAccessPointEnable->add_option("--passphrase,--pskPassphrase", m_cliData->WifiAccessPointPskPassphrase, "The PSK passphrase of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--sae,--password,--passwords,--saePassword,--saePasswords", m_cliData->WifiAccessPointSaePasswords, "The SAE passwords of the access point to enable");
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
     });
