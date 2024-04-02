@@ -275,7 +275,7 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
     cliAppWifiAccessPointEnable->add_option("--akm,--akms,--akmSuite,--akmSuites,--keyManagement,--keyManagements", m_cliData->WifiAccessPointAkmSuites, "The AKM suites of the access point to enable")
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AkmSuiteNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->add_option("--passphrase,--pskPassphrase", m_cliData->WifiAccessPointPskPassphrase, "The PSK passphrase of the access point to enable");
-    cliAppWifiAccessPointEnable->add_option("--sae,--password,--saePassword,--saePasswords", m_cliData->WifiAccessPointSaePasswords, "The SAE passwords of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--sae,--password,--passwords,--saePassword,--saePasswords", m_cliData->WifiAccessPointSaePasswords, "The SAE passwords of the access point to enable");
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
     });
