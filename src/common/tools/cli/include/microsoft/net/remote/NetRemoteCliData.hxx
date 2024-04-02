@@ -25,6 +25,7 @@ struct NetRemoteCliData
 
     std::string WifiAccessPointId{};
     std::string WifiAccessPointSsid{};
+    std::string WifiAccessPointPskPassphrase;
     Microsoft::Net::Wifi::Ieee80211PhyType WifiAccessPointPhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
     Microsoft::Net::Wifi::Ieee80211AuthenticationData WifiAccessPointAuthenticationData;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> WifiAccessPointFrequencyBands{};
