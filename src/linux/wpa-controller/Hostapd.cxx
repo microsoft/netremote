@@ -340,9 +340,6 @@ Hostapd::SetPreSharedKey(WpaPreSharedKey preSharedKey, EnforceConfigurationChang
 
     try {
         SetProperty(pskPropertyName, pskPropertyValue, enforceConfigurationChange);
-        if (enforceConfigurationChange == EnforceConfigurationChange::Now) {
-            Reload();
-        }
     } catch (const HostapdException& e) {
         throw HostapdException(std::format("Failed to set pre-shared key ({})", e.what()));
     }
