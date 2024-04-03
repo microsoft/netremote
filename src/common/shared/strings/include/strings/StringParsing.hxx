@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <ranges>
 #include <string>
+#include <tuple>
 
 namespace Strings
 {
@@ -17,6 +18,7 @@ namespace Strings
  * @tparam ContainerT The container type to store the parsed bytes.
  * @param hexString The hex string to parse.
  * @param result The container to store the parsed bytes.
+ * @param numberOfBytesToParse The number of bytes to parse from the hex string.
  * @return true If a valid hex string was parsed into the container.
  * @return false If the hex string was invalid or the container was too small to store the parsed bytes.
  */
@@ -25,11 +27,10 @@ template <std::ranges::range ContainerT>
 requires std::same_as<std::ranges::range_value_t<ContainerT>, std::uint8_t>
 // clang-format on
 bool
-ParseHexString(const std::string& hexString, ContainerT& result)
+ParseHexString(const std::string& hexString, ContainerT& result, std::size_t numberOfBytesToParse = std::tuple_size_v<ContainerT>)
 {
-    // Ensure the result container is large enough to hold the parsed data. Since each byte is represented by 2 hex
-    // characters, the result container must be at least half the size of the hex string.
-    if (std::size(hexString) > std::size(result) * 2) {
+    // Ensure the input has enough characters to parse the requested number of bytes.
+    if (std::size(hexString) / 2 < numberOfBytesToParse) {
         return false;
     }
 
