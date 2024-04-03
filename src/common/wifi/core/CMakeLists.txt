@@ -34,6 +34,7 @@ target_link_libraries(wifi-core
     PRIVATE
         magic_enum::magic_enum
         notstd
+        strings
     PUBLIC
         plog::plog
 )

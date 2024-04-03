@@ -27,6 +27,7 @@ target_link_libraries(${PROJECT_NAME}-cli
         magic_enum::magic_enum
         notstd
         plog::plog
+        strings
     PUBLIC
         ${PROJECT_NAME}-client
         wifi-core

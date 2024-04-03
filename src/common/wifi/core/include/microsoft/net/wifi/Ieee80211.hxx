@@ -6,6 +6,7 @@
 #include <cmath>
 #include <cstdint>
 #include <initializer_list>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -422,6 +423,15 @@ using Ieee80211MacAddress = std::array<uint8_t, MacAddressNumOctets>;
  */
 std::string
 Ieee80211MacAddressToString(const Ieee80211MacAddress& macAddress);
+
+/**
+ * @brief Parse a string into a MAC address.
+ *
+ * @param macAddress The MAC address string to parse.
+ * @return std::optional<Ieee80211MacAddress>
+ */
+std::optional<Ieee80211MacAddress>
+Ieee80211MacAddressFromString(std::string macAddress);
 
 /**
  * @brief Information about a BSS.

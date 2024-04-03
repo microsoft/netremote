@@ -180,6 +180,90 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
     }
 
+    SECTION("Fails with psk too short")
+    {
+        const auto pskPassphraseTooShort = std::string(Ieee80211RsnaPskPassphraseLengthMinimum - 1, 'a');
+
+        Dot11AccessPointConfiguration apConfiguration{};
+        *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = pskPassphraseTooShort;
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+    }
+
+    SECTION("Fails with psk too long")
+    {
+        const auto pskPassphraseTooShort = std::string(Ieee80211RsnaPskPassphraseLengthMaximum + 1, 'a');
+
+        Dot11AccessPointConfiguration apConfiguration{};
+        *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = pskPassphraseTooShort;
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+    }
+
+    SECTION("Succeeds with psk minimum length")
+    {
+        const auto pskPassphraseMinimum = std::string(Ieee80211RsnaPskPassphraseLengthMinimum, 'a');
+
+        Dot11AccessPointConfiguration apConfiguration{};
+        *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = pskPassphraseMinimum;
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Succeeds with psk maximum length")
+    {
+        const auto pskPassphraseMaximum = std::string(Ieee80211RsnaPskPassphraseLengthMaximum, 'a');
+
+        Dot11AccessPointConfiguration apConfiguration{};
+        *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = pskPassphraseMaximum;
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
     SECTION("Succeeds without access point configuration if already configured")
     {
         Dot11CipherSuiteConfiguration dot11CipherSuiteConfigurationWpa1{};

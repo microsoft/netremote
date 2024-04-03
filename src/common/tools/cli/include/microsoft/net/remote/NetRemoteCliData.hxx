@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
@@ -26,7 +27,8 @@ struct NetRemoteCliData
     std::string WifiAccessPointId{};
     std::string WifiAccessPointSsid{};
     std::string WifiAccessPointPskPassphrase;
-    std::vector<std::string> WifiAccessPointSaePasswords{};
+    std::string WifiAccessPointPskHex;
+    std::vector<std::tuple<std::string, std::optional<std::string>, std::optional<std::string>>> WifiAccessPointSaePasswords{};
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> WifiAccessPointFrequencyBands{};
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> WifiAccessPointAuthenticationAlgorithms{};
     std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> WifiAccessPointAkmSuites{};

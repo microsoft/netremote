@@ -13,6 +13,7 @@
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
+#include <strings/StringParsing.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -661,19 +662,15 @@ FromDot11RsnaPsk(const Dot11RsnaPsk& dot11RsnaPsk) noexcept
 
         if (pskValue.has_hex()) {
             const auto& pskHex = pskValue.hex();
-            // Ensure the hex string is at least twice the length of the value array (2 hex characters per byte).
-            if (std::size(pskHex) >= std::size(ieee80211RsnaPsk.Value()) * 2) {
-                std::string_view pskHexView{ pskHex };
-                std::vector<uint8_t> pskValueRawV(std::size(pskValueRaw));
-                for (std::size_t i = 0; i < std::size(pskValueRaw); i++) {
-                    const auto byteAsHex = pskHexView.substr(i * 2, 2); // 2 hex chars
-                    std::from_chars(std::data(byteAsHex), std::data(byteAsHex) + std::size(byteAsHex), pskValueRaw[i], 16);
-                }
+            if (!Strings::ParseHexString(pskHex, pskValueRaw)) {
+                ieee80211RsnaPsk = {};
             }
         } else if (pskValue.has_raw()) {
             const auto& pskRaw = pskValue.raw();
             if (std::size(pskRaw) >= std::size(pskValueRaw)) {
                 std::ranges::copy_n(std::cbegin(pskRaw), static_cast<long>(std::size(pskValueRaw)), std::begin(pskValueRaw));
+            } else {
+                ieee80211RsnaPsk = {};
             }
         } else {
             ieee80211RsnaPsk = {};
