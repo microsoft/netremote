@@ -294,7 +294,7 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
 }
 
 AccessPointOperationStatus
-AccessPointControllerLinux::SetAuthenticationData([[maybe_unused]] Ieee80211AuthenticationData authenticationData) noexcept
+AccessPointControllerLinux::SetAuthenticationData(Ieee80211AuthenticationData authenticationData) noexcept
 {
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
