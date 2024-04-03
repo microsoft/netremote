@@ -5,7 +5,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <tuple>
 
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <strings/StringParsing.hxx>

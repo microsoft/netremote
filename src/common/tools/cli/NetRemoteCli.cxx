@@ -1,5 +1,6 @@
 
 #include <format>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <stdexcept>
@@ -20,6 +21,7 @@
 #include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 #include <notstd/Memory.hxx>
 #include <plog/Log.h>
+#include <strings/StringParsing.hxx>
 
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Wifi;
@@ -120,9 +122,9 @@ namespace detail
 {
 /**
  * @brief Thin wrapper to destructure the std::tuple used to parse SAE passwords.
- * 
+ *
  * @param saePasswordArgument The tuple containing the SAE password, password ID, and peer MAC address.
- * @return Ieee80211RsnaPassword 
+ * @return Ieee80211RsnaPassword
  */
 Ieee80211RsnaPassword
 ParseSaePasswordCliArgument(std::tuple<std::string, std::optional<std::string>, std::optional<std::string>>& saePasswordArgument)
@@ -147,6 +149,14 @@ NetRemoteCli::WifiAccessPointEnableCallback()
     if (!std::empty(m_cliData->WifiAccessPointPskPassphrase)) {
         auto& psk = ieee80211AccessPointConfiguration.AuthenticationData.Psk.emplace();
         psk.Psk = m_cliData->WifiAccessPointPskPassphrase;
+    }
+    if (!std::empty(m_cliData->WifiAccessPointPskHex)) {
+        auto& psk = ieee80211AccessPointConfiguration.AuthenticationData.Psk.emplace();
+        auto& pskValue = psk.Psk.emplace<Ieee80211RsnaPskValue>();
+        if (!Strings::ParseHexString(m_cliData->WifiAccessPointPskHex, pskValue)) {
+            std::cerr << "Failed to parse PSK value (must be 64 hex characters)" << std::endl;
+            return;
+        }
     }
 
     if (!std::empty(m_cliData->WifiAccessPointSaePasswords)) {
@@ -284,7 +294,8 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AuthenticationAlgorithmNames(), CLI::ignore_case));
     cliAppWifiAccessPointEnable->add_option("--akm,--akms,--akmSuite,--akmSuites,--keyManagement,--keyManagements", m_cliData->WifiAccessPointAkmSuites, "The AKM suites of the access point to enable")
         ->transform(CLI::CheckedTransformer(detail::Ieee80211AkmSuiteNames(), CLI::ignore_case));
-    cliAppWifiAccessPointEnable->add_option("--passphrase,--pskPassphrase", m_cliData->WifiAccessPointPskPassphrase, "The PSK passphrase of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--psk", m_cliData->WifiAccessPointPskHex, "The PSK of the access point to enable");
+    cliAppWifiAccessPointEnable->add_option("--passphrase,--pskPassphrase", m_cliData->WifiAccessPointPskPassphrase, "The PSK passphrase of the access point to enable")->excludes("--psk");
     cliAppWifiAccessPointEnable->add_option("--sae,--password,--passwords,--saePassword,--saePasswords", m_cliData->WifiAccessPointSaePasswords, "The SAE passwords of the access point to enable")->type_size(1, 3);
     cliAppWifiAccessPointEnable->callback([this] {
         WifiAccessPointEnableCallback();
