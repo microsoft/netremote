@@ -21,6 +21,7 @@ target_link_libraries(wifi-core-adapter-dot11
         wifi-core
     PRIVATE
         notstd
+        strings
 )
 
 install(

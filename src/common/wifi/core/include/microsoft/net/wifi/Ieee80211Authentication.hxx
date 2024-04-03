@@ -26,6 +26,7 @@ using Ieee80211RsnaPskVariant = std::variant<Ieee80211RsnaPskPassphrase, Ieee802
  * @brief Encoding of a pre-shared key.
  */
 enum class Ieee80211RsnaPskEncoding {
+    Invalid,
     Passphrase,
     Value,
 };
@@ -50,9 +51,13 @@ struct Ieee80211RsnaPsk :
     constexpr Ieee80211RsnaPskEncoding
     Encoding() const noexcept
     {
+        // clang-format off
         return std::holds_alternative<Ieee80211RsnaPskPassphrase>(*this)
             ? Ieee80211RsnaPskEncoding::Passphrase
-            : Ieee80211RsnaPskEncoding::Value;
+            : std::holds_alternative<Ieee80211RsnaPskValue>(*this)
+                ? Ieee80211RsnaPskEncoding::Value
+                : Ieee80211RsnaPskEncoding::Invalid;
+        // clang-format on
     }
 
     /**
