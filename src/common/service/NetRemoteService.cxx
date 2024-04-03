@@ -751,6 +751,12 @@ NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view acce
                 wifiOperationStatus.set_message("No PSK passphrase provided (empty)");
                 return wifiOperationStatus;
             }
+            const auto pskPassphraseSize = std::size(pskPassphrase);
+            if (pskPassphraseSize < Ieee80211RsnaPskPassphraseLengthMinimum || pskPassphraseSize > Ieee80211RsnaPskPassphraseLengthMaximum) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message(std::format("Invalid PSK passphrase size '{}' provided (expected {} to {} characters)", pskPassphraseSize, Ieee80211RsnaPskPassphraseLengthMinimum, Ieee80211RsnaPskPassphraseLengthMaximum));
+                return wifiOperationStatus;
+            }
         } else if (psk.has_value()) {
             const auto& pskValue = psk.value();
             if (!pskValue.has_hex() && !pskValue.has_raw()) {
@@ -769,7 +775,7 @@ NetRemoteService::WifiAccessPointSetAuthenticationDataImpl(std::string_view acce
                 const auto& pskRaw = pskValue.raw();
                 if (std::size(pskRaw) != Ieee80211RsnaPskLength) {
                     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-                    wifiOperationStatus.set_message(std::format("Invalid PSK raw value provided (not {} bytes)", Ieee80211RsnaPskLength));
+                    wifiOperationStatus.set_message(std::format("Invalid PSK raw value size '{}' provided (expected {} bytes)", std::size(pskRaw), Ieee80211RsnaPskLength));
                     return wifiOperationStatus;
                 }
             }
