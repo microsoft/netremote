@@ -30,6 +30,12 @@ install(
 )
 
 install(
+    DIRECTORY
+    DESTINATION ${CMAKE_INSTALL_RUNSTATEDIR}/hostapd
+    COMPONENT hostapd
+)
+
+install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/hostapd-release@.service
     CONFIGURATIONS Release
