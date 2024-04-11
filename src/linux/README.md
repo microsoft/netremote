@@ -4,7 +4,7 @@ This project tree is meant to exercise and test the OS-agnostic portions of the 
 
 ## Development Environment Setup
 
-As described in the main project [`README`](/README.md), a C++ 20 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 23.10 (mantic) with a few development packages. Instructions for setting up this environment are provided below.
+As described in the main project [`README`](/README.md), a C++ 23 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 23.10 (mantic) with a few development packages. Instructions for setting up this environment are provided below.
 
 ### 1. Install Ubuntu 23.10 (mantic)
 

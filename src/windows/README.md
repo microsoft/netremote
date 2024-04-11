@@ -3,7 +3,7 @@
 
 # Development Environment Setup
 
-As described in the main project [`README`](/README.md), a C++ 20 compiler and CMake are required. A known, minimal working environment is using Visual Studio 2022 Build Tools which provides all of the necessary development requirements. Note that the build tools do not provide the Visual Studio IDE, so if this is desired, the Visual Studio product of choice may be installed instead. Instructions for setting up this environment are provided below.
+As described in the main project [`README`](/README.md), a C++ 23 compiler and CMake are required. A known, minimal working environment is using Visual Studio 2022 Build Tools which provides all of the necessary development requirements. Note that the build tools do not provide the Visual Studio IDE, so if this is desired, the Visual Studio product of choice may be installed instead. Instructions for setting up this environment are provided below.
 
 ## 1. Install the tools
 
