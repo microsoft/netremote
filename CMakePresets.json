@@ -387,26 +387,38 @@
     "packagePresets": [
         {
             "name": "packaging-dev",
+            "displayName": "Development",
+            "description": "Development packaging for inner-loop",
             "configurePreset": "packaging-dev"
         },
         {
             "name": "packaging-release",
+            "displayName": "Release",
+            "description": "Release packaging for inner-loop",
             "configurePreset": "packaging-release"
         },
         {
             "name": "packaging-dev-linux",
+            "displayName": "Development",
+            "description": "Development packaging for inner-loop on Linux",
             "configurePreset": "dev-linux"
         },
         {
             "name": "packaging-release-linux",
+            "displayName": "Release",
+            "description": "Release packaging for inner-loop on Linux",
             "configurePreset": "release-linux"
         },
         {
             "name": "packaging-dev-windows",
+            "displayName": "Development",
+            "description": "Development packaging for inner-loop on Windows",
             "configurePreset": "dev-windows"
         },
         {
             "name": "packaging-release-windows",
+            "displayName": "Release",
+            "description": "Release packaging for inner-loop on Windows",
             "configurePreset": "release-windows"
         }
     ]
