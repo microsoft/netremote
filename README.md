@@ -48,12 +48,12 @@ While not required, it is strongly recommended to configure git with a [GNU Priv
 
 Pre-requisities:
 
-* C++ 20 Compiler
+* C++ 23 Compiler
 * CMake version >= 3.25
 
 ### Compiler
 
-Both a compiler and standard C++ library supporting C++20 are required. The C++ reference pages for [C++20 core language features](https://en.cppreference.com/w/cpp/compiler_support#cpp20) and [C++20 library features](https://en.cppreference.com/w/cpp/compiler_support#C.2B.2B20_library_features) provide complete details about current compiler and library support.
+Both a compiler and standard C++ library supporting C++23 are required. The C++ reference pages for [C++23 core language features](https://en.cppreference.com/w/cpp/compiler_support#C.2B.2B23_features) and [C++23 library features](https://en.cppreference.com/w/cpp/compiler_support#C.2B.2B23_library_features) provide complete details about current compiler and library support.
 
 #### Windows
 
