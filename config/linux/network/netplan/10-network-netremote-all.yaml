@@ -1,0 +1,36 @@
+#
+# This plan defines a network topology where a set of interfaces provide gateway services to wireless network clients.
+# 
+# Netplan YAML reference: https://netplan.readthedocs.io/en/stable/netplan-yaml/
+# 
+# Instructions:
+#   1. Identify all interfaces, ethernet or otherwise, that provide network services such as DHCP, DNS, etc. to wireless
+#   network clients. This will typically be, but is not limited to, a single ethernet interface.
+#   2. For each interface identified above:
+#     a. Add a network interface definition entry according to its type ('ethernets', 'vlans', etc.) which disables all
+#     IP addressing. See the netplan yaml reference URL above for complete options if necessary. 
+#     b. Add the interface name to the 'interfaces' property of the brgateway0 bridge definition to make the interface
+#     available to all bridge slaves.
+#   3. Re-generate ("render") the plan using 'sudo netplan generate'.
+#   4. Optionally validate the generated configuration using 'sudo netplan try'.
+#   5. Apply the generated configuration using 'sudo netplan apply'.
+#
+# The default template describes a plan where a single ethernet network interface 'eno2' provides all gateway services.
+#
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno2: # ** Change this to the interface that provides gateway network services (DHCP, DNS, etc.). **
+      # Disable DHCP on all interfaces that will be part of the virtual bridge interface.
+      dhcp4: no
+      dhcp6: no
+  bridges:
+    # Define a bridge that will act as a gateway to wireless clients.
+    brgateway0:
+      # Configure the bridge to obtain its IP address using DHCP.
+      dhcp4: yes
+      # Include interfaces that provide the gateway services to wireless clients. DO NOT ADD wireless interfaces here.
+      interfaces:
+        - eno2

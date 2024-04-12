@@ -13,6 +13,7 @@ set(CPACK_COMPONENTS_ALL
     server 
     hostapd
     dev
+    network-config
 )
 
 include(CPack)
