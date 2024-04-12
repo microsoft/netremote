@@ -5,14 +5,8 @@ configure_file(
 )
 
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/hostapd-debug@.service.in
-    ${CMAKE_CURRENT_BINARY_DIR}/hostapd-debug@.service
-    @ONLY
-)
-
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/hostapd-release@.service.in
-    ${CMAKE_CURRENT_BINARY_DIR}/hostapd-release@.service
+    ${CMAKE_CURRENT_SOURCE_DIR}/hostapd@.service.in
+    ${CMAKE_CURRENT_BINARY_DIR}/hostapd@.service
     @ONLY
 )
 
@@ -37,26 +31,14 @@ install(
 
 install(
     FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/hostapd-release@.service
-    CONFIGURATIONS Release
+        ${CMAKE_CURRENT_BINARY_DIR}/hostapd@.service
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
-    RENAME hostapd@.service
-    COMPONENT hostapd
-)
-
-install(
-    FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/hostapd-debug@.service
-    CONFIGURATIONS Debug RelWithDebInfo MinSizeRel
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
-    RENAME hostapd@.service
     COMPONENT hostapd
 )
 
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/hostapd-genconfig@.service
-    CONFIGURATIONS Debug RelWithDebInfo MinSizeRel
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/systemd/system
     COMPONENT hostapd
 )

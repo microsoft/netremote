@@ -1,12 +1,4 @@
-#
-# Default hostapd configuration file.
-# 
-# To use this with the provided systemd service unit template hostapd@.service, 
-# (eg. via 'systemctl enable hostapd@wlan0'), copy this file to 
-# /etc/hostapd/hostapd-<interface>.conf. For example, to use it with wlan0, copy this file to
-# /etc/hostapd/hostapd-wlan0.conf and specify the desired SSID after the 'ssid' property below.
-# 
-
+# Default (generated) hostapd configuration file.
 driver=nl80211
 ctrl_interface=${CMAKE_INSTALL_FULL_RUNSTATEDIR}/hostapd
 ssid=
@@ -15,6 +7,6 @@ channel=1
 auth_algs=3
 wpa=2
 wpa_passphrase=password
-wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
-wpa_pairwise=TKIP CCMP
+wpa_key_mgmt=SAE
 rsn_pairwise=CCMP
+bridge=brgateway0

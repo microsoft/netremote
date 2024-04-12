@@ -161,6 +161,7 @@ if (WERROR)
   add_compile_options(-Werror)
 endif()
 
+add_subdirectory(config)
 add_subdirectory(packaging)
 add_subdirectory(src)
 
