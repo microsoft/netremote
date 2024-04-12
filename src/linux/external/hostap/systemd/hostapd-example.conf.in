@@ -18,3 +18,4 @@ wpa_passphrase=password
 wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256 SAE
 wpa_pairwise=TKIP CCMP
 rsn_pairwise=CCMP
+bridge=brgateway0
