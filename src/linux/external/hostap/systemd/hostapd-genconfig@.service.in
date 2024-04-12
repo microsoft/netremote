@@ -1,6 +1,7 @@
 [Unit]
 Description=Generate default hostapd configuration file
 AssertPathExists=@CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-example.conf
+ConditionPathExists=!@CMAKE_INSTALL_FULL_SYSCONFDIR@/hostapd/hostapd-%i.conf
 
 [Service]
 Type=oneshot
