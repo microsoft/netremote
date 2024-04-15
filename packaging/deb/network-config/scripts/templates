@@ -1,0 +1,6 @@
+
+Template: netremote/network/bridge-interfaces
+Type: multiselect
+Default: eno2
+Choices: eno2
+Description: The interfaces that a virtual bridge should be created for.

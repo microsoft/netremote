@@ -2,4 +2,15 @@
 
 set -euo pipefail
 
-echo "Hello from the netconfig-network-config post-installation script!"
+DEBCONF_DEBUG=developer
+
+# Include debconf shell utility library
+. /usr/share/debconf/confmodule
+
+db_get netremote/network/bridge-interfaces || true
+
+# TODO: modify netplan configuration and add bridge interface description for each interface.
+# - possibly just generate the configuration file instead.
+# - invoke netplan generate
+# - invoke netplan apply
+

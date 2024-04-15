@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+DEBCONF_DEBUG=developer
+
+# Include debconf shell utility library
+. /usr/share/debconf/confmodule
+
+db_input high netremote/network/bridge-interfaces || true
+db_go || true
