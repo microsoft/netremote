@@ -1,11 +1,23 @@
 #!/usr/bin/bash
 
-set -euo pipefail
+set -euxo pipefail
 
 DEBCONF_DEBUG=developer
+QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
 
 # Include debconf shell utility library
 . /usr/share/debconf/confmodule
 
-db_input high netremote/network/bridge-interfaces || true
+# Enumerate all non-wireless network interfaces and store them as a comma + space separated list as required by
+# debconf's select/multi-select prompt.
+NETWORK_BRIDGE_CHOICES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -! -name "wl*" -printf "%f, " | sed 's/..$//')
+
+# Update the network bridge interfaces question with the list of bridge choices. 
+db_subst ${QUESTION_NETWORK_BRIDGES} network-bridge-interfaces-choices "${NETWORK_BRIDGE_CHOICES}"
+
+db_clear
+db_fset ${QUESTION_NETWORK_BRIDGES} seen false
+
+# Prompt to select interfaces to create network bridges for.
+db_input high ${QUESTION_NETWORK_BRIDGES} || true
 db_go || true
