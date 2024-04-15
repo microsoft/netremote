@@ -16,4 +16,6 @@ set(CPACK_COMPONENTS_ALL
     network-config
 )
 
+add_subdirectory(network-config)
+
 include(CPack)
