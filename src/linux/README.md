@@ -78,13 +78,13 @@ Execute the following commands in a shell to install all the tools required to c
 4. Install other development dependencies and helpful tools:
 
     ```bash
-    sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
+    sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim debconf-utils
     ```
 
 5. Install [hostapd](git://w1.fi/hostap.git) development dependencies:
 
     ```bash
-    sudo apt install -y --no-install-recommends libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc
+    sudo apt install -y --no-install-recommends libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc iw 
     ```
 
 > [!NOTE]
