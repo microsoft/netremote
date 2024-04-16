@@ -16,9 +16,9 @@ set(CPACK_COMPONENTS_ALL
     server 
     hostapd
     dev
-    network-config
+    config-netplan
 )
 
-add_subdirectory(network-config)
+add_subdirectory(config-netplan)
 
 include(CPack)

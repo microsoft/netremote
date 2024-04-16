@@ -15,22 +15,21 @@
 #   4. Optionally validate the generated configuration using 'sudo netplan try'.
 #   5. Apply the generated configuration using 'sudo netplan apply'.
 #
-# The default template describes a plan where a single ethernet network interface 'eno2' provides all gateway services.
+# The template below describes a plan where a single ethernet network interface 'eno2' provides all gateway services.
 #
-
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    eno2: # ** Change this to the interface that provides gateway network services (DHCP, DNS, etc.). **
-      # Disable DHCP on all interfaces that will be part of the virtual bridge interface.
-      dhcp4: no
-      dhcp6: no
-  bridges:
-    # Define a bridge that will act as a gateway to wireless clients.
-    brgateway0:
-      # Configure the bridge to obtain its IP address using DHCP.
-      dhcp4: yes
-      # Include interfaces that provide the gateway services to wireless clients. DO NOT ADD wireless interfaces here.
-      interfaces:
-        - eno2
+# network:
+#   version: 2
+#   renderer: networkd
+#   ethernets:
+#     eno2: # ** Change this to the interface that provides gateway network services (DHCP, DNS, etc.). **
+#       # Disable DHCP on all interfaces that will be part of the virtual bridge interface.
+#       dhcp4: no
+#       dhcp6: no
+#   bridges:
+#     # Define a bridge that will act as a gateway to wireless clients.
+#     brgateway0:
+#       # Configure the bridge to obtain its IP address using DHCP.
+#       dhcp4: yes
+#       # Include interfaces that provide the gateway services to wireless clients. DO NOT ADD wireless interfaces here.
+#       interfaces:
+#         - eno2

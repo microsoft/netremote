@@ -8,7 +8,7 @@ readonly DEBCONF_DEBUG=developer
 
 # Include debconf shell utility library
 . /usr/share/debconf/confmodule
-. "$(dirname $0)/netremote-network-config.confnetplan"
+. "$(dirname $0)/netremote-config-netplan.confnetplan"
 
 function main() {
     # Update the network bridge interfaces question with the list of bridge choices. 
