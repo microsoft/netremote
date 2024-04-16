@@ -3,4 +3,4 @@ Template: netremote/network/bridge-interfaces
 Type: multiselect
 Default: eno2
 Choices: ${network-bridge-interfaces-choices}
-Description: The interfaces that a virtual bridge should be created for.
+Description: Create virtual network bridges for the following interfaces:
