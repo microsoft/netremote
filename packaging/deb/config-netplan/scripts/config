@@ -3,8 +3,8 @@
 set -euo pipefail
 
 # Uncomment the below two lines to help debug the script.
-set -x
-readonly DEBCONF_DEBUG=developer
+# set -x
+# readonly DEBCONF_DEBUG=developer
 
 # Include debconf shell utility library
 . /usr/share/debconf/confmodule
