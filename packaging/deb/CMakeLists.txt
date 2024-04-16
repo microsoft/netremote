@@ -1,4 +1,7 @@
 
+# Uncomment below to debug package generation.
+# set(CPACK_DEBIAN_PACKAGE_DEBUG ON)
+
 # Common CPack configuration for all packages.
 set(CPACK_COMPONENTS_GROUPING ONE_PER_GROUP)
 set(CPACK_PACKAGE_CONTACT "netremoteowners@microsoft.com")

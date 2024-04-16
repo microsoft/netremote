@@ -8,66 +8,22 @@ DEBCONF_DEBUG=developer
 
 # Include debconf shell utility library
 . /usr/share/debconf/confmodule
+. $(dirname $0)/netremote-network-config.confnetplan
 
-QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
-ETHERNET_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -name "en*" -printf "%f " | xargs -n1 | sort | xargs)
-NETWORK_BRIDGE_CHOICES=$(echo ${ETHERNET_INTERFACES// /, } | head -c-1)
+function main() {
+    # Update the network bridge interfaces question with the list of bridge choices. 
+    db_subst ${QUESTION_NETWORK_BRIDGES} ${QUESTION_NETWORK_BRIDGE_CHOICES_VAR} ${QUESTION_NETWORK_BRIDGE_CHOICES}
 
-NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
-NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
-NETPLAN_ORIGIN_FILE_PERMS=0600
-NETPLAN_KEY_RENDERER=renderer
-NETPLAN_RENDERER=networkd
+    # Prompt the user for the interfaces for which a virtual network bridge should be created.
+    db_clear
+    db_fset ${QUESTION_NETWORK_BRIDGES} seen false
 
-# Set a key-value pair in the netplan configuration file.
-#
-# The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
-#
-# Arguments:
-#   Key to set ($1)
-#   Value to set ($2)
-#
-function netplan_configuration_set_key_value() {
-    local key=${1}
-    local value=${2}
-    netplan set --origin-hint ${NETPLAN_ORIGIN_FILE_NAME} ${key}=${value}
+    # Prompt to select interfaces to create network bridges for.
+    db_input high ${QUESTION_NETWORK_BRIDGES} || true
+    db_go || true
+
+    # Ensure the configuration file has been created.
+    netplan_configuration_create
 }
 
-# Set the top-level (global) fields in the netplan configuration file.
-#
-# The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
-#
-# Arguments:
-#   None
-#
-function netplan_file_set_toplevel_fields() {
-    netplan_configuration_set_key_value ${NETPLAN_KEY_RENDERER} ${NETPLAN_RENDERER}
-}
-
-# Create the netplan configuration file if it does not exist, and set top-level fields.
-#
-# The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
-#
-# Arguments:
-#   None
-# 
-function netplan_configuration_create() {
-    if [[ ! -f ${NETPLAN_ORIGIN_FILE_PATH} ]]; then
-        install -m ${NETPLAN_ORIGIN_FILE_PERMS} /dev/null ${NETPLAN_ORIGIN_FILE_PATH}
-        netplan_file_set_toplevel_fields
-    fi
-}
-
-# Update the network bridge interfaces question with the list of bridge choices. 
-db_subst ${QUESTION_NETWORK_BRIDGES} network-bridge-interfaces-choices ${NETWORK_BRIDGE_CHOICES}
-
-# Prompt the user for the interfaces for which a virtual network bridge should be created.
-db_clear
-db_fset ${QUESTION_NETWORK_BRIDGES} seen false
-
-# Prompt to select interfaces to create network bridges for.
-db_input high ${QUESTION_NETWORK_BRIDGES} || true
-db_go || true
-
-# Ensure the configuration file has been created.
-netplan_configuration_create
+main "$@"
