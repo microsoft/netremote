@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 
 # Include debconf shell utility library
 . /usr/share/debconf/confmodule
@@ -6,8 +7,13 @@
 readonly NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
 readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
+
+# Netplan key-value constants.
+readonly NETPLAN_KEY_NETWORK=network
+readonly NETPLAN_KEY_INTERFACE_TYPE_ETHERNET=ethernets
 readonly NETPLAN_KEY_RENDERER=renderer
 readonly NETPLAN_RENDERER=networkd
+readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
 
 # Below expression to enumerate ethernet interfaces assumes stable interface name generation via systemd-udevd with
 # default policy is active in which all ethernet interface names are prefixed with "en".
@@ -20,20 +26,126 @@ readonly QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
 readonly QUESTION_NETWORK_BRIDGE_CHOICES=$(echo ${ETHERNET_INTERFACES// /, } | head -c-1)
 readonly QUESTION_NETWORK_BRIDGE_CHOICES_VAR=network-bridge-interfaces-choices
 
+# Execute the `netplan set` cli command with the specified arguments. This sets a key-value pair in a netplan YAML
+# configuration file.
+# 
+# Arguments:
+#   1: Origin configuration file to update. Specify the file component only with no extension (.yml, .yaml). Eg. 10-netconfig-custom.
+#   2: Complete key to set, eg. network.ethernets.eno2.dhcp4.
+#   3: Value to set.
+#
+function netplan_configuration_set() {
+    local origin_file
+    local key
+    local value
+
+    origin_file="${1}"
+    key="${2}"
+    value="${3}"
+
+    netplan set --origin-hint "${origin_file}" "${key}=${value}"
+}
+
 # Set a key-value pair in the netplan configuration file.
 #
 # The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
 #
 # Arguments:
-#   Key to set ($1)
-#   Value to set ($2)
+#   1: Key to set.
+#   2: Value to set.
 #
 function netplan_configuration_set_key_value() {
     local key
     local value
+
     key="${1}"
     value="${2}"
-    netplan set --origin-hint ${NETPLAN_ORIGIN_FILE_NAME} ${key}=${value}
+
+    netplan_configuration_set "${NETPLAN_ORIGIN_FILE_NAME}" "${key}" "${value}"
+}
+
+# Set an interface key-value pair in the netplan configuration file. To use the interface as the key, specify an empty
+# 'Key' ($3) argument empty.
+# 
+# Arguments:
+#   1: Interface name.
+#   2: Interface type [bonds|bridges|dummy-devices|ethernets|modems|tunnels|virtual-ethernets|vlans|vrfs|wifis|nm-devices].
+#   3: Key to set. Leave empty to use the interface as the key.
+#   4: Value to set.
+#
+function netplan_configuration_set_interface_key_value() {
+    local interface_name
+    local interface_type
+    local key
+    local key_composed
+    local value
+
+    interface_name="${1}"
+    interface_type="${2}"
+    key="${3}"
+    value="${4}"
+
+    # Compose the key omitting the leaf component if empty, allowing the interface to be the key.
+    key_composed="${NETPLAN_KEY_NETWORK}.${interface_type}.${interface_name}${key:+.${key}}"
+
+    netplan_configuration_set_key_value "${key_composed}" "${value}"
+}
+
+# Set an key-value pair on an ethernet interface in the netplan configuration file. The specified interface is assumed
+# to describe an ethernet interface.
+# 
+# Arguments:
+#   1: Interface name.
+#   2: Key to set.
+#   3: Value to set.
+#
+function netplan_configuration_set_ethernet_interface_property() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+    interface_name="${1}"
+    key="${2}"
+    value="${3}"
+
+    netplan_configuration_set_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Add a new interface to the netplan configuration file.
+#
+# Arguments
+#   1: Interface name.
+#   2: Interface type [bonds|bridges|dummy-devices|ethernets|modems|tunnels|virtual-ethernets|vlans|vrfs|wifis|nm-devices].
+#
+function netplan_configuration_add_interface() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    interface_name="${1}"
+    interface_type="${2}"
+    key=
+    value="${NETPLAN_VALUE_EMPTY_OBJECT}"
+
+    netplan_configuration_set_interface_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Add a new ethernet interface to the netplan configuration file.
+#
+# Arguments
+#   1: Interface name.
+#
+function netplan_configuration_add_ethernet_interface() {
+    local interface_name
+    local interface_type
+
+    interface_name="${1}"
+    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+
+    netplan_configuration_add_interface "${interface_name}" "${interface_type}"
 }
 
 # Set the top-level (global) fields in the netplan configuration file.
@@ -44,7 +156,13 @@ function netplan_configuration_set_key_value() {
 #   None
 #
 function netplan_file_set_toplevel_fields() {
-    netplan_configuration_set_key_value ${NETPLAN_KEY_RENDERER} ${NETPLAN_RENDERER}
+    local key
+    local value
+
+    key="${NETPLAN_KEY_RENDERER}"
+    value="${NETPLAN_RENDERER}"
+
+    netplan_configuration_set_key_value "${key}" "${value}"
 }
 
 # Create the netplan configuration file if it does not exist, and set top-level fields.
@@ -60,6 +178,3 @@ function netplan_configuration_create() {
         netplan_file_set_toplevel_fields
     fi
 }
-
-
-
