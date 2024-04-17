@@ -1,0 +1,18 @@
+
+Template: netremote/network/configure-interactive
+Type: boolean
+Default: true
+Description: Do you wish to configure the networking stack for use with netremote?
+ Netremote requires a specific network topology and associated configuration to enable certain testing scenarios. Selecting yes below will invoke a set of prompts that aims to help automatically configure the networking stack in such a way to enable use of netremote for wireless testing.
+
+Template: netremote/network/configure-bridge-interfaces
+Type: boolean
+Default: true
+Description: Do you wish to configure any virtual network interface bridges?
+ Virtual network bridge interfaces aggregate multiple network segments into one. They are typically used to forward packets between interfaces on a router or gateway machine. For netremote clients employing wireless testing, one (1) network bridge per wireless interface is typically required to forward network services such as DHCP, DNS, etc. to the wireless (AP) clients.
+
+Template: netremote/network/bridge-interfaces
+Type: multiselect
+Choices: ${network-bridge-interfaces-choices}
+Description: Select the ethernet interfaces for which a virtual network bridge should be created:
+ For each ethernet interface selected below, a virtual network bridge interface will be created. The ethernet interface will be added to it as a network segment. One (1) virtual network bridge is typically needed to provide network services such as DHCP, DNS, etc. for each wireless network interface on the system.

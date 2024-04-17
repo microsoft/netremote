@@ -1,0 +1,236 @@
+# shellcheck shell=bash
+
+# Include debconf shell utility library
+. /usr/share/debconf/confmodule
+
+# Define and initialize constants.
+readonly NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
+readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
+readonly NETPLAN_ORIGIN_FILE_PERMS=0600
+
+# Netplan key-value constants.
+readonly NETPLAN_KEY_NETWORK=network
+readonly NETPLAN_KEY_INTERFACE_TYPE_ETHERNET=ethernets
+readonly NETPLAN_KEY_RENDERER=renderer
+readonly NETPLAN_RENDERER=networkd
+readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
+
+# Below expression to enumerate ethernet interfaces assumes stable interface name generation via systemd-udevd with
+# default policy is active in which all ethernet interface names are prefixed with "en".
+# 
+# Refer to https://www.freedesktop.org/software/systemd/man/latest/systemd.net-naming-scheme.html for complete details.
+# 
+ETHERNET_INTERFACES=
+ETHERNET_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -name "en*" -printf "%f " | xargs -n1 | sort | xargs)
+readonly ETHERNET_INTERFACES
+
+readonly QUESTION_NETWORK_CONFIGURE_BRIDGES=netremote/network/configure-bridge-interfaces
+readonly QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
+readonly QUESTION_NETWORK_BRIDGE_CHOICES_VAR=network-bridge-interfaces-choices
+
+# Populate bridge network interface choices with available ethernet interfaces.
+QUESTION_NETWORK_BRIDGE_CHOICES=
+QUESTION_NETWORK_BRIDGE_CHOICES=$(echo "${ETHERNET_INTERFACES// /, }" | head -c-1)
+readonly QUESTION_NETWORK_BRIDGE_CHOICES
+
+# Execute the `netplan set` cli command with the specified arguments. This sets a key-value pair in a netplan YAML
+# configuration file.
+# 
+# Arguments:
+#   1: Origin configuration file to update. Specify the file component only with no extension (.yml, .yaml). Eg. 10-netconfig-custom.
+#   2: Complete key to set, eg. network.ethernets.eno2.dhcp4.
+#   3: Value to set.
+#
+function netplan_configuration_set() {
+    local origin_file
+    local key
+    local value
+
+    origin_file="${1}"
+    key="${2}"
+    value="${3}"
+
+    netplan set --origin-hint "${origin_file}" "${key}=${value}"
+}
+
+# Set a key-value pair in the netplan configuration file.
+#
+# The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
+#
+# Arguments:
+#   1: Key to set.
+#   2: Value to set.
+#
+function netplan_configuration_set_key_value() {
+    local key
+    local value
+
+    key="${1}"
+    value="${2}"
+
+    netplan_configuration_set "${NETPLAN_ORIGIN_FILE_NAME}" "${key}" "${value}"
+}
+
+# Set an interface key-value pair in the netplan configuration file. To use the interface as the key, specify an empty
+# 'Key' ($3) argument empty.
+# 
+# Arguments:
+#   1: Interface name.
+#   2: Interface type [bonds|bridges|dummy-devices|ethernets|modems|tunnels|virtual-ethernets|vlans|vrfs|wifis|nm-devices].
+#   3: Key to set. Leave empty to use the interface as the key.
+#   4: Value to set.
+#
+function netplan_configuration_set_interface_key_value() {
+    local interface_name
+    local interface_type
+    local key
+    local key_composed
+    local value
+
+    interface_name="${1}"
+    interface_type="${2}"
+    key="${3}"
+    value="${4}"
+
+    # Compose the key omitting the leaf component if empty, allowing the interface to be the key.
+    key_composed="${NETPLAN_KEY_NETWORK}.${interface_type}.${interface_name}${key:+.${key}}"
+
+    netplan_configuration_set_key_value "${key_composed}" "${value}"
+}
+
+# Set an key-value pair on an ethernet interface in the netplan configuration file. The specified interface is assumed
+# to describe an ethernet interface.
+# 
+# Arguments:
+#   1: Interface name.
+#   2: Key to set.
+#   3: Value to set.
+#
+function netplan_configuration_set_ethernet_interface_property() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+    interface_name="${1}"
+    key="${2}"
+    value="${3}"
+
+    netplan_configuration_set_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Add a new interface to the netplan configuration file.
+#
+# Arguments
+#   1: Interface name.
+#   2: Interface type [bonds|bridges|dummy-devices|ethernets|modems|tunnels|virtual-ethernets|vlans|vrfs|wifis|nm-devices].
+#
+function netplan_configuration_add_interface() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    interface_name="${1}"
+    interface_type="${2}"
+    key=
+    value="${NETPLAN_VALUE_EMPTY_OBJECT}"
+
+    netplan_configuration_set_interface_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Add a new ethernet interface to the netplan configuration file.
+#
+# Arguments
+#   1: Interface name.
+#
+function netplan_configuration_add_ethernet_interface() {
+    local interface_name
+    local interface_type
+
+    interface_name="${1}"
+    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+
+    netplan_configuration_add_interface "${interface_name}" "${interface_type}"
+}
+
+# Set the top-level (global) fields in the netplan configuration file.
+#
+# The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
+#
+# Arguments:
+#   None
+#
+function netplan_file_set_toplevel_fields() {
+    local key
+    local value
+
+    key="${NETPLAN_KEY_RENDERER}"
+    value="${NETPLAN_RENDERER}"
+
+    netplan_configuration_set_key_value "${key}" "${value}"
+}
+
+# Create the netplan configuration file if it does not exist, and set top-level fields.
+#
+# The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
+#
+# Arguments:
+#   None
+# 
+function netplan_configuration_create() {
+    if [[ ! -f ${NETPLAN_ORIGIN_FILE_PATH} ]]; then
+        install -m ${NETPLAN_ORIGIN_FILE_PERMS} /dev/null ${NETPLAN_ORIGIN_FILE_PATH}
+        netplan_file_set_toplevel_fields
+    fi
+}
+
+# Prompt the user for the interfaces for which a virtual network bridge should be created.
+#
+# Arguments:
+#   None
+#
+function debconf_prompt_netplan_network_bridge_configuration() {
+    local ethernet_interfaces_selected_for_bridges
+
+    # Clear the question from the debconf database to force the prompt.
+    db_clear
+    db_fset "${QUESTION_NETWORK_BRIDGES}" seen false
+
+    # Prompt to select interfaces to create network bridges for.
+    db_subst "${QUESTION_NETWORK_BRIDGES}" "${QUESTION_NETWORK_BRIDGE_CHOICES_VAR}" "${QUESTION_NETWORK_BRIDGE_CHOICES}"
+    db_input high "${QUESTION_NETWORK_BRIDGES}" || true
+    db_go || true
+
+    db_get "${QUESTION_NETWORK_BRIDGES}" || true
+    readonly ethernet_interfaces_selected_for_bridges=${RET//\, / }
+
+    # Ensure the configuration file has been created.
+    netplan_configuration_create
+
+    for ethernet_interface in ${ethernet_interfaces_selected_for_bridges}; do
+        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
+    done
+}
+
+# Prompt the user for whether they want to perform netplan configuration. If requested, perform netplan configuration.
+#
+# Arguments:
+#   None
+#
+function debconf_prompt_netplan_configuration() {
+    local network_bridge_configure
+
+    # Prompt user whether they want to configure network bridges.
+    db_input high "${QUESTION_NETWORK_CONFIGURE_BRIDGES}" || true
+    db_go || true
+    db_get "${QUESTION_NETWORK_CONFIGURE_BRIDGES}" || true
+
+    readonly network_bridge_configure="${RET}"
+
+    # If user requested to configure network bridges, do so.
+    if [[ "${network_bridge_configure}" == "true" ]]; then
+        debconf_prompt_netplan_network_bridge_configuration
+    fi
+}

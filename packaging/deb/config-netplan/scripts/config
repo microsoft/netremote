@@ -1,0 +1,39 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+# Uncomment the below lines to help debug script execution.
+# set -x
+# readonly DEBCONF_DEBUG=developer
+# export DEBCONF_DEBUG
+
+# Include helper libraries.
+. /usr/share/debconf/confmodule
+# shellcheck source=./confnet
+. "$(dirname "${0}")"/netremote-config-netplan.confnet
+# shellcheck source=./confnetplan
+. "$(dirname "${0}")"/netremote-config-netplan.confnetplan
+
+# Configure the networking stack for use with netremote.
+#
+# Arguments:
+#   None
+#
+function network_stack_configure_interactive() {
+    debconf_prompt_netplan_configuration
+}
+
+# Main script execution entrypoint.
+#
+# Arguments:
+#   Must be those passed to the script (ie. "$@")
+#
+function main() {
+    debconf_prompt_network_configure_interactive
+
+    if [[ "${NETWORK_STACK_CONFIGURE}" == "true" ]]; then
+        network_stack_configure_interactive
+    fi
+}
+
+main "$@"
