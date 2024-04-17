@@ -7,6 +7,7 @@
 readonly NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
 readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
+readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
 
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
@@ -32,6 +33,24 @@ readonly QUESTION_NETWORK_BRIDGE_CHOICES_VAR=network-bridge-interfaces-choices
 QUESTION_NETWORK_BRIDGE_CHOICES=
 QUESTION_NETWORK_BRIDGE_CHOICES=$(echo "${ETHERNET_INTERFACES// /, }" | head -c-1)
 readonly QUESTION_NETWORK_BRIDGE_CHOICES
+
+# Execute the `netplan try` cli command with the specified arguments. This will apply the network configuration then
+# wait for the user to press '<Enter>' to accept the configuration prior to the timeout period expiring. Otherwise, the
+# changes will be reverted.
+#
+# Arguments:
+#   1: Configuration file path (full). If unspecified, NETPLAN_ORIGIN_FILE_PATH is used.
+#   2: Timeout value, in seconds. If unspecified, NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT is used.
+#
+function netplan_configuration_try() {
+    local config_file
+    local timeout
+
+    readonly config_file="${1:-${NETPLAN_ORIGIN_FILE_PATH}}"
+    readonly timeout="${2:-${NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT}}"
+
+    netplan try --config-file "${config_file}" --timeout "${timeout}"
+}
 
 # Execute the `netplan set` cli command with the specified arguments. This sets a key-value pair in a netplan YAML
 # configuration file.
