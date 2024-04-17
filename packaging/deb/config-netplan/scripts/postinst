@@ -2,19 +2,34 @@
 
 set -euo pipefail
 
-# Uncomment the below two lines to help debug the script.
+# Uncomment the below lines to help debug script execution.
 # set -x
 # readonly DEBCONF_DEBUG=developer
+# export DEBCONF_DEBUG
 
-# Include debconf shell utility library
+# Include helper libraries.
 . /usr/share/debconf/confmodule
+# shellcheck source=./confnet
+. "$(dirname "${0}")"/netremote-config-netplan.confnet
+# shellcheck source=./confnetplan
+. "$(dirname "${0}")"/netremote-config-netplan.confnetplan
 
-db_get netremote/network/bridge-interfaces || true
-ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES=${RET//\, / }
+# Main script execution entrypoint.
+#
+# Arguments:
+#   Must be those passed to the script (ie. "$@")
+#
+function main() {
+    db_get "${QUESTION_NETWORK_BRIDGES}" || true
+    ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES=${RET//\, / }
 
-echo "Ethernet interfaces selected: ${ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES}"
+    echo "Ethernet interfaces selected: ${ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES}"
 
-# TODO: modify netplan configuration and add bridge interface description for each interface.
-# - possibly just generate the configuration file instead.
-# - invoke `netplan generate`
-# - invoke `netplan apply`
+    # TODO: modify netplan configuration and add bridge interface description for each interface.
+    # - possibly just generate the configuration file instead.
+    # - invoke `netplan generate`
+    # - invoke `netplan apply`
+}
+
+main "$@"
+

@@ -20,11 +20,18 @@ readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
 # 
 # Refer to https://www.freedesktop.org/software/systemd/man/latest/systemd.net-naming-scheme.html for complete details.
 # 
-readonly ETHERNET_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -name "en*" -printf "%f " | xargs -n1 | sort | xargs)
+ETHERNET_INTERFACES=
+ETHERNET_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -name "en*" -printf "%f " | xargs -n1 | sort | xargs)
+readonly ETHERNET_INTERFACES
 
+readonly QUESTION_NETWORK_CONFIGURE_BRIDGES=netremote/network/configure-bridge-interfaces
 readonly QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
-readonly QUESTION_NETWORK_BRIDGE_CHOICES=$(echo ${ETHERNET_INTERFACES// /, } | head -c-1)
 readonly QUESTION_NETWORK_BRIDGE_CHOICES_VAR=network-bridge-interfaces-choices
+
+# Populate bridge network interface choices with available ethernet interfaces.
+QUESTION_NETWORK_BRIDGE_CHOICES=
+QUESTION_NETWORK_BRIDGE_CHOICES=$(echo "${ETHERNET_INTERFACES// /, }" | head -c-1)
+readonly QUESTION_NETWORK_BRIDGE_CHOICES
 
 # Execute the `netplan set` cli command with the specified arguments. This sets a key-value pair in a netplan YAML
 # configuration file.
@@ -176,5 +183,54 @@ function netplan_configuration_create() {
     if [[ ! -f ${NETPLAN_ORIGIN_FILE_PATH} ]]; then
         install -m ${NETPLAN_ORIGIN_FILE_PERMS} /dev/null ${NETPLAN_ORIGIN_FILE_PATH}
         netplan_file_set_toplevel_fields
+    fi
+}
+
+# Prompt the user for the interfaces for which a virtual network bridge should be created.
+#
+# Arguments:
+#   None
+#
+function debconf_prompt_netplan_network_bridge_configuration() {
+    local ethernet_interfaces_selected_for_bridges
+
+    # Clear the question from the debconf database to force the prompt.
+    db_clear
+    db_fset "${QUESTION_NETWORK_BRIDGES}" seen false
+
+    # Prompt to select interfaces to create network bridges for.
+    db_subst "${QUESTION_NETWORK_BRIDGES}" "${QUESTION_NETWORK_BRIDGE_CHOICES_VAR}" "${QUESTION_NETWORK_BRIDGE_CHOICES}"
+    db_input high "${QUESTION_NETWORK_BRIDGES}" || true
+    db_go || true
+
+    db_get "${QUESTION_NETWORK_BRIDGES}" || true
+    readonly ethernet_interfaces_selected_for_bridges=${RET//\, / }
+
+    # Ensure the configuration file has been created.
+    netplan_configuration_create
+
+    for ethernet_interface in ${ethernet_interfaces_selected_for_bridges}; do
+        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
+    done
+}
+
+# Prompt the user for whether they want to perform netplan configuration. If requested, perform netplan configuration.
+#
+# Arguments:
+#   None
+#
+function debconf_prompt_netplan_configuration() {
+    local network_bridge_configure
+
+    # Prompt user whether they want to configure network bridges.
+    db_input high "${QUESTION_NETWORK_CONFIGURE_BRIDGES}" || true
+    db_go || true
+    db_get "${QUESTION_NETWORK_CONFIGURE_BRIDGES}" || true
+
+    readonly network_bridge_configure="${RET}"
+
+    # If user requested to configure network bridges, do so.
+    if [[ "${network_bridge_configure}" == "true" ]]; then
+        debconf_prompt_netplan_network_bridge_configuration
     fi
 }

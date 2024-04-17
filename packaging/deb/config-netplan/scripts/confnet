@@ -1,0 +1,21 @@
+# shellcheck shell=bash
+
+# Include debconf shell utility library
+. /usr/share/debconf/confmodule
+
+readonly QUESTION_NETWORK_STACK_CONFIGURATION=netremote/network/configure-interactive
+NETWORK_STACK_CONFIGURE=
+
+# Prompt the user for whether they want to perform interactive network configuration. This stores the user's choice,
+# either "true" or "false", in the NETWORK_STACK_CONFIGURE global variable.
+#
+# Arguments:
+#   None
+function debconf_prompt_network_configure_interactive() {
+    db_input high "${QUESTION_NETWORK_STACK_CONFIGURATION}" || true
+    db_go || true
+    db_get "${QUESTION_NETWORK_STACK_CONFIGURATION}" || true
+    NETWORK_STACK_CONFIGURE=${RET}
+
+    export NETWORK_STACK_CONFIGURE
+}

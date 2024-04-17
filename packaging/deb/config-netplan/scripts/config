@@ -2,35 +2,38 @@
 
 set -euo pipefail
 
-# Uncomment the below two lines to help debug the script.
+# Uncomment the below lines to help debug script execution.
 # set -x
 # readonly DEBCONF_DEBUG=developer
+# export DEBCONF_DEBUG
 
-# Include debconf shell utility library
+# Include helper libraries.
 . /usr/share/debconf/confmodule
-. "$(dirname $0)/netremote-config-netplan.confnetplan"
+# shellcheck source=./confnet
+. "$(dirname "${0}")"/netremote-config-netplan.confnet
+# shellcheck source=./confnetplan
+. "$(dirname "${0}")"/netremote-config-netplan.confnetplan
 
+# Configure the networking stack for use with netremote.
+#
+# Arguments:
+#   None
+#
+function network_stack_configure_interactive() {
+    debconf_prompt_netplan_configuration
+}
+
+# Main script execution entrypoint.
+#
+# Arguments:
+#   Must be those passed to the script (ie. "$@")
+#
 function main() {
-    # Update the network bridge interfaces question with the list of bridge choices. 
-    db_subst "${QUESTION_NETWORK_BRIDGES}" "${QUESTION_NETWORK_BRIDGE_CHOICES_VAR}" "${QUESTION_NETWORK_BRIDGE_CHOICES}"
+    debconf_prompt_network_configure_interactive
 
-    # Prompt the user for the interfaces for which a virtual network bridge should be created.
-    db_clear
-    db_fset "${QUESTION_NETWORK_BRIDGES}" seen false
-
-    # Prompt to select interfaces to create network bridges for.
-    db_input high "${QUESTION_NETWORK_BRIDGES}" || true
-    db_go || true
-
-    db_get "${QUESTION_NETWORK_BRIDGES}" || true
-    readonly ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES=${RET//\, / }
-
-    # Ensure the configuration file has been created.
-    netplan_configuration_create
-
-    for ethernet_interface in ${ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES}; do
-        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
-    done
+    if [[ "${NETWORK_STACK_CONFIGURE}" == "true" ]]; then
+        network_stack_configure_interactive
+    fi
 }
 
 main "$@"
