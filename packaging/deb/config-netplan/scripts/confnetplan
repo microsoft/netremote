@@ -34,7 +34,29 @@ QUESTION_NETWORK_BRIDGE_CHOICES=
 QUESTION_NETWORK_BRIDGE_CHOICES=$(echo "${ETHERNET_INTERFACES// /, }" | head -c-1)
 readonly QUESTION_NETWORK_BRIDGE_CHOICES
 
-# Execute the `netplan try` cli command with the specified arguments. This will apply the network configuration then
+# Execute the `netplan generate` cli command. This generates renderer-specific configuration files from all discovered
+# yaml configuration files in /{lib,etc,run}/netplan directories as described in
+# https://netplan.readthedocs.io/en/stable/netplan-generate/#handling-multiple-files. The location of the generated
+# files is specific to the configured renderer(s).
+# 
+# Arguments:
+#   None
+#
+function netplan_configuration_generate() {
+    netplan generate
+}
+
+# Execute the `netplan apply` cli command. This will apply netplan configuration from all discovered yaml configuration
+# files in /{lib,etc,run} directories as described in https://netplan.readthedocs.io/en/stable/netplan-generate/#handling-multiple-files.
+# 
+# Arguments:
+#   None
+#
+function netplan_configuration_apply() {
+    netplan apply
+}
+
+# Execute the `netplan try` cli command with the specified arguments. This will apply the netplan configuration then
 # wait for the user to press '<Enter>' to accept the configuration prior to the timeout period expiring. Otherwise, the
 # changes will be reverted.
 #
