@@ -12,6 +12,7 @@ readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
 readonly NETPLAN_KEY_INTERFACE_TYPE_ETHERNET=ethernets
+readonly NETPLAN_KEY_INTERFACE_TYPE_BRIDGE=bridges
 readonly NETPLAN_KEY_RENDERER=renderer
 readonly NETPLAN_RENDERER=networkd
 readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
@@ -192,6 +193,20 @@ function netplan_configuration_add_ethernet_interface() {
 
     interface_name="${1}"
     interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+
+    netplan_configuration_add_interface "${interface_name}" "${interface_type}"
+}
+
+# Add a new bridge interface to the netplan configuration file.
+#
+#   1: Interface name.
+#
+function netplan_configuration_add_bridge_interface() {
+    local interface_name
+    local interface_type
+
+    readonly interface_name="${1}"
+    readonly interface_type="${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
 
     netplan_configuration_add_interface "${interface_name}" "${interface_type}"
 }
