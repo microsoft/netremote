@@ -503,7 +503,7 @@ function debconf_prompt_netplan_configuration() {
     fi
 
     # shellcheck disable=SC2015
-    [[ -z "${DEBCONF_DEBUG}" ]] \
+    [[ -z "${DEBCONF_DEBUG-}" ]] \
         && readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS}" \
         || readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
 
