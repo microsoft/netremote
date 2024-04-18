@@ -20,6 +20,7 @@ set -euo pipefail
 #   Must be those passed to the script (ie. "$@")
 #
 function main() {
+    :;
 }
 
 main "$@"

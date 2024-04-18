@@ -18,10 +18,10 @@ Description: Select the ethernet interfaces for which a virtual network bridge s
  For each ethernet interface selected below, a virtual network bridge interface will be created and the ethernet interface will be added to it as a network segment. One (1) virtual network bridge is typically needed to provide network services such as DHCP, DNS, etc. for each wireless network interface on the system.
 
 Template: netremote/network/configure-show-generate-configuration
-Type: note
-Description: A netplan configuration file was successfully generated at ${network-netplan-configuration-file}. It will be displayed for five (5) seconds so that it can be reviewed for correctness.
- Press OK to show the generated netplan configuration:
-
+Type: boolean
+Default: true
+Description: Show the generated netplan configuration?
+ A netplan configuration file was successfully generated at ${network-netplan-configuration-file}. If shown, it will be displayed for five (5) seconds so that it can be reviewed for correctness.
 
 Template: netremote/network/configure-apply-generated-configuration
 Type: select

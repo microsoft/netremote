@@ -477,6 +477,7 @@ function debconf_prompt_netplan_network_bridge_configuration() {
 #
 function debconf_prompt_netplan_configuration() {
     local network_bridge_configure
+    local configuration_file_show
     local configuration_file_review_seconds
     local generated_configuration_action_requested
 
@@ -511,9 +512,18 @@ function debconf_prompt_netplan_configuration() {
     db_subst "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
     db_input high "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" || true
     db_go || true
-    clear
-    netplan_configuration_get
-    sleep "${configuration_file_review_seconds}"
+    db_get "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" || true
+
+    readonly configuration_file_show="${RET}"
+
+    # If user requested to show the generated configuration, do so.
+    if [[ "${configuration_file_show}" == "true" ]]; then
+        clear
+        echo "Generated netplan configuration ${NETPLAN_ORIGIN_FILE_PATH}:"
+        echo
+        netplan_configuration_get
+        sleep "${configuration_file_review_seconds}"
+    fi
 
     # Substitute the generated configuration file into the prompt description.
     db_subst "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
