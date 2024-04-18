@@ -13,6 +13,8 @@ readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
 readonly NETPLAN_KEY_NETWORK=network
 readonly NETPLAN_KEY_INTERFACE_TYPE_ETHERNET=ethernets
 readonly NETPLAN_KEY_INTERFACE_TYPE_BRIDGE=bridges
+readonly NETPLAN_KEY_INTERFACE_DHCP4=dhcp4
+readonly NETPLAN_KEY_BRIDGE_INTERFACE_SEGMENTS=interfaces
 readonly NETPLAN_KEY_RENDERER=renderer
 readonly NETPLAN_RENDERER=networkd
 readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
@@ -140,26 +142,33 @@ function netplan_configuration_set_interface_key_value() {
     netplan_configuration_set_key_value "${key_composed}" "${value}"
 }
 
-# Set an key-value pair on an ethernet interface in the netplan configuration file. The specified interface is assumed
-# to describe an ethernet interface.
+# Set a boolean property on an interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
 # 
-# Arguments:
+# Arguments
 #   1: Interface name.
-#   2: Key to set.
-#   3: Value to set.
+#   2: Interface type.
+#   3: Boolean key to set.
+#   4: Boolean value to set. Must either be true or false (boolean type, not strings).
 #
-function netplan_configuration_set_ethernet_interface_property() {
+function netplan_configuration_set_interface_boolean_property() {
     local interface_name
     local interface_type
     local key
+    local enable
     local value
 
-    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
-    interface_name="${1}"
-    key="${2}"
-    value="${3}"
+    readonly interface_name="${1}"
+    readonly interface_type="${2}"
+    readonly key="${3}"
+    readonly enable="${4}"
 
-    netplan_configuration_set_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+    # shellcheck disable=SC2015
+    [[ "${enable}" == true ]] \
+        && readonly value="true" \
+        || readonly value="false"
+
+    netplan_configuration_set_interface_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
 }
 
 # Add a new interface to the netplan configuration file.
@@ -209,6 +218,158 @@ function netplan_configuration_add_bridge_interface() {
     readonly interface_type="${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
 
     netplan_configuration_add_interface "${interface_name}" "${interface_type}"
+}
+
+# Set an key-value pair on an ethernet interface in the netplan configuration file. The specified interface must
+# describe an ethernet interface.
+# 
+# Arguments:
+#   1: Interface name.
+#   2: Key to set.
+#   3: Value to set.
+#
+function netplan_configuration_set_ethernet_interface_property() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+    interface_name="${1}"
+    key="${2}"
+    value="${3}"
+
+    netplan_configuration_set_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Set a property on a bridge interface in the netplan configuration file. The specified bridge interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments
+#   1: Interface name.
+#   2: Bridge property to set.
+#   3: Bridge property value to set.
+#
+function netplan_configuration_set_bridge_interface_property() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    readonly interface_type="${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
+    readonly interface_name="${1}"
+    readonly key="${2}"
+    readonly value="${3}"
+
+    netplan_configuration_set_interface_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Add a network segment (interface) to a bridge in the netplan configuration file. The specified bridge interface target
+# must already be descripted in a top-level entry in the netplan configuration file, as does the interface of the
+# network segment.
+#
+# Arguments:
+#   1: Bridge interface name.
+#   2: Network segment interface name.
+#
+function netplan_configuration_add_bridge_interface_segment() {
+    local interface_name
+    local interface_segment
+    local key
+    local value
+
+    readonly interface_name="${1}"
+    readonly interface_segment="${2}"
+    readonly key="${NETPLAN_KEY_BRIDGE_INTERFACE_SEGMENTS}"
+    readonly value="[${interface_segment}]"
+
+    netplan_configuration_set_bridge_interface_property "${interface_name}" "${key}" "${value}"
+}
+
+# Enable DHCP (IPv4) on an interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_interface_dhcp4_enable() {
+    local interface_name
+    local interface_type
+    local key
+    local enable
+
+    readonly interface_name="${1}"
+    readonly interface_type="${2}"
+    readonly key="${NETPLAN_KEY_INTERFACE_DHCP4}"
+    readonly enable=true
+
+    netplan_configuration_set_interface_boolean_property "${interface_name}" "${interface_type}" "${key}" "${enable}"
+}
+
+# Disable DHCP (IPv4) on an interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_interface_dhcp4_disable() {
+    local interface_name
+    local interface_type
+    local key
+    local enable
+
+    readonly interface_name="${1}"
+    readonly interface_type="${2}"
+    readonly key="${NETPLAN_KEY_INTERFACE_DHCP4}"
+    readonly enable=false
+
+    netplan_configuration_set_interface_boolean_property "${interface_name}" "${interface_type}" "${key}" "${enable}"
+}
+
+# Enable DHCP (IPv4) on an ethernet interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_ethernet_interface_dhcp4_enable() {
+    netplan_configuration_set_interface_dhcp4_enable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+}
+
+# Disable DHCP (IPv4) on an ethernet interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_ethernet_interface_dhcp4_disable() {
+    netplan_configuration_set_interface_dhcp4_disable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+}
+
+# Enable DHCP (IPv4) on a bridge  interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_bridge_interface_dhcp4_enable() {
+    netplan_configuration_set_interface_dhcp4_enable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
+}
+
+# Disable DHCP (IPv4) on a bridge  interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_bridge_interface_dhcp4_enable() {
+    netplan_configuration_set_interface_dhcp4_disable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
 }
 
 # Set the top-level (global) fields in the netplan configuration file.
