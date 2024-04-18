@@ -372,6 +372,28 @@ function netplan_configuration_set_bridge_interface_dhcp4_enable() {
     netplan_configuration_set_interface_dhcp4_disable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
 }
 
+# Create a new virtual network bridge with an ethernet interface segment.
+#
+# This will create a bridge, enable dhpc IPv4 on it, add the specified ethernet interface as a segment, and disable
+# DHCPv4 on it.
+#
+# Arguments:
+#   1: Bridge interface name.
+#   2: Ethernet segment interface name.
+#
+function netplan_configuration_create_bridge_with_initial_ethernet_segment() {
+    local interface_name
+    local interface_segment
+
+    readonly interface_name="${1}"
+    readonly interface_segment="${2}"
+
+    netplan_configuration_add_bridge_interface "${interface_name}"
+    netplan_configuration_add_bridge_interface_segment "${interface_name}" "${interface_segment}"
+    netplan_configuration_set_bridge_interface_dhcp4_enable "${interface_name}"
+    netplan_configuration_set_ethernet_interface_dhcp4_disable "${interface_segment}"
+}
+
 # Set the top-level (global) fields in the netplan configuration file.
 #
 # The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
