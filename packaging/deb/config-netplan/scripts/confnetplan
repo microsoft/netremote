@@ -9,6 +9,8 @@ readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
 readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
 readonly NETPLAN_BRIDGE_INTERFACE_PREFIX=brgateway
+readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS=5
+readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG=1
 
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
@@ -28,10 +30,12 @@ readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
 ETHERNET_INTERFACES=
 ETHERNET_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -name "en*" -printf "%f " | xargs -n1 | sort | xargs)
 readonly ETHERNET_INTERFACES
-
+readonly QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION=netremote/network/configure-show-generate-configuration
+readonly QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION=netremote/network/configure-apply-generated-configuration
 readonly QUESTION_NETWORK_CONFIGURE_BRIDGES=netremote/network/configure-bridge-interfaces
 readonly QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
 readonly QUESTION_NETWORK_BRIDGE_CHOICES_VAR=network-bridge-interfaces-choices
+readonly QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR=network-netplan-configuration-file
 
 # Populate bridge network interface choices with available ethernet interfaces.
 QUESTION_NETWORK_BRIDGE_CHOICES=
@@ -68,6 +72,7 @@ function netplan_configuration_apply() {
 #   1: Configuration file path (full). If unspecified, NETPLAN_ORIGIN_FILE_PATH is used.
 #   2: Timeout value, in seconds. If unspecified, NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT is used.
 #
+# shellcheck disable=SC2120
 function netplan_configuration_try() {
     local config_file
     local timeout
@@ -76,6 +81,15 @@ function netplan_configuration_try() {
     readonly timeout="${2:-${NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT}}"
 
     netplan try --config-file "${config_file}" --timeout "${timeout}"
+}
+
+# Execute the `netplan get` cli command.
+#
+# Arguments:
+#   None
+#
+function netplan_configuration_get() {
+    netplan get
 }
 
 # Execute the `netplan set` cli command with the specified arguments. This sets a key-value pair in a netplan YAML
@@ -369,7 +383,7 @@ function netplan_configuration_set_bridge_interface_dhcp4_enable() {
 #   1: Interface name.
 #   2: Interface type.
 #
-function netplan_configuration_set_bridge_interface_dhcp4_enable() {
+function netplan_configuration_set_bridge_interface_dhcp4_disable() {
     netplan_configuration_set_interface_dhcp4_disable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
 }
 
@@ -435,7 +449,6 @@ function debconf_prompt_netplan_network_bridge_configuration() {
     local ethernet_interfaces_selected_for_bridges
     local bridge_interface
     local num_bridges
-    # local bridge_interface
 
     # Clear the question from the debconf database to force the prompt.
     db_clear
@@ -464,12 +477,14 @@ function debconf_prompt_netplan_network_bridge_configuration() {
 #
 function debconf_prompt_netplan_configuration() {
     local network_bridge_configure
+    local configuration_file_review_seconds
+    local generated_configuration_action_requested
 
     # Ensure the configuration file has been created.
     netplan_configuration_create
 
     # Add each ethernet interface. If the ethernet interface is later added to a bridge, DHCPv4 will be disabled on it,
-    # however, it is done here because the user may not configure a bridge for every interface, and so this will ensure
+    # however, it is enabled here because the user may not configure a bridge for every interface, and so this will ensure
     # the interface is usable in either case.
     for ethernet_interface in ${ETHERNET_INTERFACES}; do
         netplan_configuration_add_ethernet_interface "${ethernet_interface}"
@@ -486,4 +501,49 @@ function debconf_prompt_netplan_configuration() {
     if [[ "${network_bridge_configure}" == "true" ]]; then
         debconf_prompt_netplan_network_bridge_configuration
     fi
+
+    # shellcheck disable=SC2015
+    [[ -z "${DEBCONF_DEBUG}" ]] \
+        && readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS}" \
+        || readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
+
+    # Show the user the generated netplan configuration.
+    db_subst "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
+    db_input high "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" || true
+    db_go || true
+    netplan_configuration_get
+    sleep "${configuration_file_review_seconds}"
+
+    # Substitute the generated configuration file into the prompt description.
+    db_subst "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
+
+    # Prompt the user to choose an action to take on the generated configuration.
+    # Continue prompting until either 'Apply', 'Continue', or an invalid option is selected.
+    while true; do 
+        db_input high "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" || true
+        db_go || true
+        db_get "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" || true
+
+        generated_configuration_action_requested="${RET}"
+
+        # Check which action the user requested and carry it out.
+        case "${generated_configuration_action_requested}" in
+            "Generate Backend Configuration")
+                netplan_configuration_generate
+                ;;
+            "Try")
+                netplan_configuration_try
+                ;;
+            "Apply")
+                netplan_configuration_apply
+                break # Exit while loop
+                ;;
+            "Continue" | *) 
+                break # Exit while loop
+                ;;
+        esac
+
+        # Update default to "None" after first iteration.
+        db_set "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" "Continue" || true
+    done # while true
 }
