@@ -8,6 +8,7 @@ readonly NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
 readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
 readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
+readonly NETPLAN_BRIDGE_INTERFACE_PREFIX=brgateway
 
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
@@ -432,6 +433,9 @@ function netplan_configuration_create() {
 #
 function debconf_prompt_netplan_network_bridge_configuration() {
     local ethernet_interfaces_selected_for_bridges
+    local bridge_interface
+    local num_bridges
+    # local bridge_interface
 
     # Clear the question from the debconf database to force the prompt.
     db_clear
@@ -445,11 +449,11 @@ function debconf_prompt_netplan_network_bridge_configuration() {
     db_get "${QUESTION_NETWORK_BRIDGES}" || true
     readonly ethernet_interfaces_selected_for_bridges=${RET//\, / }
 
-    # Ensure the configuration file has been created.
-    netplan_configuration_create
-
+    num_bridges=0
     for ethernet_interface in ${ethernet_interfaces_selected_for_bridges}; do
-        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
+        bridge_interface="${NETPLAN_BRIDGE_INTERFACE_PREFIX}$((num_bridges++))"
+
+        netplan_configuration_create_bridge_with_initial_ethernet_segment "${bridge_interface}" "${ethernet_interface}"
     done
 }
 
@@ -460,6 +464,16 @@ function debconf_prompt_netplan_network_bridge_configuration() {
 #
 function debconf_prompt_netplan_configuration() {
     local network_bridge_configure
+
+    # Ensure the configuration file has been created.
+    netplan_configuration_create
+
+    # Add each ethernet interface. If the ethernet interface is later added to a bridge, DHCPv4 will be disabled on it,
+    # however, it is done here because the user may not configure a bridge for every interface, and so this will ensure
+    # the interface is usable in either case.
+    for ethernet_interface in ${ETHERNET_INTERFACES}; do
+        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
+    done
 
     # Prompt user whether they want to configure network bridges.
     db_input high "${QUESTION_NETWORK_CONFIGURE_BRIDGES}" || true
