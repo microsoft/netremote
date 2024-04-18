@@ -511,6 +511,7 @@ function debconf_prompt_netplan_configuration() {
     db_subst "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
     db_input high "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" || true
     db_go || true
+    clear
     netplan_configuration_get
     sleep "${configuration_file_review_seconds}"
 
