@@ -20,15 +20,7 @@ set -euo pipefail
 #   Must be those passed to the script (ie. "$@")
 #
 function main() {
-    db_get "${QUESTION_NETWORK_BRIDGES}" || true
-    ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES=${RET//\, / }
-
-    echo "Ethernet interfaces selected: ${ETHERNET_INTERFACES_SELECTED_FOR_BRIDGES}"
-
-    # TODO: modify netplan configuration and add bridge interface description for each interface.
-    # - possibly just generate the configuration file instead.
-    # - invoke `netplan generate`
-    # - invoke `netplan apply`
+    :;
 }
 
 main "$@"

@@ -7,10 +7,17 @@
 readonly NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
 readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
+readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
+readonly NETPLAN_BRIDGE_INTERFACE_PREFIX=brgateway
+readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS=5
+readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG=1
 
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
 readonly NETPLAN_KEY_INTERFACE_TYPE_ETHERNET=ethernets
+readonly NETPLAN_KEY_INTERFACE_TYPE_BRIDGE=bridges
+readonly NETPLAN_KEY_INTERFACE_DHCP4=dhcp4
+readonly NETPLAN_KEY_BRIDGE_INTERFACE_SEGMENTS=interfaces
 readonly NETPLAN_KEY_RENDERER=renderer
 readonly NETPLAN_RENDERER=networkd
 readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
@@ -23,15 +30,67 @@ readonly NETPLAN_VALUE_EMPTY_OBJECT="{}"
 ETHERNET_INTERFACES=
 ETHERNET_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -name "en*" -printf "%f " | xargs -n1 | sort | xargs)
 readonly ETHERNET_INTERFACES
-
+readonly QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION=netremote/network/configure-show-generate-configuration
+readonly QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION=netremote/network/configure-apply-generated-configuration
 readonly QUESTION_NETWORK_CONFIGURE_BRIDGES=netremote/network/configure-bridge-interfaces
 readonly QUESTION_NETWORK_BRIDGES=netremote/network/bridge-interfaces
 readonly QUESTION_NETWORK_BRIDGE_CHOICES_VAR=network-bridge-interfaces-choices
+readonly QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR=network-netplan-configuration-file
 
 # Populate bridge network interface choices with available ethernet interfaces.
 QUESTION_NETWORK_BRIDGE_CHOICES=
 QUESTION_NETWORK_BRIDGE_CHOICES=$(echo "${ETHERNET_INTERFACES// /, }" | head -c-1)
 readonly QUESTION_NETWORK_BRIDGE_CHOICES
+
+# Execute the `netplan generate` cli command. This generates renderer-specific configuration files from all discovered
+# yaml configuration files in /{lib,etc,run}/netplan directories as described in
+# https://netplan.readthedocs.io/en/stable/netplan-generate/#handling-multiple-files. The location of the generated
+# files is specific to the configured renderer(s).
+# 
+# Arguments:
+#   None
+#
+function netplan_configuration_generate() {
+    netplan generate
+}
+
+# Execute the `netplan apply` cli command. This will apply netplan configuration from all discovered yaml configuration
+# files in /{lib,etc,run} directories as described in https://netplan.readthedocs.io/en/stable/netplan-generate/#handling-multiple-files.
+# 
+# Arguments:
+#   None
+#
+function netplan_configuration_apply() {
+    netplan apply
+}
+
+# Execute the `netplan try` cli command with the specified arguments. This will apply the netplan configuration then
+# wait for the user to press '<Enter>' to accept the configuration prior to the timeout period expiring. Otherwise, the
+# changes will be reverted.
+#
+# Arguments:
+#   1: Configuration file path (full). If unspecified, NETPLAN_ORIGIN_FILE_PATH is used.
+#   2: Timeout value, in seconds. If unspecified, NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT is used.
+#
+# shellcheck disable=SC2120
+function netplan_configuration_try() {
+    local config_file
+    local timeout
+
+    readonly config_file="${1:-${NETPLAN_ORIGIN_FILE_PATH}}"
+    readonly timeout="${2:-${NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT}}"
+
+    netplan try --config-file "${config_file}" --timeout "${timeout}"
+}
+
+# Execute the `netplan get` cli command.
+#
+# Arguments:
+#   None
+#
+function netplan_configuration_get() {
+    netplan get
+}
 
 # Execute the `netplan set` cli command with the specified arguments. This sets a key-value pair in a netplan YAML
 # configuration file.
@@ -98,26 +157,33 @@ function netplan_configuration_set_interface_key_value() {
     netplan_configuration_set_key_value "${key_composed}" "${value}"
 }
 
-# Set an key-value pair on an ethernet interface in the netplan configuration file. The specified interface is assumed
-# to describe an ethernet interface.
+# Set a boolean property on an interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
 # 
-# Arguments:
+# Arguments
 #   1: Interface name.
-#   2: Key to set.
-#   3: Value to set.
+#   2: Interface type.
+#   3: Boolean key to set.
+#   4: Boolean value to set. Must either be true or false (boolean type, not strings).
 #
-function netplan_configuration_set_ethernet_interface_property() {
+function netplan_configuration_set_interface_boolean_property() {
     local interface_name
     local interface_type
     local key
+    local enable
     local value
 
-    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
-    interface_name="${1}"
-    key="${2}"
-    value="${3}"
+    readonly interface_name="${1}"
+    readonly interface_type="${2}"
+    readonly key="${3}"
+    readonly enable="${4}"
 
-    netplan_configuration_set_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+    # shellcheck disable=SC2015
+    [[ "${enable}" == true ]] \
+        && readonly value="true" \
+        || readonly value="false"
+
+    netplan_configuration_set_interface_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
 }
 
 # Add a new interface to the netplan configuration file.
@@ -153,6 +219,194 @@ function netplan_configuration_add_ethernet_interface() {
     interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
 
     netplan_configuration_add_interface "${interface_name}" "${interface_type}"
+}
+
+# Add a new bridge interface to the netplan configuration file.
+#
+#   1: Interface name.
+#
+function netplan_configuration_add_bridge_interface() {
+    local interface_name
+    local interface_type
+
+    readonly interface_name="${1}"
+    readonly interface_type="${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
+
+    netplan_configuration_add_interface "${interface_name}" "${interface_type}"
+}
+
+# Set an key-value pair on an ethernet interface in the netplan configuration file. The specified interface must
+# describe an ethernet interface.
+# 
+# Arguments:
+#   1: Interface name.
+#   2: Key to set.
+#   3: Value to set.
+#
+function netplan_configuration_set_ethernet_interface_property() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    interface_type="${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+    interface_name="${1}"
+    key="${2}"
+    value="${3}"
+
+    netplan_configuration_set_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Set a property on a bridge interface in the netplan configuration file. The specified bridge interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments
+#   1: Interface name.
+#   2: Bridge property to set.
+#   3: Bridge property value to set.
+#
+function netplan_configuration_set_bridge_interface_property() {
+    local interface_name
+    local interface_type
+    local key
+    local value
+
+    readonly interface_type="${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
+    readonly interface_name="${1}"
+    readonly key="${2}"
+    readonly value="${3}"
+
+    netplan_configuration_set_interface_key_value "${interface_name}" "${interface_type}" "${key}" "${value}"
+}
+
+# Add a network segment (interface) to a bridge in the netplan configuration file. The specified bridge interface target
+# must already be descripted in a top-level entry in the netplan configuration file, as does the interface of the
+# network segment.
+#
+# Arguments:
+#   1: Bridge interface name.
+#   2: Network segment interface name.
+#
+function netplan_configuration_add_bridge_interface_segment() {
+    local interface_name
+    local interface_segment
+    local key
+    local value
+
+    readonly interface_name="${1}"
+    readonly interface_segment="${2}"
+    readonly key="${NETPLAN_KEY_BRIDGE_INTERFACE_SEGMENTS}"
+    readonly value="[${interface_segment}]"
+
+    netplan_configuration_set_bridge_interface_property "${interface_name}" "${key}" "${value}"
+}
+
+# Enable DHCP (IPv4) on an interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_interface_dhcp4_enable() {
+    local interface_name
+    local interface_type
+    local key
+    local enable
+
+    readonly interface_name="${1}"
+    readonly interface_type="${2}"
+    readonly key="${NETPLAN_KEY_INTERFACE_DHCP4}"
+    readonly enable=true
+
+    netplan_configuration_set_interface_boolean_property "${interface_name}" "${interface_type}" "${key}" "${enable}"
+}
+
+# Disable DHCP (IPv4) on an interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_interface_dhcp4_disable() {
+    local interface_name
+    local interface_type
+    local key
+    local enable
+
+    readonly interface_name="${1}"
+    readonly interface_type="${2}"
+    readonly key="${NETPLAN_KEY_INTERFACE_DHCP4}"
+    readonly enable=false
+
+    netplan_configuration_set_interface_boolean_property "${interface_name}" "${interface_type}" "${key}" "${enable}"
+}
+
+# Enable DHCP (IPv4) on an ethernet interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_ethernet_interface_dhcp4_enable() {
+    netplan_configuration_set_interface_dhcp4_enable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+}
+
+# Disable DHCP (IPv4) on an ethernet interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_ethernet_interface_dhcp4_disable() {
+    netplan_configuration_set_interface_dhcp4_disable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_ETHERNET}"
+}
+
+# Enable DHCP (IPv4) on a bridge  interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_bridge_interface_dhcp4_enable() {
+    netplan_configuration_set_interface_dhcp4_enable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
+}
+
+# Disable DHCP (IPv4) on a bridge  interface in the netplan configuration file. The specified interface must already be
+# described in a top-level entry in the netplan configuration file.
+#
+# Arguments:
+#   1: Interface name.
+#   2: Interface type.
+#
+function netplan_configuration_set_bridge_interface_dhcp4_disable() {
+    netplan_configuration_set_interface_dhcp4_disable "${1}" "${NETPLAN_KEY_INTERFACE_TYPE_BRIDGE}"
+}
+
+# Create a new virtual network bridge with an ethernet interface segment.
+#
+# This will create a bridge, enable dhpc IPv4 on it, add the specified ethernet interface as a segment, and disable
+# DHCPv4 on it.
+#
+# Arguments:
+#   1: Bridge interface name.
+#   2: Ethernet segment interface name.
+#
+function netplan_configuration_create_bridge_with_initial_ethernet_segment() {
+    local interface_name
+    local interface_segment
+
+    readonly interface_name="${1}"
+    readonly interface_segment="${2}"
+
+    netplan_configuration_add_bridge_interface "${interface_name}"
+    netplan_configuration_add_bridge_interface_segment "${interface_name}" "${interface_segment}"
+    netplan_configuration_set_bridge_interface_dhcp4_enable "${interface_name}"
+    netplan_configuration_set_ethernet_interface_dhcp4_disable "${interface_segment}"
 }
 
 # Set the top-level (global) fields in the netplan configuration file.
@@ -193,6 +447,8 @@ function netplan_configuration_create() {
 #
 function debconf_prompt_netplan_network_bridge_configuration() {
     local ethernet_interfaces_selected_for_bridges
+    local bridge_interface
+    local num_bridges
 
     # Clear the question from the debconf database to force the prompt.
     db_clear
@@ -206,11 +462,11 @@ function debconf_prompt_netplan_network_bridge_configuration() {
     db_get "${QUESTION_NETWORK_BRIDGES}" || true
     readonly ethernet_interfaces_selected_for_bridges=${RET//\, / }
 
-    # Ensure the configuration file has been created.
-    netplan_configuration_create
-
+    num_bridges=0
     for ethernet_interface in ${ethernet_interfaces_selected_for_bridges}; do
-        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
+        bridge_interface="${NETPLAN_BRIDGE_INTERFACE_PREFIX}$((num_bridges++))"
+
+        netplan_configuration_create_bridge_with_initial_ethernet_segment "${bridge_interface}" "${ethernet_interface}"
     done
 }
 
@@ -221,6 +477,19 @@ function debconf_prompt_netplan_network_bridge_configuration() {
 #
 function debconf_prompt_netplan_configuration() {
     local network_bridge_configure
+    local configuration_file_show
+    local configuration_file_review_seconds
+    local generated_configuration_action_requested
+
+    # Ensure the configuration file has been created.
+    netplan_configuration_create
+
+    # Add each ethernet interface. If the ethernet interface is later added to a bridge, DHCPv4 will be disabled on it,
+    # however, it is enabled here because the user may not configure a bridge for every interface, and so this will ensure
+    # the interface is usable in either case.
+    for ethernet_interface in ${ETHERNET_INTERFACES}; do
+        netplan_configuration_add_ethernet_interface "${ethernet_interface}"
+    done
 
     # Prompt user whether they want to configure network bridges.
     db_input high "${QUESTION_NETWORK_CONFIGURE_BRIDGES}" || true
@@ -233,4 +502,59 @@ function debconf_prompt_netplan_configuration() {
     if [[ "${network_bridge_configure}" == "true" ]]; then
         debconf_prompt_netplan_network_bridge_configuration
     fi
+
+    # shellcheck disable=SC2015
+    [[ -z "${DEBCONF_DEBUG-}" ]] \
+        && readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS}" \
+        || readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
+
+    # Show the user the generated netplan configuration.
+    db_subst "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
+    db_input high "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" || true
+    db_go || true
+    db_get "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" || true
+
+    readonly configuration_file_show="${RET}"
+
+    # If user requested to show the generated configuration, do so.
+    if [[ "${configuration_file_show}" == "true" ]]; then
+        clear
+        echo "Generated netplan configuration ${NETPLAN_ORIGIN_FILE_PATH}:"
+        echo
+        netplan_configuration_get
+        sleep "${configuration_file_review_seconds}"
+    fi
+
+    # Substitute the generated configuration file into the prompt description.
+    db_subst "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
+
+    # Prompt the user to choose an action to take on the generated configuration.
+    # Continue prompting until either 'Apply', 'Continue', or an invalid option is selected.
+    while true; do 
+        db_input high "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" || true
+        db_go || true
+        db_get "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" || true
+
+        generated_configuration_action_requested="${RET}"
+
+        # Check which action the user requested and carry it out.
+        case "${generated_configuration_action_requested}" in
+            "Generate Backend Configuration")
+                netplan_configuration_generate
+                ;;
+            "Try")
+                netplan_configuration_try
+                ;;
+            "Apply")
+                netplan_configuration_apply
+                break # Exit while loop
+                ;;
+            "Continue" | *) 
+                break # Exit while loop
+                ;;
+        esac
+
+        # Update default to "None" after first iteration.
+        db_set "${QUESTION_NETWORK_CONFIGURE_APPLY_GENERATED_CONFIGURATION}" "Continue" || true
+    done # while true
 }

@@ -15,4 +15,24 @@ Template: netremote/network/bridge-interfaces
 Type: multiselect
 Choices: ${network-bridge-interfaces-choices}
 Description: Select the ethernet interfaces for which a virtual network bridge should be created:
- For each ethernet interface selected below, a virtual network bridge interface will be created. The ethernet interface will be added to it as a network segment. One (1) virtual network bridge is typically needed to provide network services such as DHCP, DNS, etc. for each wireless network interface on the system.
+ For each ethernet interface selected below, a virtual network bridge interface will be created and the ethernet interface will be added to it as a network segment. One (1) virtual network bridge is typically needed to provide network services such as DHCP, DNS, etc. for each wireless network interface on the system.
+
+Template: netremote/network/configure-show-generate-configuration
+Type: boolean
+Default: true
+Description: Show the generated netplan configuration?
+ A netplan configuration file was successfully generated at ${network-netplan-configuration-file}. If shown, it will be displayed for five (5) seconds so that it can be reviewed for correctness.
+
+Template: netremote/network/configure-apply-generated-configuration
+Type: select
+Default: Apply
+Choices: Continue, Generate Backend Configuration, Try, Apply
+Description: Select the action to take on the generated configuration:
+ The generated netplan configuration at ${network-netplan-configuration-file} is ready for use. The configuration must be applied to take effect, but you may select any of the following four (4) actions to take on the generated configuration:
+ .
+  Apply: Generate the backend configuration, apply it, and continue package installation.
+  Continue: Leave the generated configuration file in place, don't apply any changes, and continue package installation.
+  Try: Generate the backend configuration, apply it for 10 seconds, then revert it. Use to validate the generated configuration.
+  Generate Backend Configuration: Generate backend configuration files under /run/systemd/network. Use to inspect the backend configuration files in detail. 
+ .
+ For the 'Continue' and 'Generate Backend Configuration' options, the generated configuration in ${network-netplan-configuration-file} must later be applied manually using 'netplan apply'. For the 'Try' and 'Apply' actions, netplan will bring down all network interfaces described in the generated configuration and connectivity will be lost for a short period while the configuration is applied. This menu will be exited when either 'Continue' or 'Apply' is selected.
