@@ -1,4 +1,6 @@
 
+find_package(sdbus-c++ REQUIRED)
+
 add_subdirectory(external)
 add_subdirectory(libnl-helpers)
 add_subdirectory(wifi)
