@@ -10,6 +10,10 @@
     "plog",
     "magic-enum",
     {
+      "name": "sdbus-cpp",
+      "platform": "linux"
+    },
+    {
       "name": "wil",
       "platform": "windows"
     }
