@@ -17,5 +17,12 @@
       "name": "wil",
       "platform": "windows"
     }
-  ]
+  ],
+  "overrides": [
+    {
+      "name": "cli11",
+      "version": "2.3.1"
+    }
+  ],
+  "builtin-baseline": "9224b3bbd8df24999d85720b1d005dd6f969ade0"
 }
