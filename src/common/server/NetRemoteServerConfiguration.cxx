@@ -4,7 +4,9 @@
 #include <vector>
 
 #include <CLI/App.hpp>
+#include <CLI/Config.hpp>
 #include <CLI/Error.hpp>
+#include <CLI/Formatter.hpp>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 
 using namespace Microsoft::Net::Remote;
@@ -49,7 +51,7 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
         app.parse(std::forward<Args>(args)...);
     } catch (const CLI::ParseError& parseError) {
         if (throwOnParseError) {
-            throw parseError;   // NOLINT(cert-err60-cpp)
+            throw parseError; // NOLINT(cert-err60-cpp)
         }
     }
 

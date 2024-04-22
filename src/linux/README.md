@@ -66,7 +66,7 @@ Execute the following commands in a shell to install all the tools required to c
 2. Install core build tools and dependencies:
 
     ```bash
-    sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
+    sudo apt install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl dotnet7 git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip
     ```
 
 3. Install LLVM compiler dependencies:

@@ -3,6 +3,10 @@
   "name": "netremote",
   "version-string": "1",
   "dependencies": [
+    {
+      "name": "sdbus-cpp",
+      "platform": "linux"
+    },
     "grpc",
     "cli11",
     "protobuf",

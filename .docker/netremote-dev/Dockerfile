@@ -22,9 +22,9 @@ LABEL org.label-schema.schema-version = "1.0"
 # sudo apt -y update && sudo apt -y upgrade
 #
 # 2. Install core build tools and dependencies:
-# sudo apt install -y --no-install-recommends build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
+# sudo apt install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl dotnet7 git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
 #
-# 3. Install complete LLVM 17  + clang 17 toolchain:
+# 3. Install complete LLVM 17 + clang 17 toolchain:
 # sudo apt install -y --no-install-recommends libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
 # 
 # 4. Install other development dependencies and helpful tools:
@@ -39,7 +39,10 @@ RUN apt-get $APT_ARGS_COMMON update && \
     apt-get $APT_ARGS_COMMON upgrade && \
     apt-get $APT_ARGS_COMMON install  \
         # Core project build dependencies.
-        # build-essential ca-certificates cmake curl dotnet7 git gnupg linux-libc-dev ninja-build pkg-config tar unzip zip
+        # autoconf automake autopoint build-essential ca-certificates cmake curl dotnet7 git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
+        autoconf \
+        automake \
+        autopoint \
         build-essential \
         ca-certificates \
         cmake \
@@ -47,9 +50,13 @@ RUN apt-get $APT_ARGS_COMMON update && \
         dotnet7 \
         git \
         gnupg \
+        libltdl-dev \
+        libmount-dev \
+        libtool \
         linux-libc-dev \
         ninja-build \
         pkg-config \
+        python3-jinja2 \
         tar \
         unzip \
         zip \
