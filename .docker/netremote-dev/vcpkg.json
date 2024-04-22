@@ -3,16 +3,16 @@
   "name": "netremote",
   "version-string": "1",
   "dependencies": [
+    {
+      "name": "sdbus-cpp",
+      "platform": "linux"
+    },
     "grpc",
     "cli11",
     "protobuf",
     "catch2",
     "plog",
     "magic-enum",
-    {
-      "name": "sdbus-cpp",
-      "platform": "linux"
-    },
     {
       "name": "wil",
       "platform": "windows"
