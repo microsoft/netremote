@@ -10,13 +10,14 @@ target_sources(libnl-helpers
         Ieee80211Nl80211Adapters.cxx
         Netlink80211.cxx
         Netlink80211Interface.cxx
-        NetlinkException.cxx
         Netlink80211ProtocolState.cxx
         Netlink80211Wiphy.cxx
         Netlink80211WiphyBand.cxx
         Netlink80211WiphyBandFrequency.cxx
         NetlinkErrorCategory.cxx
+        NetlinkException.cxx
         NetlinkMessage.cxx
+        NetlinkRoute.cxx
         NetlinkSocket.cxx
     PUBLIC
     FILE_SET HEADERS
@@ -25,9 +26,9 @@ target_sources(libnl-helpers
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkErrorCategory.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkException.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkRoute.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Ieee80211Nl80211Adapters.hxx
-        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Interface.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211ProtocolState.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Wiphy.hxx
