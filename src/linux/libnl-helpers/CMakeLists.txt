@@ -26,12 +26,12 @@ target_sources(libnl-helpers
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkErrorCategory.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkException.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkMessage.hxx
-        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkRoute.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/NetlinkSocket.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Ieee80211Nl80211Adapters.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Interface.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211ProtocolState.hxx
         ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/nl80211/Netlink80211Wiphy.hxx
+        ${LIBNL_HELPERS_PUBLIC_INCLUDE_PREFIX}/route/NetlinkRoute.hxx
 )
 
 target_link_libraries(libnl-helpers
