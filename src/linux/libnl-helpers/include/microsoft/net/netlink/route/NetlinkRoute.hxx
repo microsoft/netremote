@@ -22,19 +22,11 @@ CreateNlRouteSocket();
 
 /**
  * @brief Enumerate all ipv4 addresses on the system.
- * 
- * @return std::vector<std::string> 
- */
-std::vector<std::string>
-NetlinkEnumerateIpv4Addresses();
-
-/**
- * @brief Enumerate all ipv4 addresses on the system.
- * 
- * @return std::optional<std::vector<std::string>> 
+ *
+ * @return std::optional<std::vector<std::string>>
  */
 std::optional<std::vector<std::string>>
-NetlinkEnumerateIpv4Addresses2();
+NetlinkEnumerateIpv4Addresses();
 
 } // namespace Microsoft::Net::Netlink
 

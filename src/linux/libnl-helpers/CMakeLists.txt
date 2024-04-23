@@ -37,6 +37,7 @@ target_sources(libnl-helpers
 target_link_libraries(libnl-helpers
     PRIVATE
         magic_enum::magic_enum
+        notstd
         plog::plog
         wifi-core
     PUBLIC
