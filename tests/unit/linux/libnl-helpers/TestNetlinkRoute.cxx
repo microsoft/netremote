@@ -10,4 +10,22 @@ TEST_CASE("NetlinkEnumerateIpv4Addresses", "[linux][libnl-helpers]")
     {
         REQUIRE_NOTHROW(NetlinkEnumerateIpv4Addresses());
     }
+
+    SECTION("If value is returned, it is non-empty")
+    {
+        const auto addresses = NetlinkEnumerateIpv4Addresses();
+        if (addresses.has_value()) {
+            REQUIRE_FALSE(std::empty(addresses.value()));
+        }
+    }
+
+    SECTION("If values are returned, they are non-empty")
+    {
+        const auto addresses = NetlinkEnumerateIpv4Addresses();
+        if (addresses.has_value()) {
+            for (const auto& address : addresses.value()) {
+                REQUIRE_FALSE(std::empty(address));
+            }
+        }
+    }
 }
