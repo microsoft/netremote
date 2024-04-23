@@ -1,9 +1,11 @@
 
 #include <format>
+#include <optional>
 #include <string>
 #include <system_error>
 #include <vector>
 
+#include <arpa/inet.h>
 #include <linux/if_addr.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
@@ -23,11 +25,53 @@
 
 namespace detail
 {
+std::optional<std::string>
+ParseNlGetAddressMessage([[maybe_unused]] struct nlmsghdr *nlMessageHeader)
+{
+    auto ifAddressMessage = static_cast<struct ifaddrmsg *>(nlmsg_data(nlMessageHeader));
+    auto ifAddressMessageLength = IFA_PAYLOAD(nlMessageHeader);
+    auto ifAddressAttribute = static_cast<struct rtattr *>(IFA_RTA(ifAddressMessage));
+
+    for (;;) {
+        if (!RTA_OK(ifAddressAttribute, ifAddressMessageLength)) {
+            break;
+        }
+
+        switch (ifAddressAttribute->rta_type) {
+        case IFA_LOCAL: {
+            auto ipAddress = *reinterpret_cast<struct in_addr *>(RTA_DATA(ifAddressAttribute));
+            return inet_ntop(AF_INET, &ipAddress, nullptr, 0);
+        }
+        }
+    }
+
+    return {};
+}
+
 std::vector<std::string>
-ParseNlGetAddressResponse([[maybe_unused]] struct nl_msg *nlMessage) noexcept
+ParseNlGetAddressDumpResponse(struct nl_msg *nlMessage) noexcept
 {
     std::vector<std::string> ipAddresses{};
-    // TODO
+    struct nlmsghdr *nlMessageHeader = nlmsg_hdr(nlMessage);
+    auto nlMessageLength = nlMessageHeader->nlmsg_len;
+
+    for (;;) {
+        if (!NLMSG_OK(nlMessageHeader, nlMessageLength)) {
+            break;
+        }
+        if (nlMessageHeader->nlmsg_type == NLMSG_DONE) {
+            break;
+        }
+        if (nlMessageHeader->nlmsg_type == RTM_NEWADDR) {
+            auto ipAddress = ParseNlGetAddressMessage(nlMessageHeader);
+            if (ipAddress.has_value()) {
+                ipAddresses.push_back(ipAddress.value());
+            }
+        }
+
+        nlMessageHeader = NLMSG_NEXT(nlMessageHeader, nlMessageLength);
+    }
+
     return ipAddresses;
 }
 
@@ -40,7 +84,7 @@ HandleNlGetAddressResponse([[maybe_unused]] struct nl_msg *nlMessage, void *cont
     }
 
     auto &nlGetAddressResult = *static_cast<std::vector<std::string> *>(context);
-    nlGetAddressResult = ParseNlGetAddressResponse(nlMessage);
+    nlGetAddressResult = ParseNlGetAddressDumpResponse(nlMessage);
 
     LOGD << "Successfully parsed a netlink route get address response message";
 
