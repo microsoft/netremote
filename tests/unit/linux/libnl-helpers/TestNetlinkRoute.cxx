@@ -4,10 +4,10 @@
 
 TEST_CASE("NetlinkEnumerateIpv4Addresses", "[linux][libnl-helpers]")
 {
-    using Microsoft::Net::Netlink::NetlinkEnumerateIpv4Addresses;
+    using Microsoft::Net::Netlink::NetlinkEnumerateIpv4Addresses2;
 
     SECTION("Doesn't cause a crash")
     {
-        REQUIRE_NOTHROW(NetlinkEnumerateIpv4Addresses());
+        REQUIRE_NOTHROW(NetlinkEnumerateIpv4Addresses2());
     }
 }

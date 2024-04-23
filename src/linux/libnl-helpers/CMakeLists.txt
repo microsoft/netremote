@@ -42,6 +42,7 @@ target_link_libraries(libnl-helpers
     PUBLIC
         nl
         nl-genl
+        nl-route-3
 )
 
 install(

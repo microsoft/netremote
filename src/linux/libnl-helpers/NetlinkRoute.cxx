@@ -3,6 +3,7 @@
 #include <optional>
 #include <string>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include <arpa/inet.h>
@@ -13,11 +14,14 @@
 #include <microsoft/net/netlink/NetlinkMessage.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/route/NetlinkRoute.hxx>
+#include <netinet/in.h>
 #include <netlink/attr.h>
 #include <netlink/errno.h>
 #include <netlink/handlers.h>
 #include <netlink/msg.h>
 #include <netlink/netlink.h>
+#include <netlink/object.h>
+#include <netlink/route/addr.h>
 #include <netlink/socket.h>
 #include <plog/Log.h>
 #include <sys/socket.h>
@@ -40,9 +44,15 @@ ParseNlGetAddressMessage([[maybe_unused]] struct nlmsghdr *nlMessageHeader)
         switch (ifAddressAttribute->rta_type) {
         case IFA_LOCAL: {
             auto ipAddress = *reinterpret_cast<struct in_addr *>(RTA_DATA(ifAddressAttribute));
-            return inet_ntop(AF_INET, &ipAddress, nullptr, 0);
+            auto *ipAddressString = inet_ntop(AF_INET, &ipAddress, nullptr, 0);
+            if (ipAddressString != nullptr) {
+                return ipAddressString;
+            }
+            break;
         }
         }
+
+        ifAddressAttribute = RTA_NEXT(ifAddressAttribute, ifAddressMessageLength);
     }
 
     return {};
@@ -157,6 +167,41 @@ NetlinkEnumerateIpv4Addresses()
     if (ret < 0) {
         LOGE << std::format("Failed to receive netlink get address response with error {} ({})", ret, nl_geterror(ret));
         return {};
+    }
+
+    return ipAddresses;
+}
+
+std::optional<std::vector<std::string>>
+NetlinkEnumerateIpv4Addresses2()
+{
+    auto nlRouteSocket{ CreateNlRouteSocket() };
+
+    struct nl_cache *ipAddressCache{ nullptr };
+    int ret = rtnl_addr_alloc_cache(nlRouteSocket, &ipAddressCache);
+    if (ret != 0) {
+        LOGE << std::format("failed to allocate address cache with error {} ({})", ret, nl_geterror(ret));
+        return std::nullopt;
+    }
+
+    std::vector<std::string> ipAddresses{};
+    struct nl_object *nlObjectIpAddress{ nullptr };
+    for (nlObjectIpAddress = nl_cache_get_first(ipAddressCache); nlObjectIpAddress != nullptr;  nlObjectIpAddress = nl_cache_get_next(nlObjectIpAddress)) {
+        auto *nlIpAddress = reinterpret_cast<struct rtnl_addr *>(nlObjectIpAddress);
+
+        const auto family = rtnl_addr_get_family(nlIpAddress);
+        switch (family) {
+        case AF_INET: {
+            auto *ipAddress = rtnl_addr_get_local(nlIpAddress);
+            std::string ipAddressAscii(INET_ADDRSTRLEN, '\0');
+            nl_addr2str(ipAddress, std::data(ipAddressAscii), std::size(ipAddressAscii));
+            ipAddresses.push_back(ipAddressAscii);
+            break;
+        }
+        default: {
+            break;
+        }
+        }
     }
 
     return ipAddresses;

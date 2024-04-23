@@ -2,6 +2,7 @@
 #ifndef NETLINK_ROUTE_HXX
 #define NETLINK_ROUTE_HXX
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,14 @@ CreateNlRouteSocket();
  */
 std::vector<std::string>
 NetlinkEnumerateIpv4Addresses();
+
+/**
+ * @brief Enumerate all ipv4 addresses on the system.
+ * 
+ * @return std::optional<std::vector<std::string>> 
+ */
+std::optional<std::vector<std::string>>
+NetlinkEnumerateIpv4Addresses2();
 
 } // namespace Microsoft::Net::Netlink
 
