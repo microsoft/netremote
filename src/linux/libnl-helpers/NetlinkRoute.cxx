@@ -42,7 +42,7 @@ CreateNlRouteSocket()
     return socket;
 }
 
-std::optional<std::vector<std::string>>
+std::vector<std::string>
 NetlinkEnumerateIpv4Addresses()
 {
     auto nlRouteSocket{ CreateNlRouteSocket() };
@@ -50,8 +50,10 @@ NetlinkEnumerateIpv4Addresses()
     struct nl_cache *ipAddressCache{ nullptr };
     int ret = rtnl_addr_alloc_cache(nlRouteSocket, &ipAddressCache);
     if (ret != 0) {
-        LOGE << std::format("failed to allocate address cache with error {} ({})", ret, nl_geterror(ret));
-        return std::nullopt;
+        const auto errorCode = MakeNetlinkErrorCode(-ret);
+        const auto message = std::format("Failed to allocate address cache with error {}", errorCode.value());
+        LOGE << message;
+        throw std::system_error(errorCode, message);
     }
 
     auto freeNlCache = notstd::scope_exit([&ipAddressCache] {
