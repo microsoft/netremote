@@ -7,12 +7,16 @@ set(NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVER_PUBLIC_INCLUDE}/
 
 target_sources(${PROJECT_NAME}-server
     PRIVATE
+        NetRemoteDiscoveryDnssd.cxx
+        NetRemoteDiscoveryService.cxx
         NetRemoteServer.cxx
         NetRemoteServerConfiguration.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_SERVER_PUBLIC_INCLUDE}
     FILES
+        ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteDiscoveryDnssd.hxx
+        ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteDiscoveryService.hxx
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServer.hxx
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServerConfiguration.hxx
 )

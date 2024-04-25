@@ -32,9 +32,12 @@ struct NetRemoteServer
      * Prevent copying and moving of this object.
      */
     NetRemoteServer(const NetRemoteServer&) = delete;
+
+    NetRemoteServer(NetRemoteServer&&) = delete;
+
     NetRemoteServer&
     operator=(const NetRemoteServer&) = delete;
-    NetRemoteServer(NetRemoteServer&&) = delete;
+
     NetRemoteServer&
     operator=(NetRemoteServer&&) = delete;
 

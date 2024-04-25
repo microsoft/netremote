@@ -4,6 +4,8 @@ add_executable(${PROJECT_NAME}-server-linux "")
 target_sources(${PROJECT_NAME}-server-linux
     PRIVATE
         Main.cxx
+        NetRemoteDiscoveryServiceLinuxDnssd.cxx
+        NetRemoteDiscoveryServiceLinuxDnssd.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-server-linux
@@ -12,6 +14,7 @@ target_link_libraries(${PROJECT_NAME}-server-linux
         logging-utils
         notstd
         plog::plog
+        sdbus-c++
         wifi-apmanager-linux
         wifi-core-linux
 )
