@@ -20,3 +20,13 @@ TEST_CASE("NetlinkEnumerateIpv4Addresses", "[linux][libnl-helpers]")
         }
     }
 }
+
+TEST_CASE("NetlinkEnumerateInterfaceInfo", "[linux][libnl-helpers]")
+{
+    using Microsoft::Net::Netlink::NetlinkEnumerateInterfaceInfo;
+
+    SECTION("Doesn't cause a crash")
+    {
+        REQUIRE_NOTHROW(NetlinkEnumerateInterfaceInfo());
+    }
+}
