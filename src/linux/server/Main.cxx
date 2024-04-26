@@ -22,6 +22,10 @@
 #include <plog/Logger.h>
 #include <unistd.h>
 
+#include "NetRemoteDiscoveryServiceLinuxDnssd.hxx"
+#include "NetworkOperationsLinux.hxx"
+
+using namespace Microsoft::Net;
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Wifi;
 
@@ -61,6 +65,12 @@ main(int argc, char *argv[])
         auto &accessPointManager = configuration.AccessPointManager;
 
         accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+    }
+
+    // Configure service discovery to use DNS-SD.
+    {
+        configuration.NetworkOperations = std::make_unique<NetworkOperationsLinux>();
+        configuration.DiscoveryServiceFactory = std::make_unique<NetRemoteDiscoveryServiceLinuxDnssdFactory>();
     }
 
     // Create the server.

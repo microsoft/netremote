@@ -6,6 +6,8 @@ target_sources(${PROJECT_NAME}-server-linux
         Main.cxx
         NetRemoteDiscoveryServiceLinuxDnssd.cxx
         NetRemoteDiscoveryServiceLinuxDnssd.hxx
+        NetworkOperationsLinux.cxx
+        NetworkOperationsLinux.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-server-linux

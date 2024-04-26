@@ -9,55 +9,9 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <unordered_set>
 
+#include <microsoft/net/INetworkOperations.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
-
-namespace Microsoft::Net
-{
-struct IpInformation
-{
-    // TODO
-};
-} // namespace Microsoft::Net
-
-namespace Microsoft::Net::Remote
-{
-// enum class NetRemoteServiceEndpointInterfaceType {
-//     Unknown,
-//     Ethernet,
-//     Wifi,
-//     Other,
-// };
-
-// struct NetRemoteServiceEndpoint
-// {
-//     NetRemoteServiceEndpointInterfaceType Type;
-//     std::string IpAddress;
-//     uint32_t Port;
-
-//     auto
-//     operator<=>(const NetRemoteServiceEndpoint&) const = default;
-// };
-} // namespace Microsoft::Net::Remote
-
-// namespace std
-// {
-// /**
-//  * @brief Hash function enabling use of NetRemoteServiceEndpoint as a key in unordered_map.
-//  *
-//  * @tparam
-//  */
-// template <>
-// struct hash<Microsoft::Net::Remote::NetRemoteServiceEndpoint>
-// {
-//     std::size_t
-//     operator()(const Microsoft::Net::Remote::NetRemoteServiceEndpoint& endpoint) const noexcept
-//     {
-//         return std::hash<std::string>{}(endpoint.IpAddress) ^ std::hash<uint32_t>{}(endpoint.Port);
-//     }
-// };
-// } // namespace std
 
 namespace Microsoft::Net::Remote
 {
@@ -99,23 +53,12 @@ private:
     std::unordered_map<std::string, Microsoft::Net::IpInformation> m_ipAddresses;
 };
 
-struct INetRemoteRemoteDiscoveryServiceFactory
+struct INetRemoteDiscoveryServiceFactory
 {
-    virtual ~INetRemoteRemoteDiscoveryServiceFactory() = default;
+    virtual ~INetRemoteDiscoveryServiceFactory() = default;
 
     virtual std::shared_ptr<NetRemoteDiscoveryService>
     Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpInformation> ipAddresses) = 0;
-};
-
-struct INetworkOperations
-{
-    virtual ~INetworkOperations() = default;
-
-    virtual std::unordered_set<std::string>
-    GetLocalIpAddresses() const noexcept = 0;
-
-    virtual Microsoft::Net::IpInformation
-    GetLocalIpInformation(const std::string& ipAddress) const noexcept = 0;
 };
 
 /**
@@ -131,7 +74,7 @@ struct NetRemoteDiscoveryServiceBuilder
      * @param discoveryServiceFactory The factory to use to create the service instance.
      * @param networkOperations The object to use when performing network operations.
      */
-    NetRemoteDiscoveryServiceBuilder(std::unique_ptr<INetRemoteRemoteDiscoveryServiceFactory> discoveryServiceFactory, std::unique_ptr<INetworkOperations> networkOperations);
+    NetRemoteDiscoveryServiceBuilder(std::unique_ptr<INetRemoteDiscoveryServiceFactory> discoveryServiceFactory, std::unique_ptr<INetworkOperations> networkOperations);
 
     /**
      * @brief Destroy the NetRemoteDiscoveryServiceBuilder object.
@@ -176,8 +119,8 @@ struct NetRemoteDiscoveryServiceBuilder
     Build();
 
 private:
-    std::unique_ptr<INetRemoteRemoteDiscoveryServiceFactory> m_discoveryServiceFactory;
-    std::unique_ptr<INetworkOperations> m_networkOperations;
+    std::unique_ptr<INetRemoteDiscoveryServiceFactory> m_discoveryServiceFactory;
+    std::unique_ptr<Microsoft::Net::INetworkOperations> m_networkOperations;
     std::string m_hostname;
     uint32_t m_port{ Protocol::NetRemoteProtocol::PortDefault };
     std::unordered_map<std::string, Microsoft::Net::IpInformation> m_ipAddresses{};
