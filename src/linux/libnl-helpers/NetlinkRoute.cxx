@@ -3,16 +3,16 @@
 #include <format>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <utility>
 #include <vector>
-
-#include <iostream> // TODO: remove me
 
 #include <linux/netlink.h>
 #include <microsoft/net/netlink/NetlinkErrorCategory.hxx>
 #include <microsoft/net/netlink/NetlinkSocket.hxx>
 #include <microsoft/net/netlink/route/NetlinkRoute.hxx>
+#include <net/if.h>
 #include <netinet/in.h>
 #include <netlink/addr.h>
 #include <netlink/cache.h>
@@ -20,12 +20,68 @@
 #include <netlink/netlink.h>
 #include <netlink/object.h>
 #include <netlink/route/addr.h>
+#include <netlink/route/link.h>
 #include <notstd/Scope.hxx>
 #include <plog/Log.h>
 #include <sys/socket.h>
 
 namespace Microsoft::Net::Netlink
 {
+namespace detail
+{
+// The maximum length of an ipv4 address is INET_ADDRSTRLEN (16) + 3 (for the subnet mask), eg. xxx.xxx.xxx.xxx/yy.
+constexpr auto Ipv4AddressAsciiLengthMax{ INET_ADDRSTRLEN + 3 };
+constexpr auto Ipv6AddressAsciiLengthMax{ INET6_ADDRSTRLEN + 5 };
+
+std::size_t
+GetAddressLength(int addressFamily) noexcept
+{
+    switch (addressFamily) {
+    case AF_INET:
+        return Ipv4AddressAsciiLengthMax;
+    case AF_INET6:
+        [[fallthrough]];
+    default:
+        return Ipv6AddressAsciiLengthMax;
+    }
+}
+
+constexpr std::string_view
+GetAddressFamilyName(int addressFamily) noexcept
+{
+    switch (addressFamily) {
+    case AF_INET:
+        return "IPv4";
+    case AF_INET6:
+        return "IPv6";
+    default:
+        return "Unknown";
+    }
+}
+
+void
+OnLink(struct nl_object *nlObjectLink, void *context)
+{
+    auto *rtnlLink = reinterpret_cast<struct rtnl_link *>(nlObjectLink); // NOLINT
+    auto netlinkLink = NetlinkLink::FromRtnlLink(rtnlLink);
+
+    // Populate output variable (context) with result.
+    auto& netlinkLinks = *static_cast<std::unordered_set<NetlinkLink> *>(context);
+    netlinkLinks.emplace(std::move(netlinkLink));
+}
+
+void
+OnAddress(struct nl_object *nlObjectAddress, void *context)
+{
+    auto *rtnlAddress = reinterpret_cast<struct rtnl_addr *>(nlObjectAddress); // NOLINT
+    auto netlinkAddress = NetlinkIpAddress::FromRtnlAddr(rtnlAddress);
+
+    // Populate output variable (context) with result.
+    auto& netlinkAddresses = *static_cast<std::unordered_set<NetlinkIpAddress> *>(context);
+    netlinkAddresses.emplace(std::move(netlinkAddress));
+}
+} // namespace detail
+
 NetlinkSocket
 CreateNlRouteSocket()
 {
@@ -44,36 +100,8 @@ CreateNlRouteSocket()
     return socket;
 }
 
-namespace detail
-{
-// The maximum length of an ipv4 address is INET_ADDRSTRLEN (16) + 3 (for the subnet mask), eg. xxx.xxx.xxx.xxx/yy.
-constexpr auto Ipv4AddressLengthMax{ INET_ADDRSTRLEN + 3 };
-constexpr auto Ipv6AddressLengthMax{ INET6_ADDRSTRLEN + 5 };
-
-void
-OnLink(struct nl_object *nlObjectLink, void *context)
-{
-    auto *nlLink = reinterpret_cast<struct rtnl_link *>(nlObjectLink); // NOLINT
-    auto &interfaceLinkInfo = *static_cast<std::unordered_map<std::string, NetlinkInterfaceLinkInfo> *>(context);
-
-    const auto *linkType = rtnl_link_get_type(nlLink);
-    const auto *linkName = rtnl_link_get_name(nlLink);
-    const auto *linkIpAddress = rtnl_link_get_addr(nlLink);
-    if (linkType == nullptr) {
-        linkType = "none";
-    }
-
-    // Convert the IP address to a string.
-    std::string linkIpAddressAscii(Ipv6AddressLengthMax, '\0');
-    nl_addr2str(linkIpAddress, std::data(linkIpAddressAscii), std::size(linkIpAddressAscii));
-
-    interfaceLinkInfo[linkName] = NetlinkInterfaceLinkInfo{ linkType, linkIpAddressAscii };
-    std::cout << std::format("{}: {} {}", linkName, linkType, linkIpAddressAscii);
-}
-} // namespace detail
-
-std::unordered_map<std::string, NetlinkInterfaceLinkInfo>
-NetlinkEnumerateInterfaceInfo()
+std::unordered_set<NetlinkLink>
+NetlinkEnumerateLinks()
 {
     auto nlRouteSocket{ CreateNlRouteSocket() };
 
@@ -90,22 +118,14 @@ NetlinkEnumerateInterfaceInfo()
         nl_cache_free(linkCache);
     });
 
-    std::unordered_map<std::string, NetlinkInterfaceLinkInfo> interfaceLinkInfo{};
-    nl_cache_foreach(linkCache, detail::OnLink, &interfaceLinkInfo);
+    std::unordered_set<NetlinkLink> links{};
+    nl_cache_foreach(linkCache, detail::OnLink, &links);
 
-    // int ret = rtnl_addr_alloc_cache(nlRouteSocket, &ipAddressCache);
-    // if (ret != 0) {
-    //     const auto errorCode = MakeNetlinkErrorCode(-ret);
-    //     const auto message = std::format("Failed to allocate address cache with error {}", errorCode.value());
-    //     LOGE << message;
-    //     throw std::system_error(errorCode, message);
-    // }
-
-    return interfaceLinkInfo;
+    return links;
 }
 
-std::vector<std::string>
-NetlinkEnumerateIpv4Addresses()
+std::unordered_set<NetlinkIpAddress>
+NetlinkEnumerateIpAddresses()
 {
     auto nlRouteSocket{ CreateNlRouteSocket() };
 
@@ -118,42 +138,98 @@ NetlinkEnumerateIpv4Addresses()
         throw std::system_error(errorCode, message);
     }
 
-    auto freeNlCache = notstd::scope_exit([&ipAddressCache] {
+    auto freeIpAddressCache = notstd::scope_exit([&ipAddressCache] {
         nl_cache_free(ipAddressCache);
     });
 
-    std::vector<std::string> ipv4Addresses{};
-    struct nl_object *nlObjectIpAddress{ nullptr };
-    for (nlObjectIpAddress = nl_cache_get_first(ipAddressCache); nlObjectIpAddress != nullptr; nlObjectIpAddress = nl_cache_get_next(nlObjectIpAddress)) {
-        auto *nlIpAddress = reinterpret_cast<struct rtnl_addr *>(nlObjectIpAddress); // NOLINT
+    std::unordered_set<NetlinkIpAddress> ipAddresses{};
+    nl_cache_foreach(ipAddressCache, detail::OnAddress, &ipAddresses);
 
-        // Process ipv4 addresses only.
-        const auto family = rtnl_addr_get_family(nlIpAddress);
-        if (family != AF_INET) {
-            continue;
-        }
+    return ipAddresses;
+}
 
-        // Convert the ipv4 address to a string.
-        auto *ipv4Address = rtnl_addr_get_local(nlIpAddress);
-        std::string ipv4AddressAscii(detail::Ipv4AddressLengthMax, '\0');
-        nl_addr2str(ipv4Address, std::data(ipv4AddressAscii), std::size(ipv4AddressAscii));
+/* static */
+NetlinkIpAddress
+NetlinkIpAddress::FromRtnlAddr(struct rtnl_addr *rtnlAddress)
+{
+    const auto index = rtnl_addr_get_ifindex(rtnlAddress);
+    const auto family = rtnl_addr_get_family(rtnlAddress);
+    const auto prefixLength = rtnl_addr_get_prefixlen(rtnlAddress);
+    const auto *local = rtnl_addr_get_local(rtnlAddress);
 
-        {
-            auto *nlLink = rtnl_addr_get_link(nlIpAddress);
-            if (nlLink != nullptr) {
-                const auto *linkType = rtnl_link_get_type(nlLink);
-                std::cout << std::format("{}: {}", linkType, ipv4AddressAscii);
-            } else {
-                std::cout << std::format("nolink: {}", ipv4AddressAscii);
-            }
-        }
+    // Convert the address to a string then resize to actual null-terminated length.
+    std::string addressLocalAscii(detail::GetAddressLength(family), '\0');
+    nl_addr2str(local, std::data(addressLocalAscii), std::size(addressLocalAscii));
+    addressLocalAscii.resize(std::strlen(std::data(addressLocalAscii)));
 
-        // Resize to the actual null-terminated string length.
-        ipv4AddressAscii.resize(std::strlen(std::data(ipv4AddressAscii)));
-        ipv4Addresses.push_back(std::move(ipv4AddressAscii));
+    return NetlinkIpAddress{ index, family, prefixLength, addressLocalAscii };
+}
+
+/* static */
+NetlinkLink
+NetlinkLink::FromRtnlLink(struct rtnl_link *rtnlLink)
+{
+    const auto index = rtnl_link_get_ifindex(rtnlLink);
+    const auto *name = rtnl_link_get_name(rtnlLink);
+    const auto *type = rtnl_link_get_type(rtnlLink);
+    const auto *macAddress = rtnl_link_get_addr(rtnlLink);
+
+    // TODO: implement independent function to get proper type when this is nullptr.
+    if (type == nullptr) {
+        type = "none";
     }
 
-    return ipv4Addresses;
+    // Convert the address to a string then resize to actual null-terminated length.
+    std::string macAddressAscii(detail::Ipv6AddressAsciiLengthMax, '\0');
+    nl_addr2str(macAddress, std::data(macAddressAscii), std::size(macAddressAscii));
+    macAddressAscii.resize(std::strlen(std::data(macAddressAscii)));
+
+    return NetlinkLink{ index, name, type, std::move(macAddressAscii) };
+}
+
+/* static */
+std::optional<NetlinkLink>
+NetlinkLink::FromInterfaceIndex(int interfaceIndex)
+{
+    // Obtain interface/linlk name from interface index.
+    char interfaceName[IF_NAMESIZE]{ '\0' };
+    if_indextoname(static_cast<uint32_t>(interfaceIndex), interfaceName);
+
+    // Allocate a netlink socket to make the kernel request with.
+    auto nlRouteSocket{ CreateNlRouteSocket() };
+
+    // Send a kernel request to get the link information.
+    struct rtnl_link *rtnlLink{ nullptr };
+    int ret = rtnl_link_get_kernel(nlRouteSocket, interfaceIndex, interfaceName, &rtnlLink);
+    if (ret < 0) {
+        const auto errorCode = MakeNetlinkErrorCode(-ret);
+        const auto message = std::format("Failed to get link with error {}", errorCode.value());
+        LOGE << message;
+        return std::nullopt;
+    }
+
+    auto freeLink = notstd::scope_exit([&rtnlLink] {
+        nl_object_free(OBJ_CAST(rtnlLink));
+        rtnlLink = nullptr;
+    });
+
+    return FromRtnlLink(rtnlLink);
+}
+
+std::string
+NetlinkLink::ToString() const
+{
+    return std::format("[{}] {} {} {}", InterfaceIndex, Name, Type, MacAddress);
+}
+
+std::string
+NetlinkIpAddress::ToString(bool showInterfaceIndex) const
+{
+    auto addressFamilyName = detail::GetAddressFamilyName(Family);
+
+    return showInterfaceIndex
+        ? std::format("[{}] {} {}/{}", InterfaceIndex, addressFamilyName, Address, PrefixLength)
+        : std::format("{} {}/{}", addressFamilyName, Address, PrefixLength);
 }
 
 } // namespace Microsoft::Net::Netlink

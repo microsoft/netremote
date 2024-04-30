@@ -85,7 +85,7 @@ struct NetRemoteDiscoveryServiceLinuxDnssdFactory :
      * @return std::shared_ptr<NetRemoteDiscoveryService>
      */
     std::shared_ptr<NetRemoteDiscoveryService>
-    Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpInformation> ipAddresses) override;
+    Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses) override;
 };
 } // namespace Microsoft::Net::Remote
 

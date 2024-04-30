@@ -3,6 +3,8 @@
 #define NETWORK_OPERATIONS_LINUX_HXX
 
 #include <string>
+#include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 
 #include <microsoft/net/INetworkOperations.hxx>
@@ -33,21 +35,15 @@ struct NetworkOperationsLinux :
     operator=(NetworkOperationsLinux&&) = delete;
 
     /**
-     * @brief Enumerate all local IP addresses on the system.
+     * @brief Obtain information about the specified IP address. The returned map will contain the IP address as the key
+     * and the information as the value. In the case of a fixed address, the returned map will have a single entry. In
+     * the case of any "any" address (eg. 0.0.0.0, ::), the returned map will contain all available addresses.
      *
-     * @return std::unordered_set<std::string>
+     * @param ipAddress The ip address to obtain information for.
+     * @return std::unordered_map<std::string, IpAddressInformation>
      */
-    std::unordered_set<std::string>
-    GetLocalIpAddresses() const noexcept override;
-
-    /**
-     * @brief Obtain information about a local IP address.
-     *
-     * @param ipAddress The IP address to get information about.
-     * @return IpInformation
-     */
-    IpInformation
-    GetLocalIpInformation(const std::string& ipAddress) const noexcept override;
+    std::unordered_map<std::string, IpAddressInformation>
+    GetLocalIpAddressInformation(std::string_view ipAddress) const noexcept override;
 };
 } // namespace Microsoft::Net
 

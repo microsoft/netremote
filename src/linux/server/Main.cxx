@@ -8,6 +8,7 @@
 #include <logging/LogUtils.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
@@ -23,7 +24,6 @@
 #include <unistd.h>
 
 #include "NetRemoteDiscoveryServiceLinuxDnssd.hxx"
-#include "NetworkOperationsLinux.hxx"
 
 using namespace Microsoft::Net;
 using namespace Microsoft::Net::Remote;

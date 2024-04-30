@@ -17,7 +17,7 @@ namespace Microsoft::Net::Remote
 {
 struct NetRemoteDiscoveryService
 {
-    NetRemoteDiscoveryService(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpInformation> ipAddresses);
+    NetRemoteDiscoveryService(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses);
 
     virtual ~NetRemoteDiscoveryService() = default;
 
@@ -44,13 +44,13 @@ protected:
     uint32_t
     GetPort() const noexcept;
 
-    const std::unordered_map<std::string, Microsoft::Net::IpInformation>&
+    const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>&
     GetIpAddresses() const noexcept;
 
 private:
     std::string m_hostname;
     uint32_t m_port;
-    std::unordered_map<std::string, Microsoft::Net::IpInformation> m_ipAddresses;
+    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> m_ipAddresses;
 };
 
 struct INetRemoteDiscoveryServiceFactory
@@ -58,7 +58,7 @@ struct INetRemoteDiscoveryServiceFactory
     virtual ~INetRemoteDiscoveryServiceFactory() = default;
 
     virtual std::shared_ptr<NetRemoteDiscoveryService>
-    Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpInformation> ipAddresses) = 0;
+    Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses) = 0;
 };
 
 /**
@@ -123,7 +123,7 @@ private:
     std::unique_ptr<Microsoft::Net::INetworkOperations> m_networkOperations;
     std::string m_hostname;
     uint32_t m_port{ Protocol::NetRemoteProtocol::PortDefault };
-    std::unordered_map<std::string, Microsoft::Net::IpInformation> m_ipAddresses{};
+    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> m_ipAddresses{};
 };
 } // namespace Microsoft::Net::Remote
 
