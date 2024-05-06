@@ -2,18 +2,28 @@
 #ifndef IP_ADDRESS_INFORMATION_HXX
 #define IP_ADDRESS_INFORMATION_HXX
 
+#include <regex>
+#include <string>
 #include <string_view>
 
 namespace Microsoft::Net
 {
-constexpr auto Ipv4AnyAddress{ "0.0.0.0" };
-constexpr auto Ipv6AnyAddress{ "::" };
-
-constexpr bool
-IsAnyAddress(std::string_view ipAddress) noexcept
+/**
+ * @brief Determine if a string contains an IPv4 or IPv6 "any" address. The port is option for both forms, and square
+ * brackets are optional for the IPv6 form.
+ * 
+ * @param ipAddressView The view of ther string to check.
+ * @return true If the string contains an IPv4 or IPv6 "any" address.
+ * @return false If the string does not contain an IPv4 or IPv6 "any" address.
+ */
+inline bool
+IsAnyAddress(std::string_view ipAddressView) noexcept
 {
-    // TODO: validate this logic.
-    return ipAddress.contains(Ipv4AnyAddress) || ipAddress.starts_with(Ipv6AnyAddress);
+    const std::regex RegexIpv4AnyAddressWithPort{ "^0.0.0.0(:\\d+)?$" };
+    const std::regex RegexIpv6AnyAddressWithPort{ "^\\[?::\\]?(:\\d+)?$" };
+    const std::string ipAddress(ipAddressView);
+
+    return std::regex_match(ipAddress, RegexIpv4AnyAddressWithPort) || std::regex_match(ipAddress, RegexIpv6AnyAddressWithPort);
 }
 
 /**
