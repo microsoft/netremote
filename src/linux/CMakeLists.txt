@@ -1,5 +1,5 @@
 
-find_package(sdbus-c++ REQUIRED)
+find_package(sdbus-c++ CONFIG REQUIRED)
 
 add_subdirectory(external)
 add_subdirectory(libnl-helpers)
