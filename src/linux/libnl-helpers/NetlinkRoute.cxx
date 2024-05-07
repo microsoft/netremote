@@ -1,10 +1,13 @@
 
+#include <array>
+#include <cstdint>
 #include <cstring>
 #include <format>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -16,7 +19,6 @@
 #include <netinet/in.h>
 #include <netlink/addr.h>
 #include <netlink/cache.h>
-#include <netlink/errno.h>
 #include <netlink/netlink.h>
 #include <netlink/object.h>
 #include <netlink/route/addr.h>
@@ -33,8 +35,14 @@ namespace detail
 constexpr auto Ipv4AddressAsciiLengthMax{ INET_ADDRSTRLEN + 3 };
 constexpr auto Ipv6AddressAsciiLengthMax{ INET6_ADDRSTRLEN + 5 };
 
+/**
+ * @brief Get the (maximum) length of an address in ascii format.
+ *
+ * @param addressFamily The address family to get the length for. This must be either AF_INET or AF_INET6.
+ * @return std::size_t The maximum length of an address string corresponding to the specified IP family.
+ */
 std::size_t
-GetAddressLength(int addressFamily) noexcept
+GetAddressAsciiLength(int addressFamily) noexcept
 {
     switch (addressFamily) {
     case AF_INET:
@@ -46,6 +54,13 @@ GetAddressLength(int addressFamily) noexcept
     }
 }
 
+/**
+ * @brief Get a string representation of the specified IP address family.
+ *
+ * @param addressFamily The address family to get the name for. This must be either AF_INET or AF_INET6.
+ * @return constexpr std::string_view The name of the address family or "Unknown" if the address family is not
+ * recognized.
+ */
 constexpr std::string_view
 GetAddressFamilyName(int addressFamily) noexcept
 {
@@ -59,6 +74,13 @@ GetAddressFamilyName(int addressFamily) noexcept
     }
 }
 
+/**
+ * @brief Helper function to use with nl_cache_foreach when processing an rtnl link cache. This will parse the netlink
+ * object and if it represents a valid netlink link, add an entry to the map specified by the context.
+ *
+ * @param nlObjectLink The netlink object representing a potential netlink link.
+ * @param context The context to populate with the result. This must be of type std::unordered_set<NetlinkLink>.
+ */
 void
 OnLink(struct nl_object *nlObjectLink, void *context)
 {
@@ -66,10 +88,17 @@ OnLink(struct nl_object *nlObjectLink, void *context)
     auto netlinkLink = NetlinkLink::FromRtnlLink(rtnlLink);
 
     // Populate output variable (context) with result.
-    auto& netlinkLinks = *static_cast<std::unordered_set<NetlinkLink> *>(context);
+    auto &netlinkLinks = *static_cast<std::unordered_set<NetlinkLink> *>(context);
     netlinkLinks.emplace(std::move(netlinkLink));
 }
 
+/**
+ * @brief Helper function to use with nl_cache_foreach when processing an rtnl address cache. This parses the specified
+ * netlink object and if it represents a valid netlink address, add an entry to the map specified by the context.
+ *
+ * @param nlObjectAddress The netlink object representing a potential netlink address.
+ * @param context The context to populate with the result. This must be of type std::unordered_set<NetlinkIpAddress>.
+ */
 void
 OnAddress(struct nl_object *nlObjectAddress, void *context)
 {
@@ -77,7 +106,7 @@ OnAddress(struct nl_object *nlObjectAddress, void *context)
     auto netlinkAddress = NetlinkIpAddress::FromRtnlAddr(rtnlAddress);
 
     // Populate output variable (context) with result.
-    auto& netlinkAddresses = *static_cast<std::unordered_set<NetlinkIpAddress> *>(context);
+    auto &netlinkAddresses = *static_cast<std::unordered_set<NetlinkIpAddress> *>(context);
     netlinkAddresses.emplace(std::move(netlinkAddress));
 }
 } // namespace detail
@@ -106,7 +135,7 @@ NetlinkEnumerateLinks()
     auto nlRouteSocket{ CreateNlRouteSocket() };
 
     struct nl_cache *linkCache{ nullptr };
-    int ret = rtnl_link_alloc_cache(nlRouteSocket, AF_UNSPEC, &linkCache);
+    const int ret = rtnl_link_alloc_cache(nlRouteSocket, AF_UNSPEC, &linkCache);
     if (ret != 0) {
         const auto errorCode = MakeNetlinkErrorCode(-ret);
         const auto message = std::format("Failed to allocate link cache with error {}", errorCode.value());
@@ -130,7 +159,7 @@ NetlinkEnumerateIpAddresses()
     auto nlRouteSocket{ CreateNlRouteSocket() };
 
     struct nl_cache *ipAddressCache{ nullptr };
-    int ret = rtnl_addr_alloc_cache(nlRouteSocket, &ipAddressCache);
+    const int ret = rtnl_addr_alloc_cache(nlRouteSocket, &ipAddressCache);
     if (ret != 0) {
         const auto errorCode = MakeNetlinkErrorCode(-ret);
         const auto message = std::format("Failed to allocate address cache with error {}", errorCode.value());
@@ -158,7 +187,7 @@ NetlinkIpAddress::FromRtnlAddr(struct rtnl_addr *rtnlAddress)
     const auto *local = rtnl_addr_get_local(rtnlAddress);
 
     // Convert the address to a string then resize to actual null-terminated length.
-    std::string addressLocalAscii(detail::GetAddressLength(family), '\0');
+    std::string addressLocalAscii(detail::GetAddressAsciiLength(family), '\0');
     nl_addr2str(local, std::data(addressLocalAscii), std::size(addressLocalAscii));
     addressLocalAscii.resize(std::strlen(std::data(addressLocalAscii)));
 
@@ -191,16 +220,16 @@ NetlinkLink::FromRtnlLink(struct rtnl_link *rtnlLink)
 std::optional<NetlinkLink>
 NetlinkLink::FromInterfaceIndex(int interfaceIndex)
 {
-    // Obtain interface/linlk name from interface index.
-    char interfaceName[IF_NAMESIZE]{ '\0' };
-    if_indextoname(static_cast<uint32_t>(interfaceIndex), interfaceName);
+    // Obtain interface/link name from interface index.
+    std::array<char, IF_NAMESIZE> interfaceName{ '\0' };
+    if_indextoname(static_cast<uint32_t>(interfaceIndex), std::data(interfaceName));
 
     // Allocate a netlink socket to make the kernel request with.
     auto nlRouteSocket{ CreateNlRouteSocket() };
 
     // Send a kernel request to get the link information.
     struct rtnl_link *rtnlLink{ nullptr };
-    int ret = rtnl_link_get_kernel(nlRouteSocket, interfaceIndex, interfaceName, &rtnlLink);
+    const int ret = rtnl_link_get_kernel(nlRouteSocket, interfaceIndex, std::data(interfaceName), &rtnlLink);
     if (ret < 0) {
         const auto errorCode = MakeNetlinkErrorCode(-ret);
         const auto message = std::format("Failed to get link with error {}", errorCode.value());

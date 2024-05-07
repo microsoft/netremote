@@ -15,8 +15,20 @@
 
 namespace Microsoft::Net::Remote
 {
+/**
+ * @brief Network service enabling clients to discover netremote servers on the network.
+ */
 struct NetRemoteDiscoveryService
 {
+    /**
+     * @brief Construct a new NetRemoteDiscoveryService object with the specified hostname, port, and IP addresses.
+     *
+     * @param hostname The hostname of the service.
+     * @param port The IP port the service listens on.
+     * @param ipAddresses The IP addresses the service listens on. The map key specifies the IP address, and the value
+     * specifies information about the IP address needed by discovery clients, such as the IP family and type of
+     * interface.
+     */
     NetRemoteDiscoveryService(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses);
 
     virtual ~NetRemoteDiscoveryService() = default;
@@ -31,19 +43,41 @@ struct NetRemoteDiscoveryService
     NetRemoteDiscoveryService&
     operator=(NetRemoteDiscoveryService&&) = delete;
 
+    /**
+     * @brief Start the discovery service. This will begin advertising the service on the network.
+     */
     virtual void
     Start() = 0;
 
+    /**
+     * @brief Stop the discovery service. This will stop advertising the service on the network, preventing it from
+     * being discoverable by clients.
+     */
     virtual void
     Stop() = 0;
 
 protected:
+    /**
+     * @brief Get the host name of the service.
+     *
+     * @return std::string_view
+     */
     std::string_view
     GetHostname() const noexcept;
 
+    /**
+     * @brief Get the port of the service.
+     *
+     * @return uint32_t
+     */
     uint32_t
     GetPort() const noexcept;
 
+    /**
+     * @brief Get the IP addresses the service listens on.
+     *
+     * @return const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>&
+     */
     const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>&
     GetIpAddresses() const noexcept;
 
@@ -53,24 +87,40 @@ private:
     std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> m_ipAddresses;
 };
 
+/**
+ * @brief Factory to create a NetRemoteDiscoveryService.
+ *
+ * This facilitates multiple implementations of the service, including across operating systems and mock implementations
+ * for testing.
+ */
 struct INetRemoteDiscoveryServiceFactory
 {
     virtual ~INetRemoteDiscoveryServiceFactory() = default;
 
+    /**
+     * @brief Create a new NetRemoteDiscoveryService object.
+     *
+     * @param hostname The hostname of the service.
+     * @param port The IP port the service listens on.
+     * @param ipAddresses The IP addresses the service listens on. The map key specifies the IP address, and the value
+     * specifies information about the IP address needed by discovery clients, such as the IP family and type of
+     * interface.
+     * @return std::shared_ptr<NetRemoteDiscoveryService>
+     */
     virtual std::shared_ptr<NetRemoteDiscoveryService>
     Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses) = 0;
 };
 
 /**
  * @brief Helper to build a NetRemoteDiscoveryService.
- * 
+ *
  * Note that this is not thread-safe.
  */
 struct NetRemoteDiscoveryServiceBuilder
 {
     /**
      * @brief Construct a new NetRemoteDiscoveryServiceBuilder object.
-     * 
+     *
      * @param discoveryServiceFactory The factory to use to create the service instance.
      * @param networkOperations The object to use when performing network operations.
      */
@@ -112,8 +162,8 @@ struct NetRemoteDiscoveryServiceBuilder
 
     /**
      * @brief Create a NetRemoteDiscoveryService object with the stored configuration.
-     * 
-     * @return std::shared_ptr<NetRemoteDiscoveryService> 
+     *
+     * @return std::shared_ptr<NetRemoteDiscoveryService>
      */
     std::shared_ptr<NetRemoteDiscoveryService>
     Build();

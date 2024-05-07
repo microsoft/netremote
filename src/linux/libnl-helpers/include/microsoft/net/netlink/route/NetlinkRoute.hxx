@@ -14,6 +14,9 @@
 
 namespace Microsoft::Net::Netlink
 {
+/**
+ * @brief Represents IP address information obtained from a netlink address (struct rtnl_addr) object.
+ */
 struct NetlinkIpAddress
 {
     int InterfaceIndex;
@@ -21,19 +24,32 @@ struct NetlinkIpAddress
     int PrefixLength;
     std::string Address;
 
-    static NetlinkIpAddress
-    FromRtnlAddr(struct rtnl_addr *addr);
-
-    // static std::optional<NetlinkIpAddress>
-    // FromAddress(std::string_view address, struct nl_cache *rtnlAddrCache = nullptr);
-
     auto
     operator<=>(const NetlinkIpAddress &) const = default;
 
+    /**
+     * @brief Parse a netlink address object and create a NetlinkIpAddress object from it.
+     *
+     * @param rtnlAddress The netlink address object to parse.
+     * @return NetlinkIpAddress
+     */
+    static NetlinkIpAddress
+    FromRtnlAddr(struct rtnl_addr *rtnlAddress);
+
+    /**
+     * @brief Get a string representation of the IP address.
+     *
+     * @param showInterfaceIndex Whether to include the interface index in the string representation.
+     * @return std::string
+     */
     std::string
     ToString(bool showInterfaceIndex = true) const;
 };
 
+/**
+ * @brief Represents link information obtained from a netlink link (struct rtnl_link) object. A link is mostly
+ * synonymous with a network interface.
+ */
 struct NetlinkLink
 {
     int InterfaceIndex;
@@ -44,12 +60,29 @@ struct NetlinkLink
     auto
     operator<=>(const NetlinkLink &) const = default;
 
+    /**
+     * @brief Parse a netlink link object and create a NetlinkLink object from it.
+     *
+     * @param link The netlink link object to parse.
+     * @return NetlinkLink
+     */
     static NetlinkLink
     FromRtnlLink(struct rtnl_link *link);
 
+    /**
+     * @brief Get a NetlinkLink object from an interface index.
+     *
+     * @param interfaceIndex
+     * @return std::optional<NetlinkLink>
+     */
     static std::optional<NetlinkLink>
     FromInterfaceIndex(int interfaceIndex);
 
+    /**
+     * @brief Get a string representation of the link.
+     *
+     * @return std::string
+     */
     std::string
     ToString() const;
 };
