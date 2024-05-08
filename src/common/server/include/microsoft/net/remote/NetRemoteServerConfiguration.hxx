@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+#include <microsoft/net/INetworkOperations.hxx>
+#include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
+
 namespace Microsoft::Net::Wifi
 {
 class AccessPointManager;
@@ -64,7 +67,7 @@ struct NetRemoteServerConfiguration
      * and a level of 3 or above will show all verbose messages.
      */
     uint32_t LogVerbosity{ 0 };
-   
+
     /**
      * @brief Whether to enable logging to file or not.
      */
@@ -74,6 +77,16 @@ struct NetRemoteServerConfiguration
      * @brief Access point manager instance.
      */
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> AccessPointManager;
+
+    /**
+     * @brief Object to use when performing network operations.
+     */
+    std::unique_ptr<Microsoft::Net::INetworkOperations> NetworkOperations;
+
+    /**
+     * @brief Factory to use to create the discovery service.
+     */
+    std::unique_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory;
 };
 
 } // namespace Microsoft::Net::Remote

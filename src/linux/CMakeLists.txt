@@ -1,8 +1,9 @@
 
-find_package(sdbus-c++ REQUIRED)
+find_package(sdbus-c++ CONFIG REQUIRED)
 
 add_subdirectory(external)
 add_subdirectory(libnl-helpers)
+add_subdirectory(net)
 add_subdirectory(wifi)
 add_subdirectory(wpa-controller)
 

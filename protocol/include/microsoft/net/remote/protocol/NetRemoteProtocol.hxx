@@ -19,10 +19,42 @@ struct NetRemoteProtocol
 #define xstr(s)        str(s)
 #define str(s)         #s
 
+    /**
+     * @brief Primary service related definitions.
+     */
+
+    /**
+     * @brief Default port if none specified.
+     */
     static constexpr uint32_t PortDefault{ PORT_DEFAULT };
+
+    /**
+     * @brief Port separator for address parsing.
+     */
     static constexpr std::string_view PortSeparator{ PORT_SEPARATOR };
+
+    /**
+     * @brief Default IP address if none specified.
+     */
     static constexpr std::string_view IpDefault{ IP_DEFAULT };
+
+    /**
+     * @brief Default address if none specified; includes default port.
+     */
     static constexpr std::string_view AddressDefault{ IP_DEFAULT PORT_SEPARATOR xstr(PORT_DEFAULT) };
+
+    /**
+     * @brief Discovery service related definitions.
+     */
+
+    static constexpr auto DnssdServiceName = "netremote";
+
+    /**
+     * @brief Note that all non-TCP protocols must use "udp" as the protocol value, even if the protocol is not "udp".
+     * See RFC 6763 "DNS-Based Service Discovery", section 4.1.2 "Service Names" and and section 7 "Service Names" for
+     * additional details and reasoning.
+     */
+    static constexpr auto DnssdServiceProtocol = "udp";
 
 #undef IP_DEFAULT
 #undef PORT_DEFAULT
