@@ -1,5 +1,11 @@
 
-find_package(sdbus-c++ CONFIG REQUIRED)
+find_package(sdbus-c++ REQUIRED)
+
+# The d-bus vcpkg port fails to export the libsystemd dependency properly via an imported target which causes the build
+# to fail. This is a workaround to fix that by finding the libsystemd dependency via pkg-config and defining a global
+# imported target.
+include(FindPkgConfig)
+pkg_check_modules(Systemd REQUIRED IMPORTED_TARGET GLOBAL libsystemd)
 
 add_subdirectory(external)
 add_subdirectory(libnl-helpers)
