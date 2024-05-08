@@ -7,6 +7,10 @@
       "name": "sdbus-cpp",
       "platform": "linux"
     },
+    {
+      "name": "libsystemd",
+      "platform": "linux"
+    },
     "grpc",
     "cli11",
     "protobuf",

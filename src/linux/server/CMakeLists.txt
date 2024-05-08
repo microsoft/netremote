@@ -15,6 +15,7 @@ target_link_libraries(${PROJECT_NAME}-server-linux
         logging-utils
         notstd
         plog::plog
+        SDBusCpp::sdbus-c++
         wifi-apmanager-linux
         wifi-core-linux
 )
