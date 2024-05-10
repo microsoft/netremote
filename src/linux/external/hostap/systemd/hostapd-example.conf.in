@@ -9,4 +9,5 @@ wpa=2
 wpa_passphrase=password
 wpa_key_mgmt=SAE
 rsn_pairwise=CCMP
+ieee80211w=2
 bridge=brgateway0
