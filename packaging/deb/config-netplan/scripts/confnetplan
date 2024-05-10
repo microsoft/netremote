@@ -9,8 +9,8 @@ readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
 readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
 readonly NETPLAN_BRIDGE_INTERFACE_PREFIX=brgateway
-readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS=5
-readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG=1
+readonly NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS=5
+readonly NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG=1
 
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
@@ -505,8 +505,8 @@ function debconf_prompt_netplan_configuration() {
 
     # shellcheck disable=SC2015
     [[ -z "${DEBCONF_DEBUG-}" ]] \
-        && readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS}" \
-        || readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
+        && readonly configuration_file_review_seconds="${NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS}" \
+        || readonly configuration_file_review_seconds="${NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
 
     # Show the user the generated netplan configuration.
     db_subst "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
