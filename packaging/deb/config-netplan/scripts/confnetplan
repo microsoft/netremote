@@ -3,14 +3,21 @@
 # Include debconf shell utility library
 . /usr/share/debconf/confmodule
 
+# Get timestamp including current date and time.
+NOW=
+NOW=$(date +"%Y%m%d-%H%M%S")
+readonly NOW
+
 # Define and initialize constants.
 readonly NETPLAN_ORIGIN_FILE_NAME=10-network-netremote-all
 readonly NETPLAN_ORIGIN_FILE_PATH=/etc/netplan/${NETPLAN_ORIGIN_FILE_NAME}.yaml
 readonly NETPLAN_ORIGIN_FILE_PERMS=0600
 readonly NETPLAN_TRY_TIMEOUT_SECONDS_DEFAULT=10
 readonly NETPLAN_BRIDGE_INTERFACE_PREFIX=brgateway
-readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS=5
-readonly NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG=1
+readonly NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS=5
+readonly NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG=1
+readonly NETPLAN_CONFIGURATION_FILE_BACKUP_SUFFIX="${NOW}.bak"
+readonly NETPLAN_CONFIGURATION_FILE_DIRECTORIES=(/{etc,lib,run}/netplan)
 
 # Netplan key-value constants.
 readonly NETPLAN_KEY_NETWORK=network
@@ -426,14 +433,26 @@ function netplan_file_set_toplevel_fields() {
     netplan_configuration_set_key_value "${key}" "${value}"
 }
 
-# Create the netplan configuration file if it does not exist, and set top-level fields.
-#
+# Create the netplan configuration file if it does not exist, set top-level fields, and create backups of any
+# pre-existing netplan configuration files.
+# 
 # The netplan configuration file referred to by NETPLAN_ORIGIN_FILE_NAME is used.
 #
 # Arguments:
 #   None
 # 
 function netplan_configuration_create() {
+    # Rename any existing netplan configuration files as they will conflict with the generated configuration.
+    for netplan_configuration_directory in "${NETPLAN_CONFIGURATION_FILE_DIRECTORIES[@]}"; do
+        # If the directory does not exist, skip it as find will return an error if passed a non-existent directory.
+        if [[ ! -d ${netplan_configuration_directory} ]]; then
+            continue
+        fi
+
+        # Rename the .yaml and .yml files in this directory, appending a suffix with the current time and .bak extension.
+        find "${netplan_configuration_directory}" -type f -regex ".*\.\(y[a]*ml\)" -print0 2> /dev/null | xargs -0 -I {} mv {} "{}.${NETPLAN_CONFIGURATION_FILE_BACKUP_SUFFIX}"
+    done
+
     if [[ ! -f ${NETPLAN_ORIGIN_FILE_PATH} ]]; then
         install -m ${NETPLAN_ORIGIN_FILE_PERMS} /dev/null ${NETPLAN_ORIGIN_FILE_PATH}
         netplan_file_set_toplevel_fields
@@ -505,8 +524,8 @@ function debconf_prompt_netplan_configuration() {
 
     # shellcheck disable=SC2015
     [[ -z "${DEBCONF_DEBUG-}" ]] \
-        && readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS}" \
-        || readonly configuration_file_review_seconds="${NETPLAT_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
+        && readonly configuration_file_review_seconds="${NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS}" \
+        || readonly configuration_file_review_seconds="${NETPLAN_CONFIGURATION_FILE_REVIEW_SECONDS_DEBUG}"
 
     # Show the user the generated netplan configuration.
     db_subst "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION}" "${QUESTION_NETWORK_CONFIGURE_SHOW_GENERATED_CONFIGURATION_VAR}" "${NETPLAN_ORIGIN_FILE_PATH}"
