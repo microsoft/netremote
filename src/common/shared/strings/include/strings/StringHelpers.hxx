@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cctype>
 #include <concepts>
+#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -84,6 +85,15 @@ CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs)
 {
     return std::ranges::equal(lhs, rhs, CaseInsensitiveCharEquals);
 }
+
+/**
+ * @brief Generate a random string with ASCII characters of the specified length.
+ *
+ * @param length The desired length of the string.
+ * @return std::string
+ */
+std::string
+GenerateRandomAsciiString(std::size_t length);
 
 } // namespace Strings
 
