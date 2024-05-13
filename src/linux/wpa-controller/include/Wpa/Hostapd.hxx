@@ -175,14 +175,13 @@ struct Hostapd :
     void
     AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Defer) override;
 
-protected:
     /**
      * @brief Generates a new network access server identifier. If no length is specified, a default value will be used.
      * 
      * @param lengthRequested The requested length of the identifier. Valid values are in the range [1, 48].
      * @return std::string 
      */
-    std::string
+    static std::string
     GenerateNetworkAccessServerId(std::size_t lengthRequested = Microsoft::Net::Wifi::Ieee80211FtR0KeyHolderIdLengthOctetsMaximum);
 
     /**
@@ -191,7 +190,7 @@ protected:
      * @param networkAccessServiceId The network access server identifier to set.
      */
     void
-    SetNetworkAccessServerId(std::string_view networkAccessServiceId);
+    SetNetworkAccessServerId(std::string_view networkAccessServiceId = GenerateNetworkAccessServerId());
 
 private:
     const std::string m_interface;
