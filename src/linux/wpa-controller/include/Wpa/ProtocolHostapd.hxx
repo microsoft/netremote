@@ -300,15 +300,41 @@ inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
 };
 
 /**
- * @brief All valid WpaKeyManagement values supporting fast-transition (FT).
+ * @brief A bitmask cotaining all valid WpaKeyManagement values supporting fast-transition (FT).
  */
-static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementFt =
+static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementMaskFt =
     std::to_underlying(WpaKeyManagement::Ieee80211x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021xSha384) |
     std::to_underlying(WpaKeyManagement::FtSae) |
     std::to_underlying(WpaKeyManagement::FtFilsSha256) |
     std::to_underlying(WpaKeyManagement::FtFilsSha384);
+
+/**
+ * @brief All valid WpaKeyManagement values supporting fast-transition (FT).
+ */
+static constexpr std::initializer_list<WpaKeyManagement> WpaKeyManagementFt = {
+    WpaKeyManagement::Ieee80211x,
+    WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtIeee8021xSha384,
+    WpaKeyManagement::FtSae,
+    WpaKeyManagement::FtFilsSha256,
+    WpaKeyManagement::FtFilsSha384,
+};
+
+/**
+ * @brief Determines if the specified key management value is part of the fast-transition (FT) class of authentication
+ * and key management schemes.
+ *
+ * @param wpaKeyManagement The key management value to check
+ * @return true The specified key management value supports fast-transition (FT).
+ * @return false The specified key management value does not support fast-transition (FT).
+ */
+static constexpr bool
+IsKeyManagementFastTransition(WpaKeyManagement wpaKeyManagement)
+{
+    return std::ranges::contains(WpaKeyManagementFt, wpaKeyManagement);
+}
 
 /**
  * @brief Management frame protection levels.
