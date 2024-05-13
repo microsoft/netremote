@@ -45,7 +45,9 @@ target_link_libraries(wpa-controller
     PUBLIC
         libwpa-client
         notstd
+        wifi-core
     PRIVATE
         magic_enum::magic_enum
         plog::plog
+        strings
 )
