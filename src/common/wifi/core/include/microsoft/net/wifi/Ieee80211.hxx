@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <initializer_list>
 #include <optional>
@@ -442,6 +443,12 @@ struct Ieee80211Bss
     Ieee80211Bssid Bssid;
     std::string Ssid;
 };
+
+/**
+ * @brief See IEEE 802.11r-2008, page 102, 'dot11FTR0KeyHolderId'.
+ */
+static constexpr std::size_t Ieee80211FtR0KeyHolderIdLengthOctetsMinimum{ 1 };
+static constexpr std::size_t Ieee80211FtR0KeyHolderIdLengthOctetsMaximum{ 48 };
 
 } // namespace Microsoft::Net::Wifi
 

@@ -49,14 +49,7 @@ ToLower(CharT c)
  * @return std::string
  */
 std::string
-ToLower(std::string s)
-{
-    std::ranges::transform(s, std::begin(s), [](auto c) {
-        return ToLower(c);
-    });
-
-    return s;
-}
+ToLower(std::string s);
 
 /**
  * @brief Determines if the specified characters are equal, ignoring case.
@@ -67,10 +60,7 @@ ToLower(std::string s)
  * @return false
  */
 bool
-CaseInsensitiveCharEquals(char lhs, char rhs)
-{
-    return ToLower(lhs) == ToLower(rhs);
-}
+CaseInsensitiveCharEquals(char lhs, char rhs);
 
 /**
  * @brief Determines if the specified strings are equal, ignoring case.
@@ -81,10 +71,7 @@ CaseInsensitiveCharEquals(char lhs, char rhs)
  * @return false
  */
 bool
-CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs)
-{
-    return std::ranges::equal(lhs, rhs, CaseInsensitiveCharEquals);
-}
+CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs);
 
 /**
  * @brief Generate a random string with ASCII characters of the specified length.
