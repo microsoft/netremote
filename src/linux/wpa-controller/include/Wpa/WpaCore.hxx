@@ -11,7 +11,7 @@ namespace Wpa
  */
 enum class WpaType {
     Hostapd,
-    WpaSupplicant
+    WpaSupplicant,
 };
 
 /**
@@ -20,8 +20,18 @@ enum class WpaType {
  * @param type The WpaType to obtain the daemon binary name for.
  * @return std::string_view
  */
-std::string_view
-GetWpaTypeDaemonBinaryName(WpaType type) noexcept;
+static constexpr std::string_view
+GetWpaTypeDaemonBinaryName(WpaType type) noexcept
+{
+    switch (type) {
+    case WpaType::Hostapd:
+        return "hostapd";
+    case WpaType::WpaSupplicant:
+        return "wpa_supplicant";
+    default:
+        return "unknown";
+    }
+}
 
 } // namespace Wpa
 

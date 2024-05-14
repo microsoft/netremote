@@ -9,6 +9,7 @@
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Wpa
 {
@@ -173,6 +174,23 @@ struct Hostapd :
      */
     void
     AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Defer) override;
+
+    /**
+     * @brief Generates a new network access server identifier. If no length is specified, a default value will be used.
+     * 
+     * @param lengthRequested The requested length of the identifier. Valid values are in the range [1, 48].
+     * @return std::string 
+     */
+    static std::string
+    GenerateNetworkAccessServerId(std::size_t lengthRequested = Microsoft::Net::Wifi::Ieee80211FtR0KeyHolderIdLengthOctetsMaximum);
+
+    /**
+     * @brief Set the Network Access Server Id ("nas_identifier") for the access point.
+     *
+     * @param networkAccessServiceId The network access server identifier to set.
+     */
+    void
+    SetNetworkAccessServerId(std::string_view networkAccessServiceId = GenerateNetworkAccessServerId());
 
 private:
     const std::string m_interface;

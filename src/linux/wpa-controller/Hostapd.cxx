@@ -18,7 +18,9 @@
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 #include <magic_enum.hpp>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <plog/Log.h>
+#include <strings/StringHelpers.hxx>
 
 using namespace Wpa;
 
@@ -281,6 +283,16 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
         keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
     }
 
+    constexpr auto hasFtKeyManagement = [](const auto& keyManagement) {
+        return std::ranges::contains(WpaKeyManagementFt, keyManagement);
+    };
+
+    // If any key managements to set support fast-transition, set the network access server (NAS) identifier property to
+    // a default (random) value.
+    if (std::ranges::any_of(keyManagements, hasFtKeyManagement)) {
+        SetNetworkAccessServerId();
+    }
+
     try {
         SetProperty(ProtocolHostapd::PropertyNameWpaKeyManagement, keyManagementPropertyValue, enforceConfigurationChange);
     } catch (const HostapdException& e) {
@@ -395,5 +407,27 @@ Hostapd::AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enfo
         SetProperty(ProtocolHostapd::PropertyNameSaePassword, saePasswordValue, enforceConfigurationChange);
     } catch (const HostapdException& e) {
         throw HostapdException(std::format("Failed to add sae password ({})", e.what()));
+    }
+}
+
+/* static */
+std::string
+Hostapd::GenerateNetworkAccessServerId(std::size_t lengthRequested)
+{
+    return Strings::GenerateRandomAsciiString(lengthRequested);
+}
+
+/**
+ * @brief Set the Network Access Server Id ("nas_identifier") for the access point.
+ *
+ * @param networkAccessServiceId The network access server identifier to set.
+ */
+void
+Hostapd::SetNetworkAccessServerId(std::string_view networkAccessServiceId)
+{
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameNasIdentifier, networkAccessServiceId);
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set network access identifier ({})", e.what()));
     }
 }
