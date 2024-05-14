@@ -55,6 +55,8 @@ function systemd_create_network_mdns_dropin_file() {
         mkdir -p "${basedir}/${component_dir}"
     fi
 
+    echo -n "Creating systemd network drop-in file ${filepath} to enable mDNS on ${component_name}..."
+
 	# The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
 	# as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
 	# with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
@@ -63,6 +65,8 @@ function systemd_create_network_mdns_dropin_file() {
 	# Enable multicast DNS (mDNS) to allow discovery of netremote-server instances on the network.
 	MulticastDNS=yes
 	EOF
+
+    echo "done"
 }
 
 # Enable multicast DNS (mDNS) on the specified network interface.
@@ -82,7 +86,6 @@ function mdns_enable_on_interface() {
     readonly component_name="${interface}"
     readonly filename="${SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME}"
 
-    echo "Creating drop-in file to enable mDNS on interface ${interface}"
     systemd_create_network_mdns_dropin_file "${dropin_file_dir_base}" "${priority}" "${filename}" "${component_name}"
 }
 
