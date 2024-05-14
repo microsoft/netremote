@@ -16,7 +16,6 @@ target_sources(wpa-controller
         WpaCommandSet.cxx
         WpaCommandStatus.cxx
         WpaController.cxx
-        WpaCore.cxx
         WpaKeyValuePair.cxx
         WpaResponse.cxx
         WpaResponseParser.cxx
