@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 
+#include <Wpa/ProtocolWpaConfig.hxx>
 #include <Wpa/WpaCommand.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
@@ -124,9 +125,6 @@ struct WpaController
          */
         static constexpr auto MessageSizeMax = 4096;
 
-        static constexpr auto DefaultPathHostapd = "/usr/local/var/run/hostapd";
-        static constexpr auto DefaultPathWpaSupplicant = "/usr/local/var/run/wpa_supplicant";
-
         /**
          * @brief Get the default path for the control socket of the specified daemon.
          *
@@ -138,9 +136,9 @@ struct WpaController
         {
             switch (wpaType) {
             case WpaType::Hostapd:
-                return DefaultPathHostapd;
+                return ProtocolWpaConfig::ControlSocketPathHostapd;
             case WpaType::WpaSupplicant:
-                return DefaultPathWpaSupplicant;
+                return ProtocolWpaConfig::ControlSocketPathWpaSupplicant;
             default:
                 throw std::runtime_error("Unknown WpaType");
             }

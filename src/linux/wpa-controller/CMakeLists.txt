@@ -29,6 +29,7 @@ target_sources(wpa-controller
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/IHostapd.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolHostapd.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolWpa.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolWpaConfig.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommand.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandGet.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandSet.hxx
@@ -49,4 +50,10 @@ target_link_libraries(wpa-controller
         magic_enum::magic_enum
         plog::plog
         strings
+)
+
+# Add WPA control path path base for use in ProtocolWpaConfig.hxx.
+target_compile_definitions(wpa-controller
+    PUBLIC
+        CONFIG_WPA_CONTROL_SOCKET_PATH_BASE="${CMAKE_INSTALL_FULL_RUNSTATEDIR}"
 )
