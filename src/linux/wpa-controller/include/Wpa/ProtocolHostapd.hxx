@@ -300,11 +300,12 @@ inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
 };
 
 /**
- * @brief A bitmask cotaining all valid WpaKeyManagement values supporting fast-transition (FT).
+ * @brief A bitmask containing all valid WpaKeyManagement values supporting fast-transition (FT).
  */
 static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementMaskFt =
     std::to_underlying(WpaKeyManagement::Ieee80211x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021x) |
+    std::to_underlying(WpaKeyManagement::FtPsk) |
     std::to_underlying(WpaKeyManagement::FtIeee8021xSha384) |
     std::to_underlying(WpaKeyManagement::FtSae) |
     std::to_underlying(WpaKeyManagement::FtFilsSha256) |
@@ -316,6 +317,7 @@ static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementMaskFt
 static constexpr std::initializer_list<WpaKeyManagement> WpaKeyManagementFt = {
     WpaKeyManagement::Ieee80211x,
     WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtPsk,
     WpaKeyManagement::FtIeee8021xSha384,
     WpaKeyManagement::FtSae,
     WpaKeyManagement::FtFilsSha256,
