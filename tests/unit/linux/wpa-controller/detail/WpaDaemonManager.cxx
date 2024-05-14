@@ -73,14 +73,8 @@ WpaDaemonManager::CreateAndWriteDefaultConfigurationFile(Wpa::WpaType wpaType, s
     const auto daemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
     const auto daemonConfigurationFilePath = std::filesystem::temp_directory_path() / std::format("{}.conf", daemon);
 
-    // Create the configuration file.
-    const auto daemonConfigurationFileStatus = std::filesystem::status(daemonConfigurationFilePath);
-    if (std::filesystem::exists(daemonConfigurationFileStatus)) {
-        return daemonConfigurationFilePath;
-    }
-
-    // Write default configuration file contents.
-    std::ofstream daemonConfigurationFile{ daemonConfigurationFilePath };
+    // Create and write default configuration file contents.
+    std::ofstream daemonConfigurationFile{ daemonConfigurationFilePath, std::ios::out | std::ios::trunc };
     detail::WriteDefaultConfigurationFileContents(wpaType, interfaceName, daemonConfigurationFile);
     daemonConfigurationFile.flush();
     daemonConfigurationFile.close();
