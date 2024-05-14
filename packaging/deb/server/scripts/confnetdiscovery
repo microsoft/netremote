@@ -100,6 +100,8 @@ function mdns_configure() {
     for interface in ${interfaces}; do
         mdns_enable_on_interface "${interface}"
     done
+
+    systemctl restart systemd-resolved.service
 }
 
 # Prompt the user to select the network interfaces to configure multicast DNS (mDNS) on. This stores the user's choice
