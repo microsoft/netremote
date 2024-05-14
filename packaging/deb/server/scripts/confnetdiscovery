@@ -1,0 +1,149 @@
+# shellcheck shell=bash
+
+# Include debconf shell utility library
+. /usr/share/debconf/confmodule
+
+# Define and initialize constants.
+readonly SYSTEMD_NETWORK_DROPIN_DIR_BASE_DEFAULT=/etc/systemd/network
+readonly SYSTEMD_NETOWRK_DROPIN_DIR_INSTANCE_SUFFIX=.network.d
+
+readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME=enable-mdns
+readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_PRIORITY_DEFAULT=10
+
+readonly QUESTION_NETWORK_CONFIGURE_MDNS_METHOD=netremote/network/mdns-configure-interfaces-method
+readonly QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY=netremote/network/mdns-configure-interfaces-manually
+readonly QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_INTERFACES_VAR=network-mdns-interfaces-choices
+
+# Enumerate all network interfaces on the system, excluding the loopback interface.
+NETWORK_INTERFACES=
+NETWORK_INTERFACES=$(find -L /sys/class/net -mindepth 1 -maxdepth 1 -type d -not -name "lo*" -printf "%f " | xargs -n1 | sort | xargs)
+readonly NETWORK_INTERFACES
+
+QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_CHOICES=
+QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_CHOICES=$(echo "${NETWORK_INTERFACES// /, }" | head -c-1)
+readonly QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_CHOICES
+
+# Globals to be defined later.
+NETWORK_CONFIGURE_MDNS_METHOD=
+NETWORK_INTERFACES_SELECTED_FOR_MDNS=
+
+# Create a systemd network drop-in file
+function systemd_create_network_mdns_dropin_file() {
+    local basedir
+    local priority
+    local component_name
+    local component_dir
+    local filename
+    local filepath
+
+    readonly basedir="$1"
+    readonly priority="$2"
+    readonly filename="$3"
+    readonly component_name="$4"
+    readonly component_dir="${priority}-${component_name}${SYSTEMD_NETOWRK_DROPIN_DIR_INSTANCE_SUFFIX}"
+    readonly filepath="${basedir}/${component_dir}/${filename}.conf"
+
+    # Create the destination directory if it does not exist.
+    if [[ ! -d "${basedir}/${component_dir}" ]]; then
+        mkdir -p "${basedir}/${component_dir}"
+    fi
+
+	# The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
+	# as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
+	# with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
+	cat <<- EOF > "${filepath}"
+	[Network]
+	# Enable multicast DNS (mDNS) to allow discovery of netremote-server instances on the network.
+	MulticastDNS=yes
+	EOF
+}
+
+function mdns_enable_on_interface() {
+    local interface=$1
+    local dropin_file_dir_base
+    local priority
+    local component_name
+    local filename
+
+    readonly dropin_file_dir_base="${SYSTEMD_NETWORK_DROPIN_DIR_BASE_DEFAULT}"
+    readonly priority="${SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_PRIORITY_DEFAULT}"
+    readonly component_name="${interface}"
+    readonly filename="${SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME}"
+
+    echo "Creating drop-in file to enable mDNS on interface ${interface}"
+    systemd_create_network_mdns_dropin_file "${dropin_file_dir_base}" "${priority}" "${filename}" "${component_name}"
+}
+
+function mdns_configure() {
+    local interfaces="$1"
+
+    for interface in ${interfaces}; do
+        mdns_enable_on_interface "${interface}"
+    done
+}
+
+function debconf_prompt_network_configure_mdns_interfaces_manually() {
+    # Clear the question from the debconf database to force the prompt.
+    db_clear
+    db_fset "${QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY}" seen false
+
+    # Prompt to select interfaces to create network bridges for.
+    db_subst "${QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY}" "${QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_INTERFACES_VAR}" "${QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_CHOICES}"
+    db_input high "${QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY}" || true
+    db_go || true
+
+    db_get "${QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY}" || true
+    readonly network_interfaces_selected_for_mdns=${RET//\, / }
+    readonly NETWORK_INTERFACES_SELECTED_FOR_MDNS="${network_interfaces_selected_for_mdns}"
+}
+
+function mdns_configure_interfaces_select_manually() {
+    echo "Configuring mDNS for manually specified interfaces"
+    debconf_prompt_network_configure_mdns_interfaces_manually
+}
+
+function mdns_configure_interfaces_select_automatically() {
+    echo "Configuring mDNS for all interfaces"
+    readonly NETWORK_INTERFACES_SELECTED_FOR_MDNS="${NETWORK_INTERFACES}"
+}
+
+# Prompt the user to select the multicast DNS configuration option. This stores the user's choice, either "auto",
+# "manual", or "none", in the NETWORK_CONFIGURE_MDNS_METHOD global variable.
+#
+# Arguments:
+#   None
+function debconf_prompt_network_configure_mdns_method() {
+    # Clear the question from the debconf database to force the prompt.
+    db_clear
+    db_fset "${QUESTION_NETWORK_CONFIGURE_MDNS_METHOD}" seen false
+
+    db_input high "${QUESTION_NETWORK_CONFIGURE_MDNS_METHOD}" || true
+    # shellcheck disable=SC2119
+    db_go || true
+    db_get "${QUESTION_NETWORK_CONFIGURE_MDNS_METHOD}" || true
+    NETWORK_CONFIGURE_MDNS_METHOD=${RET}
+
+    export NETWORK_CONFIGURE_MDNS_METHOD
+}
+
+function network_service_discovery_configure_interactive() {
+    debconf_prompt_network_configure_mdns_method
+
+    case "${NETWORK_CONFIGURE_MDNS_METHOD}" in
+        "Automatic")
+            mdns_configure_interfaces_select_automatically
+            mdns_configure "${NETWORK_INTERFACES_SELECTED_FOR_MDNS}"
+            ;;
+        "Manual")
+            mdns_configure_interfaces_select_manually
+            ;;
+        "Skip" | *)
+            NETWORK_INTERFACES_SELECTED_FOR_MDNS=
+            echo "Not configuring mDNS"
+            ;;
+    esac
+
+    if [[ -n "${NETWORK_INTERFACES_SELECTED_FOR_MDNS}" ]]; then
+        mdns_configure "${NETWORK_INTERFACES_SELECTED_FOR_MDNS}"
+    fi
+}

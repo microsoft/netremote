@@ -1,0 +1,19 @@
+
+Template: netremote/network/mdns-configure-interfaces-method
+Type: select
+Default: Automatic
+Choices: Automatic, Manual, Skip
+Description: How should multicast DNS (mDNS) be configured?
+ Multicast DNS (mDNS) is a protocol that allows devices on a local network to discover services running on other devices. mDNS is used by netremote to allow clients to discover netremote servers on the network. Which configuration mode should be used to configure multicast DNS (mDNS)? 
+ .
+  Automatic: Automatically enable mDNS on all valid interfaces.
+  Manual: Manually select the interfaces on which to enable mDNS.
+  Skip: Skip enabling mDNS on any interfaces.
+ If 'Skip' is selected, you must manually enable mDNS on at least one (1) interface for netremote service discovery to work.
+
+Template: netremote/network/mdns-configure-interfaces-manually
+Type: multiselect
+Default: ${network-mdns-interfaces-choices}
+Choices: ${network-mdns-interfaces-choices}
+Description: Select the network interfaces for which multicast DNS (mDNS) will be enabled:
+ For each network interface selected below, a systemd network drop-in file will be created under /usr/lib/system/network that enables multicast DNS (mDNS). At least one (1) network interface must have mDNS enabled to allow netremote servers to be discovered on the network.
