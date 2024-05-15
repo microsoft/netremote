@@ -16,11 +16,13 @@ target_sources(wpa-controller
         WpaCommandSet.cxx
         WpaCommandStatus.cxx
         WpaController.cxx
+        WpaControlSocket.cxx
+        WpaControlSocketConnection.cxx
         WpaKeyValuePair.cxx
+        WpaParsingUtilities.cxx
+        WpaParsingUtilities.hxx
         WpaResponse.cxx
         WpaResponseParser.cxx
-        WpaParsingUtilities.hxx
-        WpaParsingUtilities.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WPA_CONTROLLER_PUBLIC_INCLUDE}
@@ -35,6 +37,8 @@ target_sources(wpa-controller
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandSet.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandStatus.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaControlSocket.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaControlSocketConnection.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCore.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaKeyValuePair.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaResponse.hxx

@@ -12,6 +12,7 @@
 #include <wpa_ctrl.h>
 
 #include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaControlSocket.hxx>
 #include <Wpa/WpaController.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
