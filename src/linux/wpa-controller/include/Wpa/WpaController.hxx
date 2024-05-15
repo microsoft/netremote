@@ -11,6 +11,7 @@
 
 #include <Wpa/ProtocolWpaConfig.hxx>
 #include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaControlSocketConnection.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
 
@@ -64,7 +65,7 @@ struct WpaController
     /**
      * @brief Destroy the WpaController object.
      */
-    virtual ~WpaController();
+    virtual ~WpaController() = default;
 
     /**
      * @brief The type of daemon this object is controlling.
@@ -113,21 +114,20 @@ struct WpaController
 
 private:
     /**
-     * @brief Get the control socket object. If a socket connection does not
-     * exist, one will be established.
+     * @brief Get a control socket connection. If one does not exist, one will be established and cached for future use.
      *
-     * @return struct wpa_ctrl*
+     * @return WpaControlSocketConnection*
      */
-    struct wpa_ctrl*
-    GetCommandControlSocket();
+    WpaControlSocketConnection*
+    GetCommandControlSocketConnection();
 
 private:
     const WpaType m_type;
     const std::string m_interfaceName;
     std::filesystem::path m_controlSocketPath;
-    // Protects m_controlSocketCommand.
-    std::shared_mutex m_controlSocketCommandGate;
-    struct wpa_ctrl* m_controlSocketCommand{ nullptr };
+    // Protects m_controlSocketCommandConnection.
+    std::shared_mutex m_controlSocketCommandConnectionGate;
+    std::unique_ptr<WpaControlSocketConnection> m_controlSocketCommandConnection;
 };
 } // namespace Wpa
 
