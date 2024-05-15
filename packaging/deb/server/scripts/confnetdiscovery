@@ -99,6 +99,7 @@ function mdns_configure() {
 
     for interface in ${interfaces}; do
         mdns_enable_on_interface "${interface}"
+        resolvectl mdns "${interface}" yes
     done
 
     systemctl restart systemd-resolved.service
@@ -177,7 +178,6 @@ function network_service_discovery_configure_interactive() {
     case "${NETWORK_CONFIGURE_MDNS_METHOD}" in
         "Automatic")
             mdns_configure_interfaces_select_automatically
-            mdns_configure "${NETWORK_INTERFACES_SELECTED_FOR_MDNS}"
             ;;
         "Manual")
             mdns_configure_interfaces_select_manually

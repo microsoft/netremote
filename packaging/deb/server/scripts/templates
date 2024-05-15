@@ -9,6 +9,7 @@ Description: How should multicast DNS (mDNS) be configured?
   Automatic: Automatically enable mDNS on all valid interfaces.
   Manual: Manually select the interfaces on which to enable mDNS.
   Skip: Skip enabling mDNS on any interfaces.
+ .
  If 'Skip' is selected, you must manually enable mDNS on at least one (1) interface for netremote service discovery to work.
 
 Template: netremote/network/mdns-configure-interfaces-manually
