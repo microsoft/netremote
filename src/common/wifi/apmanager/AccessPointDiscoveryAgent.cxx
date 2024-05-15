@@ -91,5 +91,6 @@ AccessPointDiscoveryAgent::Stop()
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgent::ProbeAsync()
 {
+    LOGI << "Access point probe initiated";
     return m_operations->ProbeAsync();
 }

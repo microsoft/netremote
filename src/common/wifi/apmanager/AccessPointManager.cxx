@@ -38,14 +38,20 @@ AccessPointManager::GetInstance() noexcept
 void
 AccessPointManager::AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 {
+    const auto interfaceName{ accessPoint->GetInterfaceName() };
+    LOGI << std::format("Attempting to add access point {} to manager", interfaceName);
+
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPointExists = std::ranges::any_of(m_accessPoints, [&](const auto& accessPointExisting) {
-        return (accessPointExisting->GetInterfaceName() == accessPoint->GetInterfaceName());
+        return (accessPointExisting->GetInterfaceName() == interfaceName);
     });
 
     if (accessPointExists) {
+        LOGW << std::format("Access point {} not added (already exists)", interfaceName);
         return;
     }
+
+    LOGI << std::format("Adding access point {} to manager", interfaceName);
 
     m_accessPoints.push_back(std::move(accessPoint));
 }
@@ -53,14 +59,20 @@ AccessPointManager::AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 void
 AccessPointManager::RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 {
+    const auto interfaceName{ accessPoint->GetInterfaceName() };
+    LOGI << std::format("Attempting to remove access point {} from manager", interfaceName);
+
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPointToRemove = std::ranges::find_if(m_accessPoints, [&](const auto& accessPointExisting) {
-        return (accessPointExisting->GetInterfaceName() == accessPoint->GetInterfaceName());
+        return (accessPointExisting->GetInterfaceName() == interfaceName);
     });
 
     if (accessPointToRemove == std::cend(m_accessPoints)) {
+        LOGW << std::format("Access point {} not removed (not found in manager)", interfaceName);
         return;
     }
+
+    LOGI << std::format("Removing access point {} from manager", interfaceName);
 
     m_accessPoints.erase(accessPointToRemove);
 }
@@ -108,6 +120,8 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
     discoveryAgent->RegisterDiscoveryEventCallback([discoveryAgentPtr = discoveryAgent.get(), weakThis = std::weak_ptr<AccessPointManager>(GetInstance())](auto&& presence, auto&& accessPointChanged) {
         if (auto strongThis = weakThis.lock()) {
             strongThis->OnAccessPointPresenceChanged(discoveryAgentPtr, presence, std::move(accessPointChanged));
+        } else {
+            LOGW << std::format("Access point manager no longer valid (expired); ignoring presence change event {} for {}", magic_enum::enum_name(presence), accessPointChanged->GetInterfaceName());
         }
     });
 
@@ -146,6 +160,8 @@ AccessPointManager::AddDiscoveryAgent(std::shared_ptr<AccessPointDiscoveryAgent>
 void
 AccessPointManager::OnAccessPointPresenceChanged(AccessPointDiscoveryAgent* /* discoveryAgent */, AccessPointPresenceEvent presence, std::shared_ptr<IAccessPoint> accessPointChanged)
 {
+    LOGI << std::format("Access point presence changed: {} ({})", accessPointChanged->GetInterfaceName(), magic_enum::enum_name(presence));
+
     switch (presence) {
     case AccessPointPresenceEvent::Arrived:
         AddAccessPoint(std::move(accessPointChanged));
