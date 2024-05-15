@@ -20,5 +20,6 @@ set(CPACK_COMPONENTS_ALL
 )
 
 add_subdirectory(config-netplan)
+add_subdirectory(server)
 
 include(CPack)
