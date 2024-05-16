@@ -38,8 +38,8 @@ struct AccessPoint :
      *
      * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
      */
-    virtual std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
-    CreateController() override;
+    std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
+    CreateController() override final;
 
 private:
     const std::string m_interfaceName;

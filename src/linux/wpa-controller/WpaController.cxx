@@ -9,14 +9,14 @@
 #include <string_view>
 #include <utility>
 
-#include <wpa_ctrl.h>
-
 #include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaControlSocket.hxx>
 #include <Wpa/WpaController.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
 #include <magic_enum.hpp>
 #include <plog/Log.h>
+#include <wpa_ctrl.h>
 
 using namespace Wpa;
 
@@ -37,12 +37,10 @@ WpaController::WpaController(std::string_view interfaceName, WpaType type, std::
 {
 }
 
-WpaController::~WpaController()
+bool
+WpaController::IsValid() const noexcept
 {
-    if (m_controlSocketCommand != nullptr) {
-        wpa_ctrl_close(m_controlSocketCommand);
-        m_controlSocketCommand = nullptr;
-    }
+    return WpaControlSocket::Exists(m_interfaceName, m_controlSocketPath);
 }
 
 WpaType
@@ -57,45 +55,44 @@ WpaController::ControlSocketPath() const noexcept
     return m_controlSocketPath;
 }
 
-struct wpa_ctrl*
-WpaController::GetCommandControlSocket()
+WpaControlSocketConnection*
+WpaController::GetCommandControlSocketConnection()
 {
     // Check if a socket connection is already established.
     {
-        const std::shared_lock lockShared{ m_controlSocketCommandGate };
-        if (m_controlSocketCommand != nullptr) {
-            return m_controlSocketCommand;
+        const std::shared_lock lockShared{ m_controlSocketCommandConnectionGate };
+        if (m_controlSocketCommandConnection != nullptr) {
+            return m_controlSocketCommandConnection.get();
         }
     }
 
     // Check if socket was updated between releasing the shared lock and acquiring the exclusive lock.
-    const std::scoped_lock lockExclusive{ m_controlSocketCommandGate };
-    if (m_controlSocketCommand != nullptr) {
-        return m_controlSocketCommand;
+    const std::scoped_lock lockExclusive{ m_controlSocketCommandConnectionGate };
+    if (m_controlSocketCommandConnection != nullptr) {
+        return m_controlSocketCommandConnection.get();
     }
 
     // Establish a new socket connection. Continue holding the exclusive lock
     // until the connection is established to prevent multiple connections.
-    const auto controlSocketPath = m_controlSocketPath / m_interfaceName;
-    struct wpa_ctrl* controlSocket = wpa_ctrl_open(controlSocketPath.c_str());
-    if (controlSocket == nullptr) {
-        LOGE << std::format("Failed to open control socket for {} interface at {}.", m_interfaceName, controlSocketPath.c_str());
+    auto controlSocketCommandConnection = WpaControlSocketConnection::TryCreate(m_interfaceName, m_controlSocketPath);
+    if (controlSocketCommandConnection == nullptr) {
+        LOGE << std::format("Failed to establish {} control socket connection for {} interface at {}.", magic_enum::enum_name(m_type), m_interfaceName, m_controlSocketPath.c_str());
         return nullptr;
     }
 
-    LOGD << std::format("Opened {} control socket for {} interface at {}.", magic_enum::enum_name(m_type), m_interfaceName, controlSocketPath.c_str());
+    LOGD << std::format("Established {} control socket for {} interface at {}.", magic_enum::enum_name(m_type), m_interfaceName, m_controlSocketPath.c_str());
 
     // Update the member and return it.
-    m_controlSocketCommand = controlSocket;
-    return controlSocket;
+    m_controlSocketCommandConnection = std::move(controlSocketCommandConnection);
+    return m_controlSocketCommandConnection.get();
 }
 
 std::shared_ptr<WpaResponse>
 WpaController::SendCommand(const WpaCommand& command)
 {
     // Obtain a control socket connection to send the command over.
-    struct wpa_ctrl* controlSocket = GetCommandControlSocket();
-    if (controlSocket == nullptr) {
+    auto controlSocketCommandConnection = GetCommandControlSocketConnection();
+    if (controlSocketCommandConnection == nullptr) {
         LOGE << std::format("Failed to get control socket for {}.", m_interfaceName);
         return nullptr;
     }
@@ -106,7 +103,7 @@ WpaController::SendCommand(const WpaCommand& command)
 
     auto commandPayload = command.GetPayload();
     LOGD << std::format("Sending wpa command to {} interface: '{}'", m_interfaceName, commandPayload);
-    int ret = wpa_ctrl_request(controlSocket, std::data(commandPayload), std::size(commandPayload), std::data(responseBuffer), &responseSize, nullptr);
+    int ret = wpa_ctrl_request(*controlSocketCommandConnection, std::data(commandPayload), std::size(commandPayload), std::data(responseBuffer), &responseSize, nullptr);
     switch (ret) {
     case 0: {
         const std::string_view responsePayload{ std::data(responseBuffer), responseSize };

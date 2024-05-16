@@ -11,6 +11,7 @@
 
 #include <Wpa/ProtocolWpaConfig.hxx>
 #include <Wpa/WpaCommand.hxx>
+#include <Wpa/WpaControlSocketConnection.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponse.hxx>
 
@@ -64,7 +65,18 @@ struct WpaController
     /**
      * @brief Destroy the WpaController object.
      */
-    virtual ~WpaController();
+    virtual ~WpaController() = default;
+
+    /**
+     * @brief Determines if this controller is valid, meaning that it can be used to control the interface for which it
+     * was configured. TThe controller will be invalid if the control socket path is not valid, either because it is
+     * inacessible (bad permissions) or it does not exist (wpa_supplicant or hostapd is not controlling this interface).
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsValid() const noexcept;
 
     /**
      * @brief The type of daemon this object is controlling.
@@ -111,57 +123,22 @@ struct WpaController
         return std::dynamic_pointer_cast<ResponseT>(SendCommand(command));
     }
 
-    /**
-     * @brief Helper class for working with the wpa control socket.
-     */
-    struct WpaControlSocket
-    {
-        WpaControlSocket() = delete;
-
-        /**
-         * @brief Maximum WPA control interface message size, im bytes. The
-         * official wpa_cli tool uses this as an upper bound, so is used
-         * similarly here.
-         */
-        static constexpr auto MessageSizeMax = 4096;
-
-        /**
-         * @brief Get the default path for the control socket of the specified daemon.
-         *
-         * @param wpaType The wpa daemon type to get the default control socket for.
-         * @return constexpr auto A string containing the default control socket path.
-         */
-        static constexpr auto
-        DefaultPath(WpaType wpaType)
-        {
-            switch (wpaType) {
-            case WpaType::Hostapd:
-                return ProtocolWpaConfig::ControlSocketPathHostapd;
-            case WpaType::WpaSupplicant:
-                return ProtocolWpaConfig::ControlSocketPathWpaSupplicant;
-            default:
-                throw std::runtime_error("Unknown WpaType");
-            }
-        }
-    };
-
 private:
     /**
-     * @brief Get the control socket object. If a socket connection does not
-     * exist, one will be established.
+     * @brief Get a control socket connection. If one does not exist, one will be established and cached for future use.
      *
-     * @return struct wpa_ctrl*
+     * @return WpaControlSocketConnection*
      */
-    struct wpa_ctrl*
-    GetCommandControlSocket();
+    WpaControlSocketConnection*
+    GetCommandControlSocketConnection();
 
 private:
     const WpaType m_type;
     const std::string m_interfaceName;
     std::filesystem::path m_controlSocketPath;
-    // Protects m_controlSocketCommand.
-    std::shared_mutex m_controlSocketCommandGate;
-    struct wpa_ctrl* m_controlSocketCommand{ nullptr };
+    // Protects m_controlSocketCommandConnection.
+    std::shared_mutex m_controlSocketCommandConnectionGate;
+    std::unique_ptr<WpaControlSocketConnection> m_controlSocketCommandConnection;
 };
 } // namespace Wpa
 
