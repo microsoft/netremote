@@ -28,14 +28,6 @@ struct AccessPointLinux :
      */
     AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
 
-    /**
-     * @brief Create a IAccessPointController object of type AccessPointControllerLinux.
-     * 
-     * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController> 
-     */
-    std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
-    CreateController() override;
-
 private:
     Microsoft::Net::Netlink::Nl80211::Nl80211Interface m_nl80211Interface;
 };

@@ -22,12 +22,6 @@ AccessPointLinux::AccessPointLinux(std::string_view interfaceName, std::shared_p
 {
 }
 
-std::unique_ptr<IAccessPointController>
-AccessPointLinux::CreateController()
-{
-    return std::make_unique<AccessPointControllerLinux>(GetInterfaceName());
-}
-
 std::shared_ptr<IAccessPoint>
 AccessPointFactoryLinux::Create(std::string_view interfaceName)
 {
