@@ -68,6 +68,17 @@ struct WpaController
     virtual ~WpaController() = default;
 
     /**
+     * @brief Determines if this controller is valid, meaning that it can be used to control the interface for which it
+     * was configured. TThe controller will be invalid if the control socket path is not valid, either because it is
+     * inacessible (bad permissions) or it does not exist (wpa_supplicant or hostapd is not controlling this interface).
+     * 
+     * @return true 
+     * @return false 
+     */
+    bool
+    IsValid() const noexcept;
+
+    /**
      * @brief The type of daemon this object is controlling.
      *
      * @return WpaType

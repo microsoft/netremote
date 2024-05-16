@@ -37,6 +37,12 @@ WpaController::WpaController(std::string_view interfaceName, WpaType type, std::
 {
 }
 
+bool
+WpaController::IsValid() const noexcept
+{
+    return WpaControlSocket::IsPathValidForInterface(m_controlSocketPath, m_interfaceName);
+}
+
 WpaType
 WpaController::Type() const noexcept
 {

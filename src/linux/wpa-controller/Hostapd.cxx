@@ -129,6 +129,12 @@ Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyVal
     }
 }
 
+bool
+Hostapd::IsActive() const noexcept
+{
+    return m_controller.IsValid();
+}
+
 void
 Hostapd::Enable()
 {

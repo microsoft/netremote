@@ -27,6 +27,15 @@ struct Hostapd :
     explicit Hostapd(std::string_view interfaceName);
 
     /**
+     * @brief Determines if hostapd is active for thios interface.
+     * 
+     * @return true If a hostapd daemon is active for this interface.
+     * @return false If a hostapd daemon is not active for this interface.
+     */
+    bool
+    IsActive() const noexcept;
+
+    /**
      * @brief Enables the interface for use.
      */
     void
