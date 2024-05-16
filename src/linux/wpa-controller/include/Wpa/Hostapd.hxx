@@ -37,7 +37,7 @@ struct Hostapd :
     IsManagingInterface(std::string_view interfaceName);
 
     /**
-     * @brief Determines if hostapd is active for thios interface.
+     * @brief Determines if hostapd is active for this interface.
      *
      * @return true If a hostapd daemon is active for this interface.
      * @return false If a hostapd daemon is not active for this interface.
