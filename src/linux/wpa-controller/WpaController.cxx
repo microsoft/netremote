@@ -40,7 +40,7 @@ WpaController::WpaController(std::string_view interfaceName, WpaType type, std::
 bool
 WpaController::IsValid() const noexcept
 {
-    return WpaControlSocket::IsPathValidForInterface(m_controlSocketPath, m_interfaceName);
+    return WpaControlSocket::Exists(m_interfaceName, m_controlSocketPath);
 }
 
 WpaType
@@ -74,7 +74,7 @@ WpaController::GetCommandControlSocketConnection()
 
     // Establish a new socket connection. Continue holding the exclusive lock
     // until the connection is established to prevent multiple connections.
-    auto controlSocketCommandConnection = WpaControlSocketConnection::TryCreate(m_controlSocketPath, m_interfaceName);
+    auto controlSocketCommandConnection = WpaControlSocketConnection::TryCreate(m_interfaceName, m_controlSocketPath);
     if (controlSocketCommandConnection == nullptr) {
         LOGE << std::format("Failed to establish {} control socket connection for {} interface at {}.", magic_enum::enum_name(m_type), m_interfaceName, m_controlSocketPath.c_str());
         return nullptr;

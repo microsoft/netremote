@@ -15,6 +15,7 @@
 #include <Wpa/WpaCommandGet.hxx>
 #include <Wpa/WpaCommandSet.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
+#include <Wpa/WpaControlSocket.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 #include <magic_enum.hpp>
@@ -23,6 +24,13 @@
 #include <strings/StringHelpers.hxx>
 
 using namespace Wpa;
+
+/* static */
+bool
+Hostapd::IsManagingInterface(std::string_view interfaceName)
+{
+    return WpaControlSocket::Exists(interfaceName, WpaType::Hostapd);
+}
 
 Hostapd::Hostapd(std::string_view interfaceName) :
     m_interface(interfaceName),

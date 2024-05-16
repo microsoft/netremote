@@ -27,8 +27,18 @@ struct Hostapd :
     explicit Hostapd(std::string_view interfaceName);
 
     /**
+     * @brief Determines if the specified interface is being managed by hostapd.
+     *
+     * @param interfaceName The interface to check.
+     * @return true If hostapd is actively managing the interface.
+     * @return false If hostapd is not managing the interface.
+     */
+    static bool
+    IsManagingInterface(std::string_view interfaceName);
+
+    /**
      * @brief Determines if hostapd is active for thios interface.
-     * 
+     *
      * @return true If a hostapd daemon is active for this interface.
      * @return false If a hostapd daemon is not active for this interface.
      */
@@ -186,9 +196,9 @@ struct Hostapd :
 
     /**
      * @brief Generates a new network access server identifier. If no length is specified, a default value will be used.
-     * 
+     *
      * @param lengthRequested The requested length of the identifier. Valid values are in the range [1, 48].
-     * @return std::string 
+     * @return std::string
      */
     static std::string
     GenerateNetworkAccessServerId(std::size_t lengthRequested = Microsoft::Net::Wifi::Ieee80211FtR0KeyHolderIdLengthOctetsMaximum);

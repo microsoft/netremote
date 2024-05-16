@@ -5,6 +5,7 @@
 #include <notstd/Memory.hxx>
 #include <wpa_ctrl.h>
 
+#include <Wpa/WpaControlSocket.hxx>
 #include <Wpa/WpaControlSocketConnection.hxx>
 
 using namespace Wpa;
@@ -14,16 +15,15 @@ WpaControlSocketConnection::~WpaControlSocketConnection()
     Disconnect();
 }
 
-WpaControlSocketConnection::WpaControlSocketConnection(std::filesystem::path controlSocketPathDir, std::string_view interfaceName) :
+WpaControlSocketConnection::WpaControlSocketConnection(std::string_view interfaceName, std::filesystem::path controlSocketPathDir) :
     m_controlSocketPath(std::move(controlSocketPathDir) / interfaceName)
 {
 }
 
-/* static */
 std::unique_ptr<WpaControlSocketConnection>
-WpaControlSocketConnection::TryCreate(std::filesystem::path controlSocketPathDir, std::string_view interfaceName)
+WpaControlSocketConnection::TryCreate(std::string_view interfaceName, std::filesystem::path controlSocketPathDir)
 {
-    auto controlSocketConnection = std::make_unique<notstd::enable_make_protected<WpaControlSocketConnection>>(std::move(controlSocketPathDir), interfaceName);
+    auto controlSocketConnection = std::make_unique<notstd::enable_make_protected<WpaControlSocketConnection>>(interfaceName, std::move(controlSocketPathDir));
     if (!controlSocketConnection->Connect()) [[unlikely]] {
         return nullptr;
     }

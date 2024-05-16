@@ -45,15 +45,26 @@ struct WpaControlSocket
     }
 
     /**
-     * @brief Determine if the specified control socket path is valid for the specified interface.
-     * 
-     * @param controlSocketPath The control socket path to check.
-     * @param interfaceName The interface name for the control socket.
-     * @return true 
-     * @return false 
+     * @brief Determine if a control socket exists for the specified interface and control socket path.
+     *
+     * @param interfaceName The interface to check.
+     * @param wpaType The type of wpa daemon to check for.
+     * @return true If a control socket exists for the specified interface.
+     * @return false If a control socket does not exist for the specified interface.
      */
     static bool
-    IsPathValidForInterface(std::filesystem::path controlSocketPath, std::string_view interfaceName);
+    Exists(std::string_view interfaceName, WpaType wpaType);
+
+    /**
+     * @brief Determine if a control socket exists for the specified interface and control socket path.
+     *
+     * @param interfaceName The interface to check.
+     * @param controlSocketPathDir The directory containing the control socket.
+     * @return true If a control socket exists for the specified interface.
+     * @return false If a control socket does not exist for the specified interface.
+     */
+    static bool
+    Exists(std::string_view interfaceName, std::filesystem::path controlSocketPathDir);
 };
 } // namespace Wpa
 

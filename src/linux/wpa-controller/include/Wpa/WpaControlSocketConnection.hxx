@@ -25,12 +25,12 @@ public:
     /**
      * @brief Attempt to make a connection to a WPA control socket for the specicied interface.
      *
-     * @param controlSocketPathDir The directory containing the control socket.
      * @param interfaceName The name of the interface to connect to.
+     * @param controlSocketPathDir The directory containing the control socket.
      * @return std::unique_ptr<WpaControlSocketConnection>
      */
     static std::unique_ptr<WpaControlSocketConnection>
-    TryCreate(std::filesystem::path controlSocketPathDir, std::string_view interfaceName);
+    TryCreate(std::string_view interfaceName, std::filesystem::path controlSocketPathDir);
 
     /**
      * @brief Attempt to make a connection to a WPA control socket for the specicied interface.
@@ -52,10 +52,10 @@ protected:
     /**
      * @brief Construct a new WpaControlSocketConnection object.
      *
-     * @param controlSocketPathDir The directory containing the control socket.
      * @param interfaceName The name of the interface to connect to.
+     * @param controlSocketPathDir The directory containing the control socket.
      */
-    WpaControlSocketConnection(std::filesystem::path controlSocketPathDir, std::string_view interfaceName);
+    WpaControlSocketConnection(std::string_view interfaceName, std::filesystem::path controlSocketPathDir);
 
 private:
     std::filesystem::path m_controlSocketPath;
