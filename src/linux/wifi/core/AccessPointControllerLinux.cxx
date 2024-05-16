@@ -87,6 +87,13 @@ AccessPointControllerLinux::GetOperationalState(AccessPointOperationalState& ope
     AccessPointOperationStatus status{ GetInterfaceName() };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
+    // If there is no active hostapd daemon, the operational state is disabled, so status is not needed.
+    if (!m_hostapd.IsActive()) {
+        operationalState = AccessPointOperationalState::Disabled;
+        status.Code = AccessPointOperationStatusCode::Succeeded;
+        return status;
+    }
+
     try {
         auto hostapdStatus = m_hostapd.GetStatus();
         operationalState = (hostapdStatus.State == Wpa::HostapdInterfaceState::Enabled)
