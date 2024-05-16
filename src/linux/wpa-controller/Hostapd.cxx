@@ -27,7 +27,7 @@ using namespace Wpa;
 
 /* static */
 bool
-Hostapd::IsManagingInterface(std::string_view interfaceName)
+Hostapd::IsManagingInterface(std::string_view interfaceName) noexcept
 {
     return WpaControlSocket::Exists(interfaceName, WpaType::Hostapd);
 }

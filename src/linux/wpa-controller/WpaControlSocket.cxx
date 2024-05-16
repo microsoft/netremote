@@ -10,7 +10,7 @@ using namespace Wpa;
 
 /* static */
 bool
-WpaControlSocket::Exists(std::string_view interfaceName, std::filesystem::path controlSocketPath)
+WpaControlSocket::Exists(std::string_view interfaceName, std::filesystem::path controlSocketPath) noexcept
 {
     // Attempt to create a control socket connection to the specified path and interface. If it succeeds, the path is
     // valid. There's no real way around this without trying to connect to the control socket since calling open() on it
@@ -21,7 +21,7 @@ WpaControlSocket::Exists(std::string_view interfaceName, std::filesystem::path c
 
 /* static */
 bool
-WpaControlSocket::Exists(std::string_view interfaceName, WpaType wpaType)
+WpaControlSocket::Exists(std::string_view interfaceName, WpaType wpaType) noexcept
 {
     return Exists(interfaceName, DefaultPath(wpaType));
 }

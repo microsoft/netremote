@@ -3,7 +3,6 @@
 #define WPA_CONTROL_SOCKET_HXX
 
 #include <filesystem>
-#include <stdexcept>
 #include <string_view>
 
 #include <Wpa/ProtocolWpaConfig.hxx>
@@ -32,7 +31,7 @@ struct WpaControlSocket
      * @return constexpr auto A string containing the default control socket path.
      */
     static constexpr auto
-    DefaultPath(WpaType wpaType)
+    DefaultPath(WpaType wpaType) noexcept
     {
         switch (wpaType) {
         case WpaType::Hostapd:
@@ -40,7 +39,7 @@ struct WpaControlSocket
         case WpaType::WpaSupplicant:
             return ProtocolWpaConfig::ControlSocketPathWpaSupplicant;
         default:
-            throw std::runtime_error("Unknown WpaType");
+            return ProtocolWpaConfig::ControlSocketPathBase;
         }
     }
 
@@ -53,7 +52,7 @@ struct WpaControlSocket
      * @return false If a control socket does not exist for the specified interface.
      */
     static bool
-    Exists(std::string_view interfaceName, WpaType wpaType);
+    Exists(std::string_view interfaceName, WpaType wpaType) noexcept;
 
     /**
      * @brief Determine if a control socket exists for the specified interface and control socket path.
@@ -64,7 +63,7 @@ struct WpaControlSocket
      * @return false If a control socket does not exist for the specified interface.
      */
     static bool
-    Exists(std::string_view interfaceName, std::filesystem::path controlSocketPathDir);
+    Exists(std::string_view interfaceName, std::filesystem::path controlSocketPathDir) noexcept;
 };
 } // namespace Wpa
 

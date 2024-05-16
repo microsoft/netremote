@@ -34,7 +34,7 @@ struct Hostapd :
      * @return false If hostapd is not managing the interface.
      */
     static bool
-    IsManagingInterface(std::string_view interfaceName);
+    IsManagingInterface(std::string_view interfaceName) noexcept;
 
     /**
      * @brief Determines if hostapd is active for this interface.
