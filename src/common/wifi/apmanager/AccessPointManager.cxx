@@ -41,6 +41,14 @@ AccessPointManager::AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
     const auto interfaceName{ accessPoint->GetInterfaceName() };
     LOGI << std::format("Attempting to add access point {} to manager", interfaceName);
 
+    {
+        auto accessPointController = accessPoint->CreateController();
+        if (!accessPointController) {
+            LOGW << std::format("Access point {} not added (not controllable)", interfaceName);
+            return;
+        }
+    }
+
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPointExists = std::ranges::any_of(m_accessPoints, [&](const auto& accessPointExisting) {
         return (accessPointExisting->GetInterfaceName() == interfaceName);

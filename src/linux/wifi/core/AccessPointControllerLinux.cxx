@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include <Wpa/Hostapd.hxx>
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <magic_enum.hpp>
@@ -32,6 +33,7 @@ using namespace Microsoft::Net::Wifi;
 
 using Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy;
 using Wpa::EnforceConfigurationChange;
+using Wpa::Hostapd;
 using Wpa::HostapdException;
 
 AccessPointControllerLinux::AccessPointControllerLinux(std::string_view interfaceName) :
@@ -430,5 +432,9 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
 std::unique_ptr<IAccessPointController>
 AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {
+    if (!Hostapd::IsManagingInterface(interfaceName)) {
+        return nullptr;
+    }
+
     return std::make_unique<AccessPointControllerLinux>(interfaceName);
 }

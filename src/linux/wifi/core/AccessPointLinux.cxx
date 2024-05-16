@@ -16,7 +16,7 @@ using Microsoft::Net::Netlink::Nl80211::Nl80211Interface;
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointLinux::AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface) :
+AccessPointLinux::AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Nl80211Interface nl80211Interface) :
     AccessPoint(interfaceName, std::move(accessPointControllerFactory)),
     m_nl80211Interface{ std::move(nl80211Interface) }
 {
