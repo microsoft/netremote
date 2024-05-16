@@ -12,9 +12,10 @@ readonly SYSTEMD_RESOLVED_DROPIN_CONF_FILE_PRIORITY_DEFAULT=${SYSTEMD_DROPIN_CON
 readonly SYSTEMD_RESOLVED_DROPIN_CONF_FILE_NAME=${SYSTEMD_DROPIN_PREFIX_COMMON}-enable-mdns
 
 readonly SYSTEMD_NETWORK_DROPIN_DIR_BASE_DEFAULT=/etc/systemd/network
+readonly SYSTEMD_NETWORK_DROPIN_DIR_INSTANCE_PREFIX=netplan
 readonly SYSTEMD_NETWORK_DROPIN_DIR_INSTANCE_SUFFIX=.network.d
 
-readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME=${SYSTEMD_DROPIN_PREFIX_COMMON}-enable-mdns
+readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME=enable-mdns
 readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_PRIORITY_DEFAULT=${SYSTEMD_DROPIN_CONF_FILE_PRIORITY_DEFAULT}
 
 readonly QUESTION_NETWORK_CONFIGURE_MDNS_METHOD=netremote/network/mdns-configure-interfaces-method
@@ -42,27 +43,27 @@ NETWORK_INTERFACES_SELECTED_FOR_MDNS=
 #  3: The name of the drop-in file.
 #
 function systemd_create_resolved_mdns_dropin_file() {
-    local basedir
+    local dropin_basedir
     local priority
     local filename
     local filepath
 
-    readonly basedir="$1"
+    readonly dropin_basedir="$1"
     readonly priority="$2"
     readonly filename="$3"
-    readonly filepath="${basedir}/${priority}-${filename}.conf"
+    readonly filepath="${dropin_basedir}/${priority}-${filename}.conf"
 
     echo -n "Creating systemd resolved drop-in file ${filepath} to enable mDNS for system-wide peer-to-peer network resolution..."
 
     # Create the destination directory if it does not exist.
-    if [[ ! -d "${basedir}" ]]; then
-        mkdir -p "${basedir}"
+    if [[ ! -d "${dropin_basedir}" ]]; then
+        mkdir -p "${dropin_basedir}"
     fi
 
-	# The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
-	# as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
-	# with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
-	cat <<- EOF > "${filepath}"
+    # The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
+    # as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
+    # with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
+    cat <<- EOF > "${filepath}"
 
 	# See https://www.freedesktop.org/software/systemd/man/latest/resolved.conf.html#Description for more information.
 	[Resolve]
@@ -75,38 +76,52 @@ function systemd_create_resolved_mdns_dropin_file() {
 
 # Create a drop-in file for a systemd network configuration file to enable multicast DNS (mDNS) on the specified interface.
 #
+# Drop-ins for network interfaces are created in an instance directory whose name must correspond _exactly_ with that of
+# the .network file to which it should apply, and is formed using the following format:
+#
+#   <priority>-<instance dir prefix>-<interface>.network.d
+# 
+# The supplied arugments must be specified such that the instance directory name is formed correctly per this format.
+# For example, if there is a .network file /etc/systemd/network/10-netplan-eth0.network, the instance directory for the
+# drop-in file would be 10-netplan-eth0.network.d and the arguments to this function should be supplied as:
+#
+#  systemd_create_network_mdns_dropin_file "/etc/systemd/network" 10 "netplan" "eth0" "enable-mdns"
+# 
 # Arguments:
 #   1: The base directory for the drop-in file.
 #   2: The priority of the drop-in file. This is used by systemd to lexicographically order drop-in files.
-#   3: The name of the drop-in file.
-#   4: The name of the component to create the drop-in file for.
+#   3: The suffix of the instance directory for the drop-in file.
+#   4: The name of the interface to create the drop-in file for.
+#   5: The name of the drop-in file.
 #
 function systemd_create_network_mdns_dropin_file() {
-    local basedir
+    local dropin_basedir
     local priority
     local interface
-    local component_dir
+    local instance_dir_name_prefix
+    local instance_dir_name
     local filename
     local filepath
 
-    readonly basedir="$1"
+    readonly dropin_basedir="$1"
     readonly priority="$2"
-    readonly filename="$3"
+    readonly instance_dir_name_prefix="$3"
     readonly interface="$4"
-    readonly component_dir="${interface}${SYSTEMD_NETWORK_DROPIN_DIR_INSTANCE_SUFFIX}"
-    readonly filepath="${basedir}/${component_dir}/${priority}-${filename}.conf"
+    readonly filename="$5"
+    readonly instance_dir_name="${priority}-${instance_dir_name_prefix}-${interface}${SYSTEMD_NETWORK_DROPIN_DIR_INSTANCE_SUFFIX}"
+    readonly filepath="${dropin_basedir}/${instance_dir_name}/${filename}.conf"
 
     # Create the destination directory if it does not exist.
-    if [[ ! -d "${basedir}/${component_dir}" ]]; then
-        mkdir -p "${basedir}/${component_dir}"
+    if [[ ! -d "${dropin_basedir}/${instance_dir_name}" ]]; then
+        mkdir -p "${dropin_basedir}/${instance_dir_name}"
     fi
 
     echo -n "Creating systemd network drop-in file ${filepath} to enable mDNS on ${interface}..."
 
-	# The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
-	# as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
-	# with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
-	cat <<- EOF > "${filepath}"
+    # The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
+    # as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
+    # with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
+    cat <<- EOF > "${filepath}"
 
 	# See https://www.freedesktop.org/software/systemd/man/latest/systemd.network.html#Description for more information.
 	[Network]
@@ -123,15 +138,15 @@ function systemd_create_network_mdns_dropin_file() {
 #   None
 #
 function mdns_enable_on_system() {
-    local dropin_file_dir_base
+    local dropin_dropin_basedir
     local priority
     local filename
 
-    readonly dropin_file_dir_base="${SYSTEMD_RESOLVED_DROPIN_DIR_BASE_DEFAULT}"
+    readonly dropin_dropin_basedir="${SYSTEMD_RESOLVED_DROPIN_DIR_BASE_DEFAULT}"
     readonly priority="${SYSTEMD_RESOLVED_DROPIN_CONF_FILE_PRIORITY_DEFAULT}"
     readonly filename="${SYSTEMD_RESOLVED_DROPIN_CONF_FILE_NAME}"
 
-    systemd_create_resolved_mdns_dropin_file "${dropin_file_dir_base}" "${priority}" "${filename}"
+    systemd_create_resolved_mdns_dropin_file "${dropin_dropin_basedir}" "${priority}" "${filename}"
 }
 
 # Enable multicast DNS (mDNS) on the specified network interface.
@@ -140,17 +155,19 @@ function mdns_enable_on_system() {
 #   1: The network interface to enable mDNS on.
 #
 function mdns_enable_on_interface() {
-    local interface=$1
-    local dropin_file_dir_base
+    local interface="$1"
+    local dropin_dropin_basedir
     local priority
+    local instance_dir_name_prefix
     local filename
 
     readonly interface
-    readonly dropin_file_dir_base="${SYSTEMD_NETWORK_DROPIN_DIR_BASE_DEFAULT}"
+    readonly dropin_dropin_basedir="${SYSTEMD_NETWORK_DROPIN_DIR_BASE_DEFAULT}"
     readonly priority="${SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_PRIORITY_DEFAULT}"
-    readonly filename="${SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME}"
+    readonly instance_dir_name_prefix="${SYSTEMD_NETWORK_DROPIN_DIR_INSTANCE_PREFIX}"
+    readonly filename="${SYSTEMD_NETWORK_DROPIN_DIR_INSTANCE_PREFIX}-${SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME}"
 
-    systemd_create_network_mdns_dropin_file "${dropin_file_dir_base}" "${priority}" "${filename}" "${interface}"
+    systemd_create_network_mdns_dropin_file "${dropin_dropin_basedir}" "${priority}" "${instance_dir_name_prefix}" "${interface}" "${filename}" 
 }
 
 # Enable multicast DNS (mDNS) on the specified network interfaces.
