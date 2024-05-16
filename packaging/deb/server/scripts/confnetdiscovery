@@ -4,11 +4,18 @@
 . /usr/share/debconf/confmodule
 
 # Define and initialize constants.
+readonly SYSTEMD_DROPIN_PREFIX_COMMON=netremote
+readonly SYSTEMD_DROPIN_CONF_FILE_PRIORITY_DEFAULT=10
+
+readonly SYSTEMD_RESOLVED_DROPIN_DIR_BASE_DEFAULT=/etc/systemd/resolved.conf.d
+readonly SYSTEMD_RESOLVED_DROPIN_CONF_FILE_PRIORITY_DEFAULT=${SYSTEMD_DROPIN_CONF_FILE_PRIORITY_DEFAULT}
+readonly SYSTEMD_RESOLVED_DROPIN_CONF_FILE_NAME=${SYSTEMD_DROPIN_PREFIX_COMMON}-enable-mdns
+
 readonly SYSTEMD_NETWORK_DROPIN_DIR_BASE_DEFAULT=/etc/systemd/network
 readonly SYSTEMD_NETOWRK_DROPIN_DIR_INSTANCE_SUFFIX=.network.d
 
-readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME=enable-mdns
-readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_PRIORITY_DEFAULT=10
+readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_NAME=${SYSTEMD_DROPIN_PREFIX_COMMON}-enable-mdns
+readonly SYSTEMD_NETWORK_DROPIN_MDNS_CONF_FILE_PRIORITY_DEFAULT=${SYSTEMD_DROPIN_CONF_FILE_PRIORITY_DEFAULT}
 
 readonly QUESTION_NETWORK_CONFIGURE_MDNS_METHOD=netremote/network/mdns-configure-interfaces-method
 readonly QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY=netremote/network/mdns-configure-interfaces-manually
@@ -26,6 +33,45 @@ readonly QUESTION_NETWORK_CONFIGURE_MDNS_INTERFACES_MANUALLY_CHOICES
 # Globals to be defined later.
 NETWORK_CONFIGURE_MDNS_METHOD=
 NETWORK_INTERFACES_SELECTED_FOR_MDNS=
+
+# Create a drop-in file for a systemd resolved configuration file to enable multicast DNS (mDNS) system-wide.
+#
+# Arguments:
+#  1: The base directory for the drop-in file.
+#  2: The priority of the drop-in file. This is used by systemd to lexicographically order drop-in files.
+#  3: The name of the drop-in file.
+#
+function systemd_create_resolved_mdns_dropin_file() {
+    local basedir
+    local priority
+    local filename
+    local filepath
+
+    readonly basedir="$1"
+    readonly priority="$2"
+    readonly filename="$3"
+    readonly filepath="${basedir}/${priority}-${filename}.conf"
+
+    echo -n "Creating systemd resolved drop-in file ${filepath} to enable mDNS for system-wide peer-to-peer network resolution..."
+
+    # Create the destination directory if it does not exist.
+    if [[ ! -d "${basedir}" ]]; then
+        mkdir -p "${basedir}"
+    fi
+
+	# The following line specifies a "here document". The <<- operator is used instead of << which ignores leading tabs,
+	# as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
+	# with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
+	cat <<- EOF > "${filepath}"
+
+	# See https://www.freedesktop.org/software/systemd/man/latest/resolved.conf.html#Description for more information.
+	[Resolve]
+	# Enable system-wide peer-to-peer network resolution.
+	MulticastDNS=yes
+	EOF
+
+    echo "done"
+}
 
 # Create a drop-in file for a systemd network configuration file to enable multicast DNS (mDNS) on the specified interface.
 #
@@ -61,12 +107,31 @@ function systemd_create_network_mdns_dropin_file() {
 	# as opposed to the typical << operator which preserves tabs. Conseauently, the lines of content below are indented
 	# with tabs instead of spaces, and these must be preserved for the file content to be written without tabs.
 	cat <<- EOF > "${filepath}"
+
+    # See https://www.freedesktop.org/software/systemd/man/latest/systemd.network.html#Description for more information.
 	[Network]
 	# Enable multicast DNS (mDNS) to allow discovery of netremote-server instances on the network.
 	MulticastDNS=yes
 	EOF
 
     echo "done"
+}
+
+# Enable multicast DNS (mDNS) system-wide.
+#
+# Arguments:
+#   None
+#
+function mdns_enable_on_system() {
+    local dropin_file_dir_base
+    local priority
+    local filename
+
+    readonly dropin_file_dir_base="${SYSTEMD_RESOLVED_DROPIN_DIR_BASE_DEFAULT}"
+    readonly priority="${SYSTEMD_RESOLVED_DROPIN_CONF_FILE_PRIORITY_DEFAULT}"
+    readonly filename="${SYSTEMD_RESOLVED_DROPIN_CONF_FILE_NAME}"
+
+    systemd_create_resolved_mdns_dropin_file "${dropin_file_dir_base}" "${priority}" "${filename}"
 }
 
 # Enable multicast DNS (mDNS) on the specified network interface.
@@ -96,6 +161,8 @@ function mdns_enable_on_interface() {
 #
 function mdns_configure() {
     local interfaces="$1"
+
+    mdns_enable_on_system
 
     for interface in ${interfaces}; do
         mdns_enable_on_interface "${interface}"
