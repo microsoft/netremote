@@ -11,6 +11,14 @@
 namespace Wpa
 {
 /**
+ * @brief Policy to use when an existing connection is detected.
+ */
+enum class ExistingConnectionPolicy {
+    Reconnect,
+    Ignore,
+};
+
+/**
  * @brief Helper class to create a connection on a WPA control socket.
  *
  * This automatically manages the resources required to connect to a WPA control socket.
@@ -35,12 +43,12 @@ public:
     /**
      * @brief Attempt to make a connection to a WPA control socket for the specicied interface.
      *
-     * @param forceReconnect Force a reconnection to the control socket if it is already connected.
+     * @param existingConnectionPolicy The policy to use when an existing connection is detected.
      * @return true The connection was successful.
      * @return false The connection was not successful.
      */
     bool
-    Connect(bool forceReconnect = false) noexcept;
+    Connect(ExistingConnectionPolicy existingConnectionPolicy = ExistingConnectionPolicy::Ignore) noexcept;
 
     /**
      * @brief Disconnect from the control socket.

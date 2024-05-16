@@ -37,10 +37,10 @@ WpaControlSocketConnection::operator struct wpa_ctrl *() const noexcept
 }
 
 bool
-WpaControlSocketConnection::Connect(bool forceReconnect) noexcept
+WpaControlSocketConnection::Connect(ExistingConnectionPolicy existingConnectionPolicy) noexcept
 {
     if (m_controlSocket != nullptr) {
-        if (!forceReconnect) {
+        if (existingConnectionPolicy != ExistingConnectionPolicy::Reconnect) {
             return true;
         }
 
