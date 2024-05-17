@@ -39,7 +39,7 @@ NetRemoteDiscoveryService::GetHostname() const noexcept
     return m_configuration.Hostname;
 }
 
-uint32_t
+uint16_t
 NetRemoteDiscoveryService::GetPort() const noexcept
 {
     return m_configuration.Port;
@@ -78,7 +78,7 @@ NetRemoteDiscoveryServiceBuilder::SetHostname(std::string hostname)
 }
 
 NetRemoteDiscoveryServiceBuilder&
-NetRemoteDiscoveryServiceBuilder::SetPort(uint32_t port)
+NetRemoteDiscoveryServiceBuilder::SetPort(uint16_t port)
 {
     m_discoveryServiceConfiguration.Port = port;
     return *this;

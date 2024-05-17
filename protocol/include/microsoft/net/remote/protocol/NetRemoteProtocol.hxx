@@ -26,7 +26,7 @@ struct NetRemoteProtocol
     /**
      * @brief Default port if none specified.
      */
-    static constexpr uint32_t PortDefault{ PORT_DEFAULT };
+    static constexpr uint16_t PortDefault{ PORT_DEFAULT };
 
     /**
      * @brief Port separator for address parsing.

@@ -19,7 +19,7 @@ namespace Microsoft::Net::Remote
  */
 struct NetRemoteDiscoveryServiceConfiguration
 {
-    uint32_t Port{ Protocol::NetRemoteProtocol::PortDefault };
+    uint16_t Port{ Protocol::NetRemoteProtocol::PortDefault };
     std::string Name{ Protocol::NetRemoteProtocol::DnssdServiceName };
     std::string Protocol{ Protocol::NetRemoteProtocol::DnssdServiceProtocol };
     std::string Hostname;
@@ -91,9 +91,9 @@ protected:
     /**
      * @brief Get the port of the service.
      *
-     * @return uint32_t
+     * @return uint16_t
      */
-    uint32_t
+    uint16_t
     GetPort() const noexcept;
 
     /**
@@ -184,7 +184,7 @@ struct NetRemoteDiscoveryServiceBuilder
      * @return NetRemoteDiscoveryServiceBuilder&
      */
     NetRemoteDiscoveryServiceBuilder&
-    SetPort(uint32_t port);
+    SetPort(uint16_t port);
 
     /**
      * @brief Add an IP address the service listens on.
