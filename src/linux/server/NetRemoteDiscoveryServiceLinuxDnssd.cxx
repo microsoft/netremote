@@ -15,8 +15,8 @@ NetRemoteDiscoveryServiceLinuxDnssd::Stop()
     // TODO
 }
 
-std::shared_ptr<NetRemoteDiscoveryService>
-NetRemoteDiscoveryServiceLinuxDnssdFactory::Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses)
+std::unique_ptr<NetRemoteDiscoveryService>
+NetRemoteDiscoveryServiceLinuxDnssdFactory::Create(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration)
 {
-    return std::make_unique<NetRemoteDiscoveryServiceLinuxDnssd>(std::move(hostname), port, std::move(ipAddresses));
+    return std::make_unique<NetRemoteDiscoveryServiceLinuxDnssd>(std::move(discoveryServiceConfiguration));
 }
