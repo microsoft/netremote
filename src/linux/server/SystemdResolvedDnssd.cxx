@@ -1,9 +1,12 @@
 
 #include <algorithm>
+#include <chrono>
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 #include <magic_enum.hpp>
 #include <microsoft/net/IpAddressInformation.hxx>
@@ -54,24 +57,32 @@ ResolvedDnssd::BuildTxtTextRecord(const std::unordered_map<std::string, IpAddres
 
 /* static */
 std::string
-ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view protocol, uint16_t port, const std::vector<std::string>& txtTextRecords, std::optional<uint16_t> priority, std::optional<uint16_t> weight)
+ResolvedDnssd::RegisterService(const std::string_view serviceName, std::string_view protocol, uint16_t port, [[maybe_unused]] const std::vector<std::string>& txtTextRecords, std::optional<uint16_t> priority, std::optional<uint16_t> weight)
 {
+    // TODO: transform txtTextRecords to txtTextRecords2 below, accounting for expected dbus C++ type for
+    // array-of-array-of dictionary entries.
+    std::vector<std::map<std::string, std::vector<uint8_t>>> txtTextRecords2{};
+
     try {
-        auto sdbusConnection = sdbus::createSessionBusConnection(DbusServiceName);
-        // TODO: create proxy
-        // TODO: call RegisterService on proxy with args
+        std::string dnssdObjectPath{};
+        auto sdbusProxy = sdbus::createProxy(DbusServiceName, DbusServiceObjectPath, sdbus::dont_run_event_loop_thread);
+        sdbusProxy->callMethod("RegisterService")
+            .onInterface(DbusServiceInterface)
+            .withArguments(std::data(serviceName), "", std::data(protocol), port, priority.value_or(0), weight.value_or(0), txtTextRecords2)
+            .withTimeout(std::chrono::seconds(2))
+            .storeResultsTo(dnssdObjectPath);
+        return dnssdObjectPath;
     } catch (...) {
         // TODO: Log error
-        return "";
     }
 
-    return "";
+    return std::string();
 }
 
 /* static */
-bool 
-ResolvedDnssd::UnregisterService(std::string_view serviceObjectPath)
+bool
+ResolvedDnssd::UnregisterService([[maybe_unused]] std::string_view serviceObjectPath)
 {
     // TODO
-    return "";
+    return false;
 }

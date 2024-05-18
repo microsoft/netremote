@@ -25,6 +25,11 @@ struct ResolvedDnssd
     static constexpr auto DbusServiceObjectPath = "/org/freedesktop/resolve1";
 
     /**
+     * @brief The interface for the D-Bus service for systemd-resolved.
+     */
+    static constexpr auto DbusServiceInterface = "org.freedesktop.resolve1.Manager";
+
+    /**
      * @brief Build the TxtText' record for a DNS-SD service.
      *
      * @param ipAddresses The ip addresses to include in the record.
