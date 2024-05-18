@@ -22,25 +22,40 @@ NetRemoteDiscoveryServiceLinuxDnssd::NetRemoteDiscoveryServiceLinuxDnssd(NetRemo
 void
 NetRemoteDiscoveryServiceLinuxDnssd::Start()
 {
+    LOGI << "Starting systemd-resolved DNS-SD service registration";
+
+    if (!std::empty(m_dbusServiceObjectPath)) {
+        LOGW << std::format("Unregistering pre-existing DNS-SD dbus service with path {}", m_dbusServiceObjectPath);
+        Stop();
+    }
+
     auto dbusServiceObjectPath = Systemd::ResolvedDnssd::RegisterService(GetServiceName(), GetProtocol(), GetPort(), m_txtRecords);
+    if (std::empty(dbusServiceObjectPath)) {
+        LOGE << "Failed to register new DNS-SD service on dbus";
+        return;
+    }
+
+    LOGI << std::format("Successfully registered DNS-SD dbus service object with path {}", dbusServiceObjectPath);
     m_dbusServiceObjectPath = std::move(dbusServiceObjectPath);
 }
 
 void
 NetRemoteDiscoveryServiceLinuxDnssd::Stop()
 {
+    LOGI << "Stopping systemd-resolved DNS-SD service registration";
+
     if (std::empty(m_dbusServiceObjectPath)) {
-        LOGE << "No dbus service object path to unregister";
+        LOGE << "No DNS-SD dbus service found to unregister";
         return;
     }
 
     const auto unregisterSucceeded = Systemd::ResolvedDnssd::UnregisterService(m_dbusServiceObjectPath);
     if (!unregisterSucceeded) {
-        LOGE << std::format("Failed to unregister dbus service object path {}", m_dbusServiceObjectPath);
+        LOGE << std::format("Failed to unregister DNS-SD dbus service with path {}", m_dbusServiceObjectPath);
         return;
     }
 
-    LOGI << std::format("Successfully unregistered dbus service object path {}", m_dbusServiceObjectPath);
+    LOGI << std::format("Successfully unregistered DNS-SD dbus service with path {}", m_dbusServiceObjectPath);
     m_dbusServiceObjectPath.clear();
 }
 
