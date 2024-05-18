@@ -82,6 +82,9 @@ private:
     std::unique_ptr<grpc::Server> m_server;
     Service::NetRemoteService m_service;
     Service::NetRemoteDataStreamingService m_dataStreamingService;
+    std::shared_ptr<INetRemoteDiscoveryServiceFactory> m_discoveryServiceFactory;
+    std::shared_ptr<INetworkOperations> m_networkOperations;
+    std::shared_ptr<NetRemoteDiscoveryService> m_discoveryService;
 };
 } // namespace Microsoft::Net::Remote
 
