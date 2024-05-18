@@ -17,7 +17,7 @@ namespace Microsoft::Net::Remote
 struct NetRemoteDiscoveryServiceLinuxDnssd :
     public NetRemoteDiscoveryService
 {
-    using NetRemoteDiscoveryService::NetRemoteDiscoveryService;
+    NetRemoteDiscoveryServiceLinuxDnssd(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration);
 
     ~NetRemoteDiscoveryServiceLinuxDnssd() override = default;
 
@@ -45,6 +45,10 @@ struct NetRemoteDiscoveryServiceLinuxDnssd :
      */
     void
     Stop() override;
+
+private:
+    std::vector<std::string> m_txtRecords;
+    std::string m_dbusServiceObjectPath;
 };
 
 /**

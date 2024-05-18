@@ -42,10 +42,19 @@ struct ResolvedDnssd
      * @param txtTextRecords The TXT records for the service.
      * @param priority The optional priority of the service.
      * @param weight The optional weight of the service.
-     * @return std::string
+     * @return std::string The dbus object path of the newly registered service.
      */
     static std::string
-    RegisterService(std::string_view serviceName, std::string_view protocol, uint16_t port, std::vector<std::string> txtTextRecords, std::optional<uint16_t> priority, std::optional<uint16_t> weight);
+    RegisterService(std::string_view serviceName, std::string_view protocol, uint16_t port, const std::vector<std::string>& txtTextRecords, std::optional<uint16_t> priority = std::nullopt, std::optional<uint16_t> weight = std::nullopt);
+
+    /**
+     * @brief Unregister a DNS-SD service with systemd-resolved.
+     *
+     * @param serviceObjectPath The dbus object path of the service to unregister.
+     * @return bool
+     */
+    static bool
+    UnregisterService(std::string_view serviceObjectPath);
 };
 } // namespace Microsoft::Net::Systemd
 

@@ -7,6 +7,7 @@
 
 #include <magic_enum.hpp>
 #include <microsoft/net/IpAddressInformation.hxx>
+#include <sdbus-c++/sdbus-c++.h>
 
 #include "SystemdResolvedDnssd.hxx"
 
@@ -53,7 +54,23 @@ ResolvedDnssd::BuildTxtTextRecord(const std::unordered_map<std::string, IpAddres
 
 /* static */
 std::string
-ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view protocol, uint16_t port, std::vector<std::string> txtTextRecords, std::optional<uint16_t> priority, std::optional<uint16_t> weight)
+ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view protocol, uint16_t port, const std::vector<std::string>& txtTextRecords, std::optional<uint16_t> priority, std::optional<uint16_t> weight)
+{
+    try {
+        auto sdbusConnection = sdbus::createSessionBusConnection(DbusServiceName);
+        // TODO: create proxy
+        // TODO: call RegisterService on proxy with args
+    } catch (...) {
+        // TODO: Log error
+        return "";
+    }
+
+    return "";
+}
+
+/* static */
+bool 
+ResolvedDnssd::UnregisterService(std::string_view serviceObjectPath)
 {
     // TODO
     return "";
