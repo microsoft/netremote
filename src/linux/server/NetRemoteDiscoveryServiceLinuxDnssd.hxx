@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <microsoft/net/INetworkOperations.hxx>
 #include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
@@ -47,7 +48,7 @@ struct NetRemoteDiscoveryServiceLinuxDnssd :
     Stop() override;
 
 private:
-    std::vector<std::string> m_txtRecords;
+    std::vector<std::unordered_map<std::string, std::vector<uint8_t>>> m_txtDataRecord;
     std::string m_dbusServiceObjectPath;
 };
 

@@ -16,7 +16,7 @@ using Microsoft::Net::Systemd::ResolvedDnssd;
 
 NetRemoteDiscoveryServiceLinuxDnssd::NetRemoteDiscoveryServiceLinuxDnssd(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) :
     NetRemoteDiscoveryService(std::move(discoveryServiceConfiguration)),
-    m_txtRecords({ Systemd::ResolvedDnssd::BuildTxtTextRecord(GetIpAddresses()) })
+    m_txtDataRecord(Systemd::ResolvedDnssd::BuildTxtDataRecord(GetIpAddresses()))
 {}
 
 void
@@ -29,7 +29,7 @@ NetRemoteDiscoveryServiceLinuxDnssd::Start()
         Stop();
     }
 
-    auto dbusServiceObjectPath = Systemd::ResolvedDnssd::RegisterService(GetServiceName(), GetProtocol(), GetPort(), m_txtRecords);
+    auto dbusServiceObjectPath = Systemd::ResolvedDnssd::RegisterService(GetServiceName(), GetProtocol(), GetPort(), m_txtDataRecord);
     if (std::empty(dbusServiceObjectPath)) {
         LOGE << "Failed to register new DNS-SD service on dbus";
         return;

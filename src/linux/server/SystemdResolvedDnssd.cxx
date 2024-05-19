@@ -10,6 +10,7 @@
 
 #include <magic_enum.hpp>
 #include <microsoft/net/IpAddressInformation.hxx>
+#include <plog/Log.h>
 #include <sdbus-c++/sdbus-c++.h>
 
 #include "SystemdResolvedDnssd.hxx"
@@ -56,24 +57,31 @@ ResolvedDnssd::BuildTxtTextRecord(const std::unordered_map<std::string, IpAddres
 }
 
 /* static */
-std::string
-ResolvedDnssd::RegisterService(const std::string_view serviceName, std::string_view protocol, uint16_t port, [[maybe_unused]] const std::vector<std::string>& txtTextRecords, std::optional<uint16_t> priority, std::optional<uint16_t> weight)
+std::vector<std::unordered_map<std::string, std::vector<uint8_t>>>
+ResolvedDnssd::BuildTxtDataRecord(const std::unordered_map<std::string, IpAddressInformation>& ipAddresses)
 {
-    // TODO: transform txtTextRecords to txtTextRecords2 below, accounting for expected dbus C++ type for
-    // array-of-array-of dictionary entries.
-    std::vector<std::map<std::string, std::vector<uint8_t>>> txtTextRecords2{};
+    std::vector<std::unordered_map<std::string, std::vector<uint8_t>>> txtTextRecords{};
+    // TODO: convert the ipaddresses to uint8_t vector.
+    return txtTextRecords;
+}
+
+/* static */
+std::string
+ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view protocol, uint16_t port, const std::vector<std::unordered_map<std::string, std::vector<uint8_t>>>& txtDataRecord, std::optional<uint16_t> priority, std::optional<uint16_t> weight)
+{
+    static constexpr auto Timeout = std::chrono::seconds(2);
 
     try {
         std::string dnssdObjectPath{};
         auto sdbusProxy = sdbus::createProxy(DbusServiceName, DbusServiceObjectPath, sdbus::dont_run_event_loop_thread);
-        sdbusProxy->callMethod("RegisterService")
+        sdbusProxy->callMethod(MethodNameReigterService)
             .onInterface(DbusServiceInterface)
-            .withArguments(std::data(serviceName), "", std::data(protocol), port, priority.value_or(0), weight.value_or(0), txtTextRecords2)
-            .withTimeout(std::chrono::seconds(2))
+            .withArguments(std::data(serviceName), "", std::data(protocol), port, priority.value_or(0), weight.value_or(0), txtDataRecord)
+            .withTimeout(Timeout)
             .storeResultsTo(dnssdObjectPath);
         return dnssdObjectPath;
-    } catch (...) {
-        // TODO: Log error
+    } catch (const sdbus::Error& sdbusError) {
+        LOGE << std::format("Failed to register DNS-SD service with systemd-resolved: {}", sdbusError.what());
     }
 
     return std::string();
@@ -83,6 +91,18 @@ ResolvedDnssd::RegisterService(const std::string_view serviceName, std::string_v
 bool
 ResolvedDnssd::UnregisterService([[maybe_unused]] std::string_view serviceObjectPath)
 {
-    // TODO
+    static constexpr auto Timeout = std::chrono::seconds(2);
+
+    try {
+        auto sdbusProxy = sdbus::createProxy(DbusServiceName, DbusServiceObjectPath, sdbus::dont_run_event_loop_thread);
+        sdbusProxy->callMethod(MethodNameUnregisterService)
+            .onInterface(DbusServiceInterface)
+            .withArguments(std::data(serviceObjectPath))
+            .withTimeout(Timeout);
+        return true;
+    } catch (const sdbus::Error& sdbusError) {
+        LOGE << std::format("Failed to unregister DNS-SD service with systemd-resolved: {}", sdbusError.what());
+    }
+
     return false;
 }
