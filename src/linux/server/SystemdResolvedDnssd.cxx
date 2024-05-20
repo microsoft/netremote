@@ -102,14 +102,14 @@ ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view pr
     static constexpr auto Timeout = std::chrono::seconds(2);
 
     try {
-        std::string dnssdObjectPath{};
         auto sdbusProxy = sdbus::createProxy(DbusServiceName, DbusServiceObjectPath, sdbus::dont_run_event_loop_thread);
+        sdbus::ObjectPath dnssdObjectPath;
         sdbusProxy->callMethod(MethodNameReigterService)
             .onInterface(DbusServiceInterface)
             .withArguments(std::data(serviceName), std::data(serviceName), std::data(protocol), port, priority.value_or(0), weight.value_or(0), txtDataRecord)
             .withTimeout(Timeout)
             .storeResultsTo(dnssdObjectPath);
-        LOGD << std::format("Registered DNS-SD service with systemd-resolved: {}", dnssdObjectPath);
+        LOGD << std::format("Registered DNS-SD service with systemd-resolved: {}", dnssdObjectPath.c_str());
         return dnssdObjectPath;
     } catch (const sdbus::Error& sdbusError) {
         LOGE << std::format("Failed to register DNS-SD service with systemd-resolved: {}", sdbusError.what());
