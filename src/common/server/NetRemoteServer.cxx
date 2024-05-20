@@ -81,6 +81,7 @@ NetRemoteServer::Stop()
         return;
     }
 
+    m_discoveryService->Stop();
     m_server->Shutdown();
     m_server = nullptr;
 }
