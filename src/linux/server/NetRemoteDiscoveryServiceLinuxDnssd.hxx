@@ -48,7 +48,7 @@ struct NetRemoteDiscoveryServiceLinuxDnssd :
     Stop() override;
 
 private:
-    std::vector<std::unordered_map<std::string, std::vector<uint8_t>>> m_txtDataRecord;
+    std::unordered_map<std::string, std::vector<uint8_t>> m_txtDataRecord;
     std::string m_dbusServiceObjectPath;
 };
 

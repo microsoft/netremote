@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
+#include <ranges>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -33,6 +34,19 @@ GetInterfaceTypeName(NetworkInterfaceType interfaceType)
 {
     return magic_enum::enum_name(interfaceType);
 }
+
+/**
+ * @brief Helper which invokes BuildTxtDataRecordIpAddressKeyValuePair, unwrapping its arguments from a std::pair.
+ *
+ * @param ipAddressEntry The pair of ip address and ip address information.
+ * @return std::pair<std::string, std::vector<uint8_t>>
+ */
+std::pair<std::string, std::vector<uint8_t>>
+BuildTxtDataRecordIpAddressKeyValuePairWrapped(const std::pair<std::string, IpAddressInformation>& ipAddressEntry)
+{
+    const auto& [ipAddress, ipAddressInformation] = ipAddressEntry;
+    return ResolvedDnssd::BuildTxtDataRecordIpAddressKeyValuePair(ipAddress, ipAddressInformation);
+}
 } // namespace detail
 
 /* static */
@@ -57,12 +71,28 @@ ResolvedDnssd::BuildTxtTextRecord(const std::unordered_map<std::string, IpAddres
 }
 
 /* static */
-std::vector<std::unordered_map<std::string, std::vector<uint8_t>>>
+std::pair<std::string, std::vector<uint8_t>>
+ResolvedDnssd::BuildTxtDataRecordIpAddressKeyValuePair(std::string_view ipAddress, const IpAddressInformation& ipAddressInformation)
+{
+    const auto prefixIndex = ipAddress.find_last_of('/');
+    if (prefixIndex != std::string_view::npos) {
+        ipAddress = ipAddress.substr(0, prefixIndex);
+    }
+
+    const auto interfaceTypeName = detail::GetInterfaceTypeName(ipAddressInformation.InterfaceType);
+    std::vector<uint8_t> txtDataValue(std::cbegin(interfaceTypeName), std::cend(interfaceTypeName));
+
+    return std::make_pair(std::string{ ipAddress }, std::move(txtDataValue));
+}
+
+/* static */
+std::unordered_map<std::string, std::vector<uint8_t>>
 ResolvedDnssd::BuildTxtDataRecord(const std::unordered_map<std::string, IpAddressInformation>& ipAddresses)
 {
-    std::vector<std::unordered_map<std::string, std::vector<uint8_t>>> txtTextRecords{};
-    // TODO: convert the ipaddresses to uint8_t vector.
-    return txtTextRecords;
+    std::unordered_map<std::string, std::vector<uint8_t>> txtDataRecord{};
+    std::ranges::transform(ipAddresses, std::inserter(txtDataRecord, std::end(txtDataRecord)), detail::BuildTxtDataRecordIpAddressKeyValuePairWrapped);
+
+    return txtDataRecord;
 }
 
 /* static */
@@ -76,9 +106,10 @@ ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view pr
         auto sdbusProxy = sdbus::createProxy(DbusServiceName, DbusServiceObjectPath, sdbus::dont_run_event_loop_thread);
         sdbusProxy->callMethod(MethodNameReigterService)
             .onInterface(DbusServiceInterface)
-            .withArguments(std::data(serviceName), "", std::data(protocol), port, priority.value_or(0), weight.value_or(0), txtDataRecord)
+            .withArguments(std::data(serviceName), std::data(serviceName), std::data(protocol), port, priority.value_or(0), weight.value_or(0), txtDataRecord)
             .withTimeout(Timeout)
             .storeResultsTo(dnssdObjectPath);
+        LOGD << std::format("Registered DNS-SD service with systemd-resolved: {}", dnssdObjectPath);
         return dnssdObjectPath;
     } catch (const sdbus::Error& sdbusError) {
         LOGE << std::format("Failed to register DNS-SD service with systemd-resolved: {}", sdbusError.what());
@@ -89,7 +120,7 @@ ResolvedDnssd::RegisterService(std::string_view serviceName, std::string_view pr
 
 /* static */
 bool
-ResolvedDnssd::UnregisterService([[maybe_unused]] std::string_view serviceObjectPath)
+ResolvedDnssd::UnregisterService(std::string_view serviceObjectPath)
 {
     static constexpr auto Timeout = std::chrono::seconds(2);
 

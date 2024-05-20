@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <microsoft/net/IpAddressInformation.hxx>
@@ -49,12 +50,22 @@ struct ResolvedDnssd
     BuildTxtTextRecord(const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>& ipAddresses);
 
     /**
+     * @brief Build a key-value pair for the 'TxtData' record for a DNS-SD service.
+     * 
+     * @param ipAddress The ip address to include in the record.
+     * @param ipAddressInformation The information about the ip address.
+     * @return std::pair<std::string, std::vector<uint8_t>> 
+     */
+    static std::pair<std::string, std::vector<uint8_t>>
+    BuildTxtDataRecordIpAddressKeyValuePair(std::string_view ipAddress, const Microsoft::Net::IpAddressInformation& ipAddressInformation);
+
+    /**
      * @brief Build the 'TxtData' record for a DNS-SD service.
      *
      * @param ipAddresses The ip addresses to include in the record.
-     * @return std::vector<std::unordered_map<std::string, std::vector<uint8_t>>>
+     * @return std::unordered_map<std::string, std::vector<uint8_t>> 
      */
-    static std::vector<std::unordered_map<std::string, std::vector<uint8_t>>>
+    static std::unordered_map<std::string, std::vector<uint8_t>>
     BuildTxtDataRecord(const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>& ipAddresses);
 
     /**

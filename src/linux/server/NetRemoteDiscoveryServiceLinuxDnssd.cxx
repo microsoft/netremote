@@ -29,7 +29,7 @@ NetRemoteDiscoveryServiceLinuxDnssd::Start()
         Stop();
     }
 
-    auto dbusServiceObjectPath = Systemd::ResolvedDnssd::RegisterService(GetServiceName(), GetProtocol(), GetPort(), m_txtDataRecord);
+    auto dbusServiceObjectPath = Systemd::ResolvedDnssd::RegisterService(GetServiceName(), GetProtocol(), GetPort(), { m_txtDataRecord });
     if (std::empty(dbusServiceObjectPath)) {
         LOGE << "Failed to register new DNS-SD service on dbus";
         return;
