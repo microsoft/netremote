@@ -77,6 +77,13 @@ struct NetRemoteServer
     void
     Stop();
 
+protected:
+    /**
+     * @brief Initialize the discovery service, if its configuration was provided.
+     */
+    void
+    InitializeDiscoveryService();
+
 private:
     std::string m_serverAddress;
     std::unique_ptr<grpc::Server> m_server;
