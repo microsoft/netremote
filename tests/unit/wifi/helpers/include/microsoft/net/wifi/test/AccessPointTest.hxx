@@ -27,6 +27,7 @@ struct AccessPointTest final :
 {
     std::string Ssid;
     std::string InterfaceName;
+    std::string BridgeInterfaceId;
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
     Microsoft::Net::Wifi::Ieee80211AuthenticationData AuthenticationData;
