@@ -125,10 +125,11 @@ ResolvedDnssd::UnregisterService(std::string_view serviceObjectPath)
     static constexpr auto Timeout = std::chrono::seconds(2);
 
     try {
+        const sdbus::ObjectPath dnssdObjectPath{ serviceObjectPath };
         auto sdbusProxy = sdbus::createProxy(DbusServiceName, DbusServiceObjectPath, sdbus::dont_run_event_loop_thread);
         sdbusProxy->callMethod(MethodNameUnregisterService)
             .onInterface(DbusServiceInterface)
-            .withArguments(std::data(serviceObjectPath))
+            .withArguments(dnssdObjectPath)
             .withTimeout(Timeout);
         return true;
     } catch (const sdbus::Error& sdbusError) {
