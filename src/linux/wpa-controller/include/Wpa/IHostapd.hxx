@@ -200,6 +200,18 @@ struct IHostapd
      */
     virtual void
     AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Set the network bridge interface the access point interface will be added to.
+     *
+     * Note that this will only take effect after the configuration is reloaded.
+     *
+     * @param bridgeInterface The name of the network bridge interface.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
+     * configuration reload.
+     */
+    virtual void
+    SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**
