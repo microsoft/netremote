@@ -424,6 +424,16 @@ Hostapd::AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enfo
     }
 }
 
+void
+Hostapd::SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurationChange enforceConfigurationChange)
+{
+    try {
+        SetProperty(ProtocolHostapd::PropertyNameBridgeInterface, bridgeInterface, enforceConfigurationChange);
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to set bridge interface to '{}' ({})", bridgeInterface, e.what()));
+    }
+}
+
 /* static */
 std::string
 Hostapd::GenerateNetworkAccessServerId(std::size_t lengthRequested)

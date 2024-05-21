@@ -693,6 +693,7 @@ constexpr std::array<char, WpaPskValueLength> PskHexValid{
 constexpr auto AsciiPassword{ "password" };
 constexpr auto PasswordIdValid{ "someid" };
 constexpr auto PeerMacAddressValid{ "00:11:22:33:44:55" };
+constexpr auto BridgeInterfaceNameDefault{ "brgateway0" };
 constexpr int32_t VlanIdValid{ 1 };
 
 const SaePassword SaePasswordValid1{
@@ -811,5 +812,19 @@ TEST_CASE("Send SetSaePasswords() command (root)", "[wpa][hostapd][client][remot
             REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Now));
             REQUIRE_NOTHROW(hostapd.SetSaePasswords({ saePassword }, EnforceConfigurationChange::Defer));
         }
+    }
+}
+
+TEST_CASE("Send SetBridgeInterface() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+    using namespace Wpa::Test;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.SetBridgeInterface(BridgeInterfaceNameDefault, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.SetBridgeInterface(BridgeInterfaceNameDefault, EnforceConfigurationChange::Defer));
     }
 }

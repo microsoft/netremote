@@ -195,6 +195,18 @@ struct Hostapd :
     AddSaePassword(SaePassword saePassword, EnforceConfigurationChange enforceConfigurationChange = EnforceConfigurationChange::Defer) override;
 
     /**
+     * @brief Set the network bridge interface the access point interface will be added to.
+     *
+     * Note that this will only take effect after the configuration is reloaded.
+     *
+     * @param bridgeInterface The name of the network bridge interface.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
+     * configuration reload.
+     */
+    void
+    SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurationChange enforceConfigurationChange) override;
+
+    /**
      * @brief Generates a new network access server identifier. If no length is specified, a default value will be used.
      *
      * @param lengthRequested The requested length of the identifier. Valid values are in the range [1, 48].

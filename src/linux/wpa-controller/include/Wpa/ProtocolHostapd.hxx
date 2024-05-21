@@ -535,6 +535,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyValueIeee80211WRequired = "2";
 
     static constexpr auto PropertyNameNasIdentifier = "nas_identifier";
+    static constexpr auto PropertyNameBridgeInterface = "bridge";
 
     // Indexed property names for BSS entries in the "STATUS" response.
     static constexpr auto PropertyNameBss = "bss";
