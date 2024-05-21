@@ -33,12 +33,6 @@ NetRemoteDiscoveryService::GetProtocol() const noexcept
     return m_configuration.Protocol;
 }
 
-std::string_view
-NetRemoteDiscoveryService::GetHostname() const noexcept
-{
-    return m_configuration.Hostname;
-}
-
 uint16_t
 NetRemoteDiscoveryService::GetPort() const noexcept
 {

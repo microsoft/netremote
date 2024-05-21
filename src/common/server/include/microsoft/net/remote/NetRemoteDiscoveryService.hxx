@@ -22,8 +22,7 @@ struct NetRemoteDiscoveryServiceConfiguration
     uint16_t Port{ Protocol::NetRemoteProtocol::PortDefault };
     std::string Name{ Protocol::NetRemoteProtocol::DnssdServiceName };
     std::string Protocol{ Protocol::NetRemoteProtocol::DnssdServiceProtocol };
-    std::string Hostname; // TODO: is this needed?
-    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> IpAddresses;
+    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> IpAddresses{};
 };
 
 /**
@@ -78,14 +77,6 @@ struct NetRemoteDiscoveryService
      */
     std::string_view
     GetProtocol() const noexcept;
-
-    /**
-     * @brief Get the host name of the service.
-     *
-     * @return std::string_view
-     */
-    std::string_view
-    GetHostname() const noexcept;
 
     /**
      * @brief Get the port of the service.
