@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -16,20 +15,27 @@
 namespace Microsoft::Net::Remote
 {
 /**
+ * @brief Collection of netremote discovery service configuration.
+ */
+struct NetRemoteDiscoveryServiceConfiguration
+{
+    uint16_t Port{ Protocol::NetRemoteProtocol::PortDefault };
+    std::string Name{ Protocol::NetRemoteProtocol::DnssdServiceName };
+    std::string Protocol{ Protocol::NetRemoteProtocol::DnssdServiceProtocol };
+    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> IpAddresses{};
+};
+
+/**
  * @brief Network service enabling clients to discover netremote servers on the network.
  */
 struct NetRemoteDiscoveryService
 {
     /**
-     * @brief Construct a new NetRemoteDiscoveryService object with the specified hostname, port, and IP addresses.
+     * @brief Construct a new Net RemoteDiscoveryService object with the specified configuration.
      *
-     * @param hostname The hostname of the service.
-     * @param port The IP port the service listens on.
-     * @param ipAddresses The IP addresses the service listens on. The map key specifies the IP address, and the value
-     * specifies information about the IP address needed by discovery clients, such as the IP family and type of
-     * interface.
+     * @param discoveryServiceConfiguration The configuration for the service.
      */
-    NetRemoteDiscoveryService(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses);
+    NetRemoteDiscoveryService(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration);
 
     virtual ~NetRemoteDiscoveryService() = default;
 
@@ -56,21 +62,28 @@ struct NetRemoteDiscoveryService
     virtual void
     Stop() = 0;
 
-protected:
     /**
-     * @brief Get the host name of the service.
+     * @brief Get the service name.
      *
      * @return std::string_view
      */
     std::string_view
-    GetHostname() const noexcept;
+    GetServiceName() const noexcept;
+
+    /**
+     * @brief Get the service protocol type.
+     *
+     * @return std::string_view
+     */
+    std::string_view
+    GetProtocol() const noexcept;
 
     /**
      * @brief Get the port of the service.
      *
-     * @return uint32_t
+     * @return uint16_t
      */
-    uint32_t
+    uint16_t
     GetPort() const noexcept;
 
     /**
@@ -82,9 +95,7 @@ protected:
     GetIpAddresses() const noexcept;
 
 private:
-    std::string m_hostname;
-    uint32_t m_port;
-    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> m_ipAddresses;
+    NetRemoteDiscoveryServiceConfiguration m_configuration;
 };
 
 /**
@@ -98,82 +109,13 @@ struct INetRemoteDiscoveryServiceFactory
     virtual ~INetRemoteDiscoveryServiceFactory() = default;
 
     /**
-     * @brief Create a new NetRemoteDiscoveryService object.
+     * @brief Create a new NetRemoteDiscoveryService object with the specified configuration.
      *
-     * @param hostname The hostname of the service.
-     * @param port The IP port the service listens on.
-     * @param ipAddresses The IP addresses the service listens on. The map key specifies the IP address, and the value
-     * specifies information about the IP address needed by discovery clients, such as the IP family and type of
-     * interface.
+     * @param discoveryServiceConfiguration
      * @return std::shared_ptr<NetRemoteDiscoveryService>
      */
-    virtual std::shared_ptr<NetRemoteDiscoveryService>
-    Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses) = 0;
-};
-
-/**
- * @brief Helper to build a NetRemoteDiscoveryService.
- *
- * Note that this is not thread-safe.
- */
-struct NetRemoteDiscoveryServiceBuilder
-{
-    /**
-     * @brief Construct a new NetRemoteDiscoveryServiceBuilder object.
-     *
-     * @param discoveryServiceFactory The factory to use to create the service instance.
-     * @param networkOperations The object to use when performing network operations.
-     */
-    NetRemoteDiscoveryServiceBuilder(std::unique_ptr<INetRemoteDiscoveryServiceFactory> discoveryServiceFactory, std::unique_ptr<INetworkOperations> networkOperations);
-
-    /**
-     * @brief Destroy the NetRemoteDiscoveryServiceBuilder object.
-     */
-    virtual ~NetRemoteDiscoveryServiceBuilder() = default;
-
-    /**
-     * @brief Set the hostname of the service.
-     *
-     * @param hostname The hostname to set.
-     * @return NetRemoteDiscoveryServiceBuilder&
-     */
-    NetRemoteDiscoveryServiceBuilder&
-    SetHostname(std::string hostname);
-
-    /**
-     * @brief Set the port of the service.
-     *
-     * If not specified, the default port is used.
-     *
-     * @param port The port the service listens on.
-     * @return NetRemoteDiscoveryServiceBuilder&
-     */
-    NetRemoteDiscoveryServiceBuilder&
-    SetPort(uint32_t port);
-
-    /**
-     * @brief Add an IP address the service listens on.
-     *
-     * @param ipAddress The ip address the service listens on.
-     * @return NetRemoteDiscoveryServiceBuilder&
-     */
-    NetRemoteDiscoveryServiceBuilder&
-    AddIpAddress(std::string ipAddress);
-
-    /**
-     * @brief Create a NetRemoteDiscoveryService object with the stored configuration.
-     *
-     * @return std::shared_ptr<NetRemoteDiscoveryService>
-     */
-    std::shared_ptr<NetRemoteDiscoveryService>
-    Build();
-
-private:
-    std::unique_ptr<INetRemoteDiscoveryServiceFactory> m_discoveryServiceFactory;
-    std::unique_ptr<Microsoft::Net::INetworkOperations> m_networkOperations;
-    std::string m_hostname;
-    uint32_t m_port{ Protocol::NetRemoteProtocol::PortDefault };
-    std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> m_ipAddresses{};
+    virtual std::unique_ptr<NetRemoteDiscoveryService>
+    Create(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) = 0;
 };
 } // namespace Microsoft::Net::Remote
 

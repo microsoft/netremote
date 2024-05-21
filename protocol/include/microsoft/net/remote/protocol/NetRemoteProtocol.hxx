@@ -13,6 +13,7 @@ namespace Microsoft::Net::Remote::Protocol
  */
 struct NetRemoteProtocol
 {
+#define SERVICE_NAME   "netremote"
 #define IP_DEFAULT     "localhost"
 #define PORT_DEFAULT   5047
 #define PORT_SEPARATOR ":"
@@ -26,7 +27,7 @@ struct NetRemoteProtocol
     /**
      * @brief Default port if none specified.
      */
-    static constexpr uint32_t PortDefault{ PORT_DEFAULT };
+    static constexpr uint16_t PortDefault{ PORT_DEFAULT };
 
     /**
      * @brief Port separator for address parsing.
@@ -47,15 +48,16 @@ struct NetRemoteProtocol
      * @brief Discovery service related definitions.
      */
 
-    static constexpr auto DnssdServiceName = "netremote";
+    static constexpr auto DnssdServiceName = SERVICE_NAME;
 
     /**
      * @brief Note that all non-TCP protocols must use "udp" as the protocol value, even if the protocol is not "udp".
      * See RFC 6763 "DNS-Based Service Discovery", section 4.1.2 "Service Names" and and section 7 "Service Names" for
      * additional details and reasoning.
      */
-    static constexpr auto DnssdServiceProtocol = "udp";
+    static constexpr auto DnssdServiceProtocol = "_" SERVICE_NAME "._" "udp";
 
+#undef SERVICE_NAME
 #undef IP_DEFAULT
 #undef PORT_DEFAULT
 #undef PORT_SEPARATOR

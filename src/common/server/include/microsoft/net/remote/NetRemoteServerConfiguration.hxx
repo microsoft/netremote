@@ -81,12 +81,12 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Object to use when performing network operations.
      */
-    std::unique_ptr<Microsoft::Net::INetworkOperations> NetworkOperations;
+    std::shared_ptr<Microsoft::Net::INetworkOperations> NetworkOperations;
 
     /**
      * @brief Factory to use to create the discovery service.
      */
-    std::unique_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory;
+    std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory;
 };
 
 } // namespace Microsoft::Net::Remote

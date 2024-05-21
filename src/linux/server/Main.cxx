@@ -69,8 +69,8 @@ main(int argc, char *argv[])
 
     // Configure service discovery to use DNS-SD.
     {
-        configuration.NetworkOperations = std::make_unique<NetworkOperationsLinux>();
-        configuration.DiscoveryServiceFactory = std::make_unique<NetRemoteDiscoveryServiceLinuxDnssdFactory>();
+        configuration.NetworkOperations = std::make_shared<NetworkOperationsLinux>();
+        configuration.DiscoveryServiceFactory = std::make_shared<NetRemoteDiscoveryServiceLinuxDnssdFactory>();
     }
 
     // Create the server.

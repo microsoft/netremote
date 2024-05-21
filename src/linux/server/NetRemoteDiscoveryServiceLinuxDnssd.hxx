@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include <microsoft/net/INetworkOperations.hxx>
 #include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
@@ -17,7 +18,7 @@ namespace Microsoft::Net::Remote
 struct NetRemoteDiscoveryServiceLinuxDnssd :
     public NetRemoteDiscoveryService
 {
-    using NetRemoteDiscoveryService::NetRemoteDiscoveryService;
+    NetRemoteDiscoveryServiceLinuxDnssd(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration);
 
     ~NetRemoteDiscoveryServiceLinuxDnssd() override = default;
 
@@ -45,6 +46,10 @@ struct NetRemoteDiscoveryServiceLinuxDnssd :
      */
     void
     Stop() override;
+
+private:
+    std::unordered_map<std::string, std::vector<uint8_t>> m_txtDataRecord;
+    std::string m_dbusServiceObjectPath;
 };
 
 /**
@@ -77,15 +82,13 @@ struct NetRemoteDiscoveryServiceLinuxDnssdFactory :
     operator=(NetRemoteDiscoveryServiceLinuxDnssdFactory&&) = delete;
 
     /**
-     * @brief Create a new instance of a NetRemoteDiscoveryServiceLinuxDnssd.
+     * @brief Create a new instance of a NetRemoteDiscoveryServiceLinuxDnssd object using the specified configuration.
      *
-     * @param hostname The hostname of the service.
-     * @param port The port the service runs on.
-     * @param ipAddresses The IP addresses of the service.
-     * @return std::shared_ptr<NetRemoteDiscoveryService>
+     * @param discoveryServiceConfiguration The configuration for the service.
+     * @return std::unique_ptr<NetRemoteDiscoveryService>
      */
-    std::shared_ptr<NetRemoteDiscoveryService>
-    Create(std::string hostname, uint32_t port, std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> ipAddresses) override;
+    std::unique_ptr<NetRemoteDiscoveryService>
+    Create(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) override;
 };
 } // namespace Microsoft::Net::Remote
 

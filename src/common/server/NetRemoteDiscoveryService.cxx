@@ -17,64 +17,30 @@ using namespace Microsoft::Net::Remote;
 using Microsoft::Net::INetworkOperations;
 using Microsoft::Net::IpAddressInformation;
 
-NetRemoteDiscoveryService::NetRemoteDiscoveryService(std::string hostname, uint32_t port, std::unordered_map<std::string, IpAddressInformation> ipAddresses) :
-    m_hostname(std::move(hostname)),
-    m_port(port),
-    m_ipAddresses(std::move(ipAddresses))
+NetRemoteDiscoveryService::NetRemoteDiscoveryService(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) :
+    m_configuration(std::move(discoveryServiceConfiguration))
 {}
 
 std::string_view
-NetRemoteDiscoveryService::GetHostname() const noexcept
+NetRemoteDiscoveryService::GetServiceName() const noexcept
 {
-    return m_hostname;
+    return m_configuration.Name;
 }
 
-uint32_t
+std::string_view
+NetRemoteDiscoveryService::GetProtocol() const noexcept
+{
+    return m_configuration.Protocol;
+}
+
+uint16_t
 NetRemoteDiscoveryService::GetPort() const noexcept
 {
-    return m_port;
+    return m_configuration.Port;
 }
 
 const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>&
 NetRemoteDiscoveryService::GetIpAddresses() const noexcept
 {
-    return m_ipAddresses;
-}
-
-NetRemoteDiscoveryServiceBuilder::NetRemoteDiscoveryServiceBuilder(std::unique_ptr<INetRemoteDiscoveryServiceFactory> discoveryServiceFactory, std::unique_ptr<INetworkOperations> networkOperations) :
-    m_discoveryServiceFactory(std::move(discoveryServiceFactory)),
-    m_networkOperations(std::move(networkOperations))
-{}
-
-NetRemoteDiscoveryServiceBuilder&
-NetRemoteDiscoveryServiceBuilder::SetHostname(std::string hostname)
-{
-    m_hostname = std::move(hostname);
-    return *this;
-}
-
-NetRemoteDiscoveryServiceBuilder&
-NetRemoteDiscoveryServiceBuilder::SetPort(uint32_t port)
-{
-    m_port = port;
-    return *this;
-}
-
-NetRemoteDiscoveryServiceBuilder&
-NetRemoteDiscoveryServiceBuilder::AddIpAddress(std::string ipAddress)
-{
-    auto ipAddressInfo = m_networkOperations->GetLocalIpAddressInformation(ipAddress);
-    if (std::empty(ipAddressInfo)) {
-        throw std::invalid_argument(std::format("Invalid IP address: {}", ipAddress));
-    }
-
-    m_ipAddresses.merge(ipAddressInfo);
-
-    return *this;
-}
-
-std::shared_ptr<NetRemoteDiscoveryService>
-NetRemoteDiscoveryServiceBuilder::Build()
-{
-    return m_discoveryServiceFactory->Create(m_hostname, m_port, m_ipAddresses);
+    return m_configuration.IpAddresses;
 }
