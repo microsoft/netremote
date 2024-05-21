@@ -1,14 +1,17 @@
 
 #include <cerrno>
+#include <condition_variable>
+#include <csignal>
 #include <format>
 #include <memory>
+#include <mutex>
 #include <stdexcept>
 #include <utility>
 
 #include <logging/LogUtils.hxx>
+#include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/remote/NetRemoteServer.hxx>
 #include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
-#include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
@@ -35,9 +38,52 @@ enum class LogInstanceId : int {
     File = 2,
 };
 
+namespace
+{
+/**
+ * @brief Flag indicating if termination of the server has been requested.
+ */
+bool TerminateRequested{ false };
+
+/**
+ * @brief Lock to protect the 'TerminateRequested' termination flag.
+ */
+std::mutex TerminateGate{};
+
+/**
+ * @brief Condition variable to signal that the termination flag 'TerminateRequested' has changed.
+ */
+std::condition_variable TerminateRequstedChanged{};
+} // namespace
+
+/**
+ * @brief Signal handler for SIGTERM and SIGINT signals. Sets a flag to request termination of the server.
+ *
+ * @param signal The signal number.
+ */
+void
+OnSignal(int signal)
+{
+    if (signal != SIGTERM && signal != SIGINT) {
+        LOGW << std::format("Ignoring unexpected signal {}", signal);
+        return;
+    }
+
+    LOGI << std::format("Received signal {} to terminate server", signal);
+    {
+        std::unique_lock<std::mutex> terminateRequestedLock{ TerminateGate };
+        TerminateRequested = true;
+    }
+
+    TerminateRequstedChanged.notify_one();
+}
+
 int
 main(int argc, char *argv[])
 {
+    std::signal(SIGTERM, OnSignal);
+    std::signal(SIGINT, OnSignal);
+
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
     static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("server").c_str());
@@ -94,10 +140,20 @@ main(int argc, char *argv[])
     }
     // Otherwise wait for the server to exit.
     else {
-        server.GetGrpcServer()->Wait();
+        {
+            std::unique_lock<std::mutex> terminateRequestedLock{ TerminateGate };
+            TerminateRequstedChanged.wait(terminateRequestedLock, [] {
+                return TerminateRequested;
+            });
+        }
+
+        LOGI << "Netremote server stopping";
+        auto &grpcServer = server.GetGrpcServer();
+        grpcServer->Shutdown();
+        grpcServer->Wait();
     }
 
-    LOGI << "Netremote server stopping";
+    LOGI << "Netremote server stopped";
 
     return 0;
 }
