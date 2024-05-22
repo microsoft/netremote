@@ -87,3 +87,15 @@ message WifiAccessPointSetFrequencyBandsResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointSetNetworkBridgeRequest
+{
+    string AccessPointId = 1;
+    string NetworkBridgeId = 2;
+}
+
+message WifiAccessPointSetNetworkBridgeResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
