@@ -684,14 +684,6 @@ WifiAccessPointOperationStatus
 NetRemoteService::WifiAccessPointSetNetworkBridgeImpl(std::string_view accessPointId, std::string_view networkBridgeId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
-
-    // Validate basic parameters in the request.
-    if (std::empty(networkBridgeId)) {
-        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        wifiOperationStatus.set_message("No network bridge id provided");
-        return wifiOperationStatus;
-    }
-
     AccessPointOperationStatus operationStatus{ accessPointId };
 
     // Create an AP controller for the requested AP if one wasn't specified.
@@ -711,6 +703,8 @@ NetRemoteService::WifiAccessPointSetNetworkBridgeImpl(std::string_view accessPoi
         wifiOperationStatus.set_message(std::format("Failed to set network bridge for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
     return wifiOperationStatus;
 }
