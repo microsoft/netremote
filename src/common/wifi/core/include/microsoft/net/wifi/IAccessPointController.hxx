@@ -138,6 +138,15 @@ struct IAccessPointController
      */
     virtual AccessPointOperationStatus
     SetSsid(std::string_view ssid) noexcept = 0;
+
+    /**
+     * @brief Set the network bridge interface the access point interface will be added to.
+     *
+     * @param networkBridgeId The network bridge interface id. The specific format of the id is platform dependent.
+     * @return AccessPointOperationStatus
+     */
+    virtual AccessPointOperationStatus
+    SetNetworkBridge(std::string_view networkBridgeId) noexcept = 0;
 };
 
 /**

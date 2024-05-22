@@ -97,6 +97,17 @@ private:
     grpc::Status
     WifiAccessPointSetFrequencyBands(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result) override;
 
+    /**
+     * @brief Set the network bridge interface the access point interface will be added to.
+     * 
+     * @param context 
+     * @param request 
+     * @param result 
+     * @return grpc::Status 
+     */
+    grpc::Status
+    WifiAccessPointSetNetworkBridge(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetNetworkBridgeRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetNetworkBridgeResult* result) override;
+
 protected:
     /**
      * @brief Attempt to obtain an IAccessPoint instance for the specified access point identifier.
@@ -172,6 +183,17 @@ protected:
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPointId, std::vector<Microsoft::Net::Wifi::Dot11FrequencyBand>& dot11FrequencyBands, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
+     * @brief Set the network bridge interface the access point interface will be added to.
+     * 
+     * @param accessPointId The access point identifier.
+     * @param networkBridgeId The network bridge interface id.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetNetworkBridgeImpl(std::string_view accessPointId, std::string_view networkBridgeId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
      * @brief Set the active authentication algorithms of the access point. If the access point is online, this will

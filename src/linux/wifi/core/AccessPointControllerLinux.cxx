@@ -429,6 +429,24 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
     return status;
 }
 
+AccessPointOperationStatus
+AccessPointControllerLinux::SetNetworkBridge([[maybe_unused]] std::string_view networkBridgeId) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    try {
+        m_hostapd.SetBridgeInterface(networkBridgeId, EnforceConfigurationChange::Now);
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set bridge interface to {} - {}", networkBridgeId, ex.what());
+        return status;
+    }
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
+    return status;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {
