@@ -28,6 +28,7 @@
 #include "NetRemoteApiTrace.hxx"
 #include "NetRemoteWifiApiTrace.hxx"
 
+using namespace Microsoft::Net::Remote::Network;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Service::Tracing;
 using namespace Microsoft::Net::Remote::Wifi;
@@ -270,6 +271,15 @@ std::shared_ptr<AccessPointManager>
 NetRemoteService::GetAccessPointManager() noexcept
 {
     return m_accessPointManager;
+}
+
+grpc::Status
+NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const NetworkEnumerateInterfacesRequest* request, NetworkEnumerateInterfacesResult* response)
+{
+    const NetRemoteApiTrace traceMe{};
+
+    // TODO: implement
+    return grpc::Status::OK;
 }
 
 grpc::Status

@@ -1,0 +1,9 @@
+
+syntax = "proto3";
+
+package Microsoft.Net;
+
+message NetworkInterface
+{
+    string Id = 1;
+}
