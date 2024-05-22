@@ -608,3 +608,124 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
 }
+
+TEST_CASE("WifiAccessPointSetNetworkBridge API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto InterfaceName{ "TestWifiAccessPointSetNetworkBridge" };
+    constexpr auto NetworkBridgeId1{ "TestWifiAccessPointSetNetworkBridge1" };
+    constexpr auto NetworkBridgeId2{ "TestWifiAccessPointSetNetworkBridge2" };
+    constexpr auto NetworkBridgeIds = std::array<const char*, 2>{ NetworkBridgeId1, NetworkBridgeId2 };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
+    };
+    auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
+    apManagerTest->AddAccessPoint(apTest);
+
+    const NetRemoteServerConfiguration Configuration{
+        .ServerAddress = RemoteServiceAddressHttp,
+        .AccessPointManager = apManagerTest,
+    };
+
+    NetRemoteServer server{ Configuration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointSetNetworkBridgeRequest request{};
+        request.set_accesspointid(InterfaceName);
+        request.set_networkbridgeid(NetworkBridgeId1);
+
+        WifiAccessPointSetNetworkBridgeResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointSetNetworkBridge(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Can be called multiple times")
+    {
+        WifiAccessPointSetNetworkBridgeRequest request{};
+        request.set_accesspointid(InterfaceName);
+        request.set_networkbridgeid(NetworkBridgeId1);
+
+        for (auto i = 0; i < 2; i++) {
+            WifiAccessPointSetNetworkBridgeResult result{};
+            grpc::ClientContext clientContext{};
+
+            auto status = client->WifiAccessPointSetNetworkBridge(&clientContext, request, &result);
+            REQUIRE(status.ok());
+            REQUIRE(result.accesspointid() == request.accesspointid());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        }
+    }
+
+    SECTION("Can be called with different network bridge")
+    {
+        WifiAccessPointSetNetworkBridgeRequest request{};
+        request.set_accesspointid(InterfaceName);
+
+        for (const auto networkBridgeId : NetworkBridgeIds) {
+            WifiAccessPointSetNetworkBridgeResult result{};
+            grpc::ClientContext clientContext{};
+
+            request.set_networkbridgeid(networkBridgeId);
+            auto status = client->WifiAccessPointSetNetworkBridge(&clientContext, request, &result);
+            REQUIRE(status.ok());
+            REQUIRE(result.accesspointid() == request.accesspointid());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        }
+    }
+
+    SECTION("Can be called with empty bridge id to clear the network bridge")
+    {
+        constexpr auto NetworkBridgeIdsForClearing = std::array<const char*, 2>{ NetworkBridgeId1, "" };
+
+        WifiAccessPointSetNetworkBridgeRequest request{};
+        request.set_accesspointid(InterfaceName);
+
+        for (const auto& networkBridgeId : NetworkBridgeIdsForClearing) {
+            WifiAccessPointSetNetworkBridgeResult result{};
+            grpc::ClientContext clientContext{};
+
+            request.set_networkbridgeid(networkBridgeId);
+            auto status = client->WifiAccessPointSetNetworkBridge(&clientContext, request, &result);
+            REQUIRE(status.ok());
+            REQUIRE(result.accesspointid() == request.accesspointid());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        }
+    }
+
+    SECTION("Can be called with empty bridge id with none previously set")
+    {
+        WifiAccessPointSetNetworkBridgeRequest request{};
+        request.set_accesspointid(InterfaceName);
+        request.set_networkbridgeid("");
+
+        WifiAccessPointSetNetworkBridgeResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointSetNetworkBridge(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+}
