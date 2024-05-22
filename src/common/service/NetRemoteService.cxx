@@ -348,6 +348,18 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
     return grpc::Status::OK;
 }
 
+grpc::Status
+NetRemoteService::WifiAccessPointSetNetworkBridge([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetNetworkBridgeRequest* request, WifiAccessPointSetNetworkBridgeResult* result)
+{
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+
+    auto wifiOperationStatus = WifiAccessPointSetNetworkBridgeImpl(request->accesspointid(), request->networkbridgeid());
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(wifiOperationStatus);
+
+    return grpc::Status::OK;
+}
+
 AccessPointOperationStatus
 NetRemoteService::TryGetAccessPoint(std::string_view accessPointId, std::shared_ptr<IAccessPoint>& accessPoint)
 {
@@ -664,6 +676,41 @@ NetRemoteService::WifiAccessPointSetFrequencyBandsImpl(std::string_view accessPo
     }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetNetworkBridgeImpl(std::string_view accessPointId, std::string_view networkBridgeId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (std::empty(networkBridgeId)) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No network bridge id provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Attempt to set the network bridge.
+    operationStatus = accessPointController->SetNetworkBridge(networkBridgeId);
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set network bridge for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
 
     return wifiOperationStatus;
 }
