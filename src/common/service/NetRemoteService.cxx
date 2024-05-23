@@ -266,7 +266,8 @@ NetRemoteAccessPointResultItemIsInvalid(const WifiAccessPointsEnumerateResultIte
 using detail::HandleFailure;
 
 NetRemoteService::NetRemoteService(std::shared_ptr<NetworkManager> networkManager) noexcept :
-    m_networkManager(std::move(networkManager))
+    m_networkManager(networkManager),
+    m_accessPointManager(networkManager->GetAccessPointManager())
 {
 }
 
