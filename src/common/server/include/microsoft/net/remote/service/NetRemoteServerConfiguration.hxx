@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <microsoft/net/NetworkManager.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
 
 namespace Microsoft::Net::Remote::Service
@@ -17,12 +18,6 @@ namespace Microsoft::Net::Remote::Service
  */
 struct NetRemoteServerConfiguration
 {
-    /**
-     * @brief Default address for the server to listen on.
-     * TODO: This should be sourced from NetRemoteProtocol.hxx.
-     */
-    static constexpr auto ServerAddressDefault = "0.0.0.0:5047";
-
     /**
      * @brief Create a NetRemoteServerConfiguration object from command-line
      * arguments.
@@ -49,7 +44,7 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Default address for the server to listen on.
      */
-    std::string ServerAddress{ ServerAddressDefault };
+    std::string ServerAddress{ Microsoft::Net::Remote::Protocol::NetRemoteProtocol::AddressDefault };
 
     /**
      * @brief Run the service in the background.

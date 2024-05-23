@@ -14,7 +14,7 @@ namespace Microsoft::Net::Remote::Protocol
 struct NetRemoteProtocol
 {
 #define SERVICE_NAME   "netremote"
-#define IP_DEFAULT     "localhost"
+#define IP_DEFAULT     "0.0.0.0"
 #define PORT_DEFAULT   5047
 #define PORT_SEPARATOR ":"
 #define xstr(s)        str(s)
