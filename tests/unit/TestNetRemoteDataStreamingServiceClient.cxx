@@ -23,6 +23,8 @@
 #include "TestNetRemoteCommon.hxx"
 #include "TestNetRemoteDataStreamingReactors.hxx"
 
+using namespace Microsoft::Net::Remote::Test;
+
 TEST_CASE("DataStreamUpload API", "[basic][rpc][client][remote][stream]")
 {
     using namespace Microsoft::Net::Remote;
@@ -30,13 +32,9 @@ TEST_CASE("DataStreamUpload API", "[basic][rpc][client][remote][stream]")
     using namespace Microsoft::Net::Remote::Service;
 
     using Microsoft::Net::Remote::Test::DataStreamWriter;
-    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -86,13 +84,9 @@ TEST_CASE("DataStreamDownload API", "[basic][rpc][client][remote][stream]")
     using namespace Microsoft::Net::Remote::Service;
 
     using Microsoft::Net::Remote::Test::DataStreamReader;
-    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -169,13 +163,9 @@ TEST_CASE("DataStreamBidirectional API", "[basic][rpc][client][remote][stream]")
     using namespace Microsoft::Net::Remote::Service;
 
     using Microsoft::Net::Remote::Test::DataStreamReaderWriter;
-    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -239,13 +229,9 @@ TEST_CASE("DataStreamPing API", "[basic][rpc][client][remote][stream]")
     using namespace Microsoft::Net::Remote::Service;
 
     using Microsoft::Net::Remote::Test::DataStreamReaderWriter;
-    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
