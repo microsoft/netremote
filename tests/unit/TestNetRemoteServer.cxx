@@ -10,9 +10,9 @@
 #include <grpc/impl/codegen/connectivity_state.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
-#include <microsoft/net/remote/NetRemoteServer.hxx>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/service/NetRemoteServer.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 
 #include "TestNetRemoteCommon.hxx"
@@ -23,7 +23,7 @@ using Microsoft::Net::Remote::Test::RemoteServiceConnectionTimeout;
 
 TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 {
-    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Wifi;
 
     const NetRemoteServerConfiguration Configuration{

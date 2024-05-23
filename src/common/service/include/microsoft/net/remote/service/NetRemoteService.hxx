@@ -7,10 +7,12 @@
 
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/status.h>
+#include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/NetworkCore.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/remote/service/NetRemoteService.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -26,11 +28,11 @@ class NetRemoteService :
 {
 public:
     /**
-     * @brief Construct a new NetRemoteService object with the specified access point manager.
+     * @brief Construct a new NetRemoteService object with the specified network manager.
      *
-     * @param accessPointManager The access point manager to use.
+     * @param networkManager The network manager to use.
      */
-    explicit NetRemoteService(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager);
+    explicit NetRemoteService(std::shared_ptr<Microsoft::Net::NetworkManager> networkManager) noexcept;
 
     /**
      * @brief Get the AccessPointManager object for this service.
@@ -43,11 +45,11 @@ public:
 private:
     /**
      * @brief Enumerate the available network interfaces.
-     * 
-     * @param context 
-     * @param request 
-     * @param response 
-     * @return grpc::Status 
+     *
+     * @param context
+     * @param request
+     * @param response
+     * @return grpc::Status
      */
     grpc::Status
     NetworkInterfacesEnumerate(grpc::ServerContext* context, const Microsoft::Net::Remote::Network::NetworkEnumerateInterfacesRequest* request, Microsoft::Net::Remote::Network::NetworkEnumerateInterfacesResult* response) override;
@@ -268,6 +270,7 @@ protected:
     WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
 private:
+    std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
 };
 } // namespace Microsoft::Net::Remote::Service

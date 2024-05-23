@@ -6,7 +6,7 @@
 #include "NetRemoteDiscoveryServiceLinuxDnssd.hxx"
 #include "SystemdResolvedDnssd.hxx"
 
-using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Systemd;
 
 namespace Systemd

@@ -6,11 +6,12 @@
 #include <string>
 
 #include <grpcpp/server.h>
-#include <microsoft/net/remote/NetRemoteDataStreamingService.hxx>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
-#include <microsoft/net/remote/NetRemoteService.hxx>
+#include <microsoft/net/NetworkManager.hxx>
+#include <microsoft/net/remote/service/NetRemoteDataStreamingService.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/service/NetRemoteService.hxx>
 
-namespace Microsoft::Net::Remote
+namespace Microsoft::Net::Remote::Service
 {
 /**
  * @brief Represents a remote server. Note that this class is not thread-safe.
@@ -54,7 +55,7 @@ struct NetRemoteServer
      *
      * @return Service::NetRemoteService&
      */
-    Service::NetRemoteService&
+    NetRemoteService&
     GetService() noexcept;
 
     /**
@@ -62,7 +63,7 @@ struct NetRemoteServer
      *
      * @return Service::NetRemoteDataStreamingService&
      */
-    Service::NetRemoteDataStreamingService&
+    NetRemoteDataStreamingService&
     GetDataStreamingService() noexcept;
 
     /**
@@ -86,13 +87,14 @@ protected:
 
 private:
     std::string m_serverAddress;
-    std::unique_ptr<grpc::Server> m_server;
-    Service::NetRemoteService m_service;
-    Service::NetRemoteDataStreamingService m_dataStreamingService;
+    std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;
     std::shared_ptr<INetRemoteDiscoveryServiceFactory> m_discoveryServiceFactory;
-    std::shared_ptr<INetworkOperations> m_networkOperations;
     std::shared_ptr<NetRemoteDiscoveryService> m_discoveryService;
+    std::unique_ptr<grpc::Server> m_server;
+
+    NetRemoteService m_service;
+    NetRemoteDataStreamingService m_dataStreamingService;
 };
-} // namespace Microsoft::Net::Remote
+} // namespace Microsoft::Net::Remote::Service
 
 #endif // NET_REMOTE_SERVER_HXX
