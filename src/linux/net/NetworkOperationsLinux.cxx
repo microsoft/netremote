@@ -21,7 +21,10 @@ GetNetworkInterfaceType(const Netlink::NetlinkLink& netlinkLink) noexcept
     if (netlinkLink.Type == "wireless") {
         return NetworkInterfaceType::Wifi;
     }
-    if (netlinkLink.Type == "ethernet" || netlinkLink.Type == "loopback" || netlinkLink.Type == "bridge") {
+    if (netlinkLink.Type == "bridge") {
+        return NetworkInterfaceType::Bridge;
+    }
+    if (netlinkLink.Type == "ethernet" || netlinkLink.Type == "loopback") {
         return NetworkInterfaceType::Other;
     }
     return NetworkInterfaceType::Unknown;

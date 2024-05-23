@@ -11,7 +11,7 @@ namespace Microsoft::Net
 /**
  * @brief Determine if a string contains an IPv4 or IPv6 "any" address. The port is optional for both forms, and square
  * brackets are optional for the IPv6 form.
- * 
+ *
  * @param ipAddressView The view of the string to check.
  * @return true If the string contains an IPv4 or IPv6 "any" address.
  * @return false If the string does not contain an IPv4 or IPv6 "any" address.
@@ -32,6 +32,7 @@ IsAnyAddress(std::string_view ipAddressView) noexcept
 enum class NetworkInterfaceType {
     Unknown,
     Wifi,
+    Bridge,
     Other,
 };
 
