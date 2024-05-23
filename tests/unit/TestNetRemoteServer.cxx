@@ -10,7 +10,6 @@
 #include <grpc/impl/codegen/connectivity_state.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
-#include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>

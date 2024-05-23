@@ -13,7 +13,6 @@
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/security/credentials.h>
 #include <magic_enum.hpp>
-#include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
@@ -32,7 +31,6 @@
 namespace Microsoft::Net::Remote::Service::Test
 {
 using Microsoft::Net::NetworkManager;
-using Microsoft::Net::NetworkOperationsLinux;
 using Microsoft::Net::Wifi::AccessPointManager;
 
 constexpr auto AllPhyTypes = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211PhyType>();
