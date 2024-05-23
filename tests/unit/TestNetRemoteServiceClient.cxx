@@ -115,7 +115,7 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
     apManagerTest->AddAccessPoint(apTest1);
     apManagerTest->AddAccessPoint(apTest2);
 
-    const auto serverConfiguration = CreateServerConfiguration();
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
     NetRemoteServer server{ serverConfiguration };
     server.Run();
 
@@ -335,7 +335,7 @@ TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
     apManagerTest->AddAccessPoint(apTest1);
     apManagerTest->AddAccessPoint(apTest2);
 
-    const auto serverConfiguration = CreateServerConfiguration();
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
     NetRemoteServer server{ serverConfiguration };
     server.Run();
 
@@ -427,7 +427,7 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);
 
-    const auto serverConfiguration = CreateServerConfiguration();
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
     NetRemoteServer server{ serverConfiguration };
     server.Run();
 
@@ -492,7 +492,7 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
     apManagerTest->AddAccessPoint(apTestBands5_0);
     apManagerTest->AddAccessPoint(apTestBands6_0);
 
-    const auto serverConfiguration = CreateServerConfiguration();
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
     NetRemoteServer server{ serverConfiguration };
     server.Run();
 
@@ -614,7 +614,7 @@ TEST_CASE("WifiAccessPointSetNetworkBridge API", "[basic][rpc][client][remote]")
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);
 
-    const auto serverConfiguration = CreateServerConfiguration();
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
     NetRemoteServer server{ serverConfiguration };
     server.Run();
 

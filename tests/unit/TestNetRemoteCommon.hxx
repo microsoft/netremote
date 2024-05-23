@@ -40,11 +40,14 @@ EstablishClientConnections(std::size_t numConnectionsToEstablish, std::string_vi
 
 /**
  * @brief Create a server configuration to be used for testing.
+ * 
+ * @param accessPointManager The access point manager to use.
+ * @param networkManager The network manager to use.
  *
  * @return Microsoft::Net::Remote::Service::NetRemoteServerConfiguration
  */
 Microsoft::Net::Remote::Service::NetRemoteServerConfiguration
-CreateServerConfiguration();
+CreateServerConfiguration(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager = nullptr, std::shared_ptr<Microsoft::Net::NetworkManager> networkManager = nullptr);
 
 } // namespace Microsoft::Net::Remote::Test
 
