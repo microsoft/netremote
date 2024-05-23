@@ -6,6 +6,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <grpcpp/create_channel.h>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/test/NetworkOperationsTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointManagerTest.hxx>
 
 #include "TestNetRemoteCommon.hxx"
@@ -13,6 +14,7 @@
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::Test;
 using namespace Microsoft::Net::Remote::Service;
+using namespace Microsoft::Net::Test;
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
 
@@ -31,20 +33,20 @@ Microsoft::Net::Remote::Test::EstablishClientConnections(std::size_t numConnecti
     return clients;
 }
 
-namespace detail
-{
-using namespace Microsoft::Net;
+// namespace detail
+// {
+// using namespace Microsoft::Net;
 
-struct NetworkOperationsTest :
-    public INetworkOperations
-{
-    std::unordered_map<std::string, IpAddressInformation>
-    GetLocalIpAddressInformation(std::string_view ipAddress) const noexcept override
-    {
-        return {};
-    }
-};
-} // namespace detail
+// struct NetworkOperationsTest :
+//     public INetworkOperations
+// {
+//     std::unordered_map<std::string, IpAddressInformation>
+//     GetLocalIpAddressInformation(std::string_view ipAddress) const noexcept override
+//     {
+//         return {};
+//     }
+// };
+// } // namespace detail
 
 NetRemoteServerConfiguration
 Microsoft::Net::Remote::Test::CreateServerConfiguration(std::shared_ptr<AccessPointManager> accessPointManager, std::shared_ptr<NetworkManager> networkManager)
@@ -53,7 +55,7 @@ Microsoft::Net::Remote::Test::CreateServerConfiguration(std::shared_ptr<AccessPo
         accessPointManager = std::make_shared<AccessPointManagerTest>();
     }
     if (networkManager == nullptr) {
-        networkManager = std::make_shared<NetworkManager>(std::make_unique<detail::NetworkOperationsTest>(), accessPointManager);
+        networkManager = std::make_shared<NetworkManager>(std::make_unique<NetworkOperationsTest>(), accessPointManager);
     }
 
     return {
