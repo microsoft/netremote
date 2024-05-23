@@ -1,0 +1,15 @@
+
+syntax = "proto3";
+
+package Microsoft.Net.Remote.Network;
+
+import "NetworkCore.proto";
+
+message NetworkEnumerateInterfacesRequest
+{
+}
+
+message NetworkEnumerateInterfacesResult
+{
+    repeated NetworkInterface Interfaces = 1;
+}

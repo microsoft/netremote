@@ -8,9 +8,9 @@
 #include <vector>
 
 #include <microsoft/net/INetworkOperations.hxx>
-#include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
+#include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
 
-namespace Microsoft::Net::Remote
+namespace Microsoft::Net::Remote::Service
 {
 /**
  * @brief Linux DNS-SD based service discovery implementation.
@@ -90,6 +90,6 @@ struct NetRemoteDiscoveryServiceLinuxDnssdFactory :
     std::unique_ptr<NetRemoteDiscoveryService>
     Create(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) override;
 };
-} // namespace Microsoft::Net::Remote
+} // namespace Microsoft::Net::Remote::Service
 
 #endif // NET_REMOTE_DISCOVERY_SERVICE_LINUX_DNSSD_HXX

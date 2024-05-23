@@ -4,26 +4,21 @@
 
 #include <grpcpp/security/server_credentials.h>
 #include <grpcpp/server_builder.h>
-#include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
-#include <microsoft/net/remote/NetRemoteServer.hxx>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
-#include <microsoft/net/remote/NetRemoteService.hxx>
+#include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
+#include <microsoft/net/remote/service/NetRemoteServer.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/service/NetRemoteService.hxx>
 #include <plog/Log.h>
 
-using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Service;
 
 NetRemoteServer::NetRemoteServer(const NetRemoteServerConfiguration& configuration) :
     m_serverAddress(configuration.ServerAddress),
-    m_service(configuration.AccessPointManager),
+    m_networkManager(configuration.NetworkManager),
     m_discoveryServiceFactory(std::move(configuration.DiscoveryServiceFactory)),
-    m_networkOperations(std::move(configuration.NetworkOperations))
+    m_service(configuration.NetworkManager)
 {
     InitializeDiscoveryService();
-}
-
-NetRemoteServer::~NetRemoteServer()
-{
-    Stop();
 }
 
 void
@@ -33,17 +28,13 @@ NetRemoteServer::InitializeDiscoveryService()
         LOGW << "Discovery service is already initialized; skipping initialization";
         return;
     }
-    if (m_networkOperations == nullptr) {
-        LOGW << "Network operations is not available; server will not be discoverable";
-        return;
-    }
     if (m_discoveryServiceFactory == nullptr) {
         LOGW << "Discovery service factory is not available; server will not be discoverable";
         return;
     }
 
     NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration{};
-    discoveryServiceConfiguration.IpAddresses = m_networkOperations->GetLocalIpAddressInformation(m_serverAddress);
+    discoveryServiceConfiguration.IpAddresses = m_networkManager->GetLocalIpAddressInformation(m_serverAddress);
     auto discoveryService = m_discoveryServiceFactory->Create(std::move(discoveryServiceConfiguration));
     if (discoveryService == nullptr) {
         LOGE << "Failed to create discovery service; server will not be discoverable";
@@ -51,7 +42,12 @@ NetRemoteServer::InitializeDiscoveryService()
     }
 
     m_discoveryService = std::move(discoveryService);
-    LOGI << "Discovery service initialized";
+    LOGD << "Discovery service initialized";
+}
+
+NetRemoteServer::~NetRemoteServer()
+{
+    Stop();
 }
 
 std::unique_ptr<grpc::Server>&
@@ -60,13 +56,13 @@ NetRemoteServer::GetGrpcServer() noexcept
     return m_server;
 }
 
-Service::NetRemoteService&
+NetRemoteService&
 NetRemoteServer::GetService() noexcept
 {
     return m_service;
 }
 
-Service::NetRemoteDataStreamingService&
+NetRemoteDataStreamingService&
 NetRemoteServer::GetDataStreamingService() noexcept
 {
     return m_dataStreamingService;
@@ -106,6 +102,7 @@ NetRemoteServer::Stop()
     if (m_server == nullptr) {
         return;
     }
+
     m_server->Shutdown();
     m_server = nullptr;
 }

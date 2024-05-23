@@ -7,26 +7,17 @@
 #include <string>
 #include <vector>
 
-#include <microsoft/net/INetworkOperations.hxx>
-#include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
+#include <microsoft/net/NetworkManager.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
+#include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
 
-namespace Microsoft::Net::Wifi
-{
-class AccessPointManager;
-} // namespace Microsoft::Net::Wifi
-
-namespace Microsoft::Net::Remote
+namespace Microsoft::Net::Remote::Service
 {
 /**
  * @brief Collects configuration options for the NetRemoteServer class.
  */
 struct NetRemoteServerConfiguration
 {
-    /**
-     * @brief Default address for the server to listen on.
-     */
-    static constexpr auto ServerAddressDefault = "0.0.0.0:5047";
-
     /**
      * @brief Create a NetRemoteServerConfiguration object from command-line
      * arguments.
@@ -53,7 +44,7 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Default address for the server to listen on.
      */
-    std::string ServerAddress{ ServerAddressDefault };
+    std::string ServerAddress{ Microsoft::Net::Remote::Protocol::NetRemoteProtocol::AddressDefault };
 
     /**
      * @brief Run the service in the background.
@@ -74,14 +65,9 @@ struct NetRemoteServerConfiguration
     bool EnableFileLogging{ false };
 
     /**
-     * @brief Access point manager instance.
-     */
-    std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> AccessPointManager;
-
-    /**
      * @brief Object to use when performing network operations.
      */
-    std::shared_ptr<Microsoft::Net::INetworkOperations> NetworkOperations;
+    std::shared_ptr<Microsoft::Net::NetworkManager> NetworkManager;
 
     /**
      * @brief Factory to use to create the discovery service.
@@ -89,6 +75,6 @@ struct NetRemoteServerConfiguration
     std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory;
 };
 
-} // namespace Microsoft::Net::Remote
+} // namespace Microsoft::Net::Remote::Service
 
 #endif // NET_REMOTE_SERVER_CONFIGURATION_HXX

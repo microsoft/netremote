@@ -7,9 +7,9 @@
 #include <CLI/Config.hpp>
 #include <CLI/Error.hpp>
 #include <CLI/Formatter.hpp>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
 
-using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Service;
 
 namespace details
 {

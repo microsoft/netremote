@@ -7,9 +7,12 @@
 
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/status.h>
+#include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/NetworkCore.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/remote/service/NetRemoteService.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -25,11 +28,11 @@ class NetRemoteService :
 {
 public:
     /**
-     * @brief Construct a new NetRemoteService object with the specified access point manager.
+     * @brief Construct a new NetRemoteService object with the specified network manager.
      *
-     * @param accessPointManager The access point manager to use.
+     * @param networkManager The network manager to use.
      */
-    explicit NetRemoteService(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager);
+    explicit NetRemoteService(std::shared_ptr<Microsoft::Net::NetworkManager> networkManager) noexcept;
 
     /**
      * @brief Get the AccessPointManager object for this service.
@@ -38,6 +41,18 @@ public:
      */
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager>
     GetAccessPointManager() noexcept;
+
+private:
+    /**
+     * @brief Enumerate the available network interfaces.
+     *
+     * @param context
+     * @param request
+     * @param response
+     * @return grpc::Status
+     */
+    grpc::Status
+    NetworkInterfacesEnumerate(grpc::ServerContext* context, const Microsoft::Net::Remote::Network::NetworkEnumerateInterfacesRequest* request, Microsoft::Net::Remote::Network::NetworkEnumerateInterfacesResult* response) override;
 
 private:
     /**
@@ -99,11 +114,11 @@ private:
 
     /**
      * @brief Set the network bridge interface the access point interface will be added to.
-     * 
-     * @param context 
-     * @param request 
-     * @param result 
-     * @return grpc::Status 
+     *
+     * @param context
+     * @param request
+     * @param result
+     * @return grpc::Status
      */
     grpc::Status
     WifiAccessPointSetNetworkBridge(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetNetworkBridgeRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetNetworkBridgeResult* result) override;
@@ -186,11 +201,11 @@ protected:
 
     /**
      * @brief Set the network bridge interface the access point interface will be added to.
-     * 
+     *
      * @param accessPointId The access point identifier.
      * @param networkBridgeId The network bridge interface id.
      * @param accessPointController The access point controller for the specified access point (optional).
-     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetNetworkBridgeImpl(std::string_view accessPointId, std::string_view networkBridgeId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
@@ -210,11 +225,11 @@ protected:
     /**
      * @brief Set the active authentication data of the access point. If the access point is online, this will cause it to
      * temporarily go offline while the change is being applied.
-     * 
+     *
      * @param accessPointId The access point identifier.
      * @param dot11AuthenticationData The new authentication data to set.
      * @param accessPointController The access point controller for the specified access point (optional).
-     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetAuthenticationDataImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AuthenticationData& dot11AuthenticationData, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
@@ -255,6 +270,7 @@ protected:
     WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
 private:
+    std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
 };
 } // namespace Microsoft::Net::Remote::Service

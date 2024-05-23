@@ -2,21 +2,17 @@
 add_library(${PROJECT_NAME}-server STATIC "")
 
 set(NET_REMOTE_SERVER_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
-set(NET_REMOTE_SERVER_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote)
+set(NET_REMOTE_SERVER_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote/service)
 set(NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_SERVER_PUBLIC_INCLUDE}/${NET_REMOTE_SERVER_PUBLIC_INCLUDE_SUFFIX})
 
 target_sources(${PROJECT_NAME}-server
     PRIVATE
-        NetRemoteDiscoveryDnssd.cxx
-        NetRemoteDiscoveryService.cxx
         NetRemoteServer.cxx
         NetRemoteServerConfiguration.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_SERVER_PUBLIC_INCLUDE}
     FILES
-        ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteDiscoveryDnssd.hxx
-        ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteDiscoveryService.hxx
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServer.hxx
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServerConfiguration.hxx
 )

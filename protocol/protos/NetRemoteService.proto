@@ -4,10 +4,15 @@ syntax = "proto3";
 package Microsoft.Net.Remote.Service;
 
 import "NetRemote.proto";
+import "NetRemoteNetwork.proto";
 import "NetRemoteWifi.proto";
 
 service NetRemote
 {
+    // General network related APIs
+    rpc NetworkInterfacesEnumerate (Microsoft.Net.Remote.Network.NetworkEnumerateInterfacesRequest) returns (Microsoft.Net.Remote.Network.NetworkEnumerateInterfacesResult);
+
+    // Wi-Fi related APIs
     rpc WifiAccessPointsEnumerate (Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateResult);
     rpc WifiAccessPointEnable (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableResult);
     rpc WifiAccessPointDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableResult);

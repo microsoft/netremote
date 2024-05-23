@@ -13,11 +13,11 @@
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/security/credentials.h>
 #include <magic_enum.hpp>
-#include <microsoft/net/remote/NetRemoteServer.hxx>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/remote/service/NetRemoteServer.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -28,17 +28,21 @@
 
 #include "TestNetRemoteCommon.hxx"
 
-namespace Microsoft::Net::Remote::Test
+namespace Microsoft::Net::Remote::Service::Test
 {
+using Microsoft::Net::NetworkManager;
+using Microsoft::Net::Wifi::AccessPointManager;
+
 constexpr auto AllPhyTypes = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211PhyType>();
 constexpr auto AllBands = magic_enum::enum_values<Microsoft::Net::Wifi::Ieee80211FrequencyBand>();
 
 constexpr auto PasswordIdValid{ "someid" };
 constexpr auto AsciiPassword{ "password" };
 constexpr std::array<uint8_t, 6> MacAddressDefault{ 0x00, 0x11, 0x22, 0x33, 0x44, 0x55 };
-} // namespace Microsoft::Net::Remote::Test
+} // namespace Microsoft::Net::Remote::Service::Test
 
-using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
+using namespace Microsoft::Net::Remote::Service::Test;
+using namespace Microsoft::Net::Remote::Test;
 
 TEST_CASE("WifiAccessPointsEnumerate API", "[basic][rpc][client][remote]")
 {
@@ -47,14 +51,8 @@ TEST_CASE("WifiAccessPointsEnumerate API", "[basic][rpc][client][remote]")
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
 
-    using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
-
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -115,12 +113,8 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
     apManagerTest->AddAccessPoint(apTest1);
     apManagerTest->AddAccessPoint(apTest2);
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = apManagerTest,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -339,12 +333,8 @@ TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
     apManagerTest->AddAccessPoint(apTest1);
     apManagerTest->AddAccessPoint(apTest2);
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = apManagerTest,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -435,12 +425,8 @@ TEST_CASE("WifiAccessPointSetPhyType API", "[basic][rpc][client][remote]")
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = apManagerTest,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -504,12 +490,8 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
     apManagerTest->AddAccessPoint(apTestBands5_0);
     apManagerTest->AddAccessPoint(apTestBands6_0);
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = apManagerTest,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
@@ -630,12 +612,8 @@ TEST_CASE("WifiAccessPointSetNetworkBridge API", "[basic][rpc][client][remote]")
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
     apManagerTest->AddAccessPoint(apTest);
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = apManagerTest,
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());

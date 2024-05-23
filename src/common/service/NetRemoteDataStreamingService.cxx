@@ -4,8 +4,8 @@
 #include <google/protobuf/empty.pb.h>
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/server_callback.h>
-#include <microsoft/net/remote/NetRemoteDataStreamingService.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteDataStream.pb.h>
+#include <microsoft/net/remote/service/NetRemoteDataStreamingService.hxx>
 
 #include "NetRemoteApiTrace.hxx"
 #include "NetRemoteDataStreamingReactors.hxx"

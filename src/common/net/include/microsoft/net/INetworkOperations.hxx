@@ -1,6 +1,6 @@
 
-#ifndef NETWORK_OPERATIONS_HXX
-#define NETWORK_OPERATIONS_HXX
+#ifndef I_NETWORK_OPERATIONS_HXX
+#define I_NETWORK_OPERATIONS_HXX
 
 #include <string>
 #include <string_view>
@@ -31,4 +31,4 @@ struct INetworkOperations
 };
 } // namespace Microsoft::Net
 
-#endif // NETWORK_OPERATIONS_HXX
+#endif // I_NETWORK_OPERATIONS_HXX

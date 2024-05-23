@@ -11,9 +11,9 @@
 
 #include <microsoft/net/INetworkOperations.hxx>
 #include <microsoft/net/IpAddressInformation.hxx>
-#include <microsoft/net/remote/NetRemoteDiscoveryService.hxx>
+#include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
 
-using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Service;
 using Microsoft::Net::INetworkOperations;
 using Microsoft::Net::IpAddressInformation;
 

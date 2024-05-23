@@ -9,9 +9,10 @@
 #include <utility>
 
 #include <logging/LogUtils.hxx>
+#include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/NetworkOperationsLinux.hxx>
-#include <microsoft/net/remote/NetRemoteServer.hxx>
-#include <microsoft/net/remote/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/service/NetRemoteServer.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/wifi/AccessPointControllerLinux.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
@@ -30,6 +31,7 @@
 
 using namespace Microsoft::Net;
 using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Wifi;
 
 enum class LogInstanceId : int {
@@ -101,23 +103,23 @@ main(int argc, char *argv[])
     }
 
     // Create an access point manager and discovery agent.
+    auto accessPointManager = AccessPointManager::Create();
+    auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
+    auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
+    auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory);
+    auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));
+
+    accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+
+    // Create a network manager.
     {
-        configuration.AccessPointManager = AccessPointManager::Create();
-
-        auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
-        auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
-        auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory);
-        auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));
-        auto &accessPointManager = configuration.AccessPointManager;
-
-        accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+        auto networkOperations = std::make_unique<NetworkOperationsLinux>();
+        auto networkManager = std::make_shared<NetworkManager>(std::move(networkOperations), accessPointManager);
+        configuration.NetworkManager = networkManager;
     }
 
     // Configure service discovery to use DNS-SD.
-    {
-        configuration.NetworkOperations = std::make_shared<NetworkOperationsLinux>();
-        configuration.DiscoveryServiceFactory = std::make_shared<NetRemoteDiscoveryServiceLinuxDnssdFactory>();
-    }
+    configuration.DiscoveryServiceFactory = std::make_shared<NetRemoteDiscoveryServiceLinuxDnssdFactory>();
 
     // Create the server.
     NetRemoteServer server{ configuration };

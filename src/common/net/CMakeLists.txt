@@ -1,17 +1,26 @@
 
-add_library(${PROJECT_NAME}-net INTERFACE "")
+add_library(${PROJECT_NAME}-net STATIC "")
 
 set(NET_REMOTE_NET_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(NET_REMOTE_NET_PUBLIC_INCLUDE_SUFFIX microsoft/net)
 set(NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_NET_PUBLIC_INCLUDE}/${NET_REMOTE_NET_PUBLIC_INCLUDE_SUFFIX})
 
 target_sources(${PROJECT_NAME}-net
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/NetworkManager.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_NET_PUBLIC_INCLUDE}
     FILES
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/INetworkOperations.hxx
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/IpAddressInformation.hxx
+        ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/NetworkManager.hxx
+)
+
+target_link_libraries(${PROJECT_NAME}-net
+    PUBLIC
+        wifi-apmanager
+        wifi-core
 )
 
 install(

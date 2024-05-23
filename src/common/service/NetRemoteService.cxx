@@ -13,9 +13,9 @@
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/server_context.h>
 #include <magic_enum.hpp>
-#include <microsoft/net/remote/NetRemoteService.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
+#include <microsoft/net/remote/service/NetRemoteService.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -28,9 +28,12 @@
 #include "NetRemoteApiTrace.hxx"
 #include "NetRemoteWifiApiTrace.hxx"
 
+using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Network;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Service::Tracing;
 using namespace Microsoft::Net::Remote::Wifi;
+using namespace Microsoft::Net;
 using namespace Microsoft::Net::Wifi;
 
 namespace detail
@@ -262,14 +265,25 @@ NetRemoteAccessPointResultItemIsInvalid(const WifiAccessPointsEnumerateResultIte
 
 using detail::HandleFailure;
 
-NetRemoteService::NetRemoteService(std::shared_ptr<AccessPointManager> accessPointManager) :
-    m_accessPointManager(std::move(accessPointManager))
-{}
+NetRemoteService::NetRemoteService(std::shared_ptr<NetworkManager> networkManager) noexcept :
+    m_networkManager(networkManager),
+    m_accessPointManager(networkManager->GetAccessPointManager())
+{
+}
 
 std::shared_ptr<AccessPointManager>
 NetRemoteService::GetAccessPointManager() noexcept
 {
     return m_accessPointManager;
+}
+
+grpc::Status
+NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const NetworkEnumerateInterfacesRequest* request, NetworkEnumerateInterfacesResult* response)
+{
+    const NetRemoteApiTrace traceMe{};
+
+    // TODO: implement
+    return grpc::Status::OK;
 }
 
 grpc::Status

@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
+#include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
 
 namespace Microsoft::Net::Remote::Test
 {
@@ -36,6 +37,17 @@ constexpr auto RemoteServiceConnectionTimeout = 3s;
  */
 std::vector<std::tuple<std::shared_ptr<grpc::Channel>, std::unique_ptr<Microsoft::Net::Remote::Service::NetRemote::Stub>>>
 EstablishClientConnections(std::size_t numConnectionsToEstablish, std::string_view serverAddress = RemoteServiceAddressHttp);
+
+/**
+ * @brief Create a server configuration to be used for testing.
+ * 
+ * @param accessPointManager The access point manager to use.
+ * @param networkManager The network manager to use.
+ *
+ * @return Microsoft::Net::Remote::Service::NetRemoteServerConfiguration
+ */
+Microsoft::Net::Remote::Service::NetRemoteServerConfiguration
+CreateServerConfiguration(std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> accessPointManager = nullptr, std::shared_ptr<Microsoft::Net::NetworkManager> networkManager = nullptr);
 
 } // namespace Microsoft::Net::Remote::Test
 

@@ -12,7 +12,7 @@
 #include <microsoft/net/INetworkOperations.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 
-namespace Microsoft::Net::Remote
+namespace Microsoft::Net::Remote::Service
 {
 /**
  * @brief Collection of netremote discovery service configuration.
@@ -117,6 +117,6 @@ struct INetRemoteDiscoveryServiceFactory
     virtual std::unique_ptr<NetRemoteDiscoveryService>
     Create(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) = 0;
 };
-} // namespace Microsoft::Net::Remote
+} // namespace Microsoft::Net::Remote::Service
 
 #endif // NET_REMOTE_DISCOVERY_SERVICE_HXX
