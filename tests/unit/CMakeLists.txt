@@ -19,6 +19,7 @@ target_sources(${PROJECT_NAME}-test-unit
 
 target_link_libraries(${PROJECT_NAME}-test-unit
     PRIVATE
+        ${PROJECT_NAME}-net-linux
         ${PROJECT_NAME}-server
         Catch2::Catch2
         gRPC::grpc++

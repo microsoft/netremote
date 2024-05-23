@@ -10,6 +10,7 @@
 #include <grpc/impl/codegen/connectivity_state.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
+#include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
@@ -17,23 +18,18 @@
 
 #include "TestNetRemoteCommon.hxx"
 
-using Microsoft::Net::Remote::Test::EstablishClientConnections;
-using Microsoft::Net::Remote::Test::RemoteServiceAddressHttp;
-using Microsoft::Net::Remote::Test::RemoteServiceConnectionTimeout;
+using namespace Microsoft::Net::Remote::Test;
 
 TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Wifi;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
-    };
+    const auto serverConfiguration = CreateServerConfiguration();
 
     SECTION("Create doesn't cause a crash")
     {
-        REQUIRE_NOTHROW(NetRemoteServer{ Configuration });
+        REQUIRE_NOTHROW(NetRemoteServer{ serverConfiguration });
     }
 }
 
@@ -43,12 +39,8 @@ TEST_CASE("Destroy a NetRemoteServer instance", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Wifi;
 
-    NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
-    };
-
-    std::optional<NetRemoteServer> server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    std::optional<NetRemoteServer> server{ serverConfiguration };
     server->Run();
 
     SECTION("Destroy doesn't cause a crash")
@@ -74,12 +66,8 @@ TEST_CASE("NetRemoteServer can be reached", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Wifi;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     SECTION("Can be reached using insecure channel")
@@ -97,12 +85,8 @@ TEST_CASE("NetRemoteServer shuts down correctly", "[basic][rpc][remote]")
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Wifi;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     server.Run();
 
     SECTION("Stop() doesn't cause a crash with no connected clients")
@@ -152,12 +136,8 @@ TEST_CASE("NetRemoteServer can be cycled through run/stop states", "[basic][rpc]
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Wifi;
 
-    const NetRemoteServerConfiguration Configuration{
-        .ServerAddress = RemoteServiceAddressHttp,
-        .AccessPointManager = AccessPointManager::Create(),
-    };
-
-    NetRemoteServer server{ Configuration };
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
     REQUIRE_NOTHROW(server.Run());
 
     SECTION("Can be cycled multiple times")
