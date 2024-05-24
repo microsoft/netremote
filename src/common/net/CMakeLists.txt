@@ -14,6 +14,8 @@ target_sources(${PROJECT_NAME}-net
     FILES
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/INetworkOperations.hxx
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/IpAddressInformation.hxx
+        ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/NetworkInterface.hxx
+        ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/NetworkIpAddress.hxx
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/NetworkManager.hxx
 )
 

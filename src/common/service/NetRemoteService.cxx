@@ -278,7 +278,7 @@ NetRemoteService::GetAccessPointManager() noexcept
 }
 
 grpc::Status
-NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const NetworkEnumerateInterfacesRequest* request, NetworkEnumerateInterfacesResult* response)
+NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const NetworkEnumerateInterfacesRequest* request, NetworkEnumerateInterfacesResult* result)
 {
     const NetRemoteApiTrace traceMe{};
 
