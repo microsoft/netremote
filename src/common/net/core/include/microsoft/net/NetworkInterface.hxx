@@ -14,9 +14,10 @@ namespace Microsoft::Net
  */
 enum class NetworkInterfaceType {
     Unknown,
+    Other,
+    Ethernet,
     Wifi,
     Bridge,
-    Other,
 };
 
 /**

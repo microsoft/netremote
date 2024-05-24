@@ -20,10 +20,10 @@ message NetworkAddress
 enum NetworkInterfaceKind
 {
     NetworkInterfaceKindUnknown = 0;
-    NetworkInterfaceKindEthernet = 1;
-    NetworkInterfaceKindWifi = 2;
-    NetworkInterfaceKindBridge = 3;
-    NetworkInterfaceKindUnspecified = 4; 
+    NetworkInterfaceKindOther = 1; 
+    NetworkInterfaceKindEthernet = 2;
+    NetworkInterfaceKindWifi = 3;
+    NetworkInterfaceKindBridge = 4;
 }
 
 message NetworkInterface
