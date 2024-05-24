@@ -3,7 +3,21 @@
 #include <iostream>
 
 #include <catch2/catch_test_macros.hpp>
+#include <magic_enum.hpp>
 #include <microsoft/net/NetworkOperationsLinux.hxx>
+
+TEST_CASE("Ad-hoc tests for bridge identification", "[linux][server][adhoc]")
+{
+    using namespace Microsoft::Net;
+
+    SECTION("List IP address info")
+    {
+        const auto ipInfo = NetworkOperationsLinux{}.GetLocalIpAddressInformation("0.0.0.0");
+        for (const auto& [ip, info] : ipInfo) {
+            std::cout << std::format("IP: {}, Family: {}, InterfaceType: {}\n", ip, magic_enum::enum_name(info.Family), magic_enum::enum_name(info.InterfaceType));
+        }
+    }
+}
 
 TEST_CASE("GetLocalIpAddressInformation IPv4 Addresses", "[linux][server]")
 {
