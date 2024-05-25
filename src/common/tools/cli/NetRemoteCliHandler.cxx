@@ -38,6 +38,24 @@ NetRemoteCliHandler::GetParentStrongRef() const
 }
 
 void
+NetRemoteCliHandler::HandleCommandNetworkInterfacesEnumerate()
+{
+    if (!m_operations) {
+        LOGE << "No operations instance available to handle command";
+        return;
+    }
+
+    auto parentStrong{ GetParentStrongRef() };
+    if (parentStrong == nullptr) {
+        LOGW << "Parent cli object is no longer valid, aborting command";
+        return;
+    }
+
+    LOGD << "Executing command NetworkInterfacesEnumerate";
+    m_operations->NetworkInterfacesEnumerate();
+}
+
+void
 NetRemoteCliHandler::HandleCommandWifiAccessPointsEnumerate(bool detailedOutput)
 {
     if (!m_operations) {

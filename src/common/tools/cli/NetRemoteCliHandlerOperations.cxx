@@ -15,6 +15,8 @@
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteNetwork.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteNetwork.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
@@ -23,6 +25,7 @@
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Network;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Wifi;
 using namespace Microsoft::Net::Wifi;
@@ -246,6 +249,20 @@ NetRemoteAccessPointCapabilitiesToString(const Dot11AccessPointCapabilities& acc
     return NetRemoteAccessPointCapabilitiesToStringDetailed(accessPointCapabilities, indent0, indent1);
 }
 } // namespace detail
+
+void
+NetRemoteCliHandlerOperations::NetworkInterfacesEnumerate()
+{
+    const NetworkEnumerateInterfacesRequest request{};
+    NetworkEnumerateInterfacesResult result{};
+    grpc::ClientContext clientContext{};
+
+    // auto status = m_connection->Client->NetworkInterfacesEnumerate(&clientContext, request, &result);
+    // if (!status.ok()) {
+    //     LOGE std::format("Failed to enumerate network interfaces ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
+    //     return;
+    // }
+}
 
 void
 NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)

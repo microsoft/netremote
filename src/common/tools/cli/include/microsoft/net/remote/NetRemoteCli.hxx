@@ -122,6 +122,12 @@ private:
     OnServerAddressChanged(const std::string& serverAddress);
 
     /**
+     * @brief Handle the 'net enumerate-interfaces' command.
+     */
+    void
+    OnNetworkInterfacesEnumerate();
+
+    /**
      * @brief Handle the 'wifi enumerate-access-points' command.
      *
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).

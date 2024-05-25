@@ -42,6 +42,12 @@ struct NetRemoteCliHandlerOperations :
     explicit NetRemoteCliHandlerOperations(std::shared_ptr<NetRemoteServerConnection> connection);
 
     /**
+     * @brief Enumerate available network interfaces.
+     */
+    void
+    NetworkInterfacesEnumerate() override;
+
+    /**
      * @brief Enumerate available WiFi access points.
      *
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).

@@ -60,6 +60,12 @@ struct NetRemoteCliHandler
     SetConnection(std::shared_ptr<NetRemoteServerConnection> connection);
 
     /**
+     * @brief Handle a command request to enumerate available network interfaces.
+     */
+    void
+    HandleCommandNetworkInterfacesEnumerate();
+
+    /**
      * @brief Handle a command request to enumerate available Wi-Fi access points.
      *
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).

@@ -33,6 +33,12 @@ struct INetRemoteCliHandlerOperations
     operator=(INetRemoteCliHandlerOperations&&) = delete;
 
     /**
+     * @brief Enumerate available network interfaces.
+     */
+    virtual void
+    NetworkInterfacesEnumerate() = 0;
+
+    /**
      * @brief Enumerate available WiFi access points.
      *
      * @param detailedOutput Whether the output should be detailed (false) or brief (true, single line).

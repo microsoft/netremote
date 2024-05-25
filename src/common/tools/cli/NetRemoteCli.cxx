@@ -342,6 +342,13 @@ NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 }
 
 void
+NetRemoteCli::OnNetworkInterfacesEnumerate()
+{
+    // TODO
+
+}
+
+void
 NetRemoteCli::OnWifiAccessPointsEnumerate(bool detailedOutput)
 {
     m_cliHandler->HandleCommandWifiAccessPointsEnumerate(detailedOutput);
