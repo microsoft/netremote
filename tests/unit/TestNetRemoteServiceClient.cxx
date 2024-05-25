@@ -13,8 +13,10 @@
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/security/credentials.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/remote/protocol/NetRemoteNetwork.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/NetworkCore.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
@@ -705,5 +707,35 @@ TEST_CASE("WifiAccessPointSetNetworkBridge API", "[basic][rpc][client][remote]")
         REQUIRE(result.accesspointid() == request.accesspointid());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+}
+
+TEST_CASE("NetworkInterfacesEnumerate API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net;
+    using namespace Microsoft::Net::Remote::Network;
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+
+    const auto serverConfiguration = CreateServerConfiguration();
+    NetRemoteServer server{ serverConfiguration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        const NetworkEnumerateInterfacesRequest request{};
+
+        NetworkEnumerateInterfacesResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->NetworkInterfacesEnumerate(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE_NOTHROW([&] {
+            [[maybe_unused]] const auto& networkInterfaces = result.networkinterfaces();
+        });
     }
 }
