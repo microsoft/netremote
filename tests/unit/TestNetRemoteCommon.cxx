@@ -33,21 +33,6 @@ Microsoft::Net::Remote::Test::EstablishClientConnections(std::size_t numConnecti
     return clients;
 }
 
-// namespace detail
-// {
-// using namespace Microsoft::Net;
-
-// struct NetworkOperationsTest :
-//     public INetworkOperations
-// {
-//     std::unordered_map<std::string, IpAddressInformation>
-//     GetLocalIpAddressInformation(std::string_view ipAddress) const noexcept override
-//     {
-//         return {};
-//     }
-// };
-// } // namespace detail
-
 NetRemoteServerConfiguration
 Microsoft::Net::Remote::Test::CreateServerConfiguration(std::shared_ptr<AccessPointManager> accessPointManager, std::shared_ptr<NetworkManager> networkManager)
 {
