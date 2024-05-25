@@ -2,6 +2,7 @@
 #include <iterator>
 #include <ranges>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 #include <microsoft/net/NetworkInterface.hxx>
@@ -63,5 +64,31 @@ FromServiceNetworkInterface(const NetworkInterface& networkInterface) noexcept
     };
 
     return networkInterfaceId;
+}
+
+namespace detail
+{
+/**
+ * @brief Helper function to unwrap the network interface information from a std::pair into individual variables,
+ * suitable for passing to ToServiceNetworkInterface.
+ *
+ * @param networkInterfaceInformation The network interface information to unwrap.
+ * @return NetworkInterface
+ */
+NetworkInterface
+ToServiceNetworkInterfaceWrapped(std::pair<NetworkInterfaceId, std::unordered_set<NetworkIpAddress>> networkInterfaceInformation) noexcept
+{
+    const auto& [networkInterfaceId, networkIpAddresses] = networkInterfaceInformation;
+    return ToServiceNetworkInterface(networkInterfaceId, networkIpAddresses);
+}
+} // namespace detail
+
+std::vector<NetworkInterface>
+ToServiceNetworkInterfaces(const std::unordered_map<NetworkInterfaceId, std::unordered_set<NetworkIpAddress>>& networkInterfaceInformation) noexcept
+{
+    std::vector<NetworkInterface> networkInterfaces{ std::size(networkInterfaceInformation) };
+    std::ranges::transform(networkInterfaceInformation, std::begin(networkInterfaces), detail::ToServiceNetworkInterfaceWrapped);
+
+    return networkInterfaces;
 }
 } // namespace Microsoft::Net

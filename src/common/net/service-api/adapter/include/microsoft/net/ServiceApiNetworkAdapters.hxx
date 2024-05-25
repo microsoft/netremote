@@ -147,6 +147,15 @@ ToServiceNetworkInterface(const Microsoft::Net::NetworkInterfaceId& networkInter
  */
 Microsoft::Net::NetworkInterfaceId
 FromServiceNetworkInterface(const Microsoft::Net::NetworkInterface& networkInterface) noexcept;
+
+/**
+ * @brief Convert a set of network interface information to a set of service network interfaces.
+ * 
+ * @param networkInterfaceInformation The network interface information to convert.
+ * @return std::vector<Microsoft::Net::NetworkInterface> 
+ */
+std::vector<Microsoft::Net::NetworkInterface>
+ToServiceNetworkInterfaces(const std::unordered_map<Microsoft::Net::NetworkInterfaceId, std::unordered_set<Microsoft::Net::NetworkIpAddress>>& networkInterfaceInformation) noexcept;
 } // namespace Microsoft::Net
 
 #endif // SERVICE_API_NETWORK_ADAPTERS_HXX
