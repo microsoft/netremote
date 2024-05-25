@@ -734,8 +734,14 @@ TEST_CASE("NetworkInterfacesEnumerate API", "[basic][rpc][client][remote]")
 
         auto status = client->NetworkInterfacesEnumerate(&clientContext, request, &result);
         REQUIRE(status.ok());
-        REQUIRE_NOTHROW([&] {
-            [[maybe_unused]] const auto& networkInterfaces = result.networkinterfaces();
-        });
+
+        const auto& networkInterfaces = result.networkinterfaces();
+        REQUIRE(!std::empty(networkInterfaces));
+
+        for (const auto& networkInterface : networkInterfaces) {
+            REQUIRE(!std::empty(networkInterface.id()));
+            REQUIRE(networkInterface.kind() != NetworkInterfaceKind::NetworkInterfaceKindUnknown);
+            REQUIRE(!std::empty(networkInterface.addresses()));
+        }
     }
 }
