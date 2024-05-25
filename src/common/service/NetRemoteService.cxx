@@ -13,6 +13,7 @@
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/server_context.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/ServiceApiNetworkAdapters.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/remote/service/NetRemoteService.hxx>
@@ -278,11 +279,18 @@ NetRemoteService::GetAccessPointManager() noexcept
 }
 
 grpc::Status
-NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const NetworkEnumerateInterfacesRequest* request, NetworkEnumerateInterfacesResult* response)
+NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContext* context, [[maybe_unused]] const NetworkEnumerateInterfacesRequest* request, NetworkEnumerateInterfacesResult* result)
 {
     const NetRemoteApiTrace traceMe{};
 
-    // TODO: implement
+    auto networkInterfaceInformation = m_networkManager->GetNetworkInterfaceInformation();
+    auto networkInterfaces = ToServiceNetworkInterfaces(networkInterfaceInformation);
+
+    *result->mutable_networkinterfaces() = {
+        std::make_move_iterator(std::begin(networkInterfaces)),
+        std::make_move_iterator(std::end(networkInterfaces)),
+    };
+
     return grpc::Status::OK;
 }
 

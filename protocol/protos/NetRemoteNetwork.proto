@@ -11,5 +11,5 @@ message NetworkEnumerateInterfacesRequest
 
 message NetworkEnumerateInterfacesResult
 {
-    repeated NetworkInterface Interfaces = 1;
+    repeated NetworkInterface NetworkInterfaces = 1;
 }

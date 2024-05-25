@@ -33,6 +33,14 @@ struct NetworkManager
     GetAccessPointManager() const noexcept;
 
     /**
+     * @brief Get information about all network interfaces on the system.
+     * 
+     * @return std::unordered_map<Microsoft::Net::NetworkInterfaceId, std::unordered_set<Microsoft::Net::NetworkIpAddress>> 
+     */
+    std::unordered_map<Microsoft::Net::NetworkInterfaceId, std::unordered_set<Microsoft::Net::NetworkIpAddress>>
+    GetNetworkInterfaceInformation() const noexcept;
+
+    /**
      * @brief Obtain information about the specified IP address. The returned map will contain the IP address as the key
      * and the information as the value. In the case of a fixed address, the returned map will have a single entry. In
      * the case of any "any" address (eg. 0.0.0.0, ::, [::]), the returned map will contain all available addresses.

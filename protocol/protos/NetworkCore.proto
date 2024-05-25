@@ -3,7 +3,32 @@ syntax = "proto3";
 
 package Microsoft.Net;
 
+enum NetworkAddressFamily
+{
+    NetworkAddressFamilyUnknown = 0;
+    NetworkAddressFamilyIpv4 = 1;
+    NetworkAddressFamilyIpv6 = 2;
+}
+
+message NetworkAddress
+{
+    NetworkAddressFamily Family = 1;
+    string Address = 2;
+    uint32 PrefixLength = 3;
+}
+
+enum NetworkInterfaceKind
+{
+    NetworkInterfaceKindUnknown = 0;
+    NetworkInterfaceKindOther = 1; 
+    NetworkInterfaceKindEthernet = 2;
+    NetworkInterfaceKindWifi = 3;
+    NetworkInterfaceKindBridge = 4;
+}
+
 message NetworkInterface
 {
     string Id = 1;
+    NetworkInterfaceKind Kind = 2;
+    repeated NetworkAddress Addresses = 3;
 }

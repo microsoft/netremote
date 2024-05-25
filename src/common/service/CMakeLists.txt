@@ -31,6 +31,7 @@ target_link_libraries(${PROJECT_NAME}-service
         ${PROJECT_NAME}-protocol
         wifi-apmanager
     PRIVATE
+        ${PROJECT_NAME}-net-adapter-service-api
         logging-utils
         plog::plog
         wifi-core-adapter-dot11

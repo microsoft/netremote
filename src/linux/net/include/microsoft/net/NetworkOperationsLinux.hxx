@@ -8,6 +8,8 @@
 #include <unordered_set>
 
 #include <microsoft/net/INetworkOperations.hxx>
+#include <microsoft/net/NetworkInterface.hxx>
+#include <microsoft/net/NetworkIpAddress.hxx>
 
 namespace Microsoft::Net
 {
@@ -33,6 +35,23 @@ struct NetworkOperationsLinux :
 
     NetworkOperationsLinux&
     operator=(NetworkOperationsLinux&&) = delete;
+
+    /**
+     * @brief Enumerate all the network interfaces on the system.
+     *
+     * @return std::unordered_set<std::string>
+     */
+    std::unordered_set<NetworkInterfaceId>
+    EnumerateNetworkInterfaces() const noexcept override;
+
+    /**
+     * @brief Get all the IP addresses for the specified network interface.
+     *
+     * @param networkInterfaceName The name of the network interface to get the addresses for.
+     * @return std::unordered_set<NetworkIpAddress>
+     */
+    std::unordered_set<NetworkIpAddress>
+    GetNetworkInterfaceAddresses(std::string_view networkInterfaceName) const noexcept override;
 
     /**
      * @brief Obtain information about the specified IP address. The returned map will contain the IP address as the key

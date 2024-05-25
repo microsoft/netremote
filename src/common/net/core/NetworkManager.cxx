@@ -21,6 +21,20 @@ NetworkManager::GetAccessPointManager() const noexcept
     return m_accessPointManager;
 }
 
+std::unordered_map<Microsoft::Net::NetworkInterfaceId, std::unordered_set<Microsoft::Net::NetworkIpAddress>>
+NetworkManager::GetNetworkInterfaceInformation() const noexcept
+{
+    std::unordered_map<NetworkInterfaceId, std::unordered_set<NetworkIpAddress>> networkInterfaceInfo{};
+
+    auto networkInterfaces = m_networkOperations->EnumerateNetworkInterfaces();
+    for (auto& networkInterfaceId : networkInterfaces) {
+        auto networkIpAddresses = m_networkOperations->GetNetworkInterfaceAddresses(networkInterfaceId.Name);
+        networkInterfaceInfo[std::move(networkInterfaceId)] = std::move(networkIpAddresses);
+    }
+
+    return networkInterfaceInfo;
+}
+
 std::unordered_map<std::string, IpAddressInformation>
 NetworkManager::GetLocalIpAddressInformation(std::string_view ipAddress) const noexcept
 {
