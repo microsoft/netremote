@@ -291,7 +291,7 @@ NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContex
         std::make_move_iterator(std::end(networkInterfaces)),
     };
 
-    result->set_status(NetworkOperationStatusCode::NetworkOperationStatusCodeSuccess);
+    result->mutable_status()->set_code(NetworkOperationStatusCode::NetworkOperationStatusCodeSuccess);
 
     return grpc::Status::OK;
 }

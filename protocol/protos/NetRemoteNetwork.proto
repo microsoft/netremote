@@ -12,12 +12,18 @@ enum NetworkOperationStatusCode
     NetworkOperationStatusCodeInvalidParameter = 2;
 }
 
+message NetworkOperationStatus
+{
+    NetworkOperationStatusCode Code = 1;
+    string Message = 2;
+}
+
 message NetworkEnumerateInterfacesRequest
 {
 }
 
 message NetworkEnumerateInterfacesResult
 {
-    NetworkOperationStatusCode Status = 1;
+    NetworkOperationStatus Status = 1;
     repeated NetworkInterface NetworkInterfaces = 2;
 }
