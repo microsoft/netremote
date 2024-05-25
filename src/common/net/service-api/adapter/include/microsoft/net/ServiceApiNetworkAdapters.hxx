@@ -2,6 +2,8 @@
 #ifndef SERVICE_API_NETWORK_ADAPTERS_HXX
 #define SERVICE_API_NETWORK_ADAPTERS_HXX
 
+#include <unordered_set>
+
 #include <microsoft/net/NetworkInterface.hxx>
 #include <microsoft/net/NetworkIpAddress.hxx>
 #include <microsoft/net/remote/protocol/NetworkCore.pb.h>
@@ -31,9 +33,9 @@ ToServiceNetworkInterfaceKind(Microsoft::Net::NetworkInterfaceType networkInterf
 
 /**
  * @brief Convert a service network interface kind to a network interface type.
- * 
+ *
  * @param networkInterfaceKind The service network interface kind to convert.
- * @return constexpr Microsoft::Net::NetworkInterfaceType 
+ * @return constexpr Microsoft::Net::NetworkInterfaceType
  */
 constexpr Microsoft::Net::NetworkInterfaceType
 FromServiceNetworkInterfaceKind(Microsoft::Net::NetworkInterfaceKind networkInterfaceKind) noexcept
@@ -78,6 +80,25 @@ ToServiceNetworkAddressFamily(Microsoft::Net::NetworkIpFamily networkIpFamily) n
  * @return constexpr Microsoft::Net::NetworkIpFamily
  */
 constexpr Microsoft::Net::NetworkIpFamily
+FromServiceNetworkAddressFamily(Microsoft::Net::NetworkAddressFamily networkAddressFamily) noexcept
+{
+    switch (networkAddressFamily) {
+    case Microsoft::Net::NetworkAddressFamilyIpv4:
+        return Microsoft::Net::NetworkIpFamily::Ipv4;
+    case Microsoft::Net::NetworkAddressFamilyIpv6:
+        return Microsoft::Net::NetworkIpFamily::Ipv6;
+    default:
+        return Microsoft::Net::NetworkIpFamily::Unknown;
+    }
+}
+
+/**
+ * @brief Convert a service network address family to a network IP family.
+ *
+ * @param networkAddressFamily The service network address family to convert.
+ * @return constexpr Microsoft::Net::NetworkIpFamily
+ */
+constexpr Microsoft::Net::NetworkIpFamily
 FromServiceNetworkInterface(Microsoft::Net::NetworkAddressFamily networkAddressFamily) noexcept
 {
     switch (networkAddressFamily) {
@@ -92,18 +113,18 @@ FromServiceNetworkInterface(Microsoft::Net::NetworkAddressFamily networkAddressF
 
 /**
  * @brief Convert a network IP address to a service network IP address.
- * 
+ *
  * @param networkIpAddress The network IP address to convert.
- * @return Microsoft::Net::NetworkAddress 
+ * @return Microsoft::Net::NetworkAddress
  */
 Microsoft::Net::NetworkAddress
 ToServiceNetworkAddress(const Microsoft::Net::NetworkIpAddress& networkIpAddress) noexcept;
 
 /**
  * @brief Convert a service network IP address to a network IP address.
- * 
+ *
  * @param networkAddress The service network IP address to convert.
- * @return Microsoft::Net::NetworkIpAddress 
+ * @return Microsoft::Net::NetworkIpAddress
  */
 Microsoft::Net::NetworkIpAddress
 FromServiceNetworkAddress(const Microsoft::Net::NetworkAddress& networkAddress) noexcept;
@@ -112,10 +133,11 @@ FromServiceNetworkAddress(const Microsoft::Net::NetworkAddress& networkAddress) 
  * @brief Convert a service network IP address to a network IP address.
  *
  * @param networkInterfaceId The service network IP address to convert.
+ * @param networkIpAddresses The network IP addresses to convert.
  * @return Microsoft::Net::NetworkInterface
  */
 Microsoft::Net::NetworkInterface
-ToServiceNetworkInterface(const Microsoft::Net::NetworkInterfaceId& networkInterfaceId) noexcept;
+ToServiceNetworkInterface(const Microsoft::Net::NetworkInterfaceId& networkInterfaceId, const std::unordered_set<Microsoft::Net::NetworkIpAddress> networkIpAddresses) noexcept;
 
 /**
  * @brief Convert a network IP address to a service network IP address.
