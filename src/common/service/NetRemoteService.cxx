@@ -286,7 +286,7 @@ NetRemoteService::NetworkInterfacesEnumerate([[maybe_unused]] grpc::ServerContex
     auto networkInterfaceInformation = m_networkManager->GetNetworkInterfaceInformation();
     auto networkInterfaces = ToServiceNetworkInterfaces(networkInterfaceInformation);
 
-    *result->mutable_interfaces() = {
+    *result->mutable_networkinterfaces() = {
         std::make_move_iterator(std::begin(networkInterfaces)),
         std::make_move_iterator(std::end(networkInterfaces)),
     };
