@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <microsoft/net/INetworkOperations.hxx>
 #include <microsoft/net/IpAddressInformation.hxx>
@@ -17,6 +18,13 @@ namespace Microsoft::Net::Test
 struct NetworkOperationsTest :
     public Microsoft::Net::INetworkOperations
 {
+    /**
+     * @brief Construct a new NetworkOperationsTest object.
+     */
+    NetworkOperationsTest();
+
+    virtual ~NetworkOperationsTest() = default;
+
     /**
      * @brief Enumerate all the network interfaces on the system.
      *
@@ -44,6 +52,9 @@ struct NetworkOperationsTest :
      */
     std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>
     GetLocalIpAddressInformation(std::string_view ipAddress) const noexcept override;
+
+protected:
+    std::unordered_map<NetworkInterfaceId, std::unordered_set<NetworkIpAddress>> m_networkInterfaceInformation;
 };
 } // namespace Microsoft::Net::Test
 
