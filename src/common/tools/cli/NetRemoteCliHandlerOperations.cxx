@@ -282,11 +282,11 @@ NetRemoteCliHandlerOperations::NetworkInterfacesEnumerate()
         networkInterfaceKind.remove_prefix(std::size(std::string_view("NetworkInterfaceKind")));
 
         std::stringstream ss;
-        ss << '[' << numNetworkInterface++ << "] " << networkInterface.id() << ": " << networkInterface.kind() << " Addresses: ";
+        ss << '[' << numNetworkInterface++ << "] " << networkInterface.id() << ": " << networkInterfaceKind << " Addresses: ";
         for (const auto& networkAddress : networkInterface.addresses()) {
             std::string_view networkAddressFamily = magic_enum::enum_name(networkAddress.family());
-            networkAddressFamily.remove_prefix(std::size(std::string_view("AddressFamily")));
-            ss << networkAddress.address() << "/" << networkAddress.prefixlength() << "(" << networkAddressFamily << ")";
+            networkAddressFamily.remove_prefix(std::size(std::string_view("NetworkAddressFamily")));
+            ss << networkAddress.address() << "/" << networkAddress.prefixlength() << " (" << networkAddressFamily << ") ";
         }
 
         std::cout << ss.str() << '\n';
