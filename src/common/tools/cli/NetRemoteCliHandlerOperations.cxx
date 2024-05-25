@@ -257,11 +257,40 @@ NetRemoteCliHandlerOperations::NetworkInterfacesEnumerate()
     NetworkEnumerateInterfacesResult result{};
     grpc::ClientContext clientContext{};
 
-    // auto status = m_connection->Client->NetworkInterfacesEnumerate(&clientContext, request, &result);
-    // if (!status.ok()) {
-    //     LOGE std::format("Failed to enumerate network interfaces ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
-    //     return;
-    // }
+    auto status = m_connection->Client->NetworkInterfacesEnumerate(&clientContext, request, &result);
+    if (!status.ok()) {
+        LOGE << std::format("Failed to enumerate network interfaces ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+    if (!result.has_status()) {
+        LOGE << "Failed to enumerate network interfaces, no status returned";
+        return;
+    }
+    if (result.status().code() != NetworkOperationStatusCode::NetworkOperationStatusCodeSuccess) {
+        LOGE << std::format("Failed to enumerate network interfaces ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+
+    if (std::empty(result.networkinterfaces())) {
+        LOGI << "No network interfaces found";
+        return;
+    }
+
+    std::size_t numNetworkInterface = 1;
+    for (const auto& networkInterface : result.networkinterfaces()) {
+        std::string_view networkInterfaceKind = magic_enum::enum_name(networkInterface.kind());
+        networkInterfaceKind.remove_prefix(std::size(std::string_view("NetworkInterfaceKind")));
+
+        std::stringstream ss;
+        ss << '[' << numNetworkInterface++ << "] " << networkInterface.id() << ": " << networkInterface.kind() << " Addresses: ";
+        for (const auto& networkAddress : networkInterface.addresses()) {
+            std::string_view networkAddressFamily = magic_enum::enum_name(networkAddress.family());
+            networkAddressFamily.remove_prefix(std::size(std::string_view("AddressFamily")));
+            ss << networkAddress.address() << "/" << networkAddress.prefixlength() << "(" << networkAddressFamily << ")";
+        }
+
+        std::cout << ss.str() << '\n';
+    }
 }
 
 void
