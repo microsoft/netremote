@@ -20,6 +20,8 @@ constexpr Microsoft::Net::NetworkInterfaceKind
 ToServiceNetworkInterfaceKind(Microsoft::Net::NetworkInterfaceType networkInterfaceType) noexcept
 {
     switch (networkInterfaceType) {
+    case Microsoft::Net::NetworkInterfaceType::Ethernet:
+        return Microsoft::Net::NetworkInterfaceKindEthernet;
     case Microsoft::Net::NetworkInterfaceType::Wifi:
         return Microsoft::Net::NetworkInterfaceKindWifi;
     case Microsoft::Net::NetworkInterfaceType::Bridge:
