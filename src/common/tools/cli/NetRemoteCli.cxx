@@ -85,9 +85,35 @@ NetRemoteCli::CreateParser() noexcept
     optionServer->default_str(serverAddressDefault);
 
     m_cliAppServerAddress = optionServer;
+    m_cliAppNetwork = AddSubcommandNetwork(app.get());
     m_cliAppWifi = AddSubcommandWifi(app.get());
 
     return app;
+}
+
+CLI::App*
+NetRemoteCli::AddSubcommandNetwork(CLI::App* parent)
+{
+    // Top-level command.
+    auto* networkApp = parent->add_subcommand("net", "Network operations");
+    networkApp->needs(m_cliAppServerAddress);
+
+    // Sub-commands.
+    m_cliAppNetworkEnumerateInterfaces = AddSubcommandNetworkEnumerateInterfaces(networkApp);
+
+    return networkApp;
+}
+
+CLI::App*
+NetRemoteCli::AddSubcommandNetworkEnumerateInterfaces(CLI::App* parent)
+{
+    auto* cliAppNetworkEnumerateInterfaces = parent->add_subcommand("enumerate-interfaces", "Enumerate available network interfaces");
+    cliAppNetworkEnumerateInterfaces->alias("enumifs")->alias("enum")->alias("interfaces")->alias("ifaces")->alias("ifs");
+    cliAppNetworkEnumerateInterfaces->callback([this] {
+        OnNetworkInterfacesEnumerate();
+    });
+
+    return cliAppNetworkEnumerateInterfaces;
 }
 
 CLI::App*
@@ -344,8 +370,7 @@ NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 void
 NetRemoteCli::OnNetworkInterfacesEnumerate()
 {
-    // TODO
-
+    m_cliHandler->HandleCommandNetworkInterfacesEnumerate();
 }
 
 void

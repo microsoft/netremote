@@ -78,6 +78,24 @@ private:
     CreateParser() noexcept;
 
     /**
+     * @brief Add the 'net' sub-command.
+     *
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandNetwork(CLI::App* parent);
+
+    /**
+     * @brief Add the 'net enumerate-interfaces' sub-command.
+     *
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandNetworkEnumerateInterfaces(CLI::App* parent);
+
+    /**
      * @brief Add the 'wifi' sub-command.
      *
      * @param parent The parent app to add the sub-command to.
@@ -166,6 +184,8 @@ private:
 
     // The following are helper references to the subcommands of m_cliApp; the memory is managed by CLI11.
     CLI::Option* m_cliAppServerAddress{ nullptr };
+    CLI::App* m_cliAppNetwork{ nullptr };
+    CLI::App* m_cliAppNetworkEnumerateInterfaces{ nullptr };
     CLI::App* m_cliAppWifi{ nullptr };
     CLI::App* m_cliAppWifiAccessPointsEnumerate{ nullptr };
     CLI::App* m_cliAppWifiAccessPointEnable{ nullptr };
