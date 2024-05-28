@@ -593,6 +593,51 @@ TEST_CASE("WifiAccessPointSetFrequencyBands API", "[basic][rpc][client][remote]"
     }
 }
 
+TEST_CASE("AccessPointSetSsid API", "[basic][rpc][client][remote][wifi]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto SsidName{ "TestWifiAccessPointEnable" };
+    constexpr auto InterfaceName{ "TestWifiAccessPointEnable1" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) },
+        .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
+    };
+
+    auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
+    apManagerTest->AddAccessPoint(apTest1);
+
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointSetSsidRequest request{};
+        request.set_accesspointid(InterfaceName);
+        request.mutable_ssid()->set_name(SsidName);
+
+        WifiAccessPointSetSsidResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointSetSsid(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+}
+
 TEST_CASE("WifiAccessPointSetNetworkBridge API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
