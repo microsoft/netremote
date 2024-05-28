@@ -322,7 +322,7 @@ NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)
     std::size_t numAccessPoint = 1;
     for (const auto& accessPoint : result.accesspoints()) {
         std::stringstream ss;
-        ss << '[' << numAccessPoint++ << "] " << accessPoint.accesspointid();
+        ss << '[' << numAccessPoint++ << "] " << accessPoint.macaddress() << " " << accessPoint.accesspointid();
         if (!accessPoint.isenabled()) {
             ss << " (disabled)";
         }
