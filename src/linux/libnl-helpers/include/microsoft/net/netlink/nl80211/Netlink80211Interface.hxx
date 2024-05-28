@@ -2,6 +2,7 @@
 #ifndef NETLINK_82011_INTERFACE_HXX
 #define NETLINK_82011_INTERFACE_HXX
 
+#include <array>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -16,12 +17,17 @@
 
 namespace Microsoft::Net::Netlink::Nl80211
 {
+static constexpr auto Nl80211MacAddressNumOctets{ 6 };
+
+using Nl80211MacAddress = std::array<uint8_t, Nl80211MacAddressNumOctets>;
+
 /**
  * @brief Represents a netlink 802.11 interface.
  */
 struct Nl80211Interface
 {
     std::string Name;
+    std::array<uint8_t, Nl80211MacAddressNumOctets> MacAddress{};
     nl80211_iftype Type{ nl80211_iftype::NL80211_IFTYPE_UNSPECIFIED };
     uint32_t Index{ 0 };
     uint32_t WiphyIndex{ 0 };
@@ -35,11 +41,12 @@ struct Nl80211Interface
      * @brief Construct a new Nl80211Interface object with the specified attributes.
      *
      * @param name The name of the interface.
+     * @param macAddress The MAC address of the interface.
      * @param type The nl80211_iftype of the interface.
      * @param index The interface index in the kernel.
      * @param wiphyIndex The phy interface index in the kernel.
      */
-    Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept;
+    Nl80211Interface(std::string_view name, std::array<uint8_t, Nl80211MacAddressNumOctets> macAddress, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept;
 
     /**
      * @brief Parse a netlink message into an Nl80211Interface. The netlink message must contain a response to the
