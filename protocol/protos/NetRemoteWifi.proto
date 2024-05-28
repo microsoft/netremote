@@ -9,8 +9,9 @@ import "WifiCore.proto";
 message WifiAccessPointsEnumerateResultItem
 {
     string AccessPointId = 1;
-    Microsoft.Net.Wifi.Dot11AccessPointCapabilities Capabilities = 2;
-    bool IsEnabled = 3;
+    string MacAddress = 2;
+    Microsoft.Net.Wifi.Dot11AccessPointCapabilities Capabilities = 3;
+    bool IsEnabled = 4;
 }
 
 message WifiAccessPointsEnumerateRequest

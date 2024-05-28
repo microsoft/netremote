@@ -206,6 +206,8 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     auto interfaceName = accessPoint.GetInterfaceName();
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
 
+    std::string macAddress = Ieee80211MacAddressToString(accessPoint.GetMacAddress());
+
     auto accessPointController = accessPoint.CreateController();
     if (accessPointController == nullptr) {
         LOGE << std::format("Failed to create controller for access point {}", interfaceName);
@@ -235,6 +237,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     // Populate the result item.
     WifiAccessPointsEnumerateResultItem item{};
     item.set_accesspointid(std::move(id));
+    item.set_macaddress(std::move(macAddress));
     item.set_isenabled(isEnabled);
     *item.mutable_capabilities() = std::move(dot11AccessPointCapabilities);
 
