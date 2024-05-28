@@ -18,9 +18,16 @@ using Microsoft::Net::NetworkInterfaceId;
 NetworkAddress
 ToServiceNetworkAddress(const NetworkIpAddress& networkIpAddress) noexcept
 {
+    std::string ipAddress{ networkIpAddress.Address };
+    auto ipAddressPrefixSeparatorIndex = ipAddress.find_last_of('/');
+    if (ipAddressPrefixSeparatorIndex != std::string_view::npos)
+    {
+        ipAddress = ipAddress.substr(0, ipAddressPrefixSeparatorIndex);
+    }
+
     NetworkAddress networkAddress{};
     networkAddress.set_family(ToServiceNetworkAddressFamily(networkIpAddress.Family));
-    networkAddress.set_address(networkIpAddress.Address);
+    networkAddress.set_address(ipAddress);
     networkAddress.set_prefixlength(networkIpAddress.PrefixLength);
 
     return networkAddress;

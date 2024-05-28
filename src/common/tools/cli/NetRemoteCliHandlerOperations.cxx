@@ -15,6 +15,8 @@
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
+#include <microsoft/net/remote/protocol/NetRemoteNetwork.grpc.pb.h>
+#include <microsoft/net/remote/protocol/NetRemoteNetwork.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
@@ -23,6 +25,7 @@
 #include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote;
+using namespace Microsoft::Net::Remote::Network;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Wifi;
 using namespace Microsoft::Net::Wifi;
@@ -246,6 +249,49 @@ NetRemoteAccessPointCapabilitiesToString(const Dot11AccessPointCapabilities& acc
     return NetRemoteAccessPointCapabilitiesToStringDetailed(accessPointCapabilities, indent0, indent1);
 }
 } // namespace detail
+
+void
+NetRemoteCliHandlerOperations::NetworkInterfacesEnumerate()
+{
+    const NetworkEnumerateInterfacesRequest request{};
+    NetworkEnumerateInterfacesResult result{};
+    grpc::ClientContext clientContext{};
+
+    auto status = m_connection->Client->NetworkInterfacesEnumerate(&clientContext, request, &result);
+    if (!status.ok()) {
+        LOGE << std::format("Failed to enumerate network interfaces ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+    if (!result.has_status()) {
+        LOGE << "Failed to enumerate network interfaces, no status returned";
+        return;
+    }
+    if (result.status().code() != NetworkOperationStatusCode::NetworkOperationStatusCodeSuccess) {
+        LOGE << std::format("Failed to enumerate network interfaces ({})\n{}\n", magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+
+    if (std::empty(result.networkinterfaces())) {
+        LOGI << "No network interfaces found";
+        return;
+    }
+
+    std::size_t numNetworkInterface = 1;
+    for (const auto& networkInterface : result.networkinterfaces()) {
+        std::string_view networkInterfaceKind = magic_enum::enum_name(networkInterface.kind());
+        networkInterfaceKind.remove_prefix(std::size(std::string_view("NetworkInterfaceKind")));
+
+        std::stringstream ss;
+        ss << '[' << numNetworkInterface++ << "] " << networkInterface.id() << ": " << networkInterfaceKind << " Addresses: ";
+        for (const auto& networkAddress : networkInterface.addresses()) {
+            std::string_view networkAddressFamily = magic_enum::enum_name(networkAddress.family());
+            networkAddressFamily.remove_prefix(std::size(std::string_view("NetworkAddressFamily")));
+            ss << networkAddress.address() << "/" << networkAddress.prefixlength() << " (" << networkAddressFamily << ") ";
+        }
+
+        std::cout << ss.str() << '\n';
+    }
+}
 
 void
 NetRemoteCliHandlerOperations::WifiAccessPointsEnumerate(bool detailedOutput)

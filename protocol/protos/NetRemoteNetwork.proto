@@ -5,11 +5,25 @@ package Microsoft.Net.Remote.Network;
 
 import "NetworkCore.proto";
 
+enum NetworkOperationStatusCode
+{
+    NetworkOperationStatusCodeUnknown = 0;
+    NetworkOperationStatusCodeSuccess = 1;
+    NetworkOperationStatusCodeInvalidParameter = 2;
+}
+
+message NetworkOperationStatus
+{
+    NetworkOperationStatusCode Code = 1;
+    string Message = 2;
+}
+
 message NetworkEnumerateInterfacesRequest
 {
 }
 
 message NetworkEnumerateInterfacesResult
 {
-    repeated NetworkInterface NetworkInterfaces = 1;
+    NetworkOperationStatus Status = 1;
+    repeated NetworkInterface NetworkInterfaces = 2;
 }
