@@ -113,6 +113,17 @@ private:
     WifiAccessPointSetFrequencyBands(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetFrequencyBandsResult* result) override;
 
     /**
+     * @brief Set the SSID of the access point.
+     * 
+     * @param context 
+     * @param request 
+     * @param result 
+     * @return grpc::Status 
+     */
+    grpc::Status
+    WifiAccessPointSetSsid(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetSsidRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetSsidResult* result) override;
+
+    /**
      * @brief Set the network bridge interface the access point interface will be added to.
      *
      * @param context
