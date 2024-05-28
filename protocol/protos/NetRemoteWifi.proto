@@ -100,3 +100,15 @@ message WifiAccessPointSetNetworkBridgeResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointSetSsidRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11Ssid Ssid = 2;
+}
+
+message WifiAccessPointSetSsidResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
