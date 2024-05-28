@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <linux/genetlink.h>
+#include <linux/if_ether.h>
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
 #include <magic_enum.hpp>
@@ -32,9 +33,9 @@
 using namespace Microsoft::Net::Netlink::Nl80211;
 
 // NOLINTBEGIN(concurrency-mt-unsafe)
-
-Nl80211Interface::Nl80211Interface(std::string_view name, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
+Nl80211Interface::Nl80211Interface(std::string_view name, std::array<uint8_t, Nl80211MacAddressNumOctets> macAddress, nl80211_iftype type, uint32_t index, uint32_t wiphyIndex) noexcept :
     Name(name),
+    MacAddress(macAddress),
     Type(type),
     Index(index),
     WiphyIndex(wiphyIndex)
@@ -49,7 +50,7 @@ Nl80211Interface::ToString() const
     auto interfaceType = std::string_view{ magic_enum::enum_name(Type) };
     interfaceType.remove_prefix(InterfaceTypePrefixLength);
 
-    return std::format("[{}/{}] {} {}", Index, WiphyIndex, Name, interfaceType);
+    return std::format("[{}/{}] {:02X}{:02X}{:02X}{:02X}{:02X}{:02X} {} {}", Index, WiphyIndex, MacAddress[0], MacAddress[1], MacAddress[2], MacAddress[3], MacAddress[4], MacAddress[5], Name, interfaceType);
 }
 
 /* static */
@@ -82,11 +83,20 @@ Nl80211Interface::Parse(struct nl_msg *nl80211Message) noexcept
 
     // Tease out parameters to populate the Nl80211Interface instance.
     const auto *interfaceName = static_cast<const char *>(nla_data(interfaceMessageAttributes[NL80211_ATTR_IFNAME]));
+    const auto *macAddressData = nla_data(interfaceMessageAttributes[NL80211_ATTR_MAC]);
     auto interfaceType = static_cast<nl80211_iftype>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_IFTYPE]));
     auto interfaceIndex = static_cast<uint32_t>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_IFINDEX]));
     auto wiphyIndex = static_cast<uint32_t>(nla_get_u32(interfaceMessageAttributes[NL80211_ATTR_WIPHY]));
 
-    return Nl80211Interface(interfaceName, interfaceType, interfaceIndex, wiphyIndex);
+    std::array<uint8_t, Nl80211MacAddressNumOctets> macAddress{};
+    if (macAddressData != nullptr) {
+        static_assert(std::size(macAddress) == ETH_ALEN);
+        std::memcpy(std::data(macAddress), macAddressData, std::size(macAddress));
+    } else {
+        LOGW << std::format("Received null MAC address data for interface {}; using all zeros", interfaceName ? interfaceName : "unknown");
+    }
+
+    return Nl80211Interface(interfaceName, macAddress, interfaceType, interfaceIndex, wiphyIndex);
 }
 
 namespace detail
