@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -41,6 +42,14 @@ struct IAccessPoint
      */
     virtual std::string_view
     GetInterfaceName() const noexcept = 0;
+
+    /**
+     * @brief Get the mac address of the access point.
+     *
+     * @return Ieee80211MacAddress
+     */
+    virtual Ieee80211MacAddress
+    GetMacAddress() const noexcept = 0;
 
     /**
      * @brief Create a new instance that can control the access point.

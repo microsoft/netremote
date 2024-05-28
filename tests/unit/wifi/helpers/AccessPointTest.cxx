@@ -4,6 +4,7 @@
 
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/test/AccessPointControllerTest.hxx>
 #include <microsoft/net/wifi/test/AccessPointTest.hxx>
@@ -24,6 +25,12 @@ std::string_view
 AccessPointTest::GetInterfaceName() const noexcept
 {
     return InterfaceName;
+}
+
+Ieee80211MacAddress
+AccessPointTest::GetMacAddress() const noexcept
+{
+    return MacAddress;
 }
 
 std::unique_ptr<IAccessPointController>

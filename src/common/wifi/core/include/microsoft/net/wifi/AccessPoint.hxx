@@ -2,11 +2,13 @@
 #ifndef ACCESS_POINT_HXX
 #define ACCESS_POINT_HXX
 
-#include <microsoft/net/wifi/IAccessPoint.hxx>
-#include <microsoft/net/wifi/IAccessPointController.hxx>
-
+#include <optional>
 #include <string>
 #include <string_view>
+
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/IAccessPointController.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -23,7 +25,7 @@ struct AccessPoint :
      * @param interfaceName The network interface name representing the access point.
      * @param accessPointControllerFactory The factory used to create controller objects.
      */
-    AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory);
+    AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, std::optional<Ieee80211MacAddress> macAddress = std::nullopt);
 
     /**
      * @brief Get the network interface name representing the access point.
@@ -32,6 +34,14 @@ struct AccessPoint :
      */
     std::string_view
     GetInterfaceName() const noexcept override;
+
+    /**
+     * @brief Get the mac address of the access point.
+     *
+     * @return Ieee80211MacAddress
+     */
+    Ieee80211MacAddress
+    GetMacAddress() const noexcept override;
 
     /**
      * @brief Create a controller object.
@@ -44,6 +54,7 @@ struct AccessPoint :
 private:
     const std::string m_interfaceName;
     std::shared_ptr<IAccessPointControllerFactory> m_accessPointControllerFactory;
+    std::optional<Ieee80211MacAddress> m_macAddress;
 };
 
 /**

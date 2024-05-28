@@ -22,6 +22,12 @@ AccessPointLinux::AccessPointLinux(std::string_view interfaceName, std::shared_p
 {
 }
 
+Ieee80211MacAddress
+AccessPointLinux::GetMacAddress() const noexcept
+{
+    return m_nl80211Interface.MacAddress;
+}
+
 std::shared_ptr<IAccessPoint>
 AccessPointFactoryLinux::Create(std::string_view interfaceName)
 {

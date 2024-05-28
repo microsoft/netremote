@@ -28,6 +28,7 @@ struct AccessPointTest final :
     std::string Ssid;
     std::string InterfaceName;
     std::string BridgeInterfaceId;
+    Microsoft::Net::Wifi::Ieee80211MacAddress MacAddress{};
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
     Microsoft::Net::Wifi::Ieee80211AuthenticationData AuthenticationData;
@@ -75,6 +76,14 @@ struct AccessPointTest final :
      */
     std::string_view
     GetInterfaceName() const noexcept override;
+
+    /**
+     * @brief Get the mac address of the access point.
+     *
+     * @return Microsoft::Net::Wifi::Ieee80211MacAddress
+     */
+    Microsoft::Net::Wifi::Ieee80211MacAddress
+    GetMacAddress() const noexcept override;
 
     /**
      * @brief Create a new instance that can control the access point.

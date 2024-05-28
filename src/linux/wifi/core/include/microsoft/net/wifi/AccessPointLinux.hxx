@@ -5,10 +5,11 @@
 #include <memory>
 #include <string_view>
 
+#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
+#include <microsoft/net/wifi/AccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
-#include <microsoft/net/wifi/AccessPoint.hxx>
-#include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -21,12 +22,20 @@ struct AccessPointLinux :
     /**
      * @brief Construct a new AccessPointLinux object with the specified interface name, access point controller
      * factory, and nl80211 interface.
-     * 
+     *
      * @param interfaceName The name of the interface.
      * @param accessPointControllerFactory The access point controller factory to use for creating access point.
      * @param nl80211Interface The nl80211 interface object.
      */
     AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
+
+    /**
+     * @brief Get the mac address of the access point.
+     *
+     * @return Ieee80211MacAddress
+     */
+    Ieee80211MacAddress
+    GetMacAddress() const noexcept override;
 
 private:
     Microsoft::Net::Netlink::Nl80211::Nl80211Interface m_nl80211Interface;
@@ -68,7 +77,7 @@ struct AccessPointCreateArgsLinux :
 {
     /**
      * @brief Construct a new AccessPointCreateArgsLinux object with the specified nl80211 interface.
-     * 
+     *
      * @param nl80211Interface The nl80211 interface object.
      */
     explicit AccessPointCreateArgsLinux(Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
