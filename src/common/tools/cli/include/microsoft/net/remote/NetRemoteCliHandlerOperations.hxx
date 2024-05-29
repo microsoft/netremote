@@ -72,6 +72,15 @@ struct NetRemoteCliHandlerOperations :
     void
     WifiAccessPointDisable(std::string_view accessPointId) override;
 
+    /**
+     * @brief Set the SSID of the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to set the SSID for.
+     * @param ssid The SSID to set.
+     */
+    void
+    WifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid) override;
+
 private:
     std::shared_ptr<NetRemoteServerConnection> m_connection;
 };

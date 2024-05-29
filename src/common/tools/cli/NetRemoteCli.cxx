@@ -127,6 +127,7 @@ NetRemoteCli::AddSubcommandWifi(CLI::App* parent)
     m_cliAppWifiAccessPointsEnumerate = AddSubcommandWifiAccessPointsEnumerate(wifiApp);
     m_cliAppWifiAccessPointEnable = AddSubcommandWifiAccessPointEnable(wifiApp);
     m_cliAppWifiAccessPointDisable = AddSubcommandWifiAccessPointDisable(wifiApp);
+    m_cliAppWifiAccessPointSetSsid = AddSubcommandWifiAccessPointSetSsid(wifiApp);
 
     return wifiApp;
 }
@@ -344,6 +345,21 @@ NetRemoteCli::AddSubcommandWifiAccessPointDisable(CLI::App* parent)
     return cliAppWifiAccessPointDisable;
 }
 
+CLI::App*
+NetRemoteCli::AddSubcommandWifiAccessPointSetSsid(CLI::App* parent)
+{
+    auto* cliAppWifiAccessPointSetSsid = parent->add_subcommand("access-point-set-ssid", "Set the SSID of an access point");
+    cliAppWifiAccessPointSetSsid->alias("ap-set-ssid")->alias("set-ssid")->alias("setssid");
+    cliAppWifiAccessPointSetSsid->callback([this] {
+        OnWifiAccessPointSetSsid(m_cliData->WifiAccessPointId, m_cliData->WifiAccessPointSsid);
+    });
+
+    cliAppWifiAccessPointSetSsid->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to set the SSID for")->required();
+    cliAppWifiAccessPointSetSsid->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable")->required();
+
+    return cliAppWifiAccessPointSetSsid;
+}
+
 void
 NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 {
@@ -389,4 +405,11 @@ void
 NetRemoteCli::OnWifiAccessPointDisable(std::string_view accessPointId)
 {
     m_cliHandler->HandleCommandWifiAccessPointDisable(accessPointId);
+}
+
+
+void
+NetRemoteCli::OnWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid)
+{
+    m_cliHandler->HandleCommandWifiAccessPointSetSsid(accessPointId, ssid); 
 }

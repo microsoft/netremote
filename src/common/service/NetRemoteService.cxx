@@ -376,6 +376,26 @@ NetRemoteService::WifiAccessPointSetFrequencyBands([[maybe_unused]] grpc::Server
 }
 
 grpc::Status
+NetRemoteService::WifiAccessPointSetSsid([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetSsidRequest* request, WifiAccessPointSetSsidResult* result)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+
+    if (request->has_ssid()) {
+        const auto& ssid = request->ssid();
+        wifiOperationStatus = WifiAccessPointSetSsidImpl(request->accesspointid(), ssid);
+    } else {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No SSID provided");
+    }
+
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(wifiOperationStatus);
+
+    return grpc::Status::OK;
+}
+
+grpc::Status
 NetRemoteService::WifiAccessPointSetNetworkBridge([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetNetworkBridgeRequest* request, WifiAccessPointSetNetworkBridgeResult* result)
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };

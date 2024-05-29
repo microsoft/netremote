@@ -132,6 +132,15 @@ private:
     AddSubcommandWifiAccessPointDisable(CLI::App* parent);
 
     /**
+     * @brief Add the 'wifi ap-set-ssid' sub-command.
+     * 
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App* 
+     */
+    CLI::App*
+    AddSubcommandWifiAccessPointSetSsid(CLI::App* parent);
+
+    /**
      * @brief Handle the 'server' option.
      *
      * @param serverAddress The server address to connect to.
@@ -169,6 +178,15 @@ private:
     OnWifiAccessPointEnable(std::string_view accessPointId, const Microsoft::Net::Wifi::Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration = nullptr);
 
     /**
+     * @brief Handle the 'wifi ap-set-ssid' command.
+     * 
+     * @param accessPointId The identifier of the access point to set the SSID for.
+     * @param ssid The SSID to set.
+     */
+    void
+    OnWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid);
+
+    /**
      * @brief Handle the 'wifi ap-disable' command.
      *
      * @param accessPointId The identifier of the access point to disable.
@@ -190,6 +208,7 @@ private:
     CLI::App* m_cliAppWifiAccessPointsEnumerate{ nullptr };
     CLI::App* m_cliAppWifiAccessPointEnable{ nullptr };
     CLI::App* m_cliAppWifiAccessPointDisable{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointSetSsid{ nullptr };
 };
 } // namespace Microsoft::Net::Remote
 
