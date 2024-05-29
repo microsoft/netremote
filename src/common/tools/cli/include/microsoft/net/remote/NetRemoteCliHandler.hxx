@@ -90,6 +90,15 @@ struct NetRemoteCliHandler
     void
     HandleCommandWifiAccessPointDisable(std::string_view accessPointId);
 
+    /**
+     * @brief Handle a command to set the SSID of a Wi-Fi access point.
+     * 
+     * @param accessPointId The identifier of the access point to set the SSID for.
+     * @param ssid The SSID to set.
+     */
+    void
+    HandleCommandWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid);
+
 private:
     /**
      * @brief Obtain a strong reference to the parent NetRemoteCli object. This is used to ensure that the parent object

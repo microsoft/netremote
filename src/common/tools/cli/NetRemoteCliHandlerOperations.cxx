@@ -452,6 +452,33 @@ NetRemoteCliHandlerOperations::WifiAccessPointDisable(std::string_view accessPoi
     std::cout << std::format("Successfully disabled wifi access point '{}'\n", accessPointId);
 }
 
+void
+NetRemoteCliHandlerOperations::WifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid)
+{
+    WifiAccessPointSetSsidRequest request{};
+    WifiAccessPointSetSsidResult result{};
+    grpc::ClientContext clientContext{};
+
+    request.set_accesspointid(std::string(accessPointId));
+    request.mutable_ssid()->set_name(std::string(ssid));
+
+    auto status = m_connection->Client->WifiAccessPointSetSsid(&clientContext, request, &result);
+    if (!status.ok()) {
+        std::cerr << std::format("Failed to set SSID for wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(status.error_code()), status.error_message());
+        return;
+    }
+    if (!result.has_status()) {
+        std::cerr << std::format("Failed to set SSID for wifi access point '{}', no status returned\n", accessPointId);
+        return;
+    }
+    if (result.status().code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+        std::cerr << std::format("Failed to set SSID for wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+
+    std::cout << std::format("Successfully set SSID to '{}' for wifi access point '{}'\n", accessPointId, ssid);
+}
+
 std::unique_ptr<INetRemoteCliHandlerOperations>
 NetRemoteCliHandlerOperationsFactory::Create(std::shared_ptr<NetRemoteServerConnection> connection)
 {

@@ -62,6 +62,15 @@ struct INetRemoteCliHandlerOperations
      */
     virtual void
     WifiAccessPointDisable(std::string_view accessPointId) = 0;
+
+    /**
+     * @brief Set the SSID of the specified WiFi access point.
+     * 
+     * @param accessPointId The identifier of the access point to set the SSID for.
+     * @param ssid The SSID to set.
+     */
+    virtual void
+    WifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid) = 0;
 };
 
 /**
