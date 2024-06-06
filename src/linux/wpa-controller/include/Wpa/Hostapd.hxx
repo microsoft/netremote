@@ -207,6 +207,16 @@ struct Hostapd :
     SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurationChange enforceConfigurationChange) override;
 
     /**
+     * @brief Add RADIUS server endpoints to the interface. This may contain multiple endpoints of various types.
+     *
+     * @param endpointConfigurations The endpoint configurations to add.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
+     * configuration reload.
+     */
+    void
+    AddRadiusEndpoints(std::vector<RadiusEndpointConfiguration> endpointConfigurations, EnforceConfigurationChange enforceConfigurationChange) override;
+
+    /**
      * @brief Generates a new network access server identifier. If no length is specified, a default value will be used.
      *
      * @param lengthRequested The requested length of the identifier. Valid values are in the range [1, 48].

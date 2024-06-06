@@ -212,6 +212,16 @@ struct IHostapd
      */
     virtual void
     SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurationChange enforceConfigurationChange) = 0;
+
+    /**
+     * @brief Add RADIUS server endpoints to the interface. This may contain multiple endpoints of various types.
+     *
+     * @param endpointConfigurations The endpoint configurations to add.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
+     * configuration reload.
+     */
+    virtual void
+    AddRadiusEndpoints(std::vector<RadiusEndpointConfiguration> endpointConfigurations, EnforceConfigurationChange enforceConfigurationChange) = 0;
 };
 
 /**
