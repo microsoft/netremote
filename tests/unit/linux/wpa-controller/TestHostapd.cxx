@@ -828,3 +828,26 @@ TEST_CASE("Send SetBridgeInterface() command (root)", "[wpa][hostapd][client][re
         REQUIRE_NOTHROW(hostapd.SetBridgeInterface(BridgeInterfaceNameDefault, EnforceConfigurationChange::Defer));
     }
 }
+
+TEST_CASE("Send AddRadiusEndpoints() command (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+    using namespace Wpa::Test;
+
+    static constexpr auto RadiusServerIpValid{ "127.0.0.1" };
+    static constexpr auto RadiusServerPortValid{ RadiusAuthenticationPortDefault };
+    static constexpr auto RadiusSecretValid{ "shared-secret" };
+    static constexpr RadiusEndpointConfiguration RadiusEndpointConfigurationValid1{
+        .Type = RadiusEndpointType::Authentication,
+        .Address = RadiusServerIpValid,
+        .SharedSecret = RadiusSecretValid,
+    };
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("Doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationValid1 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationValid1 }, EnforceConfigurationChange::Defer));
+    }
+}

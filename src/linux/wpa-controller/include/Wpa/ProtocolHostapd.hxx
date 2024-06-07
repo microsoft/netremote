@@ -877,6 +877,16 @@ enum class RadiusEndpointType {
 };
 
 /**
+ * @brief Default port for RADIUS authentication servers.
+ */
+static constexpr uint16_t RadiusAuthenticationPortDefault = 1812;
+
+/**
+ * @brief Default port for RADIUS accounting servers.
+ */
+static constexpr uint16_t RadiusAccountingPortDefault = 1813;
+
+/**
  * @brief Configuration values for a RADIUS endpoint, either a request or accounting server.
  */
 struct RadiusEndpointConfiguration
@@ -887,6 +897,12 @@ struct RadiusEndpointConfiguration
     std::string SharedSecret;
 };
 
+/**
+ * @brief Get the radius endpoint property names given a radius endpoint type.
+ * 
+ * @param type The type of radius endpoint.
+ * @return constexpr std::tuple<std::string_view, std::string_view, std::string_view> 
+ */
 constexpr std::tuple<std::string_view, std::string_view, std::string_view>
 GetRadiusEndpointPropertyNames(RadiusEndpointType type)
 {
