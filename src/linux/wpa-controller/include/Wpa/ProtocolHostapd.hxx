@@ -548,7 +548,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameRadiusAuthReqAttr = "radius_auth_req_attr";
 
     static constexpr auto PropertyNameRadiusAcctServerAddr = "acct_server_addr";
-    static constexpr auto PropertyNameRadiusAcctServerPort = "acctserver_port";
+    static constexpr auto PropertyNameRadiusAcctServerPort = "acct_server_port";
     static constexpr auto PropertyNameRadiusAcctServerShared = "acct_server_shared_secret";
     static constexpr auto PropertyNameRadiusAcctReqAttr = "radius_acct_req_attr";
 
