@@ -847,8 +847,20 @@ TEST_CASE("Send AddRadiusEndpoints() command (root)", "[wpa][hostapd][client][re
         .Port = RadiusServerPortValid1,
         .SharedSecret = RadiusSecretValid1,
     };
+    static constexpr RadiusEndpointConfiguration RadiusEndpointConfigurationAuthenticationValid2{
+        .Type = RadiusEndpointType::Authentication,
+        .Address = RadiusServerIpValid2,
+        .Port = RadiusServerPortValid2,
+        .SharedSecret = RadiusSecretValid2,
+    };
 
     static constexpr RadiusEndpointConfiguration RadiusEndpointConfigurationAccountingValid1{
+        .Type = RadiusEndpointType::Accounting,
+        .Address = RadiusServerIpValid2,
+        .Port = RadiusServerPortValid2,
+        .SharedSecret = RadiusSecretValid2,
+    };
+    static constexpr RadiusEndpointConfiguration RadiusEndpointConfigurationAccountingValid2{
         .Type = RadiusEndpointType::Accounting,
         .Address = RadiusServerIpValid2,
         .Port = RadiusServerPortValid2,
@@ -932,7 +944,31 @@ TEST_CASE("Send AddRadiusEndpoints() command (root)", "[wpa][hostapd][client][re
 
     SECTION("Succeeds with multiple authentication servers specified")
     {
-        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAuthenticationValid1 }, EnforceConfigurationChange::Now));
-        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAuthenticationValid1 }, EnforceConfigurationChange::Defer));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAuthenticationValid2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAuthenticationValid2 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with a single accounting server specified")
+    {
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAccountingValid1 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAccountingValid1 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with multiple accounting servers specified")
+    {
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAccountingValid1, RadiusEndpointConfigurationAccountingValid2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAccountingValid1, RadiusEndpointConfigurationAccountingValid2 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with single authentication and accounting servers specified")
+    {
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAccountingValid1 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAccountingValid1 }, EnforceConfigurationChange::Defer));
+    }
+
+    SECTION("Succeeds with mixtures of authentication and accounting servers specified")
+    {
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAuthenticationValid2, RadiusEndpointConfigurationAccountingValid1, RadiusEndpointConfigurationAccountingValid2 }, EnforceConfigurationChange::Now));
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ RadiusEndpointConfigurationAuthenticationValid1, RadiusEndpointConfigurationAuthenticationValid2, RadiusEndpointConfigurationAccountingValid1, RadiusEndpointConfigurationAccountingValid2 }, EnforceConfigurationChange::Defer));
     }
 }
