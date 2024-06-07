@@ -8,6 +8,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -537,6 +538,20 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameNasIdentifier = "nas_identifier";
     static constexpr auto PropertyNameBridgeInterface = "bridge";
 
+    static constexpr auto PropertyNameOwnIpAddr = "own_ip_addr";
+    static constexpr auto PropertyNameRadiusClientAddr = "radius_client_addr";
+    static constexpr auto PropertyNameRadiusClientDev = "radius_client_dev";
+
+    static constexpr auto PropertyNameRadiusAuthServerAddr = "auth_server_addr";
+    static constexpr auto PropertyNameRadiusAuthServerPort = "auth_server_port";
+    static constexpr auto PropertyNameRadiusAuthServerShared = "auth_server_shared_secret";
+    static constexpr auto PropertyNameRadiusAuthReqAttr = "radius_auth_req_attr";
+
+    static constexpr auto PropertyNameRadiusAcctServerAddr = "acct_server_addr";
+    static constexpr auto PropertyNameRadiusAcctServerPort = "acct_server_port";
+    static constexpr auto PropertyNameRadiusAcctServerShared = "acct_server_shared_secret";
+    static constexpr auto PropertyNameRadiusAcctReqAttr = "radius_acct_req_attr";
+
     // Indexed property names for BSS entries in the "STATUS" response.
     static constexpr auto PropertyNameBss = "bss";
     static constexpr auto PropertyNameBssBssid = "bssid";
@@ -851,6 +866,61 @@ struct SaePassword
     std::optional<std::string> PeerMacAddress;
     std::optional<int32_t> VlanId;
 };
+
+/**
+ * @brief Type of endpoint used for RADIUS.
+ */
+enum class RadiusEndpointType {
+    Unknown,
+    Authentication,
+    Accounting,
+};
+
+/**
+ * @brief Default port for RADIUS authentication servers.
+ */
+static constexpr uint16_t RadiusAuthenticationPortDefault = 1812;
+
+/**
+ * @brief Default port for RADIUS accounting servers.
+ */
+static constexpr uint16_t RadiusAccountingPortDefault = 1813;
+
+/**
+ * @brief Configuration values for a RADIUS endpoint, either a request or accounting server.
+ */
+struct RadiusEndpointConfiguration
+{
+    RadiusEndpointType Type{ RadiusEndpointType::Unknown };
+    std::string Address;
+    std::optional<uint16_t> Port;
+    std::string SharedSecret;
+};
+
+/**
+ * @brief Get the radius endpoint property names given a radius endpoint type.
+ * 
+ * @param type The type of radius endpoint.
+ * @return constexpr std::tuple<std::string_view, std::string_view, std::string_view> 
+ */
+constexpr std::tuple<std::string_view, std::string_view, std::string_view>
+GetRadiusEndpointPropertyNames(RadiusEndpointType type)
+{
+    switch (type) {
+    case RadiusEndpointType::Authentication:
+        return { ProtocolHostapd::PropertyNameRadiusAuthServerAddr,
+            ProtocolHostapd::PropertyNameRadiusAuthServerPort,
+            ProtocolHostapd::PropertyNameRadiusAuthServerShared };
+    case RadiusEndpointType::Accounting:
+        return { ProtocolHostapd::PropertyNameRadiusAcctServerAddr,
+            ProtocolHostapd::PropertyNameRadiusAcctServerPort,
+            ProtocolHostapd::PropertyNameRadiusAcctServerShared };
+    default:
+        return { ProtocolHostapd::PropertyNameInvalid,
+            ProtocolHostapd::PropertyNameInvalid,
+            ProtocolHostapd::PropertyNameInvalid };
+    }
+}
 } // namespace Wpa
 
 #endif // HOSTAPD_PROTOCOL_HXX

@@ -434,6 +434,44 @@ Hostapd::SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurati
     }
 }
 
+void
+Hostapd::AddRadiusEndpoints(std::vector<RadiusEndpointConfiguration> endpointConfigurations, EnforceConfigurationChange enforceConfigurationChange)
+{
+    try {
+        // Set each configuration, deferring the configuration change (if requested) until the end.
+        for (const auto& endpointConfiguration : endpointConfigurations) {
+            // Sanity check the arguments.
+            if (endpointConfiguration.Type == RadiusEndpointType::Unknown) {
+                throw HostapdException("Invalid RADIUS endpoint type");
+            }
+            if (std::empty(endpointConfiguration.Address)) {
+                throw HostapdException("RADIUS endpoint address is empty");
+            }
+            if (std::empty(endpointConfiguration.SharedSecret)) {
+                throw HostapdException("RADIUS endpoint shared secret is empty");
+            }
+
+            auto [propertyAddress, propertyPort, propertySharedKey] = GetRadiusEndpointPropertyNames(endpointConfiguration.Type);
+
+            // Set the address and shared key.
+            SetProperty(propertyAddress, endpointConfiguration.Address, EnforceConfigurationChange::Defer);
+            SetProperty(propertySharedKey, endpointConfiguration.SharedSecret, EnforceConfigurationChange::Defer);
+
+            // Set the port, if present.
+            if (endpointConfiguration.Port.has_value()) {
+                SetProperty(propertyPort, std::format("{}", endpointConfiguration.Port.value()), EnforceConfigurationChange::Defer);
+            }
+        }
+
+        // Now that all endpoint configurations are set, enforce the configuration change if requested.
+        if (enforceConfigurationChange == EnforceConfigurationChange::Now) {
+            Reload();
+        }
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to add RADIUS endpoints ({})", e.what()));
+    }
+}
+
 /* static */
 std::string
 Hostapd::GenerateNetworkAccessServerId(std::size_t lengthRequested)
