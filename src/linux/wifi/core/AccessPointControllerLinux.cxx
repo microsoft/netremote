@@ -458,7 +458,7 @@ AccessPointControllerLinux::SetRadiusConfiguration(Ieee8021xRadiusConfiguration 
 
     // Allocate space for WPA RADIUS endpoint configurations.
     const bool hasPrimaryAccountingServer = radiusConfiguration.AccountingServer.has_value();
-    const std::size_t numRadiusServers = 1 + std::size(radiusConfiguration.AuthenticationServerFallbacks) + std::size(radiusConfiguration.AccountingServerFallbacks) + (hasPrimaryAccountingServer ? 1 : 0);
+    const std::size_t numRadiusServers = 1 + std::size(radiusConfiguration.ServerFallbacks) + (hasPrimaryAccountingServer ? 1 : 0);
     std::vector<Wpa::RadiusEndpointConfiguration> radiusEndpointConfigurations{ numRadiusServers };
 
     // First, convert the primary authentication server.
@@ -471,7 +471,7 @@ AccessPointControllerLinux::SetRadiusConfiguration(Ieee8021xRadiusConfiguration 
     }
 
     // Last, convert all secondary authentication and accounting servers.
-    std::ranges::transform(radiusConfiguration.AuthenticationServerFallbacks, radiusEndpointConfigurationsIter, Ieee8021xRadiusServerEndpointConfigurationToWpaRadiusEndpointConfiguration);
+    std::ranges::transform(radiusConfiguration.ServerFallbacks, radiusEndpointConfigurationsIter, Ieee8021xRadiusServerEndpointConfigurationToWpaRadiusEndpointConfiguration);
 
     // Attempt to add the WPA RADIUS endpoint configurations.
     try {
