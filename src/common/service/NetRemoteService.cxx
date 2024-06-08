@@ -14,6 +14,7 @@
 #include <grpcpp/server_context.h>
 #include <magic_enum.hpp>
 #include <microsoft/net/ServiceApiNetworkAdapters.hxx>
+#include <microsoft/net/ServiceApiNetworkDot1xAdapters.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/remote/service/NetRemoteService.hxx>
@@ -1074,14 +1075,14 @@ NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, con
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view accessPointId, const Dot11Dot1xConfiguration& Dot11Dot1xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
+NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view accessPointId, const Dot11Dot1xConfiguration& dot11Dot1xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
     // Validate basic parameters in the request.
-    if (!Dot11Dot1xConfiguration.has_radius()) {
+    if (!dot11Dot1xConfiguration.has_radius()) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-        wifiOperationStatus.set_message("No EAP (RADIUS) configuration provided");
+        wifiOperationStatus.set_message("No 802.1x configuration provided");
         return wifiOperationStatus;
     }
 
@@ -1097,7 +1098,16 @@ NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view acce
         }
     }
 
-    // TODO: Implement setting 802.1x configuration.
+    // Apply 802.1X RADIUS configuration, if present.
+    if (dot11Dot1xConfiguration.has_radius()) {
+        auto ieee8021xRadiusConfiguration = FromServiceDot1xRadiusConfiguration(dot11Dot1xConfiguration.radius());
+        operationStatus = accessPointController->SetRadiusConfiguration(std::move(ieee8021xRadiusConfiguration));
+        if (!operationStatus.Succeeded()) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to set 802.1x configuration for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
