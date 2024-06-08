@@ -16,6 +16,7 @@
 #include <Wpa/IHostapd.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <magic_enum.hpp>
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/netlink/nl80211/Ieee80211Nl80211Adapters.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Wiphy.hxx>
 #include <microsoft/net/wifi/AccessPointController.hxx>
@@ -28,7 +29,9 @@
 #include <plog/Severity.h>
 
 #include "Ieee80211WpaAdapters.hxx"
+#include "Ieee8021xWpaAdapters.hxx"
 
+using namespace Microsoft::Net;
 using namespace Microsoft::Net::Wifi;
 
 using Microsoft::Net::Netlink::Nl80211::Nl80211Wiphy;
@@ -440,6 +443,53 @@ AccessPointControllerLinux::SetNetworkBridge([[maybe_unused]] std::string_view n
     } catch (const Wpa::HostapdException& ex) {
         status.Code = AccessPointOperationStatusCode::InternalError;
         status.Details = std::format("failed to set bridge interface to {} - {}", networkBridgeId, ex.what());
+        return status;
+    }
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
+    return status;
+}
+
+AccessPointOperationStatus
+AccessPointControllerLinux::SetRadiusConfiguration(Ieee8021xRadiusConfiguration radiusConfiguration) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    // Allocate space for WPA RADIUS endpoint configurations.
+    const bool hasPrimaryAccountingServer = radiusConfiguration.AccountingServer.has_value();
+    const std::size_t numRadiusServers = 1 + std::size(radiusConfiguration.AuthenticationServerFallbacks) + std::size(radiusConfiguration.AccountingServerFallbacks) + (hasPrimaryAccountingServer ? 1 : 0);
+    std::vector<Wpa::RadiusEndpointConfiguration> radiusEndpointConfigurations{ numRadiusServers };
+
+    // First, convert the primary authentication server.
+    auto radiusEndpointConfigurationsIter = std::begin(radiusEndpointConfigurations);
+    *radiusEndpointConfigurationsIter++ = Ieee8021xRadiusServerEndpointConfigurationToWpaRadiusEndpointConfiguration(radiusConfiguration.AuthenticationServer);
+
+    // Next, if specified, convert the primary accounting server.
+    if (hasPrimaryAccountingServer) {
+        *radiusEndpointConfigurationsIter++ = Ieee8021xRadiusServerEndpointConfigurationToWpaRadiusEndpointConfiguration(radiusConfiguration.AccountingServer.value());
+    }
+
+    // Last, convert all secondary authentication and accounting servers.
+    std::ranges::transform(radiusConfiguration.AuthenticationServerFallbacks, radiusEndpointConfigurationsIter, Ieee8021xRadiusServerEndpointConfigurationToWpaRadiusEndpointConfiguration);
+
+    // Attempt to add the WPA RADIUS endpoint configurations.
+    try {
+        m_hostapd.AddRadiusEndpoints(radiusEndpointConfigurations, EnforceConfigurationChange::Defer);
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to add RADIUS endpoint configurations to hostapd - {}", ex.what());
+        return status;
+    }
+
+    // If any further RADIUS configuration needs to be applied, it should be done here.
+
+    // Now that all RADIUS configuration has been applied, reload the hostapd configuration to pick up the changes.
+    try {
+        m_hostapd.Reload();
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to reload hostapd configuration for RADIUS configuration change - {}", ex.what());
         return status;
     }
 

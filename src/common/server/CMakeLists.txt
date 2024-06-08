@@ -19,7 +19,7 @@ target_sources(${PROJECT_NAME}-server
 
 target_link_libraries(${PROJECT_NAME}-server
     PUBLIC
-        ${PROJECT_NAME}-net
+        ${PROJECT_NAME}-network-manager
         ${PROJECT_NAME}-service
     PRIVATE
         CLI11::CLI11

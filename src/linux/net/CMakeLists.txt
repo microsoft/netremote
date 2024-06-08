@@ -18,6 +18,7 @@ target_sources(${PROJECT_NAME}-net-linux
 target_link_libraries(${PROJECT_NAME}-net-linux
     PUBLIC
         ${PROJECT_NAME}-net
+        plog::plog
     PRIVATE
         libnl-helpers
 )

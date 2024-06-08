@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -156,6 +157,15 @@ struct AccessPointControllerTest final :
      */
     AccessPointOperationStatus
     SetNetworkBridge(std::string_view networkBridgeId) noexcept override;
+
+    /**
+     * @brief Set the RADIUS configuration for the access point.
+     *
+     * @param radiusConfiguration The RADIUS configuration to be set.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetRadiusConfiguration(Ieee8021xRadiusConfiguration radiusConfiguration) noexcept override;
 };
 
 /**
