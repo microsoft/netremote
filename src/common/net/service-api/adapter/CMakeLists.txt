@@ -8,11 +8,13 @@ set(NET_REMOTE_NET_ADAPTER_SERVICE_API_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_NET_AD
 target_sources(${PROJECT_NAME}-net-adapter-service-api
     PRIVATE
         ServiceApiNetworkAdapters.cxx
+        ServiceApiNetworkDot1xAdapters.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_NET_ADAPTER_SERVICE_API_PUBLIC_INCLUDE}
     FILES
         ${NET_REMOTE_NET_ADAPTER_SERVICE_API_PUBLIC_INCLUDE_PREFIX}/ServiceApiNetworkAdapters.hxx 
+        ${NET_REMOTE_NET_ADAPTER_SERVICE_API_PUBLIC_INCLUDE_PREFIX}/ServiceApiNetworkDot1xAdapters.hxx 
 )
 
 target_link_libraries(${PROJECT_NAME}-net-adapter-service-api

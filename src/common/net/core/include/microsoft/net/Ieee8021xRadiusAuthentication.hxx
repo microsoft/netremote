@@ -64,7 +64,7 @@ struct Ieee8021xRadiusConfiguration
 {
     Ieee8021xRadiusServerEndpointConfiguration AuthenticationServer;
     std::optional<Ieee8021xRadiusServerEndpointConfiguration> AccountingServer;
-    std::vector<Ieee8021xRadiusServerEndpointConfiguration> ServerFallbacks;
+    std::vector<Ieee8021xRadiusServerEndpointConfiguration> FallbackServers;
 };
 } // namespace Microsoft::Net
 
