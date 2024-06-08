@@ -11,6 +11,8 @@ target_sources(wifi-core-linux
         AccessPointLinux.cxx
         Ieee80211WpaAdapters.cxx
         Ieee80211WpaAdapters.hxx
+        Ieee8021xWpaAdapters.cxx
+        Ieee8021xWpaAdapters.hxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${WIFI_CORE_LINUX_PUBLIC_INCLUDE}
@@ -23,6 +25,7 @@ target_link_libraries(wifi-core-linux
     PRIVATE
         plog::plog
     PUBLIC
+        ${PROJECT_NAME}-net
         libnl-helpers
         wifi-core
         wpa-controller

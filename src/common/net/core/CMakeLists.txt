@@ -10,6 +10,7 @@ target_sources(${PROJECT_NAME}-net
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_NET_PUBLIC_INCLUDE}
     FILES
+        ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/Ieee8021xRadiusAuthentication.hxx
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/INetworkOperations.hxx
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/IpAddressInformation.hxx
         ${NET_REMOTE_NET_PUBLIC_INCLUDE_PREFIX}/NetworkInterface.hxx

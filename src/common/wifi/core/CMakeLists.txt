@@ -36,6 +36,7 @@ target_link_libraries(wifi-core
         notstd
         strings
     PUBLIC
+        ${PROJECT_NAME}-net
         plog::plog
 )
 
