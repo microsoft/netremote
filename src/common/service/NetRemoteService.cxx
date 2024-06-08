@@ -408,11 +408,11 @@ NetRemoteService::WifiAccessPointSetNetworkBridge([[maybe_unused]] grpc::ServerC
 }
 
 grpc::Status
-NetRemoteService::WifiAccessPointSet8021xConfiguration([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSet8021xConfigurationRequest* request, WifiAccessPointSet8021xConfigurationResult* result)
+NetRemoteService::WifiAccessPointSetDot1xConfiguration([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetDot1xConfigurationRequest* request, WifiAccessPointSetDot1xConfigurationResult* result)
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    auto wifiOperationStatus = WifiAccessPointSet8021xConfigurationImpl(request->accesspointid(), request->configuration());
+    auto wifiOperationStatus = WifiAccessPointSetDot1xConfigurationImpl(request->accesspointid(), request->configuration());
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(wifiOperationStatus);
 
@@ -1074,12 +1074,12 @@ NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, con
 }
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSet8021xConfigurationImpl(std::string_view accessPointId, const Dot118021xConfiguration& dot118021xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
+NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view accessPointId, const Dot11Dot1xConfiguration& Dot11Dot1xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
     // Validate basic parameters in the request.
-    if (!dot118021xConfiguration.has_radius()) {
+    if (!Dot11Dot1xConfiguration.has_radius()) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         wifiOperationStatus.set_message("No EAP (RADIUS) configuration provided");
         return wifiOperationStatus;

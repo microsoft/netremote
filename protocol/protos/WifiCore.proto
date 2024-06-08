@@ -196,7 +196,7 @@ message Dot11CipherSuiteConfiguration
     repeated Dot11CipherSuite CipherSuites = 2;
 }
 
-message Dot118021xConfiguration
+message Dot11Dot1xConfiguration
 {
     Dot1xRadiusConfiguration Radius = 1;
 }

@@ -114,13 +114,13 @@ message WifiAccessPointSetSsidResult
     WifiAccessPointOperationStatus Status = 2;
 }
 
-message WifiAccessPointSet8021xConfigurationRequest
+message WifiAccessPointSetDot1xConfigurationRequest
 {
     string AccessPointId = 1;
-    Microsoft.Net.Wifi.Dot118021xConfiguration Configuration = 2;
+    Microsoft.Net.Wifi.Dot11Dot1xConfiguration Configuration = 2;
 }
 
-message WifiAccessPointSet8021xConfigurationResult
+message WifiAccessPointSetDot1xConfigurationResult
 {
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
