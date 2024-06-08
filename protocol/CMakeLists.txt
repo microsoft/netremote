@@ -11,6 +11,7 @@ set(PROTO_FILES
     ${PROTO_DIR}/NetRemoteNetwork.proto
     ${PROTO_DIR}/NetRemoteService.proto
     ${PROTO_DIR}/NetRemoteWifi.proto
+    ${PROTO_DIR}/Network8021x.proto
     ${PROTO_DIR}/NetworkCore.proto
     ${PROTO_DIR}/WifiCore.proto
 )
@@ -31,6 +32,7 @@ set(PROTO_HEADERS_GENERATED
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.pb.h
+    ${PROTO_DIR_BINARY}/Network8021x.pb.h
     ${PROTO_DIR_BINARY}/NetworkCore.pb.h
     ${PROTO_DIR_BINARY}/WifiCore.pb.h
 )
@@ -41,6 +43,7 @@ set(PROTO_HEADERS_GENERATED_GRPC
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.grpc.pb.h
+    ${PROTO_DIR_BINARY}/Network8021x.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetworkCore.grpc.pb.h
     ${PROTO_DIR_BINARY}/WifiCore.grpc.pb.h
 )
