@@ -2,3 +2,25 @@
 syntax = "proto3";
 
 package Microsoft.Net;
+
+enum Dot1xRadiusServerEndpoint
+{
+    Dot1xRadiusServerEndpointUnknown = 0;
+    Dot1xRadiusServerEndpointAuthentication = 1;
+    Dot1xRadiusServerEndpointAccounting = 2;
+}
+
+message Dot1xRadiusServerEndpointConfiguration
+{
+    Dot1xRadiusServerEndpoint Endpoint = 1;
+    string Address = 2;
+    uint32 Port = 3;
+    string SharedSecret = 4;
+}
+
+message Dot1xRadiusConfiguration
+{
+    Dot1xRadiusServerEndpointConfiguration AuthenticationServer = 1;
+    Dot1xRadiusServerEndpointConfiguration AccountingServer = 2;
+    repeated Dot1xRadiusServerEndpointConfiguration FallbackServers = 3;
+}
