@@ -19,4 +19,5 @@ service NetRemote
     rpc WifiAccessPointSetFrequencyBands (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsResult);
     rpc WifiAccessPointSetSsid (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidResult);
     rpc WifiAccessPointSetNetworkBridge (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeResult);
+    rpc WifiAccessPointSet8021xConfiguration (Microsoft.Net.Remote.Wifi.WifiAccessPointSet8021xConfigurationRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSet8021xConfigurationResult);
 }

@@ -407,6 +407,18 @@ NetRemoteService::WifiAccessPointSetNetworkBridge([[maybe_unused]] grpc::ServerC
     return grpc::Status::OK;
 }
 
+grpc::Status
+NetRemoteService::WifiAccessPointSet8021xConfiguration([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSet8021xConfigurationRequest* request, WifiAccessPointSet8021xConfigurationResult* result)
+{
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+
+    auto wifiOperationStatus = WifiAccessPointSet8021xConfigurationImpl(request->accesspointid(), request->configuration());
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(wifiOperationStatus);
+
+    return grpc::Status::OK;
+}
+
 AccessPointOperationStatus
 NetRemoteService::TryGetAccessPoint(std::string_view accessPointId, std::shared_ptr<IAccessPoint>& accessPoint)
 {
@@ -1055,6 +1067,37 @@ NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, con
         wifiOperationStatus.set_message(std::format("Failed to set SSID for access point {} - {}", accessPointId, operationStatus.ToString()));
         return wifiOperationStatus;
     }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSet8021xConfigurationImpl(std::string_view accessPointId, const Dot118021xConfiguration& dot118021xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate basic parameters in the request.
+    if (!dot118021xConfiguration.has_radius()) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("No EAP (RADIUS) configuration provided");
+        return wifiOperationStatus;
+    }
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // TODO: Implement setting 802.1x configuration.
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 

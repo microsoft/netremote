@@ -3,6 +3,8 @@ syntax = "proto3";
 
 package Microsoft.Net.Wifi;
 
+import "Network8021x.proto";
+
 enum Dot11FrequencyBand
 {
     option allow_alias = true;
@@ -192,6 +194,11 @@ message Dot11CipherSuiteConfiguration
 {
     Dot11SecurityProtocol SecurityProtocol = 1;
     repeated Dot11CipherSuite CipherSuites = 2;
+}
+
+message Dot118021xConfiguration
+{
+    Dot1xRadiusConfiguration Radius = 1;
 }
 
 message Dot11AccessPointConfiguration

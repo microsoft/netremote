@@ -10,6 +10,7 @@
 #include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/Network8021x.pb.h>
 #include <microsoft/net/remote/protocol/NetworkCore.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/remote/service/NetRemoteService.hxx>
@@ -114,11 +115,11 @@ private:
 
     /**
      * @brief Set the SSID of the access point.
-     * 
-     * @param context 
-     * @param request 
-     * @param result 
-     * @return grpc::Status 
+     *
+     * @param context
+     * @param request
+     * @param result
+     * @return grpc::Status
      */
     grpc::Status
     WifiAccessPointSetSsid(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetSsidRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetSsidResult* result) override;
@@ -133,6 +134,17 @@ private:
      */
     grpc::Status
     WifiAccessPointSetNetworkBridge(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetNetworkBridgeRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetNetworkBridgeResult* result) override;
+
+    /**
+     * @brief Set the IEEE 802.1x configuration for the access point.
+     *
+     * @param context
+     * @param request
+     * @param result
+     * @return grpc::Status
+     */
+    grpc::Status
+    WifiAccessPointSet8021xConfiguration(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSet8021xConfigurationRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSet8021xConfigurationResult* result) override;
 
 protected:
     /**
@@ -279,6 +291,17 @@ protected:
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointSetSsidImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Ssid& dot11Ssid, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
+     * @brief Set the IEEE 802.1x configuration for the access point.
+     * 
+     * @param accessPointId The access point identifier.
+     * @param dot11Network8021xConfiguration The new IEEE 802.1x configuration to set.
+     * @param accessPointController  The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSet8021xConfigurationImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot118021xConfiguration& dot118021xConfiguration, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
 private:
     std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;

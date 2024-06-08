@@ -4,6 +4,7 @@ syntax = "proto3";
 package Microsoft.Net.Remote.Wifi;
 
 import "google/protobuf/any.proto";
+import "Network8021x.proto";
 import "WifiCore.proto";
 
 message WifiAccessPointsEnumerateResultItem
@@ -108,6 +109,18 @@ message WifiAccessPointSetSsidRequest
 }
 
 message WifiAccessPointSetSsidResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiAccessPointSet8021xConfigurationRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot118021xConfiguration Configuration = 2;
+}
+
+message WifiAccessPointSet8021xConfigurationResult
 {
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
