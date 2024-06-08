@@ -6,7 +6,6 @@ set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE
 set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos)
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 set(PROTO_FILES
-    ${PROTO_DIR}/NetRemote.proto
     ${PROTO_DIR}/NetRemoteDataStream.proto
     ${PROTO_DIR}/NetRemoteDataStreamingService.proto
     ${PROTO_DIR}/NetRemoteNetwork.proto
@@ -27,7 +26,6 @@ set(PROTO_FILES
 # string(REGEX REPLACE "[.]proto$" ".pb.grpc.h" PROTO_HEADERS_GENERATED_GRPC "${PROTO_FILES_GENERATED}")
 #
 set(PROTO_HEADERS_GENERATED
-    ${PROTO_DIR_BINARY}/NetRemote.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStream.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.pb.h
@@ -38,7 +36,6 @@ set(PROTO_HEADERS_GENERATED
 )
 
 set(PROTO_HEADERS_GENERATED_GRPC
-    ${PROTO_DIR_BINARY}/NetRemote.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStream.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.grpc.pb.h

@@ -3,7 +3,6 @@ syntax = "proto3";
 
 package Microsoft.Net.Remote.Service;
 
-import "NetRemote.proto";
 import "NetRemoteNetwork.proto";
 import "NetRemoteWifi.proto";
 
