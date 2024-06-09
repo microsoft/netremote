@@ -1074,9 +1074,100 @@ NetRemoteService::WifiAccessPointSetSsidImpl(std::string_view accessPointId, con
     return wifiOperationStatus;
 }
 
+namespace detail
+{
+/**
+ * @brief The result of validating an 802.1x RADIUS server endpoint configuration.
+ */
+enum class Dot1xRadiusServerEndpointConfigurationValidationResult {
+    Valid,
+    MissingAddress,
+    MissingSharedSecret,
+};
+
+/**
+ * @brief Get a string representation of the 802.1x RADIUS server endpoint configuration validation result.
+ *
+ * @param validationResult The validation result.
+ * @return constexpr auto
+ */
+constexpr auto
+GetDot1xRadiusServerEndpointConfigurationValidationResultMessage(Dot1xRadiusServerEndpointConfigurationValidationResult validationResult) noexcept
+{
+    switch (validationResult) {
+    case Dot1xRadiusServerEndpointConfigurationValidationResult::MissingAddress:
+        return "missing address";
+    case Dot1xRadiusServerEndpointConfigurationValidationResult::MissingSharedSecret:
+        return "missing shared secret";
+    case Dot1xRadiusServerEndpointConfigurationValidationResult::Valid:
+        [[fallthrough]];
+    default:
+        return "valid";
+    }
+}
+
+/**
+ * @brief Check if the 802.1x RADIUS server endpoint configuration is valid.
+ *
+ * @param validationResult The validation result.
+ * @return true
+ * @return false
+ */
+constexpr bool
+IsDot1xRadiusServerEndpointConfigurationValid(Dot1xRadiusServerEndpointConfigurationValidationResult validationResult) noexcept
+{
+    return (validationResult == Dot1xRadiusServerEndpointConfigurationValidationResult::Valid);
+}
+
+/**
+ * @brief Validate the 802.1x RADIUS server endpoint configuration.
+ *
+ * @param dot1xRadiusServerEndpointConfiguration The 802.1x RADIUS server endpoint configuration.
+ * @return Dot1xRadiusServerEndpointConfigurationValidationResult The validation result.
+ */
+Dot1xRadiusServerEndpointConfigurationValidationResult
+ValidateDot1xRadiusServerEndpointConfiguration(const Dot1xRadiusServerEndpointConfiguration& dot1xRadiusServerEndpointConfiguration) noexcept
+{
+    if (std::empty(dot1xRadiusServerEndpointConfiguration.address())) {
+        return Dot1xRadiusServerEndpointConfigurationValidationResult::MissingAddress;
+    }
+    if (std::empty(dot1xRadiusServerEndpointConfiguration.sharedsecret())) {
+        return Dot1xRadiusServerEndpointConfigurationValidationResult::MissingSharedSecret;
+    }
+    return Dot1xRadiusServerEndpointConfigurationValidationResult::Valid;
+}
+
+/**
+ * @brief Get a string representation of the 802.1x RADIUS server endpoint.
+ *
+ * @param endpoint The 802.1x RADIUS server endpoint.
+ * @return constexpr std::string_view
+ */
+constexpr std::string_view
+GetDot1xRadiusServerEndpointName(Dot1xRadiusServerEndpoint dot1xRadiusServerEndpoint) noexcept
+{
+    switch (dot1xRadiusServerEndpoint) {
+    case Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication:
+        return "authentication";
+    case Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting:
+        return "accounting";
+    case Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointUnknown:
+        [[fallthrough]];
+    default:
+        return "unknown";
+    }
+}
+} // namespace detail
+
 WifiAccessPointOperationStatus
 NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view accessPointId, const Dot11Dot1xConfiguration& dot11Dot1xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
 {
+    using detail::Dot1xRadiusServerEndpointConfigurationValidationResult;
+    using detail::GetDot1xRadiusServerEndpointConfigurationValidationResultMessage;
+    using detail::GetDot1xRadiusServerEndpointName;
+    using detail::IsDot1xRadiusServerEndpointConfigurationValid;
+    using detail::ValidateDot1xRadiusServerEndpointConfiguration;
+
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
     // Validate basic parameters in the request.
@@ -1110,16 +1201,33 @@ NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view acce
         }
 
         // Validate the authentication server configuration.
-        {
-            const auto& dot1xAuthenticationServer = dot1xRadiusConfiguration.authenticationserver();
-            if (std::empty(dot1xAuthenticationServer.address())) {
+        auto dot1xRadiusServerEndpointConfigurationValidationResult = ValidateDot1xRadiusServerEndpointConfiguration(dot1xRadiusConfiguration.authenticationserver());
+        if (!IsDot1xRadiusServerEndpointConfigurationValid(dot1xRadiusServerEndpointConfigurationValidationResult)) {
+            auto validationError = GetDot1xRadiusServerEndpointConfigurationValidationResultMessage(dot1xRadiusServerEndpointConfigurationValidationResult);
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+            wifiOperationStatus.set_message(std::format("802.1x RADIUS primary authentication server configuration {}", std::move(validationError)));
+            return wifiOperationStatus;
+        }
+
+        // Validate accounting server if present.
+        if (dot1xRadiusConfiguration.has_accountingserver()) {
+            const auto& dot1xRadiusAccountingServerEndpointConfiguration = dot1xRadiusConfiguration.accountingserver();
+            dot1xRadiusServerEndpointConfigurationValidationResult = ValidateDot1xRadiusServerEndpointConfiguration(dot1xRadiusAccountingServerEndpointConfiguration);
+            if (!IsDot1xRadiusServerEndpointConfigurationValid(dot1xRadiusServerEndpointConfigurationValidationResult)) {
+                auto validationError = GetDot1xRadiusServerEndpointConfigurationValidationResultMessage(dot1xRadiusServerEndpointConfigurationValidationResult);
                 wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-                wifiOperationStatus.set_message("No 802.1x RADIUS authentication server address provided");
+                wifiOperationStatus.set_message(std::format("802.1x RADIUS primary accounting server configuration {}", std::move(validationError)));
                 return wifiOperationStatus;
             }
-            if (std::empty(dot1xAuthenticationServer.sharedsecret())) {
+        }
+
+        // Validate fallback servers.
+        for (const auto& fallbackServer : dot1xRadiusConfiguration.fallbackservers()) {
+            dot1xRadiusServerEndpointConfigurationValidationResult = ValidateDot1xRadiusServerEndpointConfiguration(fallbackServer);
+            if (!IsDot1xRadiusServerEndpointConfigurationValid(dot1xRadiusServerEndpointConfigurationValidationResult)) {
+                auto validationError = GetDot1xRadiusServerEndpointConfigurationValidationResultMessage(dot1xRadiusServerEndpointConfigurationValidationResult);
                 wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
-                wifiOperationStatus.set_message("No 802.1x RADIUS authentication server shared secret provided");
+                wifiOperationStatus.set_message(std::format("802.1x RADIUS fallback {} server configuration {}", GetDot1xRadiusServerEndpointName(fallbackServer.endpoint()), std::move(validationError)));
                 return wifiOperationStatus;
             }
         }
