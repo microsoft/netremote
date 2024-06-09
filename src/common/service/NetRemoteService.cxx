@@ -1100,7 +1100,32 @@ NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view acce
 
     // Apply 802.1X RADIUS configuration, if present.
     if (dot11Dot1xConfiguration.has_radius()) {
-        auto ieee8021xRadiusConfiguration = FromServiceDot1xRadiusConfiguration(dot11Dot1xConfiguration.radius());
+        auto& dot1xRadiusConfiguration = dot11Dot1xConfiguration.radius();
+
+        // Validate all required configuration is present.
+        if (!dot1xRadiusConfiguration.has_authenticationserver()) {
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+            wifiOperationStatus.set_message("No 802.1x RADIUS authentication server provided");
+            return wifiOperationStatus;
+        }
+
+        // Validate the authentication server configuration.
+        {
+            const auto& dot1xAuthenticationServer = dot1xRadiusConfiguration.authenticationserver();
+            if (std::empty(dot1xAuthenticationServer.address())) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message("No 802.1x RADIUS authentication server address provided");
+                return wifiOperationStatus;
+            }
+            if (std::empty(dot1xAuthenticationServer.sharedsecret())) {
+                wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+                wifiOperationStatus.set_message("No 802.1x RADIUS authentication server shared secret provided");
+                return wifiOperationStatus;
+            }
+        }
+
+        // Convert to neutral type and set the 802.1x RADIUS configuration.
+        auto ieee8021xRadiusConfiguration = FromServiceDot1xRadiusConfiguration(dot1xRadiusConfiguration);
         operationStatus = accessPointController->SetRadiusConfiguration(std::move(ieee8021xRadiusConfiguration));
         if (!operationStatus.Succeeded()) {
             wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
