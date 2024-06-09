@@ -794,6 +794,7 @@ TEST_CASE("NetworkInterfacesEnumerate API", "[basic][rpc][client][remote]")
 
 TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remote]")
 {
+    using namespace Microsoft::Net;
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
     using namespace Microsoft::Net::Remote::Test;
@@ -804,6 +805,7 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
     constexpr auto InterfaceName{ "TestWifiAccessPointSetDot1xConfiguration" };
     constexpr auto RadiusServerAddressValid{ "127.0.0.1" };
     constexpr auto RadiusServerSharedSecretValid{ "shared-secret" };
+    constexpr auto RadiusServerPortValid{ 1234 };
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
@@ -950,6 +952,82 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
     }
 
+    SECTION("RADIUS: Fails with fallback server missing address")
+    {
+        for (const auto dot1xRadiusServerEndpoint : { Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication, Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting }) {
+            WifiAccessPointSetDot1xConfigurationRequest request{};
+            request.set_accesspointid(InterfaceName);
+            auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+            auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
+            *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
+            *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
+
+            auto& radiusAccountingServer = *radiusConfiguration.mutable_accountingserver();
+            radiusAccountingServer.set_address(RadiusServerAddressValid);
+            radiusAccountingServer.set_sharedsecret(RadiusServerSharedSecretValid);
+
+            // Add a fallback server with no address.
+            {
+                std::vector<Dot1xRadiusServerEndpointConfiguration> radiusFallbackServers{};
+                Dot1xRadiusServerEndpointConfiguration dot1xRadiusServerEndpointConfiguration{};
+                dot1xRadiusServerEndpointConfiguration.set_endpoint(dot1xRadiusServerEndpoint);
+                dot1xRadiusServerEndpointConfiguration.set_address("");
+                dot1xRadiusServerEndpointConfiguration.set_sharedsecret(RadiusServerSharedSecretValid);
+                radiusFallbackServers.push_back(std::move(dot1xRadiusServerEndpointConfiguration));
+                *radiusConfiguration.mutable_fallbackservers() = {
+                    std::make_move_iterator(std::begin(radiusFallbackServers)),
+                    std::make_move_iterator(std::end(radiusFallbackServers)),
+                };
+            }
+
+            WifiAccessPointSetDot1xConfigurationResult result{};
+            grpc::ClientContext clientContext{};
+
+            auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+            REQUIRE(status.ok());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        }
+    }
+
+    SECTION("RADIUS: Fails with fallback server missing shared secret")
+    {
+        for (const auto dot1xRadiusServerEndpoint : { Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication, Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting }) {
+            WifiAccessPointSetDot1xConfigurationRequest request{};
+            request.set_accesspointid(InterfaceName);
+            auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+            auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
+            *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
+            *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
+
+            auto& radiusAccountingServer = *radiusConfiguration.mutable_accountingserver();
+            radiusAccountingServer.set_address(RadiusServerAddressValid);
+            radiusAccountingServer.set_sharedsecret(RadiusServerSharedSecretValid);
+
+            // Add a fallback server with no address.
+            {
+                std::vector<Dot1xRadiusServerEndpointConfiguration> radiusFallbackServers{};
+                Dot1xRadiusServerEndpointConfiguration dot1xRadiusServerEndpointConfiguration{};
+                dot1xRadiusServerEndpointConfiguration.set_endpoint(dot1xRadiusServerEndpoint);
+                dot1xRadiusServerEndpointConfiguration.set_address(RadiusServerAddressValid);
+                dot1xRadiusServerEndpointConfiguration.set_sharedsecret("");
+                radiusFallbackServers.push_back(std::move(dot1xRadiusServerEndpointConfiguration));
+                *radiusConfiguration.mutable_fallbackservers() = {
+                    std::make_move_iterator(std::begin(radiusFallbackServers)),
+                    std::make_move_iterator(std::end(radiusFallbackServers)),
+                };
+            }
+
+            WifiAccessPointSetDot1xConfigurationResult result{};
+            grpc::ClientContext clientContext{};
+
+            auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+            REQUIRE(status.ok());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        }
+    }
+
     SECTION("RADIUS: Succeeds with minimum configuration")
     {
         WifiAccessPointSetDot1xConfigurationRequest request{};
@@ -985,5 +1063,62 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("RADIUS: Succeeds with primary authentication, primary accounting server, and fallback servers")
+    {
+        for (const auto dot1xRadiusServerEndpoint : { Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication, Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting }) {
+            WifiAccessPointSetDot1xConfigurationRequest request{};
+            request.set_accesspointid(InterfaceName);
+            auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+            auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
+            *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
+            *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
+            auto& radiusAccountingServer = *radiusConfiguration.mutable_accountingserver();
+            radiusAccountingServer.set_address(RadiusServerAddressValid);
+            radiusAccountingServer.set_sharedsecret(RadiusServerSharedSecretValid);
+
+            {
+                std::vector<Dot1xRadiusServerEndpointConfiguration> radiusFallbackServers{};
+                // Add fallback with port.
+                {
+                    Dot1xRadiusServerEndpointConfiguration dot1xRadiusServerEndpointConfiguration{};
+                    dot1xRadiusServerEndpointConfiguration.set_endpoint(dot1xRadiusServerEndpoint);
+                    dot1xRadiusServerEndpointConfiguration.set_address(RadiusServerAddressValid);
+                    dot1xRadiusServerEndpointConfiguration.set_port(RadiusServerPortValid);
+                    dot1xRadiusServerEndpointConfiguration.set_sharedsecret(RadiusServerSharedSecretValid);
+                    radiusFallbackServers.push_back(std::move(dot1xRadiusServerEndpointConfiguration));
+                }
+                // Add fallback without port.
+                {
+                    Dot1xRadiusServerEndpointConfiguration dot1xRadiusServerEndpointConfiguration{};
+                    dot1xRadiusServerEndpointConfiguration.set_endpoint(dot1xRadiusServerEndpoint);
+                    dot1xRadiusServerEndpointConfiguration.set_address("1.2.3.4");
+                    dot1xRadiusServerEndpointConfiguration.set_sharedsecret(std::string('a', 64));
+                    radiusFallbackServers.push_back(std::move(dot1xRadiusServerEndpointConfiguration));
+                }
+                // Add fallback for other endpoint type.
+                {
+                    const auto dot1xRadiusServerEndpointOther = (dot1xRadiusServerEndpoint == Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication) ? Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting : Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication;
+                    Dot1xRadiusServerEndpointConfiguration dot1xRadiusServerEndpointConfiguration{};
+                    dot1xRadiusServerEndpointConfiguration.set_endpoint(dot1xRadiusServerEndpointOther);
+                    dot1xRadiusServerEndpointConfiguration.set_address(RadiusServerAddressValid);
+                    dot1xRadiusServerEndpointConfiguration.set_port(RadiusServerPortValid);
+                    dot1xRadiusServerEndpointConfiguration.set_sharedsecret(RadiusServerSharedSecretValid);
+                }
+
+                *radiusConfiguration.mutable_fallbackservers() = {
+                    std::make_move_iterator(std::begin(radiusFallbackServers)),
+                    std::make_move_iterator(std::end(radiusFallbackServers)),
+                };
+            }
+
+            WifiAccessPointSetDot1xConfigurationResult result{};
+            grpc::ClientContext clientContext{};
+            auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+            REQUIRE(status.ok());
+            REQUIRE(result.has_status());
+            REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        }
     }
 }
