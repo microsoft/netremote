@@ -326,6 +326,24 @@ static constexpr std::initializer_list<WpaKeyManagement> WpaKeyManagementFt = {
 };
 
 /**
+ * @brief All valid WpaKeyManagement values supporting IEEE 802.1X.
+ */
+static constexpr std::initializer_list<WpaKeyManagement> WpaKeyManagementIeee8021x = {
+    WpaKeyManagement::Ieee8021x,
+    WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtIeee8021xSha384,
+    WpaKeyManagement::Cckm,
+    WpaKeyManagement::Osen,
+    WpaKeyManagement::Ieee8021xSha256,
+    WpaKeyManagement::Ieee8021xSuiteB,
+    WpaKeyManagement::Ieee8021xSuiteB192,
+    WpaKeyManagement::FilsSha256,
+    WpaKeyManagement::FilsSha384,
+    WpaKeyManagement::FtFilsSha256,
+    WpaKeyManagement::FtFilsSha384,
+};
+
+/**
  * @brief Determines if the specified key management value is part of the fast-transition (FT) class of authentication
  * and key management schemes.
  *
@@ -337,6 +355,20 @@ static constexpr bool
 IsKeyManagementFastTransition(WpaKeyManagement wpaKeyManagement)
 {
     return std::ranges::contains(WpaKeyManagementFt, wpaKeyManagement);
+}
+
+/**
+ * @brief Determines if the specified key management value is part of the IEEE 802.1X class of authentication and key
+ * management schemes.
+ *
+ * @param wpaKeyManagement The key management value to check.
+ * @return true The specified key management value supports IEEE 802.1X.
+ * @return false The specified key management value does not support IEEE 802.1X.
+ */
+static constexpr bool
+IsKeyManagementIeee8021x(WpaKeyManagement wpaKeyManagement)
+{
+    return std::ranges::contains(WpaKeyManagementIeee8021x, wpaKeyManagement);
 }
 
 /**
@@ -904,9 +936,9 @@ struct RadiusEndpointConfiguration
 
 /**
  * @brief Get the radius endpoint property names given a radius endpoint type.
- * 
+ *
  * @param type The type of radius endpoint.
- * @return constexpr std::tuple<std::string_view, std::string_view, std::string_view> 
+ * @return constexpr std::tuple<std::string_view, std::string_view, std::string_view>
  */
 constexpr std::tuple<std::string_view, std::string_view, std::string_view>
 GetRadiusEndpointPropertyNames(RadiusEndpointType type)
