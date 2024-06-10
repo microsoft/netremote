@@ -498,3 +498,9 @@ Hostapd::SetNetworkAccessServerId(std::string_view networkAccessServiceId)
         throw HostapdException(std::format("Failed to set network access identifier ({})", e.what()));
     }
 }
+
+std::string_view
+Hostapd::GetIpAddress() const noexcept
+{
+    return m_ownIpAddress;
+}
