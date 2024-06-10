@@ -303,6 +303,15 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
         SetNetworkAccessServerId();
     }
 
+    // If any key managements to set support IEEE 802.1X, set the IEEE 802.1X property to enabled.
+    if (std::ranges::any_of(keyManagements, IsKeyManagementIeee8021x)) {
+        try {
+            SetProperty(ProtocolHostapd::PropertyNameIeee8021X, ProtocolHostapd::PropertyEnabled, EnforceConfigurationChange::Defer);
+        } catch (const HostapdException& e) {
+            throw HostapdException(std::format("Failed to enable hostapd for IEEE 802.1X ({})", e.what()));
+        }
+    }
+
     try {
         SetProperty(ProtocolHostapd::PropertyNameWpaKeyManagement, keyManagementPropertyValue, enforceConfigurationChange);
     } catch (const HostapdException& e) {
