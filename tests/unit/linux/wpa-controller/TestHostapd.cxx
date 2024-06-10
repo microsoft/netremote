@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <chrono> // NOLINT
 #include <cstdint>
 #include <initializer_list>
@@ -504,6 +505,18 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
 
     SECTION("Succeeds with all valid, single inputs")
     {
+        // If any of the key management values are IEEE 802.1X, add a RADIUS server, otherwise hostapd will refuse to
+        // allow EAP-based AKMs (at least one EAP authenticator must be pre-configured).
+        if (std::ranges::any_of(KeyManagementValidValues, IsKeyManagementIeee8021x)) {
+            RadiusEndpointConfiguration radiusAuthenticationServerEndpointConfiguration{
+                .Type = RadiusEndpointType::Authentication,
+                .Address = "127.0.0.1",
+                .Port = 1812,
+                .SharedSecret = "radius_secret",
+            };
+            REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ std::move(radiusAuthenticationServerEndpointConfiguration) }, EnforceConfigurationChange::Defer));
+        }
+
         for (const auto keyManagementValidValue : KeyManagementValidValues) {
             REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Now));
             REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Defer));
