@@ -445,7 +445,7 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
 
     static constexpr std::initializer_list<WpaKeyManagement> KeyManagementInvalidValues = {
         WpaKeyManagement::None,
-        WpaKeyManagement::Ieee80211xNoWpa,
+        WpaKeyManagement::Ieee8021xNoWpa,
         WpaKeyManagement::WpaNone,
         WpaKeyManagement::Wps,
         WpaKeyManagement::WapiPsk,
@@ -454,7 +454,7 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
     };
 
     static constexpr std::initializer_list<WpaKeyManagement> KeyManagementValidValues = {
-        WpaKeyManagement::Ieee80211x,
+        WpaKeyManagement::Ieee8021x,
         WpaKeyManagement::Psk,
         // WpaKeyManagement::FtIeee8021x,           // feature work not yet completed
         // WpaKeyManagement::FtPsk,                 // feature work not yet completed
@@ -463,8 +463,8 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
         WpaKeyManagement::Sae,
         // WpaKeyManagement::FtSae,                 // feature work not yet completed
         // WpaKeyManagement::Osen,                  // feature work not yet completed
-        // WpaKeyManagement::Ieee80211xSuiteB,      // feature work not yet completed
-        // WpaKeyManagement::Ieee80211xSuiteB192,   // feature work not yet completed
+        // WpaKeyManagement::Ieee8021xSuiteB,      // feature work not yet completed
+        // WpaKeyManagement::Ieee8021xSuiteB192,   // feature work not yet completed
         // WpaKeyManagement::FilsSha256,            // feature work not yet completed
         // WpaKeyManagement::FilsSha384,            // feature work not yet completed
         // WpaKeyManagement::FtFilsSha256,          // feature work not yet completed

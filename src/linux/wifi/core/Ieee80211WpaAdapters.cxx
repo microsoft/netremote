@@ -107,7 +107,7 @@ Ieee80211AkmSuiteToWpaKeyManagement(Ieee80211AkmSuite ieee80211AkmSuite) noexcep
 {
     switch (ieee80211AkmSuite) {
     case Ieee80211AkmSuite::Ieee8021x:
-        return WpaKeyManagement::Ieee80211x;
+        return WpaKeyManagement::Ieee8021x;
     case Ieee80211AkmSuite::Psk:
         return WpaKeyManagement::Psk;
     case Ieee80211AkmSuite::Ft8021x:
@@ -123,9 +123,9 @@ Ieee80211AkmSuiteToWpaKeyManagement(Ieee80211AkmSuite ieee80211AkmSuite) noexcep
     case Ieee80211AkmSuite::FtSae:
         return WpaKeyManagement::FtSae;
     case Ieee80211AkmSuite::Ieee8021xSuiteB:
-        return WpaKeyManagement::Ieee80211xSuiteB;
+        return WpaKeyManagement::Ieee8021xSuiteB;
     case Ieee80211AkmSuite::Ieee8011xSuiteB192:
-        return WpaKeyManagement::Ieee80211xSuiteB192;
+        return WpaKeyManagement::Ieee8021xSuiteB192;
     case Ieee80211AkmSuite::Ft8021xSha384:
         return WpaKeyManagement::FtIeee8021xSha384;
     case Ieee80211AkmSuite::FilsSha256:
