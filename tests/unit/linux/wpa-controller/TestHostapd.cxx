@@ -457,26 +457,38 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
     static constexpr std::initializer_list<WpaKeyManagement> KeyManagementValidValues = {
         WpaKeyManagement::Ieee8021x,
         WpaKeyManagement::Psk,
-        // WpaKeyManagement::FtIeee8021x,           // feature work not yet completed
-        // WpaKeyManagement::FtPsk,                 // feature work not yet completed
+        WpaKeyManagement::FtIeee8021x,
+        WpaKeyManagement::FtPsk,
         WpaKeyManagement::Ieee8021xSha256,
         WpaKeyManagement::PskSha256,
         WpaKeyManagement::Sae,
-        // WpaKeyManagement::FtSae,                 // feature work not yet completed
-        // WpaKeyManagement::Osen,                  // feature work not yet completed
-        // WpaKeyManagement::Ieee8021xSuiteB,      // feature work not yet completed
-        // WpaKeyManagement::Ieee8021xSuiteB192,   // feature work not yet completed
-        // WpaKeyManagement::FilsSha256,            // feature work not yet completed
-        // WpaKeyManagement::FilsSha384,            // feature work not yet completed
-        // WpaKeyManagement::FtFilsSha256,          // feature work not yet completed
-        // WpaKeyManagement::FtFilsSha384,          // feature work not yet completed
+        WpaKeyManagement::FtSae,
+        WpaKeyManagement::Ieee8021xSuiteB,
+        WpaKeyManagement::Ieee8021xSuiteB192,
+        WpaKeyManagement::FilsSha256,
+        WpaKeyManagement::FilsSha384,
+        WpaKeyManagement::FtFilsSha256,
+        WpaKeyManagement::FtFilsSha384,
         WpaKeyManagement::Owe,
         WpaKeyManagement::Dpp,
-        // WpaKeyManagement::FtIeee8021xSha384,     // feature work not yet completed
-        // WpaKeyManagement::Pasn,                  // feature work not yet completed
+        WpaKeyManagement::FtIeee8021xSha384,
+        // WpaKeyManagement::Osen,                  // Only applies to hotspot 2.0, not needed.
+        // WpaKeyManagement::Pasn,                  // hostapd v2.10 doesn't compile with this feature enabled (CONFIG_PASN=y)
     };
 
     Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    // If any of the key management values are IEEE 802.1X, add a RADIUS server, otherwise hostapd will refuse to
+    // allow EAP-based AKMs (at least one EAP authenticator must be pre-configured).
+    if (std::ranges::any_of(KeyManagementValidValues, IsKeyManagementIeee8021x)) {
+        RadiusEndpointConfiguration radiusAuthenticationServerEndpointConfiguration{
+            .Type = RadiusEndpointType::Authentication,
+            .Address = "127.0.0.1",
+            .Port = 1812,
+            .SharedSecret = "radius_secret",
+        };
+        REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ std::move(radiusAuthenticationServerEndpointConfiguration) }, EnforceConfigurationChange::Defer));
+    }
 
     SECTION("Doesn't throw")
     {
@@ -505,18 +517,6 @@ TEST_CASE("Send SetKeyManagement() command (root)", "[wpa][hostapd][client][remo
 
     SECTION("Succeeds with all valid, single inputs")
     {
-        // If any of the key management values are IEEE 802.1X, add a RADIUS server, otherwise hostapd will refuse to
-        // allow EAP-based AKMs (at least one EAP authenticator must be pre-configured).
-        if (std::ranges::any_of(KeyManagementValidValues, IsKeyManagementIeee8021x)) {
-            RadiusEndpointConfiguration radiusAuthenticationServerEndpointConfiguration{
-                .Type = RadiusEndpointType::Authentication,
-                .Address = "127.0.0.1",
-                .Port = 1812,
-                .SharedSecret = "radius_secret",
-            };
-            REQUIRE_NOTHROW(hostapd.AddRadiusEndpoints({ std::move(radiusAuthenticationServerEndpointConfiguration) }, EnforceConfigurationChange::Defer));
-        }
-
         for (const auto keyManagementValidValue : KeyManagementValidValues) {
             REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Now));
             REQUIRE_NOTHROW(hostapd.SetKeyManagement({ keyManagementValidValue }, EnforceConfigurationChange::Defer));
