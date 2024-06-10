@@ -297,13 +297,9 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
         keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
     }
 
-    constexpr auto hasFtKeyManagement = [](const auto& keyManagement) {
-        return std::ranges::contains(WpaKeyManagementFt, keyManagement);
-    };
-
     // If any key managements to set support fast-transition, set the network access server (NAS) identifier property to
     // a default (random) value.
-    if (std::ranges::any_of(keyManagements, hasFtKeyManagement)) {
+    if (std::ranges::any_of(keyManagements, IsKeyManagementFastTransition)) {
         SetNetworkAccessServerId();
     }
 
