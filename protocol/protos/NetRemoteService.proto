@@ -3,7 +3,6 @@ syntax = "proto3";
 
 package Microsoft.Net.Remote.Service;
 
-import "NetRemote.proto";
 import "NetRemoteNetwork.proto";
 import "NetRemoteWifi.proto";
 
@@ -20,4 +19,5 @@ service NetRemote
     rpc WifiAccessPointSetFrequencyBands (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsResult);
     rpc WifiAccessPointSetSsid (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidResult);
     rpc WifiAccessPointSetNetworkBridge (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeResult);
+    rpc WifiAccessPointSetDot1xConfiguration (Microsoft.Net.Remote.Wifi.WifiAccessPointSetDot1xConfigurationRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetDot1xConfigurationResult);
 }
