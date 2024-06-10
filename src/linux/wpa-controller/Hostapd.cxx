@@ -294,7 +294,9 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
             keyManagementPropertyValueBuilder << keyManagementValue << ' ';
         }
 
-        keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
+        auto keyManagementPropertyValueView = keyManagementPropertyValueBuilder.view();
+        keyManagementPropertyValueView.remove_suffix(1); // Remove the trailing space.
+        keyManagementPropertyValue = keyManagementPropertyValueView;
     }
 
     // If any key managements to set support fast-transition, set the network access server (NAS) identifier property to
