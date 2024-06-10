@@ -235,8 +235,19 @@ struct Hostapd :
     void
     SetNetworkAccessServerId(std::string_view networkAccessServiceId = GenerateNetworkAccessServerId());
 
+    /**
+     * @brief Get the IP address of this access point. 
+     * 
+     * Currently, this is non-configurable and is always set to the loopback address (127.0.0.1).
+     * 
+     * @return std::string_view
+     */
+    std::string_view
+    GetIpAddress() const noexcept;
+
 private:
     const std::string m_interface;
+    std::string m_ownIpAddress{ "127.0.0.1" };
     WpaController m_controller;
 };
 } // namespace Wpa

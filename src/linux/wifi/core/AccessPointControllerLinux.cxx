@@ -482,6 +482,25 @@ AccessPointControllerLinux::SetRadiusConfiguration(Ieee8021xRadiusConfiguration 
         return status;
     }
 
+    // Disable use of internal EAP server, requiring external RADIUS server for EAP.
+    try {
+        m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameEapServer, Wpa::ProtocolHostapd::PropertyDisabled, EnforceConfigurationChange::Defer);
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to disable internal EAP server - {}", ex.what());
+        return status;
+    }
+
+    // Set the "own_ip_addr" property to the IP address of the access point. This value is used as the network access
+    // server IP address in RADIUS packets.
+    try {
+        m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameOwnIpAddr, m_hostapd.GetIpAddress(), EnforceConfigurationChange::Defer);
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set 'own_ip_addr' property - {}", ex.what());
+        return status;
+    }
+
     // If any further RADIUS configuration needs to be applied, it should be done here.
 
     // Now that all RADIUS configuration has been applied, reload the hostapd configuration to pick up the changes.

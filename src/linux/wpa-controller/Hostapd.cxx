@@ -294,17 +294,24 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
             keyManagementPropertyValueBuilder << keyManagementValue << ' ';
         }
 
-        keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
+        auto keyManagementPropertyValueView = keyManagementPropertyValueBuilder.view();
+        keyManagementPropertyValueView.remove_suffix(1); // Remove the trailing space.
+        keyManagementPropertyValue = keyManagementPropertyValueView;
     }
-
-    constexpr auto hasFtKeyManagement = [](const auto& keyManagement) {
-        return std::ranges::contains(WpaKeyManagementFt, keyManagement);
-    };
 
     // If any key managements to set support fast-transition, set the network access server (NAS) identifier property to
     // a default (random) value.
-    if (std::ranges::any_of(keyManagements, hasFtKeyManagement)) {
+    if (std::ranges::any_of(keyManagements, IsKeyManagementFastTransition)) {
         SetNetworkAccessServerId();
+    }
+
+    // If any key managements to set support IEEE 802.1X, set the IEEE 802.1X property to enabled.
+    if (std::ranges::any_of(keyManagements, IsKeyManagementIeee8021x)) {
+        try {
+            SetProperty(ProtocolHostapd::PropertyNameIeee8021X, ProtocolHostapd::PropertyEnabled, EnforceConfigurationChange::Defer);
+        } catch (const HostapdException& e) {
+            throw HostapdException(std::format("Failed to enable hostapd for IEEE 802.1X ({})", e.what()));
+        }
     }
 
     try {
@@ -492,4 +499,10 @@ Hostapd::SetNetworkAccessServerId(std::string_view networkAccessServiceId)
     } catch (const HostapdException& e) {
         throw HostapdException(std::format("Failed to set network access identifier ({})", e.what()));
     }
+}
+
+std::string_view
+Hostapd::GetIpAddress() const noexcept
+{
+    return m_ownIpAddress;
 }

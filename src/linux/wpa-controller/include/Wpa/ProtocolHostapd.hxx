@@ -237,10 +237,10 @@ enum class WpaAlgorithm : uint32_t {
  */
 enum class WpaKeyManagement : uint32_t {
     Unknown = 0U,
-    Ieee80211x = (1U << 0U),
+    Ieee8021x = (1U << 0U),
     Psk = (1U << 1U),
     None = (1U << 2U),
-    Ieee80211xNoWpa = (1U << 3U),
+    Ieee8021xNoWpa = (1U << 3U),
     WpaNone = (1U << 4U),
     FtIeee8021x = (1U << 5U),
     FtPsk = (1U << 6U),
@@ -253,8 +253,8 @@ enum class WpaKeyManagement : uint32_t {
     WapiCert = (1U << 13U),
     Cckm = (1U << 14U),
     Osen = (1U << 15U),
-    Ieee80211xSuiteB = (1U << 16U),
-    Ieee80211xSuiteB192 = (1U << 17U),
+    Ieee8021xSuiteB = (1U << 16U),
+    Ieee8021xSuiteB192 = (1U << 17U),
     FilsSha256 = (1U << 18U),
     FilsSha384 = (1U << 19U),
     FtFilsSha256 = (1U << 20U),
@@ -272,10 +272,10 @@ enum class WpaKeyManagement : uint32_t {
  */
 inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
     WpaKeyManagement::Unknown,
-    WpaKeyManagement::Ieee80211x,
+    WpaKeyManagement::Ieee8021x,
     WpaKeyManagement::Psk,
     WpaKeyManagement::None,
-    WpaKeyManagement::Ieee80211xNoWpa,
+    WpaKeyManagement::Ieee8021xNoWpa,
     WpaKeyManagement::WpaNone,
     WpaKeyManagement::FtIeee8021x,
     WpaKeyManagement::FtPsk,
@@ -288,8 +288,8 @@ inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
     WpaKeyManagement::WapiCert,
     WpaKeyManagement::Cckm,
     WpaKeyManagement::Osen,
-    WpaKeyManagement::Ieee80211xSuiteB,
-    WpaKeyManagement::Ieee80211xSuiteB192,
+    WpaKeyManagement::Ieee8021xSuiteB,
+    WpaKeyManagement::Ieee8021xSuiteB192,
     WpaKeyManagement::FilsSha256,
     WpaKeyManagement::FilsSha384,
     WpaKeyManagement::FtFilsSha256,
@@ -304,7 +304,7 @@ inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
  * @brief A bitmask containing all valid WpaKeyManagement values supporting fast-transition (FT).
  */
 static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementMaskFt =
-    std::to_underlying(WpaKeyManagement::Ieee80211x) |
+    std::to_underlying(WpaKeyManagement::Ieee8021x) |
     std::to_underlying(WpaKeyManagement::FtIeee8021x) |
     std::to_underlying(WpaKeyManagement::FtPsk) |
     std::to_underlying(WpaKeyManagement::FtIeee8021xSha384) |
@@ -316,11 +316,29 @@ static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementMaskFt
  * @brief All valid WpaKeyManagement values supporting fast-transition (FT).
  */
 static constexpr std::initializer_list<WpaKeyManagement> WpaKeyManagementFt = {
-    WpaKeyManagement::Ieee80211x,
+    WpaKeyManagement::Ieee8021x,
     WpaKeyManagement::FtIeee8021x,
     WpaKeyManagement::FtPsk,
     WpaKeyManagement::FtIeee8021xSha384,
     WpaKeyManagement::FtSae,
+    WpaKeyManagement::FtFilsSha256,
+    WpaKeyManagement::FtFilsSha384,
+};
+
+/**
+ * @brief All valid WpaKeyManagement values supporting IEEE 802.1X.
+ */
+static constexpr std::initializer_list<WpaKeyManagement> WpaKeyManagementIeee8021x = {
+    WpaKeyManagement::Ieee8021x,
+    WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtIeee8021xSha384,
+    WpaKeyManagement::Cckm,
+    WpaKeyManagement::Osen,
+    WpaKeyManagement::Ieee8021xSha256,
+    WpaKeyManagement::Ieee8021xSuiteB,
+    WpaKeyManagement::Ieee8021xSuiteB192,
+    WpaKeyManagement::FilsSha256,
+    WpaKeyManagement::FilsSha384,
     WpaKeyManagement::FtFilsSha256,
     WpaKeyManagement::FtFilsSha384,
 };
@@ -337,6 +355,20 @@ static constexpr bool
 IsKeyManagementFastTransition(WpaKeyManagement wpaKeyManagement)
 {
     return std::ranges::contains(WpaKeyManagementFt, wpaKeyManagement);
+}
+
+/**
+ * @brief Determines if the specified key management value is part of the IEEE 802.1X class of authentication and key
+ * management schemes.
+ *
+ * @param wpaKeyManagement The key management value to check.
+ * @return true The specified key management value supports IEEE 802.1X.
+ * @return false The specified key management value does not support IEEE 802.1X.
+ */
+static constexpr bool
+IsKeyManagementIeee8021x(WpaKeyManagement wpaKeyManagement)
+{
+    return std::ranges::contains(WpaKeyManagementIeee8021x, wpaKeyManagement);
 }
 
 /**
@@ -535,10 +567,15 @@ struct ProtocolHostapd :
     static constexpr auto PropertyValueIeee80211WOptional = "1";
     static constexpr auto PropertyValueIeee80211WRequired = "2";
 
-    static constexpr auto PropertyNameNasIdentifier = "nas_identifier";
     static constexpr auto PropertyNameBridgeInterface = "bridge";
 
+    // 802.1X/EAP properties.
+    static constexpr auto PropertyNameIeee8021X = "ieee8021x";
+    static constexpr auto PropertyNameEapServer = "eap_server";
+
+    // RADIUS properties.
     static constexpr auto PropertyNameOwnIpAddr = "own_ip_addr";
+    static constexpr auto PropertyNameNasIdentifier = "nas_identifier";
     static constexpr auto PropertyNameRadiusClientAddr = "radius_client_addr";
     static constexpr auto PropertyNameRadiusClientDev = "radius_client_dev";
 
@@ -671,7 +708,7 @@ constexpr std::string_view
 WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
 {
     switch (wpaKeyManagement) {
-    case WpaKeyManagement::Ieee80211x:
+    case WpaKeyManagement::Ieee8021x:
         return "WPA-EAP";
     case WpaKeyManagement::Psk:
         return "WPA-PSK";
@@ -689,9 +726,9 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
         return "FT-SAE";
     case WpaKeyManagement::Osen:
         return "OSEN";
-    case WpaKeyManagement::Ieee80211xSuiteB:
+    case WpaKeyManagement::Ieee8021xSuiteB:
         return "WPA-EAP-SUITE-B";
-    case WpaKeyManagement::Ieee80211xSuiteB192:
+    case WpaKeyManagement::Ieee8021xSuiteB192:
         return "WPA-EAP-SUITE-B-192";
     case WpaKeyManagement::FilsSha256:
         return "FILS-SHA256";
@@ -712,7 +749,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
     // Below values are not accepted for nor parsed from the configuration file.
     case WpaKeyManagement::None:
         [[fallthrough]];
-    case WpaKeyManagement::Ieee80211xNoWpa:
+    case WpaKeyManagement::Ieee8021xNoWpa:
         [[fallthrough]];
     case WpaKeyManagement::WpaNone:
         [[fallthrough]];
@@ -899,9 +936,9 @@ struct RadiusEndpointConfiguration
 
 /**
  * @brief Get the radius endpoint property names given a radius endpoint type.
- * 
+ *
  * @param type The type of radius endpoint.
- * @return constexpr std::tuple<std::string_view, std::string_view, std::string_view> 
+ * @return constexpr std::tuple<std::string_view, std::string_view, std::string_view>
  */
 constexpr std::tuple<std::string_view, std::string_view, std::string_view>
 GetRadiusEndpointPropertyNames(RadiusEndpointType type)
