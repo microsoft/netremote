@@ -535,10 +535,15 @@ struct ProtocolHostapd :
     static constexpr auto PropertyValueIeee80211WOptional = "1";
     static constexpr auto PropertyValueIeee80211WRequired = "2";
 
-    static constexpr auto PropertyNameNasIdentifier = "nas_identifier";
     static constexpr auto PropertyNameBridgeInterface = "bridge";
 
+    // 802.1X/EAP properties.
+    static constexpr auto PropertyNameIeee8021X = "ieee8021x";
+    static constexpr auto PropertyNameEapServer = "eap_server";
+
+    // RADIUS properties.
     static constexpr auto PropertyNameOwnIpAddr = "own_ip_addr";
+    static constexpr auto PropertyNameNasIdentifier = "nas_identifier";
     static constexpr auto PropertyNameRadiusClientAddr = "radius_client_addr";
     static constexpr auto PropertyNameRadiusClientDev = "radius_client_dev";
 
