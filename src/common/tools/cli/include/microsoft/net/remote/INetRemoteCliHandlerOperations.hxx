@@ -5,6 +5,7 @@
 #include <memory>
 #include <string_view>
 
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
@@ -65,12 +66,21 @@ struct INetRemoteCliHandlerOperations
 
     /**
      * @brief Set the SSID of the specified WiFi access point.
-     * 
+     *
      * @param accessPointId The identifier of the access point to set the SSID for.
      * @param ssid The SSID to set.
      */
     virtual void
     WifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid) = 0;
+
+    /**
+     * @brief Set the RADIUS configuration for the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to set the RADIUS configuration for.
+     * @param ieee8021xRadiusConfiguration The RADIUS authentication configuration to set.
+     */
+    virtual void
+    WifiAccessPointSet8021xRadius(std::string_view accessPointId, const Microsoft::Net::Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration) = 0;
 };
 
 /**

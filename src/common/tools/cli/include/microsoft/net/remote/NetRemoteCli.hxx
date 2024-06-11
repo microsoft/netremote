@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <CLI/CLI.hpp>
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/remote/NetRemoteCliData.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
@@ -133,12 +134,21 @@ private:
 
     /**
      * @brief Add the 'wifi ap-set-ssid' sub-command.
-     * 
+     *
      * @param parent The parent app to add the sub-command to.
-     * @return CLI::App* 
+     * @return CLI::App*
      */
     CLI::App*
     AddSubcommandWifiAccessPointSetSsid(CLI::App* parent);
+
+    /**
+     * @brief Add the 'wifi ap-set-radius' sub-command.
+     *
+     * @param parent The parent app to add the sub-command to.
+     * @return CLI::App*
+     */
+    CLI::App*
+    AddSubcommandWifiAccessPointSet8021xRadius(CLI::App* parent);
 
     /**
      * @brief Handle the 'server' option.
@@ -179,12 +189,21 @@ private:
 
     /**
      * @brief Handle the 'wifi ap-set-ssid' command.
-     * 
+     *
      * @param accessPointId The identifier of the access point to set the SSID for.
      * @param ssid The SSID to set.
      */
     void
     OnWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid);
+
+    /**
+     * @brief Handle the 'wifi ap-set-radius' command.
+     *
+     * @param accessPointId The identifier of the access point to set the RADIUS configuration for.
+     * @param ieee8021xRadiusConfiguration The RADIUS authentication configuration to set.
+     */
+    void
+    OnWifiAccessPointSet8021xRadius(std::string_view accessPointId, const Microsoft::Net::Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration);
 
     /**
      * @brief Handle the 'wifi ap-disable' command.
@@ -209,6 +228,7 @@ private:
     CLI::App* m_cliAppWifiAccessPointEnable{ nullptr };
     CLI::App* m_cliAppWifiAccessPointDisable{ nullptr };
     CLI::App* m_cliAppWifiAccessPointSetSsid{ nullptr };
+    CLI::App* m_cliAppWifiAccessPointSetAuthenticationDot1x{ nullptr };
 };
 } // namespace Microsoft::Net::Remote
 
