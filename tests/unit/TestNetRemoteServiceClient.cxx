@@ -142,6 +142,8 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
         apConfiguration.mutable_authenticationdata()->mutable_sae()->mutable_passwords()->Add(std::move(dot11RsnaPassword));
+        apConfiguration.mutable_dot1xconfiguration()->mutable_radius()->mutable_authenticationserver()->set_address("127.0.0.1");
+        apConfiguration.mutable_dot1xconfiguration()->mutable_radius()->mutable_authenticationserver()->set_sharedsecret("shared-secret");
         *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = AsciiPassword;
 
         WifiAccessPointEnableRequest request{};
