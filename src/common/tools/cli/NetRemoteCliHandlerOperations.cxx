@@ -12,6 +12,7 @@
 
 #include <grpcpp/client_context.h>
 #include <magic_enum.hpp>
+#include <microsoft/net/ServiceApiNetworkDot1xAdapters.hxx>
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
@@ -24,6 +25,7 @@
 #include <microsoft/net/wifi/Ieee80211Dot11Adapters.hxx>
 #include <plog/Log.h>
 
+using namespace Microsoft::Net;
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::Network;
 using namespace Microsoft::Net::Remote::Service;
@@ -477,6 +479,40 @@ NetRemoteCliHandlerOperations::WifiAccessPointSetSsid(std::string_view accessPoi
     }
 
     std::cout << std::format("Successfully set SSID to '{}' for wifi access point '{}'\n", accessPointId, ssid);
+}
+
+void
+NetRemoteCliHandlerOperations::WifiAccessPointSet8021xRadius(std::string_view accessPointId, const Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration)
+{
+    if (!ieee8021xRadiusConfiguration) {
+        std::cerr << "No RADIUS configuration provided\n";
+        return;
+    }
+
+    WifiAccessPointSetAuthenticationDot1xRequest request{};
+    WifiAccessPointSetAuthenticationDot1xResult result{};
+    grpc::ClientContext clientContext{};
+
+    request.set_accesspointid(std::string(accessPointId));
+
+    auto dot11Dot1xRadiusConfiguration = ToServiceDot1xRadiusConfiguration(*ieee8021xRadiusConfiguration);
+    *request.mutable_authenticationdot1x()->mutable_radius() = std::move(dot11Dot1xRadiusConfiguration);
+
+    auto status = m_connection->Client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
+    if (!status.ok()) {
+        std::cerr << std::format("Failed to set RADIUS configuration for wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(status.error_code()), status.error_message());
+        return;
+    }
+    if (!result.has_status()) {
+        std::cerr << std::format("Failed to set RADIUS configuration for wifi access point '{}', no status returned\n", accessPointId);
+        return;
+    }
+    if (result.status().code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+        std::cerr << std::format("Failed to set RADIUS configuration for wifi access point '{}' ({})\n{}\n", accessPointId, magic_enum::enum_name(result.status().code()), result.status().message());
+        return;
+    }
+
+    std::cout << std::format("Successfully set RADIUS configuration for wifi access point '{}'\n", accessPointId);
 }
 
 std::unique_ptr<INetRemoteCliHandlerOperations>

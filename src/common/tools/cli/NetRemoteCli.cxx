@@ -12,6 +12,7 @@
 #include <CLI/App.hpp>
 #include <CLI/Error.hpp>
 #include <CLI/Validators.hpp>
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/remote/NetRemoteCli.hxx>
 #include <microsoft/net/remote/NetRemoteCliData.hxx>
 #include <microsoft/net/remote/NetRemoteCliHandler.hxx>
@@ -23,6 +24,7 @@
 #include <plog/Log.h>
 #include <strings/StringParsing.hxx>
 
+using namespace Microsoft::Net;
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Wifi;
 
@@ -128,6 +130,7 @@ NetRemoteCli::AddSubcommandWifi(CLI::App* parent)
     m_cliAppWifiAccessPointEnable = AddSubcommandWifiAccessPointEnable(wifiApp);
     m_cliAppWifiAccessPointDisable = AddSubcommandWifiAccessPointDisable(wifiApp);
     m_cliAppWifiAccessPointSetSsid = AddSubcommandWifiAccessPointSetSsid(wifiApp);
+    m_cliAppWifiAccessPointSetAuthenticationDot1x = AddSubcommandWifiAccessPointSet8021xRadius(wifiApp);
 
     return wifiApp;
 }
@@ -360,6 +363,25 @@ NetRemoteCli::AddSubcommandWifiAccessPointSetSsid(CLI::App* parent)
     return cliAppWifiAccessPointSetSsid;
 }
 
+CLI::App*
+NetRemoteCli::AddSubcommandWifiAccessPointSet8021xRadius(CLI::App* parent)
+{
+    auto* cliAppWifiAccessPointSetAuthenticationDot1x = parent->add_subcommand("access-point-set-radius", "Set the 802.1X RADIUS configuration for an access point");
+    cliAppWifiAccessPointSetAuthenticationDot1x->alias("ap-set-radius")->alias("ap-radius")->alias("radius");
+    cliAppWifiAccessPointSetAuthenticationDot1x->callback([this] {
+        const auto* ieee8021xRadiusConfiguration = m_cliData->WifiAccessPointAuthentication8021x.Radius.has_value()
+            ? &m_cliData->WifiAccessPointAuthentication8021x.Radius.value()
+            : nullptr;
+        OnWifiAccessPointSet8021xRadius(m_cliData->WifiAccessPointId, ieee8021xRadiusConfiguration);
+    });
+
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to set the 802.1X RADIUS configuration for")->required();
+
+    // TODO: add parsing for 802.1X RADIUS tsconfiguration argumen, vector of of [endpoint type, address, port, shared secret]
+
+    return cliAppWifiAccessPointSetAuthenticationDot1x;
+}
+
 void
 NetRemoteCli::OnServerAddressChanged(const std::string& serverAddressArg)
 {
@@ -407,9 +429,14 @@ NetRemoteCli::OnWifiAccessPointDisable(std::string_view accessPointId)
     m_cliHandler->HandleCommandWifiAccessPointDisable(accessPointId);
 }
 
-
 void
 NetRemoteCli::OnWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid)
 {
-    m_cliHandler->HandleCommandWifiAccessPointSetSsid(accessPointId, ssid); 
+    m_cliHandler->HandleCommandWifiAccessPointSetSsid(accessPointId, ssid);
+}
+
+void
+NetRemoteCli::OnWifiAccessPointSet8021xRadius(std::string_view accessPointId, const Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration)
+{
+    m_cliHandler->HandleCommandWifiAccessPointSet8021xRadius(accessPointId, ieee8021xRadiusConfiguration);
 }
