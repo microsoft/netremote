@@ -190,15 +190,16 @@ message Dot11AuthenticationData
     Dot11AuthenticationDataSae Sae = 2;
 }
 
+// IEEE 802.1X EAP over LAN (EAPOL) configuration per IEEE 802.1X-2004.
+message Dot11AuthenticationDot1x
+{
+    Dot1xRadiusConfiguration Radius = 1;
+}
+
 message Dot11CipherSuiteConfiguration
 {
     Dot11SecurityProtocol SecurityProtocol = 1;
     repeated Dot11CipherSuite CipherSuites = 2;
-}
-
-message Dot11Dot1xConfiguration
-{
-    Dot1xRadiusConfiguration Radius = 1;
 }
 
 message Dot11AccessPointConfiguration
@@ -207,7 +208,7 @@ message Dot11AccessPointConfiguration
     Dot11MacAddress Bssid = 2;
     Dot11PhyType PhyType = 3;
     Dot11AuthenticationData AuthenticationData = 4;
-    Dot11Dot1xConfiguration Dot1xConfiguration = 9;
+    Dot11AuthenticationDot1x AuthenticationDot1x = 9;
     repeated Dot11AuthenticationAlgorithm AuthenticationAlgorithms = 5;
     repeated Dot11CipherSuiteConfiguration PairwiseCipherSuites = 6;
     repeated Dot11AkmSuite AkmSuites = 7;

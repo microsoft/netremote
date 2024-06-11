@@ -142,8 +142,8 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
         apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand5_0GHz);
         apConfiguration.mutable_authenticationdata()->mutable_sae()->mutable_passwords()->Add(std::move(dot11RsnaPassword));
-        apConfiguration.mutable_dot1xconfiguration()->mutable_radius()->mutable_authenticationserver()->set_address("127.0.0.1");
-        apConfiguration.mutable_dot1xconfiguration()->mutable_radius()->mutable_authenticationserver()->set_sharedsecret("shared-secret");
+        apConfiguration.mutable_authenticationdot1x()->mutable_radius()->mutable_authenticationserver()->set_address("127.0.0.1");
+        apConfiguration.mutable_authenticationdot1x()->mutable_radius()->mutable_authenticationserver()->set_sharedsecret("shared-secret");
         *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = AsciiPassword;
 
         WifiAccessPointEnableRequest request{};
@@ -794,7 +794,7 @@ TEST_CASE("NetworkInterfacesEnumerate API", "[basic][rpc][client][remote]")
     }
 }
 
-TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remote]")
+TEST_CASE("WifiAccessPointSetAuthenticationDot1x API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net;
     using namespace Microsoft::Net::Remote;
@@ -804,7 +804,7 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
 
-    constexpr auto InterfaceName{ "TestWifiAccessPointSetDot1xConfiguration" };
+    constexpr auto InterfaceName{ "TestWifiAccessPointSetAuthenticationDot1x" };
     constexpr auto RadiusServerAddressValid{ "127.0.0.1" };
     constexpr auto RadiusServerSharedSecretValid{ "shared-secret" };
     constexpr auto RadiusServerPortValid{ 1234 };
@@ -825,22 +825,22 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("Can be called")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
     }
 
     SECTION("Fails with missing configuration")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -848,14 +848,14 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("Fails with invalid access point id")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid("InvalidAccessPointId");
-        *request.mutable_configuration()->mutable_radius() = {};
+        *request.mutable_authenticationdot1x()->mutable_radius() = {};
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeAccessPointInvalid);
@@ -863,14 +863,14 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Fails with missing authentication server")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        *request.mutable_configuration()->mutable_radius() = {};
+        *request.mutable_authenticationdot1x()->mutable_radius() = {};
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -878,17 +878,17 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Fails with missing authentication server address")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+        auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
         auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
         *radiusAuthenticationServer.mutable_address() = "";
         *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -896,17 +896,17 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Fails with missing authentication server shared secret")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+        auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
         auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
         *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
         *radiusAuthenticationServer.mutable_sharedsecret() = "";
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -914,9 +914,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Fails with missing accounting server address")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+        auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
         auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
         *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
         *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
@@ -924,10 +924,10 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
         radiusAccountingServer.set_address("");
         radiusAccountingServer.set_sharedsecret(RadiusServerSharedSecretValid);
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -935,9 +935,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Fails with missing accounting server shared secret")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+        auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
         auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
         *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
         *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
@@ -945,10 +945,10 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
         radiusAccountingServer.set_address(RadiusServerAddressValid);
         radiusAccountingServer.set_sharedsecret("");
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
 
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -957,9 +957,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
     SECTION("RADIUS: Fails with fallback server missing address")
     {
         for (const auto dot1xRadiusServerEndpoint : { Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication, Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting }) {
-            WifiAccessPointSetDot1xConfigurationRequest request{};
+            WifiAccessPointSetAuthenticationDot1xRequest request{};
             request.set_accesspointid(InterfaceName);
-            auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+            auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
             auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
             *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
             *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
@@ -982,10 +982,10 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
                 };
             }
 
-            WifiAccessPointSetDot1xConfigurationResult result{};
+            WifiAccessPointSetAuthenticationDot1xResult result{};
             grpc::ClientContext clientContext{};
 
-            auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+            auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
             REQUIRE(status.ok());
             REQUIRE(result.has_status());
             REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -995,9 +995,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
     SECTION("RADIUS: Fails with fallback server missing shared secret")
     {
         for (const auto dot1xRadiusServerEndpoint : { Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication, Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting }) {
-            WifiAccessPointSetDot1xConfigurationRequest request{};
+            WifiAccessPointSetAuthenticationDot1xRequest request{};
             request.set_accesspointid(InterfaceName);
-            auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+            auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
             auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
             *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
             *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
@@ -1020,10 +1020,10 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
                 };
             }
 
-            WifiAccessPointSetDot1xConfigurationResult result{};
+            WifiAccessPointSetAuthenticationDot1xResult result{};
             grpc::ClientContext clientContext{};
 
-            auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+            auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
             REQUIRE(status.ok());
             REQUIRE(result.has_status());
             REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
@@ -1032,16 +1032,16 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Succeeds with minimum configuration")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+        auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
         auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
         *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
         *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
@@ -1049,9 +1049,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
 
     SECTION("RADIUS: Succeeds with primary authentication and accounting servers")
     {
-        WifiAccessPointSetDot1xConfigurationRequest request{};
+        WifiAccessPointSetAuthenticationDot1xRequest request{};
         request.set_accesspointid(InterfaceName);
-        auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+        auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
         auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
         *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
         *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
@@ -1059,9 +1059,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
         radiusAccountingServer.set_address(RadiusServerAddressValid);
         radiusAccountingServer.set_sharedsecret(RadiusServerSharedSecretValid);
 
-        WifiAccessPointSetDot1xConfigurationResult result{};
+        WifiAccessPointSetAuthenticationDot1xResult result{};
         grpc::ClientContext clientContext{};
-        auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+        auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
         REQUIRE(status.ok());
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
@@ -1070,9 +1070,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
     SECTION("RADIUS: Succeeds with primary authentication, primary accounting server, and fallback servers")
     {
         for (const auto dot1xRadiusServerEndpoint : { Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAuthentication, Dot1xRadiusServerEndpoint::Dot1xRadiusServerEndpointAccounting }) {
-            WifiAccessPointSetDot1xConfigurationRequest request{};
+            WifiAccessPointSetAuthenticationDot1xRequest request{};
             request.set_accesspointid(InterfaceName);
-            auto& radiusConfiguration = *request.mutable_configuration()->mutable_radius();
+            auto& radiusConfiguration = *request.mutable_authenticationdot1x()->mutable_radius();
             auto& radiusAuthenticationServer = *radiusConfiguration.mutable_authenticationserver();
             *radiusAuthenticationServer.mutable_address() = RadiusServerAddressValid;
             *radiusAuthenticationServer.mutable_sharedsecret() = RadiusServerSharedSecretValid;
@@ -1115,9 +1115,9 @@ TEST_CASE("WifiAccessPointSetDot1xConfiguration API", "[basic][rpc][client][remo
                 };
             }
 
-            WifiAccessPointSetDot1xConfigurationResult result{};
+            WifiAccessPointSetAuthenticationDot1xResult result{};
             grpc::ClientContext clientContext{};
-            auto status = client->WifiAccessPointSetDot1xConfiguration(&clientContext, request, &result);
+            auto status = client->WifiAccessPointSetAuthenticationDot1x(&clientContext, request, &result);
             REQUIRE(status.ok());
             REQUIRE(result.has_status());
             REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);

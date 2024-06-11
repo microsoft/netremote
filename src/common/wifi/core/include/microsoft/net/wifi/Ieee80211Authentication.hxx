@@ -10,6 +10,7 @@
 #include <variant>
 #include <vector>
 
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Wifi
@@ -134,6 +135,11 @@ struct Ieee80211AuthenticationData
 {
     std::optional<Ieee80211AuthenticationDataPsk> Psk;
     std::optional<Ieee80211AuthenticationDataSae> Sae;
+};
+
+struct Ieee80211Authentication8021x
+{
+    std::optional<Microsoft::Net::Ieee8021xRadiusConfiguration> Radius;
 };
 
 } // namespace Microsoft::Net::Wifi

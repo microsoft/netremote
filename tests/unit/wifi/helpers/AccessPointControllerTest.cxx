@@ -199,7 +199,7 @@ AccessPointControllerTest::SetRadiusConfiguration(Ieee8021xRadiusConfiguration r
         return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
     }
 
-    AccessPoint->RadiusConfiguration = std::move(radiusConfiguration);
+    AccessPoint->Authentication8021x.Radius = std::move(radiusConfiguration);
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 

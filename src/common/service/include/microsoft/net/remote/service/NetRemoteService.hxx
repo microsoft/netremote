@@ -144,7 +144,7 @@ private:
      * @return grpc::Status
      */
     grpc::Status
-    WifiAccessPointSetDot1xConfiguration(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetDot1xConfigurationRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetDot1xConfigurationResult* result) override;
+    WifiAccessPointSetAuthenticationDot1x(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationDot1xRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointSetAuthenticationDot1xResult* result) override;
 
 protected:
     /**
@@ -296,12 +296,12 @@ protected:
      * @brief Set the IEEE 802.1x configuration for the access point.
      * 
      * @param accessPointId The access point identifier.
-     * @param dot11Dot1xConfiguration The new IEEE 802.1x configuration to set.
+     * @param dot11AuthenticationDot1x The new IEEE 802.1x configuration to set.
      * @param accessPointController  The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus 
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointSetDot1xConfigurationImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11Dot1xConfiguration& dot11Dot1xConfiguration, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+    WifiAccessPointSetAuthenticationDot1xImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AuthenticationDot1x& dot11AuthenticationDot1x, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
 private:
     std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;
