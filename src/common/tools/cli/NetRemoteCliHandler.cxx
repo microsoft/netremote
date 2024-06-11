@@ -10,6 +10,7 @@
 #include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 #include <plog/Log.h>
 
+using namespace Microsoft::Net;
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Wifi;
 
@@ -37,96 +38,92 @@ NetRemoteCliHandler::GetParentStrongRef() const
     return m_parent.lock();
 }
 
+std::tuple<std::shared_ptr<NetRemoteCli>, std::shared_ptr<INetRemoteCliHandlerOperations>>
+NetRemoteCliHandler::GetOperationsAndParentStrongRef() const
+{
+    auto parentStrong{ GetParentStrongRef() };
+    if (!parentStrong) {
+        LOGE << "Parent cli object is no longer valid, aborting command";
+        return {};
+    }
+
+    auto operations{ m_operations };
+    if (!operations) {
+        LOGE << "No operations instance available to handle command";
+        return {};
+    }
+
+    return { parentStrong, operations };
+}
+
 void
 NetRemoteCliHandler::HandleCommandNetworkInterfacesEnumerate()
 {
-    if (!m_operations) {
-        LOGE << "No operations instance available to handle command";
-        return;
-    }
-
-    auto parentStrong{ GetParentStrongRef() };
-    if (parentStrong == nullptr) {
-        LOGW << "Parent cli object is no longer valid, aborting command";
+    auto [parentStrong, operations] = GetOperationsAndParentStrongRef();
+    if (!parentStrong || !operations) {
         return;
     }
 
     LOGD << "Executing command NetworkInterfacesEnumerate";
-    m_operations->NetworkInterfacesEnumerate();
+    operations->NetworkInterfacesEnumerate();
 }
 
 void
 NetRemoteCliHandler::HandleCommandWifiAccessPointsEnumerate(bool detailedOutput)
 {
-    if (!m_operations) {
-        LOGE << "No operations instance available to handle command";
-        return;
-    }
-
-    auto parentStrong{ GetParentStrongRef() };
-    if (parentStrong == nullptr) {
-        LOGW << "Parent cli object is no longer valid, aborting command";
+    auto [parentStrong, operations] = GetOperationsAndParentStrongRef();
+    if (!parentStrong || !operations) {
         return;
     }
 
     LOGD << "Executing command WifiAccessPointsEnumerate";
-    m_operations->WifiAccessPointsEnumerate(detailedOutput);
+    operations->WifiAccessPointsEnumerate(detailedOutput);
 }
 
 void
 NetRemoteCliHandler::HandleCommandWifiAccessPointEnable(std::string_view accessPointId, const Ieee80211AccessPointConfiguration* ieee80211AccessPointConfiguration)
 {
-    if (!m_operations) {
-        LOGE << "No operations instance available to handle command";
-        return;
-    }
-
-    auto parentStrong{ GetParentStrongRef() };
-    if (parentStrong == nullptr) {
-        LOGW << "Parent cli object is no longer valid, aborting command";
+    auto [parentStrong, operations] = GetOperationsAndParentStrongRef();
+    if (!parentStrong || !operations) {
         return;
     }
 
     LOGD << "Executing command WifiAccessPointEnable";
-
-    m_operations->WifiAccessPointEnable(accessPointId, ieee80211AccessPointConfiguration);
+    operations->WifiAccessPointEnable(accessPointId, ieee80211AccessPointConfiguration);
 }
 
 void
 NetRemoteCliHandler::HandleCommandWifiAccessPointDisable(std::string_view accessPointId)
 {
-    if (!m_operations) {
-        LOGE << "No operations instance available to handle command";
-        return;
-    }
-
-    auto parentStrong{ GetParentStrongRef() };
-    if (parentStrong == nullptr) {
-        LOGW << "Parent cli object is no longer valid, aborting command";
+    auto [parentStrong, operations] = GetOperationsAndParentStrongRef();
+    if (!parentStrong || !operations) {
         return;
     }
 
     LOGD << "Executing command WifiAccessPointDisable";
-
-    m_operations->WifiAccessPointDisable(accessPointId);
+    operations->WifiAccessPointDisable(accessPointId);
 }
 
-    void
+void
 NetRemoteCliHandler::HandleCommandWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid)
 {
-    if (!m_operations) {
-        LOGE << "No operations instance available to handle command";
-        return;
-    }
-
-    auto parentStrong{ GetParentStrongRef() };
-    if (parentStrong == nullptr) {
-        LOGW << "Parent cli object is no longer valid, aborting command";
+    auto [parentStrong, operations] = GetOperationsAndParentStrongRef();
+    if (!parentStrong || !operations) {
         return;
     }
 
     LOGD << "Executing command WifiAccessPointSetSsid";
-
-    m_operations->WifiAccessPointSetSsid(accessPointId, ssid);
+    operations->WifiAccessPointSetSsid(accessPointId, ssid);
 }
 
+void
+NetRemoteCliHandler::HandleCommandWifiAccessPointSet8021xRadius(std::string_view accessPointId, const Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration)
+{
+    auto [parentStrong, operations] = GetOperationsAndParentStrongRef();
+    if (!parentStrong || !operations) {
+        return;
+    }
+
+    LOGD << "Executing command WifiAccessPointSet8021xRadius";
+    operations->WifiAccessPointSet8021xRadius(accessPointId, ieee8021xRadiusConfiguration);
+}
