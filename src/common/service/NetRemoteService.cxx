@@ -502,6 +502,13 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
+        if (dot11AccessPointConfiguration->has_dot1xconfiguration()) {
+            wifiOperationStatus = WifiAccessPointSetDot1xConfigurationImpl(accessPointId, dot11AccessPointConfiguration->dot1xconfiguration(), accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        }
+
         if (dot11AccessPointConfiguration->authenticationalgorithms_size() > 0) {
             auto dot11AuthenticationAlgorithms = ToDot11AuthenticationAlgorithms(*dot11AccessPointConfiguration);
             wifiOperationStatus = WifiAccessPointSetAuthenticationAlgorithsmImpl(accessPointId, dot11AuthenticationAlgorithms, accessPointController);
