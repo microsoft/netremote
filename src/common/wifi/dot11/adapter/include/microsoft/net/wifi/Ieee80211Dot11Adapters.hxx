@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
+#include <microsoft/net/remote/protocol/Network8021x.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -356,6 +357,24 @@ FromDot11AuthenticationData(const Dot11AuthenticationData& dot11AuthenticationDa
  */
 Dot11AuthenticationData
 ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211AuthenticationData) noexcept;
+
+/**
+ * @brief Convert the specified Dot11Dot1xConfiguration to the equivalent IEEE 802.1x authentication.
+ * 
+ * @param dot11Dot1xConfiguration The Dot11Dot1xConfiguration to convert.
+ * @return Ieee8021xAuthentication 
+ */
+Ieee8021xAuthentication
+FromDot11Dot1xConfiguration(const Dot11Dot1xConfiguration& dot11Dot1xConfiguration) noexcept;
+
+/**
+ * @brief Convert the specified IEEE 802.1x authentication to the equivalent Dot11Dot1xConfiguration.
+ * 
+ * @param ieee8021xAuthentication The IEEE 802.1x authentication to convert.
+ * @return Dot11Dot1xConfiguration 
+ */
+Dot11Dot1xConfiguration
+ToDot11Dot1xConfiguration(const Ieee8021xAuthentication& ieee8021xAuthentication) noexcept;
 
 } // namespace Microsoft::Net::Wifi
 

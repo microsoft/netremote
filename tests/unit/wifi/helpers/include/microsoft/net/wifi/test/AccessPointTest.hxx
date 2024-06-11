@@ -33,13 +33,13 @@ struct AccessPointTest final :
     Microsoft::Net::Wifi::Ieee80211MacAddress MacAddress{};
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
+    Microsoft::Net::Wifi::Ieee8021xAuthentication Authentication8021x;
     Microsoft::Net::Wifi::Ieee80211AuthenticationData AuthenticationData;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;
     std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> AkmSuites;
     std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> CipherSuites;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
-    std::optional<Microsoft::Net::Ieee8021xRadiusConfiguration> RadiusConfiguration;
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.

@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <microsoft/net/ServiceApiNetworkDot1xAdapters.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteWifi.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
@@ -815,6 +816,34 @@ ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211Authentica
     }
 
     return dot11AuthenticationData;
+}
+
+Ieee8021xAuthentication
+FromDot11Dot1xConfiguration(const Dot11Dot1xConfiguration& dot11Dot1xConfiguration) noexcept
+{
+    Ieee8021xAuthentication ieee8021xAuthentication{};
+
+    // Convert RADIUS configuration, if present.
+    if (dot11Dot1xConfiguration.has_radius()) {
+        const auto& dot1xRadiusConfiguration = dot11Dot1xConfiguration.radius();
+        ieee8021xAuthentication.Radius = FromServiceDot1xRadiusConfiguration(dot1xRadiusConfiguration);
+    }
+
+    return ieee8021xAuthentication;
+}
+
+Dot11Dot1xConfiguration
+ToDot11Dot1xConfiguration(const Ieee8021xAuthentication& ieee8021xAuthentication) noexcept
+{
+    Dot11Dot1xConfiguration dot11Dot1xConfiguration{};
+
+    // Convert RADIUS configuration, if present.
+    if (ieee8021xAuthentication.Radius.has_value()) {
+        auto dot1xRadiusConfiguration = ToServiceDot1xRadiusConfiguration(ieee8021xAuthentication.Radius.value());
+        *dot11Dot1xConfiguration.mutable_radius() = std::move(dot1xRadiusConfiguration);
+    }
+
+    return dot11Dot1xConfiguration;
 }
 
 } // namespace Microsoft::Net::Wifi
