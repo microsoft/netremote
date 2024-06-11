@@ -33,7 +33,7 @@ struct AccessPointTest final :
     Microsoft::Net::Wifi::Ieee80211MacAddress MacAddress{};
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
-    Microsoft::Net::Wifi::Ieee8021xAuthentication Authentication8021x;
+    Microsoft::Net::Wifi::Ieee80211Authentication8021x Authentication8021x;
     Microsoft::Net::Wifi::Ieee80211AuthenticationData AuthenticationData;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;

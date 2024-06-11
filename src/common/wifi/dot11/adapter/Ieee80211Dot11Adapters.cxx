@@ -818,32 +818,32 @@ ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211Authentica
     return dot11AuthenticationData;
 }
 
-Ieee8021xAuthentication
-FromDot11Dot1xConfiguration(const Dot11Dot1xConfiguration& dot11Dot1xConfiguration) noexcept
+Ieee80211Authentication8021x
+FromDot11AuthenticationDot1x(const Dot11AuthenticationDot1x& Dot11AuthenticationDot1x) noexcept
 {
-    Ieee8021xAuthentication ieee8021xAuthentication{};
+    Ieee80211Authentication8021x ieee8021xAuthentication{};
 
     // Convert RADIUS configuration, if present.
-    if (dot11Dot1xConfiguration.has_radius()) {
-        const auto& dot1xRadiusConfiguration = dot11Dot1xConfiguration.radius();
+    if (Dot11AuthenticationDot1x.has_radius()) {
+        const auto& dot1xRadiusConfiguration = Dot11AuthenticationDot1x.radius();
         ieee8021xAuthentication.Radius = FromServiceDot1xRadiusConfiguration(dot1xRadiusConfiguration);
     }
 
     return ieee8021xAuthentication;
 }
 
-Dot11Dot1xConfiguration
-ToDot11Dot1xConfiguration(const Ieee8021xAuthentication& ieee8021xAuthentication) noexcept
+Dot11AuthenticationDot1x
+ToDot11AuthenticationDot1x(const Ieee80211Authentication8021x& ieee8021xAuthentication) noexcept
 {
-    Dot11Dot1xConfiguration dot11Dot1xConfiguration{};
+    Dot11AuthenticationDot1x Dot11AuthenticationDot1x{};
 
     // Convert RADIUS configuration, if present.
     if (ieee8021xAuthentication.Radius.has_value()) {
         auto dot1xRadiusConfiguration = ToServiceDot1xRadiusConfiguration(ieee8021xAuthentication.Radius.value());
-        *dot11Dot1xConfiguration.mutable_radius() = std::move(dot1xRadiusConfiguration);
+        *Dot11AuthenticationDot1x.mutable_radius() = std::move(dot1xRadiusConfiguration);
     }
 
-    return dot11Dot1xConfiguration;
+    return Dot11AuthenticationDot1x;
 }
 
 } // namespace Microsoft::Net::Wifi

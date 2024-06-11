@@ -409,11 +409,11 @@ NetRemoteService::WifiAccessPointSetNetworkBridge([[maybe_unused]] grpc::ServerC
 }
 
 grpc::Status
-NetRemoteService::WifiAccessPointSetDot1xConfiguration([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetDot1xConfigurationRequest* request, WifiAccessPointSetDot1xConfigurationResult* result)
+NetRemoteService::WifiAccessPointSetAuthenticationDot1x([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointSetAuthenticationDot1xRequest* request, WifiAccessPointSetAuthenticationDot1xResult* result)
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    auto wifiOperationStatus = WifiAccessPointSetDot1xConfigurationImpl(request->accesspointid(), request->configuration());
+    auto wifiOperationStatus = WifiAccessPointSetAuthenticationDot1xImpl(request->accesspointid(), request->authenticationdot1x());
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(wifiOperationStatus);
 
@@ -502,8 +502,8 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        if (dot11AccessPointConfiguration->has_dot1xconfiguration()) {
-            wifiOperationStatus = WifiAccessPointSetDot1xConfigurationImpl(accessPointId, dot11AccessPointConfiguration->dot1xconfiguration(), accessPointController);
+        if (dot11AccessPointConfiguration->has_authenticationdot1x()) {
+            wifiOperationStatus = WifiAccessPointSetAuthenticationDot1xImpl(accessPointId, dot11AccessPointConfiguration->authenticationdot1x(), accessPointController);
             if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
                 return wifiOperationStatus;
             }
@@ -1167,7 +1167,7 @@ GetDot1xRadiusServerEndpointName(Dot1xRadiusServerEndpoint dot1xRadiusServerEndp
 } // namespace detail
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view accessPointId, const Dot11Dot1xConfiguration& dot11Dot1xConfiguration, std::shared_ptr<IAccessPointController> accessPointController)
+NetRemoteService::WifiAccessPointSetAuthenticationDot1xImpl(std::string_view accessPointId, const Dot11AuthenticationDot1x& dot11AuthenticationDot1x, std::shared_ptr<IAccessPointController> accessPointController)
 {
     using detail::Dot1xRadiusServerEndpointConfigurationValidationResult;
     using detail::GetDot1xRadiusServerEndpointConfigurationValidationResultMessage;
@@ -1178,7 +1178,7 @@ NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view acce
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
     // Validate basic parameters in the request.
-    if (!dot11Dot1xConfiguration.has_radius()) {
+    if (!dot11AuthenticationDot1x.has_radius()) {
         wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
         wifiOperationStatus.set_message("No 802.1x configuration provided");
         return wifiOperationStatus;
@@ -1197,8 +1197,8 @@ NetRemoteService::WifiAccessPointSetDot1xConfigurationImpl(std::string_view acce
     }
 
     // Apply 802.1X RADIUS configuration, if present.
-    if (dot11Dot1xConfiguration.has_radius()) {
-        auto& dot1xRadiusConfiguration = dot11Dot1xConfiguration.radius();
+    if (dot11AuthenticationDot1x.has_radius()) {
+        auto& dot1xRadiusConfiguration = dot11AuthenticationDot1x.radius();
 
         // Validate all required configuration is present.
         if (!dot1xRadiusConfiguration.has_authenticationserver()) {

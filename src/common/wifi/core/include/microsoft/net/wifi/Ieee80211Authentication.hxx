@@ -137,7 +137,7 @@ struct Ieee80211AuthenticationData
     std::optional<Ieee80211AuthenticationDataSae> Sae;
 };
 
-struct Ieee8021xAuthentication
+struct Ieee80211Authentication8021x
 {
     std::optional<Microsoft::Net::Ieee8021xRadiusConfiguration> Radius;
 };

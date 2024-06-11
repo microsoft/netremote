@@ -359,22 +359,22 @@ Dot11AuthenticationData
 ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211AuthenticationData) noexcept;
 
 /**
- * @brief Convert the specified Dot11Dot1xConfiguration to the equivalent IEEE 802.1x authentication.
+ * @brief Convert the specified Dot11AuthenticationDot1x to the equivalent IEEE 802.1x authentication.
  * 
- * @param dot11Dot1xConfiguration The Dot11Dot1xConfiguration to convert.
- * @return Ieee8021xAuthentication 
+ * @param dot11AuthenticationDot1x The Dot11AuthenticationDot1x to convert.
+ * @return Ieee80211Authentication8021x 
  */
-Ieee8021xAuthentication
-FromDot11Dot1xConfiguration(const Dot11Dot1xConfiguration& dot11Dot1xConfiguration) noexcept;
+Ieee80211Authentication8021x
+FromDot11AuthenticationDot1x(const Dot11AuthenticationDot1x& dot11AuthenticationDot1x) noexcept;
 
 /**
- * @brief Convert the specified IEEE 802.1x authentication to the equivalent Dot11Dot1xConfiguration.
+ * @brief Convert the specified IEEE 802.1x authentication to the equivalent Dot11AuthenticationDot1x.
  * 
  * @param ieee8021xAuthentication The IEEE 802.1x authentication to convert.
- * @return Dot11Dot1xConfiguration 
+ * @return Dot11AuthenticationDot1x 
  */
-Dot11Dot1xConfiguration
-ToDot11Dot1xConfiguration(const Ieee8021xAuthentication& ieee8021xAuthentication) noexcept;
+Dot11AuthenticationDot1x
+ToDot11AuthenticationDot1x(const Ieee80211Authentication8021x& ieee8021xAuthentication) noexcept;
 
 } // namespace Microsoft::Net::Wifi
 
