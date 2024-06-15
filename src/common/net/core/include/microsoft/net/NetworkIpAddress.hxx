@@ -37,6 +37,48 @@ struct NetworkIpAddress
 };
 
 /**
+ * @brief Categories of IP addresses.
+ */
+enum class IpAddressCategory {
+    Unknown,
+    Ipv4,
+    Ipv4Any,
+    Ipv6Any,
+};
+
+/**
+ * @brief Get the category of an IP address.
+ * 
+ * @param ipAddressView The view of the IP address to categorize.
+ * @return IpAddressCategory The category of the IP address.
+ */
+inline IpAddressCategory
+GetIpAddressCategory(std::string_view ipAddressView)
+{
+    const std::string ipAddress{ ipAddressView };
+
+    const std::regex RegexIpv4AnyAddressWithOptionalPort{ "^0.0.0.0(:\\d+)?$" };
+    if (std::regex_match(ipAddress, RegexIpv4AnyAddressWithOptionalPort))
+    {
+        return IpAddressCategory::Ipv4Any;
+    }
+
+    const std::regex RegexIpv6AnyAddressWithOptionalPort{ "^\\[?::\\]?(:\\d+)?$" };
+    if (std::regex_match(ipAddress, RegexIpv6AnyAddressWithOptionalPort))
+    {
+        return IpAddressCategory::Ipv6Any;
+    }
+
+    const std::regex RegexIpv4AddressWithOptionalPort(R"(^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::(\d|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5]))?$)");
+    if (std::regex_match(ipAddress, RegexIpv4AddressWithOptionalPort))
+    {
+        return IpAddressCategory::Ipv4;
+    }
+
+    return IpAddressCategory::Unknown;
+}
+
+/**
  * @brief Determine if a string contains an IPv4 or IPv6 "any" address. The port is optional for both forms, and square
  * brackets are optional for the IPv6 form.
  *
@@ -47,11 +89,8 @@ struct NetworkIpAddress
 inline bool
 IsAnyAddress(std::string_view ipAddressView) noexcept
 {
-    const std::regex RegexIpv4AnyAddressWithPort{ "^0.0.0.0(:\\d+)?$" };
-    const std::regex RegexIpv6AnyAddressWithPort{ "^\\[?::\\]?(:\\d+)?$" };
-    const std::string ipAddress(ipAddressView);
-
-    return std::regex_match(ipAddress, RegexIpv4AnyAddressWithPort) || std::regex_match(ipAddress, RegexIpv6AnyAddressWithPort);
+    const auto ipAddressCategory = GetIpAddressCategory(ipAddressView);
+    return ipAddressCategory == IpAddressCategory::Ipv4Any || ipAddressCategory == IpAddressCategory::Ipv6Any;
 }
 } // namespace Microsoft::Net
 
