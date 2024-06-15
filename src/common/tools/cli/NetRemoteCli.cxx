@@ -425,7 +425,7 @@ ToString(const Ieee8021xRadiusConfiguration& ieee8021xRadiusConfiguration) noexc
 /**
  * @brief Attempt to parse a vector of tokens into an Ieee8021xRadiusServerEndpointConfiguration.
  *
- * The expected format of the tokens is: [<type=[auth|acct]>,]<address>[:<port>],<sharedsecret>
+ * The expected format of the tokens is: [<[auth|acct]>,]<address>[:<port>],<sharedsecret>
  *
  * If the type is not specified, it defaults to 'auth' (authentication).
  * If the port is not specified, it defaults to 0, which will not set the 'Port' field.
@@ -588,9 +588,9 @@ NetRemoteCli::AddSubcommandWifiAccessPointSet8021xRadius(CLI::App* parent)
     });
 
     cliAppWifiAccessPointSetAuthenticationDot1x->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to set the 802.1X RADIUS configuration for")->required();
-    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--auth,--authServer,--authenticationServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AuthenticationServer, "The 802.1X RADIUS authentication server (format='<ipaddress>[:<port>],<sharedsecret>')")->required();
-    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--acct,--acctServer,--accountingServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AccountingServer, "The 802.1X RADIUS accounting server (format='<ipaddress>[:<port>],<sharedsecret>')");
-    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--fallback,--fallbackServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->FallbackServers, "An 802.1X RADIUS fallback server (authentication and/or accounting) server (format='[<type=[auth|acct]>,]<ipaddress>[:<port>],<sharedsecret>')");
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("auth,--auth,--authServer,--authenticationServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AuthenticationServer, "The 802.1X RADIUS authentication server (format='<ip>[:<port>],<sharedsecret>')")->required();
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--acct,--acctServer,--accountingServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AccountingServer, "The 802.1X RADIUS accounting server (format='<ip>[:<port>],<sharedsecret>')");
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--fallback,--fallbackServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->FallbackServers, "An 802.1X RADIUS authentication or accounting fallback server (format='[<[auth|acct]>,]<ip>[:<port>],<sharedsecret>')");
 
     return cliAppWifiAccessPointSetAuthenticationDot1x;
 }
