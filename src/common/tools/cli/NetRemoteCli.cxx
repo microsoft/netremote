@@ -317,7 +317,7 @@ NetRemoteCli::AddSubcommandWifiAccessPointEnable(CLI::App* parent)
 {
     auto* cliAppWifiAccessPointEnable = parent->add_subcommand("access-point-enable", "Enable a Wi-Fi access point");
     cliAppWifiAccessPointEnable->alias("ap-enable")->alias("enable")->alias("ape");
-    cliAppWifiAccessPointEnable->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
+    cliAppWifiAccessPointEnable->add_option("id,--id", m_cliData->WifiAccessPointId, "The identifier of the access point to enable")->required();
     cliAppWifiAccessPointEnable->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable");
     cliAppWifiAccessPointEnable->add_option("--phy,--phyType,", m_cliData->WifiAccessPointPhyType, "The PHY type of the access point to enable")
         ->transform(CLI::CheckedTransformer(detail::Ieee80211PhyTypeNames(), CLI::ignore_case));
@@ -355,13 +355,13 @@ CLI::App*
 NetRemoteCli::AddSubcommandWifiAccessPointSetSsid(CLI::App* parent)
 {
     auto* cliAppWifiAccessPointSetSsid = parent->add_subcommand("access-point-set-ssid", "Set the SSID of an access point");
-    cliAppWifiAccessPointSetSsid->alias("ap-set-ssid")->alias("set-ssid")->alias("setssid");
+    cliAppWifiAccessPointSetSsid->alias("ap-set-ssid")->alias("set-ssid")->alias("setssid")->alias("ssid");
     cliAppWifiAccessPointSetSsid->callback([this] {
         OnWifiAccessPointSetSsid(m_cliData->WifiAccessPointId, m_cliData->WifiAccessPointSsid);
     });
 
     cliAppWifiAccessPointSetSsid->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to set the SSID for")->required();
-    cliAppWifiAccessPointSetSsid->add_option("--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable")->required();
+    cliAppWifiAccessPointSetSsid->add_option("ssid,--ssid", m_cliData->WifiAccessPointSsid, "The SSID of the access point to enable")->required();
 
     return cliAppWifiAccessPointSetSsid;
 }
@@ -425,7 +425,7 @@ ToString(const Ieee8021xRadiusConfiguration& ieee8021xRadiusConfiguration) noexc
 /**
  * @brief Attempt to parse a vector of tokens into an Ieee8021xRadiusServerEndpointConfiguration.
  *
- * The expected format of the tokens is: [<type=[auth|acct]>,]<address>[:<port>],<sharedsecret>
+ * The expected format of the tokens is: [<[auth|acct]>,]<address>[:<port>],<sharedsecret>
  *
  * If the type is not specified, it defaults to 'auth' (authentication).
  * If the port is not specified, it defaults to 0, which will not set the 'Port' field.
@@ -588,9 +588,9 @@ NetRemoteCli::AddSubcommandWifiAccessPointSet8021xRadius(CLI::App* parent)
     });
 
     cliAppWifiAccessPointSetAuthenticationDot1x->add_option("id", m_cliData->WifiAccessPointId, "The identifier of the access point to set the 802.1X RADIUS configuration for")->required();
-    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--auth,--authServer,--authenticationServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AuthenticationServer, "The 802.1X RADIUS authentication server (format='<ipaddress>[:<port>],<sharedsecret>')")->required();
-    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--acct,--acctServer,--accountingServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AccountingServer, "The 802.1X RADIUS accounting server (format='<ipaddress>[:<port>],<sharedsecret>')");
-    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--fallback,--fallbackServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->FallbackServers, "An 802.1X RADIUS fallback server (authentication and/or accounting) server (format='[<type=[auth|acct]>,]<ipaddress>[:<port>],<sharedsecret>')");
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("auth,--auth,--authServer,--authenticationServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AuthenticationServer, "The 802.1X RADIUS authentication server (format='<ip>[:<port>],<sharedsecret>')")->required();
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--acct,--acctServer,--accountingServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->AccountingServer, "The 802.1X RADIUS accounting server (format='<ip>[:<port>],<sharedsecret>')");
+    cliAppWifiAccessPointSetAuthenticationDot1x->add_option("--fallback,--fallbackServer", m_cliData->WifiAccessPointAuthentication8021x.Radius->FallbackServers, "An 802.1X RADIUS authentication or accounting fallback server (format='[<[auth|acct]>,]<ip>[:<port>],<sharedsecret>')");
 
     return cliAppWifiAccessPointSetAuthenticationDot1x;
 }
