@@ -3,10 +3,10 @@
 set -euf -o pipefail
 
 readonly REPOSITORY_ROOT="${1:-${PWD}}"
-readonly CMAKE_PRESET_CONFIGURE="${2}"
-readonly CMAKE_PRESET_BUILD="${3}"
-readonly CMAKE_PRESET_PACKAGE="${4}"
-readonly CMAKE_BUILD_CONFIG="${5}"
+readonly CMAKE_PRESET_CONFIGURE="${2:-dev-linux}"
+readonly CMAKE_PRESET_BUILD="${3:-build-dev-linux}"
+readonly CMAKE_PRESET_PACKAGE="${4:-packaging-dev-linux}"
+readonly CMAKE_BUILD_CONFIG="${5:-Debug}"
 
 echo "------------------------------------"
 echo "Build entrypoint script parameters:"
@@ -36,6 +36,7 @@ git config --global --add safe.directory "${REPOSITORY_ROOT}"
 
 # Change to the root of the repo.
 cd "${REPOSITORY_ROOT}"
+set -x
 cmake --preset "${CMAKE_PRESET_CONFIGURE}"
 cmake --build --preset "${CMAKE_PRESET_BUILD}"
 cmake --install ../netremote-cmake/build/"${CMAKE_PRESET_CONFIGURE}" --config "${CMAKE_BUILD_CONFIG}"
