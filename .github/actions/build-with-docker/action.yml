@@ -20,7 +20,7 @@ inputs:
     description: 'The build configuration to use for the CMake build operation'
 runs:
   using: 'docker'
-  image: '../../../.docker/netremote-dev/Dockerfile'
+  image: 'docker://abeltrano/netremote-build:latest'
   args:
     - '/github/workspace'
     - ${{ inputs.cmake-preset-configure }}
