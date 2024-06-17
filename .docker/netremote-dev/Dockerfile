@@ -128,7 +128,7 @@ RUN mkdir -p ${VCPKG_BINARY_CACHE}
 # Obtain vcpkg, bootstrap it, and install dependencies.
 COPY vcpkg.json .
 
-RUN git clone https://github.com/microsoft/vcpkg.git --depth 1 && \
+RUN git clone https://github.com/microsoft/vcpkg.git && \
     ./vcpkg/bootstrap-vcpkg.sh && \
     ./vcpkg/vcpkg install --clean-buildtrees-after-build --clean-downloads-after-build
 
