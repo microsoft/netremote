@@ -8,11 +8,11 @@ inputs:
     description: 'The name of the preset to use for the CMake configure operation'
   cmake-preset-build:
     required: false
-    default: 'dev-linux'
+    default: 'build-dev-linux'
     description: 'The name of the preset to use for the CMake build operation'
   cmake-preset-package:
     required: false
-    default: 'dev-linux'
+    default: 'packaging-dev-linux'
     description: 'The name of the preset to use for the CMake package operation'
   cmake-build-config:
     required: false
