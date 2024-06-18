@@ -56,7 +56,7 @@ runs:
     if: ${{ contains(inputs.preset-name, 'linux') }}
     run: |
       export DEBIAN_FRONTEND=noninteractive
-      sudo apt-get install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip
+      sudo apt-get install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc iw debconf-utils policycoreutils-python-utils python-is-python3 
     shell: bash
 
   - name: CMake Configure
