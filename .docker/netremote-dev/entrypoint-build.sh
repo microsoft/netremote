@@ -36,7 +36,6 @@ git config --global --add safe.directory "${REPOSITORY_ROOT}"
 
 # Change to the root of the repo.
 cd "${REPOSITORY_ROOT}"
-set -x
 cmake --preset "${CMAKE_PRESET_CONFIGURE}"
 cmake --build --preset "${CMAKE_PRESET_BUILD}"
-cmake --install ../netremote-cmake/build/"${CMAKE_PRESET_CONFIGURE}" --config "${CMAKE_BUILD_CONFIG}"
+ctest --preset non-root -C "${CMAKE_BUILD_CONFIG}"
