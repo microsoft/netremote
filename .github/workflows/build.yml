@@ -110,6 +110,7 @@ jobs:
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
+        preset-name: 'dev-windows'
 
     - name: Build Linux Self-Hosted
       if: ${{ contains(matrix.config.os, 'ubuntu-23.10') }}
@@ -131,6 +132,7 @@ jobs:
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
         use-vcpkg-github-actions-cache: 'false'
+        preset-name: dev-linux
 
     - name: Perform CodeQL Analysis
       if: inputs.analyze-codeql == true
