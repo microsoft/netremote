@@ -22,7 +22,7 @@ runs:
   using: 'docker'
   image: 'docker://abeltrano/netremote-build:latest'
   args:
-    - '/github/workspace'
+    - '/github/workspace/netremote'
     - ${{ inputs.cmake-preset-configure }}
     - ${{ inputs.cmake-preset-build }}
     - ${{ inputs.cmake-preset-package }}
