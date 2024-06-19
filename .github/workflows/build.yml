@@ -120,7 +120,6 @@ jobs:
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
-        use-vcpkg-github-actions-cache: 'false'
         preset-name: dev-linux
 
     - name: Perform CodeQL Analysis
