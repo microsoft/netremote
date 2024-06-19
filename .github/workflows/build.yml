@@ -87,7 +87,6 @@ jobs:
           - { os: windows-2022 }
           - { os: windows-2022, arch: 'ARM64' }
           - { os: ubuntu-24.04 }
-          - { os: [ self-hosted, ubuntu-23.10 ] }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
@@ -112,17 +111,7 @@ jobs:
         publish-artifacts: ${{ inputs.publish-artifacts }}
         preset-name: 'dev-windows'
 
-    - name: Build Linux Self-Hosted
-      if: ${{ contains(matrix.config.os, 'ubuntu-23.10') }}
-      uses: ./.github/actions/build-with-selfhost
-      with:
-        build-type: ${{ matrix.build-type }}
-        install: ${{ inputs.install }}
-        test: ${{ inputs.test }}
-        package: ${{ inputs.package }}
-        publish-artifacts: ${{ inputs.publish-artifacts }}
-
-    - name: Build Linux Hosted
+    - name: Build Linux
       if: ${{ contains(matrix.config.os, 'ubuntu-24.04') }}
       uses: ./.github/actions/build-with-host
       with:
