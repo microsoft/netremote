@@ -31,12 +31,16 @@ logging::LogVerbosityToPlogSeverity(uint32_t verbosity) noexcept
 {
     switch (verbosity) {
     case 0:
-        return plog::warning;
+        return plog::fatal;
     case 1:
-        return plog::info;
+        return plog::error;
     case 2:
-        return plog::debug;
+        return plog::warning;
     case 3:
+        return plog::info;
+    case 4:
+        return plog::debug;
+    case 5:
     default:
         return plog::verbose;
     }
