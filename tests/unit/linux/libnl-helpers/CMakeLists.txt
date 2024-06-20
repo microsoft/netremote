@@ -6,6 +6,7 @@ target_sources(libnl-helpers-test-unit
         Main.cxx
         TestNetlink80211Interface.cxx
         TestNetlink80211ProtocolState.cxx
+        TestNetlinkException.cxx
         TestNetlinkRoute.cxx
 )
 
