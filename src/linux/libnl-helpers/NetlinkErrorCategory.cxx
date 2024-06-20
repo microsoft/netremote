@@ -31,7 +31,7 @@ NetlinkErrorCategory::default_error_condition(int error) const noexcept
 std::error_code
 make_netlink_error_code(int error)
 {
-    return std::error_code(error, NetlinkErrorCategory());
+    return std::error_code(error, GetNetlinkErrorCategory());
 }
 
 std::error_code
@@ -42,6 +42,13 @@ MakeNetlinkErrorCode(int error)
     }
 
     return make_netlink_error_code(error);
+}
+
+const NetlinkErrorCategory&
+GetNetlinkErrorCategory()
+{
+    static NetlinkErrorCategory instance;
+    return instance;
 }
 
 } // namespace Microsoft::Net::Netlink
