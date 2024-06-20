@@ -47,7 +47,6 @@ RUN apt-get $APT_ARGS_COMMON update && \
         ca-certificates \
         cmake \
         curl \
-        dotnet7 \
         git \
         gnupg \
         libltdl-dev \
