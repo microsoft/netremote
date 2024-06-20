@@ -1,5 +1,5 @@
 
-FROM ubuntu:mantic as netremote-build
+FROM ubuntu:noble as netremote-build
 
 # Set arguments used only in this Dockerfile.
 ARG BUILD_DATE="2024-02-28T21:09:49+00:00"
