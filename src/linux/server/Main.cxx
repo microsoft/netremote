@@ -9,6 +9,7 @@
 #include <utility>
 
 #include <logging/LogUtils.hxx>
+#include <magic_enum.hpp>
 #include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
@@ -102,6 +103,8 @@ main(int argc, char *argv[])
         plog::init(logSeverity).addAppender(plog::get<std::to_underlying(LogInstanceId::File)>());
     }
 
+    LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
+
     // Create an access point manager and discovery agent.
     auto accessPointManager = AccessPointManager::Create();
     auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
@@ -125,7 +128,6 @@ main(int argc, char *argv[])
     NetRemoteServer server{ configuration };
 
     // Start the server.
-    LOGI << "Netremote server starting";
     server.Run();
 
     // If running in the background, daemonize the process.
@@ -149,13 +151,13 @@ main(int argc, char *argv[])
             });
         }
 
-        LOGI << "Netremote server stopping";
+        LOGN << "Netremote server stopping";
         auto &grpcServer = server.GetGrpcServer();
         grpcServer->Shutdown();
         grpcServer->Wait();
     }
 
-    LOGI << "Netremote server stopped";
+    LOGN << "Netremote server stopped";
 
     return 0;
 }

@@ -272,6 +272,11 @@ void
 AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(NetlinkSocket netlinkSocket, std::stop_token stopToken)
 // NOLINTEND(performance-unnecessary-value-param)
 {
+    LOGD << "Netlink message processing thread started";
+    auto logOnExit = notstd::ScopeExit([] {
+        LOGD << "Netlink message processing thread stopped";
+    });
+
     // Disable sequence number checking since it is not required for event notifications.
     nl_socket_disable_seq_check(netlinkSocket);
 
@@ -394,7 +399,6 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
         }
     }
 
-    LOGI << "Netlink message processing thread has exited";
 }
 
 /* static */
