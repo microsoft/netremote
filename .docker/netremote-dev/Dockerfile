@@ -2,7 +2,7 @@
 FROM ubuntu:noble as netremote-build
 
 # Set arguments used only in this Dockerfile.
-ARG BUILD_DATE="2024-02-28T21:09:49+00:00"
+ARG BUILD_DATE="2024-06-20T16:36:23Z"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_ARGS_COMMON="-yqq --no-install-recommends"
 
