@@ -60,46 +60,46 @@ RUN apt-get $APT_ARGS_COMMON update && \
         tar \
         unzip \
         zip \
-        # LLVM + Clang toolchain.
-        # libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
-        bolt-17 \
-        clang-17 \
-        clang-17-doc \
-        clang-format-17 \
-        clang-tidy-17 \
-        clang-tools-17 \
-        clangd-17 \
-        flang-17 \
-        libbolt-17-dev \
-        libc++-17-dev \
-        libc++-17-dev-wasm32 \
-        libc++abi-17-dev \
-        libc++abi-17-dev-wasm32 \
-        libclang-17-dev \
-        libclang-common-17-dev \
-        libclang-rt-17-dev \
-        libclang-rt-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm64 \
-        libclang-rt-17-dev-wasm64 \
-        libclang1-17 \
-        libclc-17-dev \
-        libfuzzer-17-dev \
-        libllvm-17-ocaml-dev \
-        libllvm17 \
-        libmlir-17-dev \
-        libomp-17-dev \
-        libpolly-17-dev \
-        libunwind-17-dev \
-        lld-17 \
-        lldb-17 \
-        llvm-17 \
-        llvm-17-dev \
-        llvm-17-doc \
-        llvm-17-examples \
-        llvm-17-runtime \
-        mlir-17-tools \
-        python3-clang-17 \
+        # LLVM + Clang 18 toolchain.
+        # libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
+        libllvm-18-ocaml-dev \
+        libllvm18 \
+        llvm-18 \
+        llvm-18-dev \
+        llvm-18-doc \
+        llvm-18-examples \
+        llvm-18-runtime \
+        clang-18 \
+        clang-tools-18 \
+        clang-18-doc \
+        libclang-common-18-dev \
+        libclang-18-dev \
+        libclang1-18 \
+        clang-format-18 \
+        python3-clang-18 \
+        clangd-18 \
+        clang-tidy-18 \
+        libclang-rt-18-dev \
+        libpolly-18-dev \
+        libfuzzer-18-dev \
+        lldb-18 \
+        libc++-18-dev \
+        libc++abi-18-dev \
+        libomp-18-dev \
+        libclc-18-dev \
+        libunwind-18-dev \
+        libmlir-18-dev \
+        mlir-18-tools \
+        libbolt-18-dev \
+        bolt-18 \
+        flang-18 \
+        libclang-rt-18-dev-wasm32 \
+        libclang-rt-18-dev-wasm64 \
+        libc++-18-dev-wasm32 \
+        libc++abi-18-dev-wasm32 \
+        libclang-rt-18-dev-wasm32 \
+        libclang-rt-18-dev-wasm64 \
+        libllvmlibc-18-dev \
         # hostapd build dependencies.
         # libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev
         libnl-3-200-dbg \
