@@ -929,9 +929,9 @@ static constexpr uint16_t RadiusAccountingPortDefault = 1813;
 struct RadiusEndpointConfiguration
 {
     RadiusEndpointType Type{ RadiusEndpointType::Unknown };
-    std::string Address;
-    std::optional<uint16_t> Port;
-    std::string SharedSecret;
+    std::string Address{};
+    std::optional<uint16_t> Port{};
+    std::string SharedSecret{};
 };
 
 /**
