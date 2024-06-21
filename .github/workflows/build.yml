@@ -3,6 +3,12 @@ name: 'Build [CMake] 🛠️'
 on:
   workflow_dispatch:
     inputs:
+      build-types:
+        required: true
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
       analyze-codeql:
         required: true
         default: true
@@ -33,12 +39,11 @@ on:
         default: false
         type: boolean
         description: 'Publish build artifacts'
-      build-types:
-        required: true
-        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
-        default: "[ 'Debug' ]"
+      preset-name:
+        required: false
         type: string
-        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
+        default: 'dev'
+        description: 'The name of the CMake preset to use for all CMake operations (configure, build, test, install, package). Must be ''dev'', ''release'', or ''cicd''.'
 
   workflow_call:
     inputs:
@@ -52,26 +57,37 @@ on:
         required: false
         default: true
         type: boolean
+        description: 'Peform static analysis with CodeQL'
       build-arm64:
         required: false
         default: false
         type: boolean
+        description: 'Build ARM64 architecture'
       install:
         required: false
         default: false
         type: boolean
+        description: 'Invoke CMake install for the project'
       test:
         required: false
         default: true
         type: boolean
+        description: 'Invoke CMake CTest for the project'
       package:
         required: false
         default: false
         type: boolean
+        description: 'Invoke CMake CPack for the project'
       publish-artifacts:
         required: false
         default: false
         type: boolean
+        description: 'Publish build artifacts'
+      preset-name:
+        required: false
+        type: string
+        default: 'dev'
+        description: 'The name of the CMake preset to use for all CMake operations (configure, build, test, install, package). Must be ''dev'', ''release'', or ''cicd''.'
 
 jobs:
   build:
@@ -104,23 +120,25 @@ jobs:
       if: ${{ contains(matrix.config.os, 'windows') }}
       uses: ./.github/actions/build-with-host
       with:
+        os: ${{ matrix.config.os }}
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
-        preset-name: 'dev-windows'
+        preset-name: ${{ inputs.preset-name }}
 
     - name: Build Linux
       if: ${{ contains(matrix.config.os, 'ubuntu-24.04') }}
       uses: ./.github/actions/build-with-host
       with:
+        os: ${{ matrix.config.os }}
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
-        preset-name: dev-linux
+        preset-name: ${{ inputs.preset-name }}
 
     - name: Perform CodeQL Analysis
       if: inputs.analyze-codeql == true
