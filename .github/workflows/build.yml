@@ -116,7 +116,7 @@ jobs:
       with:
         languages: 'cpp'
 
-    - name: Build Windows
+    - name: 'Build Windows 📎'
       if: ${{ contains(matrix.config.os-name, 'windows') }}
       uses: ./.github/actions/build-with-host
       with:
@@ -128,7 +128,7 @@ jobs:
         publish-artifacts: ${{ inputs.publish-artifacts }}
         preset-name: ${{ inputs.preset-name }}
 
-    - name: Build Linux
+    - name: 'Build Linux 🐧'
       if: ${{ contains(matrix.config.os-name, 'linux') }}
       uses: ./.github/actions/build-with-host
       with:

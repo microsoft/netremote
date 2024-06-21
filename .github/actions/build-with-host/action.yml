@@ -71,7 +71,7 @@ runs:
 
   - name: CMake Test (ctest)
     if: ${{ inputs.test == 'true' && ! inputs.arch }}
-    run: ctest --preset test-$${ inputs.preset-name }}-${{ inputs.os }} -C ${{ inputs.build-type }}
+    run: ctest --preset test-${{ inputs.preset-name }}-${{ inputs.os }} -C ${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Install
