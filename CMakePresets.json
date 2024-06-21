@@ -430,13 +430,6 @@
             }
         },
         {
-            "name": "dev",
-            "configurePreset": "dev",
-            "inherits": [
-                "test-common"
-            ]
-        },
-        {
             "name": "non-root",
             "configurePreset": "dev-linux",
             "inherits": [
@@ -449,21 +442,21 @@
             }
         },
         {
-            "name": "dev-linux",
+            "name": "test-dev-linux",
             "configurePreset": "dev-linux",
             "inherits": [
                 "test-common"
             ]
         },
         {
-            "name": "dev-windows",
+            "name": "test-dev-windows",
             "configurePreset": "dev-windows",
             "inherits": [
                 "test-common"
             ]
         },
         {
-            "name": "cicd-linux",
+            "name": "test-cicd-linux",
             "configurePreset": "cicd-linux",
             "inherits": [
                 "test-common"
@@ -475,14 +468,14 @@
             }
         },
         {
-            "name": "cicd-windows",
+            "name": "test-cicd-windows",
             "configurePreset": "cicd-windows",
             "inherits": [
                 "test-common"
             ]
         },
         {
-            "name": "cicd-windows-arm64",
+            "name": "test-cicd-windows-arm64",
             "configurePreset": "cicd-windows-arm64",
             "inherits": [
                 "test-common"
