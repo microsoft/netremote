@@ -244,6 +244,42 @@
                 "release-windows",
                 "windows-arm64"
             ]
+        },
+        {
+            "name": "cicd",
+            "hidden": true,
+            "displayName": "CI/CD (base)",
+            "description": "Base options for CI/CD builds",
+            "inherits": [
+                "out-of-source-build"
+            ]
+        },
+        {
+            "name": "cicd-linux",
+            "displayName": "CI/CD",
+            "description": "CI/CD build on Linux",
+            "inherits": [
+                "cicd",
+                "linux"
+            ]
+        },
+        {
+            "name": "cicd-windows",
+            "displayName": "CI/CD",
+            "description": "CI/CD build on Windows",
+            "inherits": [
+                "cicd",
+                "windows"
+            ]
+        },
+        {
+            "name": "cicd-windows-arm64",
+            "displayName": "CI/CD (ARM64)",
+            "description": "CI/CD build on Windows ARM64",
+            "inherits": [
+                "cicd",
+                "windows-arm64"
+            ]
         }
     ],
     "buildPresets": [
@@ -291,6 +327,15 @@
             "description": "Base options for release builds on all platforms",
             "inherits": [
                 "cfg-release-with-debuginfo"
+            ]
+        },
+        {
+            "name": "build-cicd",
+            "hidden": true,
+            "displayName": "CI/CD Build (base)",
+            "description": "Base options for CI/CD builds",
+            "inherits": [
+                "cfg-debug"
             ]
         },
         {
@@ -346,6 +391,33 @@
             "inherits": [
                 "build-release"
             ]
+        },
+        {
+            "name": "build-cicd-linux",
+            "displayName": "CI/CD",
+            "description": "Build the project for CI/CD on Linux",
+            "configurePreset": "cicd-linux",
+            "inherits": [
+                "build-cicd"
+            ]
+        },
+        {
+            "name": "build-cicd-windows",
+            "displayName": "CI/CD",
+            "description": "Build the project for CI/CD on Windows",
+            "configurePreset": "cicd-windows",
+            "inherits": [
+                "build-cicd"
+            ]
+        },
+        {
+            "name": "build-cicd-windows-arm64",
+            "displayName": "CI/CD (ARM64)",
+            "description": "Build the project for CI/CD on Windows (ARM64)",
+            "configurePreset": "cicd-windows-arm64",
+            "inherits": [
+                "build-cicd"
+            ]
         }
     ],
     "testPresets": [
@@ -377,8 +449,41 @@
             }
         },
         {
+            "name": "dev-linux",
+            "configurePreset": "dev-linux",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
             "name": "dev-windows",
             "configurePreset": "dev-windows",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "cicd-linux",
+            "configurePreset": "cicd-linux",
+            "inherits": [
+                "test-common"
+            ],
+            "filter": {
+                "exclude": {
+                    "name": "(root|nl80211)"
+                }
+            }
+        },
+        {
+            "name": "cicd-windows",
+            "configurePreset": "cicd-windows",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "cicd-windows-arm64",
+            "configurePreset": "cicd-windows-arm64",
             "inherits": [
                 "test-common"
             ]
