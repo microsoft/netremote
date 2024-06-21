@@ -3,7 +3,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <netlink/attr.h>
 
-TEST_CASE("Nl80211Interface instance creation (nl82011)", "[linux][libnl-helpers]")
+TEST_CASE("Nl80211Interface instance creation (nl80211)", "[linux][libnl-helpers][nl80211]")
 {
     using Microsoft::Net::Netlink::Nl80211::Nl80211Interface;
 

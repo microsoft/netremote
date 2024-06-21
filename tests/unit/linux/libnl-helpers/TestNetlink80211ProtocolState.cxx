@@ -6,7 +6,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
 
-TEST_CASE("Netlink80211ProtocolState instance creation", "[linux][libnl-helpers]")
+TEST_CASE("Netlink80211ProtocolState instance creation (nl80211)", "[linux][libnl-helpers][nl80211]")
 {
     using namespace Microsoft::Net::Netlink::Nl80211;
 
