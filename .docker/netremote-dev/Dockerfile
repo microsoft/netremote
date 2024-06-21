@@ -173,8 +173,10 @@ RUN apt-get $APT_ARGS_COMMON update && \
         python-is-python3 \
         vim \
         # Wireless tools.
+        # iw
         iw \
         # Packaging tools.
+        # debconf-utils
         debconf-utils \
         && \
     # Reduce image size by removing package cache.
