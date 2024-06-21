@@ -2,6 +2,9 @@
 name: 'build-on-host'
 description: 'Build the repository on the runner host system'
 inputs:
+  os:
+    required: true
+    description: 'The target operating system to build for'
   build-type:
     required: false
     default: 'Debug'
@@ -24,7 +27,7 @@ inputs:
     description: 'Publish build artifacts'
   preset-name:
     required: false
-    default: 'dev-windows'
+    default: 'dev'
     description: 'The name of the preset to use for all CMake operations (configure, build, test, install, package)'
 
 runs:
@@ -39,7 +42,7 @@ runs:
         core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;x-gha,readwrite');
 
   - name: Install Linux build dependencies
-    if: ${{ contains(inputs.preset-name, 'linux') }}
+    if: ${{ inputs.os == 'linux' }}
     run: |
       export DEBIAN_FRONTEND=noninteractive
       sudo -E apt-get update
@@ -49,36 +52,36 @@ runs:
       # Install LLVM 18 toolchain
       sudo -E apt-get install libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
       # Install hostapd dependencies
-      sudo apt-get install libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+      sudo -E apt-get install libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
     shell: bash
 
   - name: CMake Configure
     if: ${{ ! inputs.arch }}
-    run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
+    run: cmake --preset ${{ inputs.preset-name }}-${{ inputs.os }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Configure Cross-Compile ${{ inputs.arch }}
     if: ${{ inputs.arch }}
-    run: cmake --preset ${{ inputs.preset-name }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DNETREMOTE_EXCLUDE_TESTS=TRUE -A ${{ inputs.arch }}
+    run: cmake --preset ${{ inputs.preset-name }}-${{ inputs.os }} --fresh -DCMAKE_BUILD_TYPE=${{ inputs.build-type }} -DNETREMOTE_EXCLUDE_TESTS=TRUE -A ${{ inputs.arch }}
     shell: pwsh
 
   - name: CMake Build
-    run: cmake --build --preset build-${{ inputs.preset-name }} --config ${{ inputs.build-type }}
+    run: cmake --build --preset build-${{ inputs.preset-name }}-${{ inputs.os }} --config ${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Test (ctest)
     if: ${{ inputs.test == 'true' && ! inputs.arch }}
-    run: ctest --preset non-root -C ${{ inputs.build-type }}
+    run: ctest --preset test-$${ inputs.preset-name }}-${{ inputs.os }} -C ${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Install
     if: inputs.install == 'true'
-    run: cmake --build --preset build-${{ inputs.preset-name }} --target install --config ${{ inputs.build-type }}
+    run: cmake --build --preset build-${{ inputs.preset-name }}-${{ inputs.os }} --target install --config ${{ inputs.build-type }}
     shell: pwsh
 
   - name: CMake Package (cpack)
     if: inputs.package == 'true'
-    run: cpack --preset packaging-${{ inputs.preset-name }} -C ${{ inputs.build-type }}
+    run: cpack --preset packaging-${{ inputs.preset-name }}-${{ inputs.os }} -C ${{ inputs.build-type }}
     shell: pwsh
 
   - name: Publish Artifacts
@@ -87,5 +90,5 @@ runs:
     with:
       name: release-package-${{ runner.os }}-${{ inputs.build-type }}-${{ inputs.arch != '' && inputs.arch || runner.arch }}
       path: |
-        ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.tar.*
-        ${{ github.workspace }}/out/package/${{ inputs.preset-name }}/*.zip
+        ${{ github.workspace }}/out/package/${{ inputs.preset-name }}-${{ inputs.os }}/*.tar.*
+        ${{ github.workspace }}/out/package/${{ inputs.preset-name }}-${{ inputs.os }}/*.zip
