@@ -48,11 +48,11 @@ runs:
       sudo -E apt-get update
       sudo -E apt-get upgrade
       # Install core build dependencies
-      sudo -E apt-get install autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
+      sudo -E apt-get install -qq --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
       # Install LLVM 18 toolchain
-      sudo -E apt-get install libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
+      sudo -E apt-get install -qq --no-install-recommends libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
       # Install hostapd dependencies
-      sudo -E apt-get install libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
+      sudo -E apt-get install -qq --no-install-recommends libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
     shell: bash
 
   - name: CMake Configure
