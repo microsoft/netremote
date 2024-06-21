@@ -100,9 +100,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-2022 }
-          - { os: windows-2022, arch: 'ARM64' }
-          - { os: ubuntu-24.04 }
+          - { os: windows-2022, os-name: 'windows' }
+          - { os: windows-2022, os-name: 'windows', arch: 'ARM64' }
+          - { os: ubuntu-24.04, os-name: 'linux' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
@@ -117,10 +117,10 @@ jobs:
         languages: 'cpp'
 
     - name: Build Windows
-      if: ${{ contains(matrix.config.os, 'windows') }}
+      if: ${{ contains(matrix.config.os-name, 'windows') }}
       uses: ./.github/actions/build-with-host
       with:
-        os: ${{ matrix.config.os }}
+        os: ${{ matrix.config.os-name }}
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}
         test: ${{ inputs.test }}
@@ -129,10 +129,10 @@ jobs:
         preset-name: ${{ inputs.preset-name }}
 
     - name: Build Linux
-      if: ${{ contains(matrix.config.os, 'ubuntu-24.04') }}
+      if: ${{ contains(matrix.config.os-name, 'linux') }}
       uses: ./.github/actions/build-with-host
       with:
-        os: ${{ matrix.config.os }}
+        os: ${{ matrix.config.os-name }}
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}
         test: ${{ inputs.test }}
