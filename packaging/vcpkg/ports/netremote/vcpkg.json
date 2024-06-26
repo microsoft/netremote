@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "netremote",
-  "version-string": "0.0.1",
+  "version-string": "0.3.0",
   "dependencies": [
     "grpc",
     "cli11",
