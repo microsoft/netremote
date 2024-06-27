@@ -3,11 +3,13 @@
 #define ACCESS_POINT_TEST_HXX
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
 
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -31,6 +33,7 @@ struct AccessPointTest final :
     Microsoft::Net::Wifi::Ieee80211MacAddress MacAddress{};
     Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities Capabilities;
     Microsoft::Net::Wifi::Ieee80211PhyType PhyType{ Microsoft::Net::Wifi::Ieee80211PhyType::Unknown };
+    Microsoft::Net::Wifi::Ieee80211Authentication8021x Authentication8021x;
     Microsoft::Net::Wifi::Ieee80211AuthenticationData AuthenticationData;
     std::vector<Microsoft::Net::Wifi::Ieee80211FrequencyBand> FrequencyBands;
     std::vector<Microsoft::Net::Wifi::Ieee80211AuthenticationAlgorithm> AuthenticationAlgorithms;

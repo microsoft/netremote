@@ -190,6 +190,19 @@ AccessPointControllerTest::SetNetworkBridge(std::string_view networkBridgeId) no
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
+AccessPointOperationStatus
+AccessPointControllerTest::SetRadiusConfiguration(Ieee8021xRadiusConfiguration radiusConfiguration) noexcept
+{
+    assert(AccessPoint != nullptr);
+
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    AccessPoint->Authentication8021x.Radius = std::move(radiusConfiguration);
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
     AccessPoint(accessPoint)
 {}

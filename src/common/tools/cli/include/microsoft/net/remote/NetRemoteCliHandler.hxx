@@ -4,7 +4,9 @@
 
 #include <memory>
 #include <string_view>
+#include <tuple>
 
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
 
@@ -92,12 +94,21 @@ struct NetRemoteCliHandler
 
     /**
      * @brief Handle a command to set the SSID of a Wi-Fi access point.
-     * 
+     *
      * @param accessPointId The identifier of the access point to set the SSID for.
      * @param ssid The SSID to set.
      */
     void
     HandleCommandWifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid);
+
+    /**
+     * @brief Handle a command to set the RADIUS configuration for a Wi-Fi access point.
+     *
+     * @param accessPointId The identifier of the access point to set the RADIUS configuration for.
+     * @param ieee8021xRadiusConfiguration The RADIUS authentication configuration to set.
+     */
+    void
+    HandleCommandWifiAccessPointSet8021xRadius(std::string_view accessPointId, const Microsoft::Net::Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration);
 
 private:
     /**
@@ -108,6 +119,15 @@ private:
      */
     std::shared_ptr<NetRemoteCli>
     GetParentStrongRef() const;
+
+    /**
+     * @brief Obtain a strong reference to the parent NetRemoteCli object and the operations instance to use for
+     * handling commands.
+     * 
+     * @return std::tuple<std::shared_ptr<NetRemoteCli>, std::shared_ptr<INetRemoteCliHandlerOperations>> 
+     */
+    std::tuple<std::shared_ptr<NetRemoteCli>, std::shared_ptr<INetRemoteCliHandlerOperations>>
+    GetOperationsAndParentStrongRef() const;
 
 private:
     std::weak_ptr<NetRemoteCli> m_parent;

@@ -17,6 +17,7 @@ target_sources(wifi-core-adapter-dot11
 
 target_link_libraries(wifi-core-adapter-dot11
     PUBLIC
+        ${PROJECT_NAME}-net-adapter-service-api
         ${PROJECT_NAME}-protocol
         wifi-core
     PRIVATE

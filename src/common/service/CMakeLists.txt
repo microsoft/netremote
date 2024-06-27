@@ -27,7 +27,7 @@ target_sources(${PROJECT_NAME}-service
 
 target_link_libraries(${PROJECT_NAME}-service
     PUBLIC
-        ${PROJECT_NAME}-net
+        ${PROJECT_NAME}-network-manager
         ${PROJECT_NAME}-protocol
         wifi-apmanager
     PRIVATE

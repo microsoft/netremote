@@ -112,3 +112,15 @@ message WifiAccessPointSetSsidResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointSetAuthenticationDot1xRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11AuthenticationDot1x AuthenticationDot1x = 2;
+}
+
+message WifiAccessPointSetAuthenticationDot1xResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}

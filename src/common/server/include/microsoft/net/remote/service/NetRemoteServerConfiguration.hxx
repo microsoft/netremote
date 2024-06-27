@@ -19,6 +19,11 @@ namespace Microsoft::Net::Remote::Service
 struct NetRemoteServerConfiguration
 {
     /**
+     * @brief Default log verbosity.
+     */
+    static constexpr auto LogVerbosityDefault = 3;
+
+    /**
      * @brief Create a NetRemoteServerConfiguration object from command-line
      * arguments.
      *
@@ -52,12 +57,21 @@ struct NetRemoteServerConfiguration
     bool RunInBackground{ false };
 
     /**
-     * @brief How verbose log output should be. The default level is 0, which
-     * will show all warnings, errors, and fatal messages. A level of 1 will
-     * show all info messages, and a level of 2 will show all debug messages,
-     * and a level of 3 or above will show all verbose messages.
+     * @brief Log verbosity threshold. The default level is 'info' (3) which will print all log messages with verbosity
+     * level info, warning, error, and fatal.
+     *
+     * --------------------
+     * | level | severity |
+     * | ----- | -------- |
+     * |   0   |  fatal   |
+     * |   1   |  error   |
+     * |   2   |  warning |
+     * |   3   |  info    |
+     * |   4   |  debug   |
+     * |   5+  |  verbose |
+     * --------------------
      */
-    uint32_t LogVerbosity{ 0 };
+    uint32_t LogVerbosity{ LogVerbosityDefault };
 
     /**
      * @brief Whether to enable logging to file or not.
@@ -67,12 +81,12 @@ struct NetRemoteServerConfiguration
     /**
      * @brief Object to use when performing network operations.
      */
-    std::shared_ptr<Microsoft::Net::NetworkManager> NetworkManager;
+    std::shared_ptr<Microsoft::Net::NetworkManager> NetworkManager{};
 
     /**
      * @brief Factory to use to create the discovery service.
      */
-    std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory;
+    std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory{};
 };
 
 } // namespace Microsoft::Net::Remote::Service

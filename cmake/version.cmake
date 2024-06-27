@@ -1,7 +1,7 @@
 
 # Default version values in case we can't get them from git.
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 2)
+set(VERSION_MINOR 3)
 set(VERSION_PATCH 0)
 
 if (NOT GIT_EXECUTABLE)

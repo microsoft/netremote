@@ -27,9 +27,10 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         "The address to listen on for incoming connections");
 
     app.add_flag(
-        "-v,--verbosity",
-        config.LogVerbosity,
-        "The log verbosity level. Supply multiple times to increase verbosity (0=warnings, errors, and fatal messages, 1=info messages, 2=debug messages, 3=verbose messages)");
+           "-v,--verbosity",
+           config.LogVerbosity,
+           "The log verbosity level. Supply multiple times to increase verbosity (0=fatal, 1=errors, 2=warnings, 3=info, 4=debug, 5+=verbose)")
+        ->default_val(NetRemoteServerConfiguration::LogVerbosityDefault);
 
     app.add_flag(
         "--enable-file-logging",

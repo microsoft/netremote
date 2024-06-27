@@ -294,17 +294,24 @@ Hostapd::SetKeyManagement(std::vector<WpaKeyManagement> keyManagements, EnforceC
             keyManagementPropertyValueBuilder << keyManagementValue << ' ';
         }
 
-        keyManagementPropertyValue = keyManagementPropertyValueBuilder.str();
+        auto keyManagementPropertyValueView = keyManagementPropertyValueBuilder.view();
+        keyManagementPropertyValueView.remove_suffix(1); // Remove the trailing space.
+        keyManagementPropertyValue = keyManagementPropertyValueView;
     }
-
-    constexpr auto hasFtKeyManagement = [](const auto& keyManagement) {
-        return std::ranges::contains(WpaKeyManagementFt, keyManagement);
-    };
 
     // If any key managements to set support fast-transition, set the network access server (NAS) identifier property to
     // a default (random) value.
-    if (std::ranges::any_of(keyManagements, hasFtKeyManagement)) {
+    if (std::ranges::any_of(keyManagements, IsKeyManagementFastTransition)) {
         SetNetworkAccessServerId();
+    }
+
+    // If any key managements to set support IEEE 802.1X, set the IEEE 802.1X property to enabled.
+    if (std::ranges::any_of(keyManagements, IsKeyManagementIeee8021x)) {
+        try {
+            SetProperty(ProtocolHostapd::PropertyNameIeee8021X, ProtocolHostapd::PropertyEnabled, EnforceConfigurationChange::Defer);
+        } catch (const HostapdException& e) {
+            throw HostapdException(std::format("Failed to enable hostapd for IEEE 802.1X ({})", e.what()));
+        }
     }
 
     try {
@@ -434,6 +441,44 @@ Hostapd::SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurati
     }
 }
 
+void
+Hostapd::AddRadiusEndpoints(std::vector<RadiusEndpointConfiguration> endpointConfigurations, EnforceConfigurationChange enforceConfigurationChange)
+{
+    try {
+        // Set each configuration, deferring the configuration change (if requested) until the end.
+        for (const auto& endpointConfiguration : endpointConfigurations) {
+            // Sanity check the arguments.
+            if (endpointConfiguration.Type == RadiusEndpointType::Unknown) {
+                throw HostapdException("Invalid RADIUS endpoint type");
+            }
+            if (std::empty(endpointConfiguration.Address)) {
+                throw HostapdException("RADIUS endpoint address is empty");
+            }
+            if (std::empty(endpointConfiguration.SharedSecret)) {
+                throw HostapdException("RADIUS endpoint shared secret is empty");
+            }
+
+            auto [propertyAddress, propertyPort, propertySharedKey] = GetRadiusEndpointPropertyNames(endpointConfiguration.Type);
+
+            // Set the address and shared key.
+            SetProperty(propertyAddress, endpointConfiguration.Address, EnforceConfigurationChange::Defer);
+            SetProperty(propertySharedKey, endpointConfiguration.SharedSecret, EnforceConfigurationChange::Defer);
+
+            // Set the port, if present.
+            if (endpointConfiguration.Port.has_value()) {
+                SetProperty(propertyPort, std::format("{}", endpointConfiguration.Port.value()), EnforceConfigurationChange::Defer);
+            }
+        }
+
+        // Now that all endpoint configurations are set, enforce the configuration change if requested.
+        if (enforceConfigurationChange == EnforceConfigurationChange::Now) {
+            Reload();
+        }
+    } catch (const HostapdException& e) {
+        throw HostapdException(std::format("Failed to add RADIUS endpoints ({})", e.what()));
+    }
+}
+
 /* static */
 std::string
 Hostapd::GenerateNetworkAccessServerId(std::size_t lengthRequested)
@@ -454,4 +499,10 @@ Hostapd::SetNetworkAccessServerId(std::string_view networkAccessServiceId)
     } catch (const HostapdException& e) {
         throw HostapdException(std::format("Failed to set network access identifier ({})", e.what()));
     }
+}
+
+std::string_view
+Hostapd::GetIpAddress() const noexcept
+{
+    return m_ownIpAddress;
 }

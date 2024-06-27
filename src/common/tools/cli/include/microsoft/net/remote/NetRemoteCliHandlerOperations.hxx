@@ -4,6 +4,7 @@
 
 #include <memory>
 
+#include <microsoft/net/Ieee8021xRadiusAuthentication.hxx>
 #include <microsoft/net/remote/INetRemoteCliHandlerOperations.hxx>
 #include <microsoft/net/remote/NetRemoteServerConnection.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointConfiguration.hxx>
@@ -80,6 +81,15 @@ struct NetRemoteCliHandlerOperations :
      */
     void
     WifiAccessPointSetSsid(std::string_view accessPointId, std::string_view ssid) override;
+
+    /**
+     * @brief Set the RADIUS configuration for the specified WiFi access point.
+     *
+     * @param accessPointId The identifier of the access point to set the RADIUS configuration for.
+     * @param ieee8021xRadiusConfiguration The RADIUS authentication configuration to set.
+     */
+    void
+    WifiAccessPointSet8021xRadius(std::string_view accessPointId, const Microsoft::Net::Ieee8021xRadiusConfiguration* ieee8021xRadiusConfiguration) override;
 
 private:
     std::shared_ptr<NetRemoteServerConnection> m_connection;

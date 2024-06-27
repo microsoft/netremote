@@ -207,6 +207,18 @@ struct Hostapd :
     SetBridgeInterface(std::string_view bridgeInterface, EnforceConfigurationChange enforceConfigurationChange) override;
 
     /**
+     * @brief Add RADIUS server endpoints to the interface. This may contain multiple endpoints of various types. The
+     * first endpoint configuration for each type is used as the primary server, and any following are used as fallbacks
+     * in case the primary server is unreachable.
+     *
+     * @param endpointConfigurations The endpoint configurations to add.
+     * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
+     * configuration reload.
+     */
+    void
+    AddRadiusEndpoints(std::vector<RadiusEndpointConfiguration> endpointConfigurations, EnforceConfigurationChange enforceConfigurationChange) override;
+
+    /**
      * @brief Generates a new network access server identifier. If no length is specified, a default value will be used.
      *
      * @param lengthRequested The requested length of the identifier. Valid values are in the range [1, 48].
@@ -223,8 +235,19 @@ struct Hostapd :
     void
     SetNetworkAccessServerId(std::string_view networkAccessServiceId = GenerateNetworkAccessServerId());
 
+    /**
+     * @brief Get the IP address of this access point. 
+     * 
+     * Currently, this is non-configurable and is always set to the loopback address (127.0.0.1).
+     * 
+     * @return std::string_view
+     */
+    std::string_view
+    GetIpAddress() const noexcept;
+
 private:
     const std::string m_interface;
+    std::string m_ownIpAddress{ "127.0.0.1" };
     WpaController m_controller;
 };
 } // namespace Wpa

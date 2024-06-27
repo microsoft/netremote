@@ -5,7 +5,6 @@ package Microsoft.Net.Remote.Service;
 
 import "google/protobuf/empty.proto";
 
-import "NetRemote.proto";
 import "NetRemoteDataStream.proto";
 
 service NetRemoteDataStreaming

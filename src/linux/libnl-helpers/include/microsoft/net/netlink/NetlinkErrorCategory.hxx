@@ -42,25 +42,33 @@ struct NetlinkErrorCategory :
 
 /**
  * @brief Constructs a std::error_code from a netlink error code.
- * 
+ *
  * This function uses the std naming convention.
- * 
+ *
  * @param error The netlink error code. Must be positive.
- * @return std::error_code 
+ * @return std::error_code
  */
 [[nodiscard]] std::error_code
 make_netlink_error_code(int error);
 
 /**
  * @brief Alias for the make_netlink_error_code function.
- * 
+ *
  * This function uses the project naming convention.
- * 
- * @param error 
- * @return std::error_code 
+ *
+ * @param error
+ * @return std::error_code
  */
 [[nodiscard]] std::error_code
 MakeNetlinkErrorCode(int error);
+
+/**
+ * @brief Get the NetlinkErrorCategory object instance.
+ * 
+ * @return const NetlinkErrorCategory& 
+ */
+[[nodiscard]] const NetlinkErrorCategory&
+GetNetlinkErrorCategory();
 
 } // namespace Microsoft::Net::Netlink
 
