@@ -1,21 +1,70 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "netremote",
-  "version-string": "1",
+  "version-string": "0.3.0",
   "dependencies": [
     {
       "name": "sdbus-cpp",
       "platform": "linux"
     },
-    "grpc",
-    "cli11",
-    "protobuf",
-    "catch2",
-    "plog",
-    "magic-enum",
+    {
+      "name": "libsystemd",
+      "platform": "linux"
+    },
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    },
     {
       "name": "wil",
       "platform": "windows"
+    },
+    "catch2",
+    "cli11",
+    "grpc",
+    "magic-enum",
+    "plog",
+    "protobuf"
+  ],
+  "overrides": [
+    {
+      "name": "cli11",
+      "version": "2.3.1"
     }
-  ]
+  ],
+  "features": {
+    "protocol": {
+      "description": "Enable building the client protocol",
+      "dependencies": [
+        "grpc",
+        "protobuf"
+      ]
+    },
+    "server":{
+      "description": "Enable building the server",
+      "dependencies": [
+        "netremote"
+      ]
+    },
+    "tests":{
+      "description": "Enable building the tests",
+      "dependencies": [
+        "netremote"
+      ]
+    },
+    "tools":{
+      "description": "Enable building the tools",
+      "dependencies": [
+        "netremote"
+      ]
+    }
+  },
+  "default-features": [
+    "protocol"
+  ],
+  "builtin-baseline": "9224b3bbd8df24999d85720b1d005dd6f969ade0"
 }
