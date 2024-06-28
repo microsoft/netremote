@@ -262,15 +262,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
         }
     }
 
-    // Reload the hostapd configuration to pick up the changes.
-    try {
-        m_hostapd.Reload();
-    } catch (const HostapdException& ex) {
-        status.Code = AccessPointOperationStatusCode::InternalError;
-        status.Details = std::format("failed to reload hostapd configuration for frequency band change - {}", ex.what());
-        return status;
-    }
-
+    // Band changes do not require reloading configuration, so skip that step and mark the operation as successful.
     status.Code = AccessPointOperationStatusCode::Succeeded;
 
     return status;
