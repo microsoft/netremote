@@ -37,7 +37,7 @@ TEST_CASE("IeeeDot11FrequencyBand GHz literals translate correctly", "[wifi][cor
             5.01_GHz,
             5.9999999999_GHz,
             6.01_GHz,
-            6.0000000000000001_GHz,
+            6.000000000000001_GHz,
             7.0_GHz,
             2000.00_GHz,
             2400.00_GHz,
