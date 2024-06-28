@@ -1,8 +1,6 @@
 # Network Remote Control
 
 [![CI/CD](https://github.com/microsoft/netremote/actions/workflows/cicd.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/cicd.yml)
-[![Build Linux](https://github.com/microsoft/netremote/actions/workflows/build-linux.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/build-linux.yml)
-[![Build Windows](https://github.com/microsoft/netremote/actions/workflows/build-windows.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/build-windows.yml)
 
 This project provides the ability to remotely control network components such as Wi-Fi access points typically used to test network functionality on Windows.
 

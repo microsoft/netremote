@@ -1,8 +1,8 @@
 
-FROM ubuntu:mantic as netremote-build
+FROM ubuntu:noble as netremote-build
 
 # Set arguments used only in this Dockerfile.
-ARG BUILD_DATE="2024-02-28T21:09:49+00:00"
+ARG BUILD_DATE="2024-06-20T16:36:23Z"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_ARGS_COMMON="-yqq --no-install-recommends"
 
@@ -22,13 +22,13 @@ LABEL org.label-schema.schema-version = "1.0"
 # sudo apt -y update && sudo apt -y upgrade
 #
 # 2. Install core build tools and dependencies:
-# sudo apt install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl dotnet7 git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
+# sudo apt install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl dotnet7 git gnupg libltdl-dev libmount-dev libtool linux-libc-dev libstdc++-14-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
 #
-# 3. Install complete LLVM 17 + clang 17 toolchain:
-# sudo apt install -y --no-install-recommends libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
+# 3. Install complete LLVM 18 + clang toolchain:
+# sudo apt install -y --no-install-recommends libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
 # 
 # 4. Install other development dependencies and helpful tools:
-# sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
+# sudo apt install -y -qq --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim
 #
 # 5. Install hostapd development dependencies and tools:
 # sudo apt install -y libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc iw debconf-utils
@@ -47,59 +47,59 @@ RUN apt-get $APT_ARGS_COMMON update && \
         ca-certificates \
         cmake \
         curl \
-        dotnet7 \
         git \
         gnupg \
         libltdl-dev \
         libmount-dev \
         libtool \
         linux-libc-dev \
+        libstdc++-14-dev \
         ninja-build \
         pkg-config \
         python3-jinja2 \
         tar \
         unzip \
         zip \
-        # LLVM + Clang toolchain.
-        # libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
-        bolt-17 \
-        clang-17 \
-        clang-17-doc \
-        clang-format-17 \
-        clang-tidy-17 \
-        clang-tools-17 \
-        clangd-17 \
-        flang-17 \
-        libbolt-17-dev \
-        libc++-17-dev \
-        libc++-17-dev-wasm32 \
-        libc++abi-17-dev \
-        libc++abi-17-dev-wasm32 \
-        libclang-17-dev \
-        libclang-common-17-dev \
-        libclang-rt-17-dev \
-        libclang-rt-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm32 \
-        libclang-rt-17-dev-wasm64 \
-        libclang-rt-17-dev-wasm64 \
-        libclang1-17 \
-        libclc-17-dev \
-        libfuzzer-17-dev \
-        libllvm-17-ocaml-dev \
-        libllvm17 \
-        libmlir-17-dev \
-        libomp-17-dev \
-        libpolly-17-dev \
-        libunwind-17-dev \
-        lld-17 \
-        lldb-17 \
-        llvm-17 \
-        llvm-17-dev \
-        llvm-17-doc \
-        llvm-17-examples \
-        llvm-17-runtime \
-        mlir-17-tools \
-        python3-clang-17 \
+        # LLVM + Clang 18 toolchain.
+        # libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
+        libllvm-18-ocaml-dev \
+        libllvm18 \
+        llvm-18 \
+        llvm-18-dev \
+        llvm-18-doc \
+        llvm-18-examples \
+        llvm-18-runtime \
+        clang-18 \
+        clang-tools-18 \
+        clang-18-doc \
+        libclang-common-18-dev \
+        libclang-18-dev \
+        libclang1-18 \
+        clang-format-18 \
+        python3-clang-18 \
+        clangd-18 \
+        clang-tidy-18 \
+        libclang-rt-18-dev \
+        libpolly-18-dev \
+        libfuzzer-18-dev \
+        lldb-18 \
+        libc++-18-dev \
+        libc++abi-18-dev \
+        libomp-18-dev \
+        libclc-18-dev \
+        libunwind-18-dev \
+        libmlir-18-dev \
+        mlir-18-tools \
+        libbolt-18-dev \
+        bolt-18 \
+        flang-18 \
+        libclang-rt-18-dev-wasm32 \
+        libclang-rt-18-dev-wasm64 \
+        libc++-18-dev-wasm32 \
+        libc++abi-18-dev-wasm32 \
+        libclang-rt-18-dev-wasm32 \
+        libclang-rt-18-dev-wasm64 \
+        libllvmlibc-18-dev \
         # hostapd build dependencies.
         # libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev
         libnl-3-200-dbg \
@@ -174,8 +174,10 @@ RUN apt-get $APT_ARGS_COMMON update && \
         python-is-python3 \
         vim \
         # Wireless tools.
+        # iw
         iw \
         # Packaging tools.
+        # debconf-utils
         debconf-utils \
         && \
     # Reduce image size by removing package cache.
