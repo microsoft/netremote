@@ -32,7 +32,6 @@ enum class Ieee80211FrequencyBand {
 
 namespace Literals
 {
-#ifndef _MSC_VER
 /**
  * @brief User-defined literal operator for allowing use of _GHz to specify
  * frequency band enumeration values.
@@ -64,8 +63,6 @@ operator"" _GHz(long double value) noexcept
         return Microsoft::Net::Wifi::Ieee80211FrequencyBand::Unknown;
     }
 }
-
-#endif // _MSC_VER
 
 /**
  * @brief User-defined literal operator for allowing use of _MHz to specify

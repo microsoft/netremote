@@ -9,7 +9,6 @@
 // literal in the code. 
 // NOLINT(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 
-#ifndef _MSC_VER 
 TEST_CASE("IeeeDot11FrequencyBand GHz literals translate correctly", "[wifi][core]")
 {
     using namespace Microsoft::Net::Wifi::Literals;
@@ -51,8 +50,6 @@ TEST_CASE("IeeeDot11FrequencyBand GHz literals translate correctly", "[wifi][cor
         }
     }
 }
-
-#endif // _MSC_VER
 
 TEST_CASE("Ieee80211FrequencyBand MHz literals translate correctly", "[wifi][core]")
 {
