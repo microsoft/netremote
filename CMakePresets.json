@@ -8,6 +8,7 @@
         {
             "name": "windows",
             "hidden": true,
+            "description": "Base options for all Windows builds",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -31,18 +32,43 @@
             }
         },
         {
+            "name": "linux-toolchain-llvm-17",
+            "hidden": true,
+            "description": "LLVM 17 toolchain on Linux",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-17"
+            }
+        },
+        {
+            "name": "linux-toolchain-llvm-18",
+            "hidden": true,
+            "description": "LLVM 18 toolchain on Linux",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-18",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-18"
+            }
+        },
+        {
             "name": "linux",
             "hidden": true,
+            "description": "Base options for all Linux builds",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
             },
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
-                "CMAKE_C_COMPILER": "/usr/bin/clang-17",
                 "CMAKE_GENERATOR": "Ninja Multi-Config"
             }
+        },
+        {
+            "name": "linux-toolchain-default",
+            "hidden": true,
+            "description": "Default toolchain to use for Linux builds",
+            "inherits": [
+                "linux-toolchain-llvm-17"
+            ]
         },
         {
             "name": "out-of-source-build",
@@ -102,6 +128,7 @@
             "displayName": "Packaging Linux (base)",
             "inherits": [
                 "linux",
+                "linux-toolchain-default",
                 "packaging"
             ],
             "cacheVariables": {
@@ -180,6 +207,7 @@
             "inherits": [
                 "dev",
                 "linux",
+                "linux-toolchain-default",
                 "packaging-linux-dev"
             ]
         },
@@ -220,6 +248,7 @@
             "inherits": [
                 "release",
                 "linux",
+                "linux-toolchain-default",
                 "packaging-linux-release"
             ],
             "cacheVariables": {
@@ -260,11 +289,10 @@
             "description": "CI/CD build on Linux",
             "inherits": [
                 "cicd",
-                "linux"
+                "linux",
+                "linux-toolchain-llvm-18"
             ],
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-18",
-                "CMAKE_C_COMPILER": "/usr/bin/clang-18",
                 "CMAKE_GENERATOR": "Ninja Multi-Config"
             }
         },
