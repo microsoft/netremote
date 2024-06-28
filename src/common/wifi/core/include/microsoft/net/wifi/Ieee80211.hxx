@@ -37,7 +37,7 @@ namespace Literals
  * @brief User-defined literal operator for allowing use of _GHz to specify
  * frequency band enumeration values.
  */
-inline constexpr Microsoft::Net::Wifi::Ieee80211FrequencyBand
+inline Microsoft::Net::Wifi::Ieee80211FrequencyBand
 operator"" _GHz(long double value) noexcept
 {
     /**

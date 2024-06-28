@@ -25,7 +25,7 @@ TEST_CASE("IeeeDot11FrequencyBand GHz literals translate correctly", "[wifi][cor
 
     SECTION("Invalid literal values translate to 'Unknown'")
     {
-        static constexpr std::initializer_list<Ieee80211FrequencyBand> InvalidBandValues{
+        static const std::initializer_list<Ieee80211FrequencyBand> InvalidBandValues{
             0.0_GHz,
             1.0_GHz,
             2.0_GHz,
