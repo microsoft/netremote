@@ -13,7 +13,7 @@ If development on Windows is desired, ubuntu may be installed in WSL using a roo
 1. Choose a location to store the WSL ubuntu root filesystem (rootfs) image and switch to this directory. For optimal performance, use a non-system drive and create a top-level folder for all WSL content such as `d:\wsl`:
 
     ```Powershell
-    mkdir d:\wsl
+    md d:\wsl
     cd d:\wsl
     ```
 
