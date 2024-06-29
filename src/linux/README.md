@@ -4,38 +4,60 @@ This project tree is meant to exercise and test the OS-agnostic portions of the 
 
 ## Development Environment Setup
 
-As described in the main project [`README`](/README.md), a C++ 23 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 23.10 (mantic) with a few development packages. Instructions for setting up this environment are provided below.
+As described in the main project [`README`](/README.md), a C++ 23 compiler and CMake are required. So, any distribution satisfying these requirements may be used. A known working environment is ubuntu 24.04 (noble numbat) with a few development packages. Instructions for setting up this environment are provided below.
 
-### 1. Install Ubuntu 23.10 (mantic)
+### 1. Install Ubuntu 24.04 (noble)
 
-If development on Windows is desired, ubuntu may be installed in WSL using a rootfs image. To install WSL, on newer versions of Windows 11, use the following command: `wsl --install --no-distribution`. For complete instructions, refer to [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow these steps to install mantic on WSL:
+If development on Windows is desired, ubuntu may be installed in WSL using a rootfs image. To install WSL, on newer versions of Windows 11, use the following command: `wsl --install --no-distribution`. For complete instructions, refer to [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow these steps to install noble for WSL:
 
-1. Download the ubuntu 23.10 wsl rootfs archive [https://cloud-images.ubuntu.com/wsl/mantic/current/ubuntu-mantic-wsl-amd64-wsl.rootfs.tar.gz](https://cloud-images.ubuntu.com/wsl/mantic/current/ubuntu-mantic-wsl-amd64-wsl.rootfs.tar.gz).
+1. Choose a location to store the WSL ubuntu root filesystem (rootfs) image and switch to this directory. For optimal performance, use a non-system drive and create a top-level folder for all WSL content such as `d:\wsl`:
 
-2. Choose a location to store the WSL ubuntu filesystem image. A good way to keep organized is to use a top-level directory for all wsl filesystem images such as `c:\wsl`, then add a sub-directory for each distribution installed, such as `c:\wsl\mantic`, `c:\wsl\fedora35`, etc. It's also recommended to do this on a non-system drive if one is available for performance reasons.
-
-3. Start an elevated command-prompt, and enter the following series of commands:
-
-    ```Shell
-    mkdir c:\wsl\mantic
-    wsl --import mantic c:\wsl\mantic c:\users\myusername\Downloads\ubuntu-mantic-wsl-amd64-wsl.rootfs.tar.gz
-    wsl -d mantic
+    ```Powershell
+    md d:\wsl
+    cd d:\wsl
     ```
 
-4. You are now running in a root shell on a fresh ubuntu 23.10 installation. Set up a non-root user to use by default:
+2. Download the ubuntu 24.04 wsl rootfs archive. The development environment has been tested and confirmed to work with the 20240627 image. More recent images may work as well, however, no guarantees are made for such images.
+
+    * Stable: [https://cloud-images.ubuntu.com/wsl/noble/20240627/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz](https://cloud-images.ubuntu.com/wsl/noble/20240627/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz)
+    * Current: [https://cloud-images.ubuntu.com/wsl/noble/current/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz](https://cloud-images.ubuntu.com/wsl/noble/current/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz)
+
+    ```Powershell
+    Invoke-WebRequest -Uri https://cloud-images.ubuntu.com/wsl/noble/20240627/ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz -OutFile .\ 
+    ```
+
+3. Import the downloaded rootfs image to create a new WSL distribution for noble:
+
+    ```Powershell
+    md d:\wsl\noble
+    wsl --import noble d:\wsl\noble .\ubuntu-noble-wsl-amd64-24.04lts.rootfs.tar.gz
+    wsl -d noble
+    ```
+
+4. You are now running in a root shell on a fresh ubuntu 24.04 installation. The rootfs image has no suitable non-root user accounts, so create one, adding them to the `sudo` and `root` groups to enable privileged execution:
 
     ```bash
-    adduser mycoolusername
-    # <accept all defaults by successively hitting 'Enter', and set a password>
-    usermod -G sudo mycoolusername
-    # install an editor if you don't like the ones pre-installed (vi and nano are available out of the box)
+    adduser dev --comment dev
+    usermod dev -aG root,sudo
     ```
 
-5. Create the file `/etc/wsl.conf` (need sudo), and save the following contents to it:
+5. Create a [`/etc/wsl.conf`](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#wslconf) file.
+
+    a. Add a `[boot]` section with a `systemd=true` setting to enable systemd.
+    b. Add a `[user]` section with a `default=username` setting to specify the default logon user to be the one you just created (eg. `dev`).
 
     ```ini
+    [boot]
+    systemd=true
+
     [user]
-    default=mycoolusername
+    default=dev
+    ```
+
+    For example, you can create the file with those contents using `echo` in execution mode:
+
+    ```bash
+    echo -e '[boot]\nsystemd=true\n\n[user]\ndefault=dev' > /etc/wsl.conf
     ```
 
 6. Exit ubuntu:
@@ -46,12 +68,12 @@ If development on Windows is desired, ubuntu may be installed in WSL using a roo
 
 7. Shutdown WSL so it can pick up the new default user changes, and re-run ubuntu:
 
-    ```Shell
+    ```Powershell
     wsl --shutdown
-    wsl -d mantic
+    wsl -d noble 
     ```
 
-You should now be logged on as `mycoolusername`.
+You should now be logged on as `dev`.
 
 ### 2. Install Linux Development Dependencies
 
@@ -60,35 +82,35 @@ Execute the following commands in a shell to install all the tools required to c
 1. Update the package cache and upgrade to latest packages:
 
     ```bash
-    sudo apt update && sudo apt upgrade
+    sudo apt-get update -y && sudo apt-get upgrade -y
     ```
 
 2. Install core build tools and dependencies:
 
     ```bash
-    sudo apt install -y --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl dotnet7 git gnupg libltdl-dev libmount-dev libtool linux-libc-dev ninja-build pkg-config python3-jinja2 tar unzip zip
+    sudo apt-get install -y autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev libstdc++-14-dev ninja-build pkg-config python3-jinja2 tar unzip zip 
     ```
 
-3. Install LLVM compiler dependencies:
+3. Install LLVM 18 toolchain dependencies:
 
     ```bash
-    sudo apt install -y --no-install-recommends libllvm-17-ocaml-dev libllvm17 llvm-17 llvm-17-dev llvm-17-doc llvm-17-examples llvm-17-runtime clang-17 clang-tools-17 clang-17-doc libclang-common-17-dev libclang-17-dev libclang1-17 clang-format-17 python3-clang-17 clangd-17 clang-tidy-17 libclang-rt-17-dev libpolly-17-dev libfuzzer-17-dev lldb-17 lld-17 libc++-17-dev libc++abi-17-dev libomp-17-dev libclc-17-dev libunwind-17-dev libmlir-17-dev mlir-17-tools libbolt-17-dev bolt-17 flang-17 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64 libc++-17-dev-wasm32 libc++abi-17-dev-wasm32 libclang-rt-17-dev-wasm32 libclang-rt-17-dev-wasm64
+    sudo apt-get install -y libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
     ```
 
 4. Install other development dependencies and helpful tools:
 
     ```bash
-    sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo emacs gdb kmod nano policycoreutils-python-utils python-is-python3 vim debconf-utils
+    sudo apt install -y --no-install-recommends bc bison dwarves flex libelf-dev dos2unix file gnupg2 iproute2 mtools neofetch rsync ssh sudo gdb kmod nano policycoreutils-python-utils python-is-python3 vim debconf-utils iw
     ```
 
-5. Install [hostapd](git://w1.fi/hostap.git) development dependencies:
+5. Install [hostapd](git://w1.fi/hostap.git) and wpa_supplicant development dependencies:
 
     ```bash
-    sudo apt install -y --no-install-recommends libnl-3-dev libssl-dev libnl-genl-3-dev libnl-3-dev libdbus-c++-dev libnl-route-3-dev flex bison dwarves libelf-dev bc iw 
+    sudo apt-get install -y libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
     ```
 
 > [!NOTE]
-> The source of truth for installing development dependencies is found in the development environment [Dockerfile](/.docker/netremote-dev/Dockerfile). The instructions there always trump the instructions here as the contianer described by the `Dockerfile` is used to build the official package.
+> The source of truth for installing development dependencies is found in the GitHub [build-with-host](/.github/actions/build-with-host/action.yml) host action `Install Linux build dependencies' step. The instructions there **always** supercede the instructions here as that action is used to build official release packages.
 
 ### 3. Install Docker on Windows (optional)
 
