@@ -59,7 +59,7 @@ Both a compiler and standard C++ library supporting C++23 are required. The C++ 
 
 #### Linux
 
-g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 23.10 (mantic) with clang 17.0.0 and LLVM 17.0.0. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](./src/linux/README.md).
+g++ or LLVM/Clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 24.04 (noble) with clang 18.1.3 and LLVM 18.1.3. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](./src/linux/README.md).
 
 ### CMake
 
