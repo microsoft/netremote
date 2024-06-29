@@ -110,7 +110,7 @@ Execute the following commands in a shell to install all the tools required to c
     ```
 
 > [!NOTE]
-> The source of truth for installing development dependencies is found in the GitHub [build-with-host](/.github/actions/build-with-host/action.yml) host action. The instructions there **always** supercede the instructions here as that action is used to build official release packages.
+> The source of truth for installing development dependencies is found in the GitHub [build-with-host](/.github/actions/build-with-host/action.yml) host action `Install Linux build dependencies' step. The instructions there **always** supercede the instructions here as that action is used to build official release packages.
 
 ### 3. Install Docker on Windows (optional)
 
