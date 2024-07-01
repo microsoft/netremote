@@ -512,6 +512,54 @@ struct HostapdStatus
     // unsigned ChannelUtilitzationAverage;
 };
 
+struct HostapdBssConfiguration
+{
+    // TODO: All types used below are direct translations of the types used in
+    // the hostapd code; there may be better representations of them.
+
+    std::string Bssid;
+    std::string Ssid;
+
+    // Note: The following fields do not yet have parsing code so they are
+    // commented out for the time being. Many of them may not be kept if they
+    // have no use in the implementation, but for now, this is a complete list
+    // of all fields that are returned from the 'GET_CONFIG' message.
+
+    // // Present with:
+    // //  - CONFIG_WPS compilation option
+    // std::optional<int> WpsState;
+
+    // // Present with:
+    // //  - Value for current 'wps_state" is set.
+    // //  - Value for current 'wpa' is set.
+    // std::optional<WpaPreSharedKey> WpaPassphrase;
+    // std::optional<WpaPreSharedKey> WpaPsk;
+
+    // // Present with:
+    // //  - 'multi_ap=1' OR 'multi_ap=3' configuration file option
+    // std::optional<int> MultiApMode;
+    // std::optional<std::string> MultiApBackhaulSsid;
+
+    // // Present with:
+    // //  - 'multi_ap=1' OR 'multi_ap=3' configuration file option
+    // //  - Value for current 'wps_state' is set.
+    // //  - Value for current 'wpa' is set.
+    // std::optional<WpaPreSharedKey> MultiApBackhaulWpaPassphrase;
+    // std::optional<WpaPreSharedKey> MultiApBackhaulWpaPsk;
+
+    WpaSecurityProtocol Wpa;
+    WpaKeyManagement WpaKeyMgmt;
+    WpaCipher GroupCipher;
+    WpaCipher RsnPairwiseCipher;
+    WpaCipher WpaPairwiseCipher;
+
+    // // Present only if 'wpa' and a current 'wpa_deny_ptk0_rekey' value is set.
+    // std::optional<int> WpaDenyPtk0Rekey;
+
+    // // Present only if driver supports it and if RSN/WPA2 is used with a CCMP/GCMP pairwise cipher.
+    // std::optional<int> ExtendedKeyId;
+};
+
 struct ProtocolHostapd :
     public ProtocolWpa
 {
@@ -608,6 +656,12 @@ struct ProtocolHostapd :
     static constexpr auto PropertyValueSaePasswordClearAll = "";
     static constexpr auto PropertyValueSaeKeyValueSeparator = "|";
 
+    // Property names for "GET_CONFIG" command.
+    static constexpr auto PropertyNameKeyManagement = "key_mgmt";
+    static constexpr auto PropertyNameGroupCipher = "group_cipher";
+    static constexpr auto PropertyNameRsnPairwiseCipher = "rsn_pairwise_cipher";
+    static constexpr auto PropertyNameWpaPairwiseCipher = "wpa_pairwise_cipher";
+
     // Response properties for the "STATUS" command.
     // Note: all properties must be terminated with the key-value delimeter (=).
     static constexpr auto ResponseStatusPropertyKeyState = PropertyNameState;
@@ -617,6 +671,16 @@ struct ProtocolHostapd :
     static constexpr auto ResponseStatusPropertyKeyDisableAC = PropertyNameDisable11AC;
     static constexpr auto ResponseStatusPropertyKeyIeee80211AX = PropertyNameIeee80211AX;
     static constexpr auto ResponseStatusPropertyKeyDisableAX = PropertyNameDisable11AX;
+
+    // Response properties for the "GET_CONFIG" command.
+    // Note: all properties must be terminated with the key-value delimeter (=).
+    static constexpr auto ResponseGetConfigPropertyKeyBssid = PropertyNameBssBssid;
+    static constexpr auto ResponseGetConfigPropertyKeySsid = PropertyNameBssSsid;
+    static constexpr auto ResponseGetConfigPropertyKeyWpa = PropertyNameWpaSecurityProtocol;
+    static constexpr auto ResponseGetConfigPropertyKeyWpaKeyMgmt = PropertyNameKeyManagement;
+    static constexpr auto ResponseGetConfigPropertyKeyGroupCipher = PropertyNameGroupCipher;
+    static constexpr auto ResponseGetConfigPropertyKeyRsnPairwiseCipher = PropertyNameRsnPairwiseCipher;
+    static constexpr auto ResponseGetConfigPropertyKeyWpaPairwiseCipher = PropertyNameWpaPairwiseCipher;
 };
 
 /**

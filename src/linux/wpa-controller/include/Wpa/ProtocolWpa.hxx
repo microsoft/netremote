@@ -27,6 +27,7 @@ struct ProtocolWpa
     static constexpr auto CommandPayloadTerminate = "TERMINATE";
     static constexpr auto CommandPayloadRelog = "RELOG";
     static constexpr auto CommandPayloadGet = "GET";
+    static constexpr auto CommandPayloadGetConfig = "GET_CONFIG";
     static constexpr auto CommandPayloadSet = "SET";
     static constexpr auto CommandPayloadNote = "NOTE";
     static constexpr auto CommandPayloadMib = "MIB";

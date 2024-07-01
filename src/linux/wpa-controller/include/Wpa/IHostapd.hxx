@@ -108,6 +108,14 @@ struct IHostapd
     GetProperty(std::string_view propertyName) = 0;
 
     /**
+     * @brief Get the configuration for the interface.
+     * 
+     * @return HostapdBssConfiguration The configuration string value.
+     */
+    virtual HostapdBssConfiguration
+    GetConfiguration() = 0;
+
+    /**
      * @brief Set a property on the interface.
      *
      * @param propertyName The name of the property to set.

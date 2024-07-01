@@ -109,6 +109,20 @@ Hostapd::GetProperty(std::string_view propertyName)
     return propertyValue;
 }
 
+
+HostapdBssConfiguration
+Hostapd::GetConfiguration()
+{
+    static constexpr WpaCommandGetConfig GetConfigCommand;
+
+    auto response = m_controller.SendCommand<WpaResponseGetConfig>(GetConfigCommand);
+    if (!response) {
+        throw HostapdException("Failed to send hostapd 'get_config' command");
+    }
+
+    return response->Configuration;
+}
+
 void
 Hostapd::SetProperty(std::string_view propertyName, std::string_view propertyValue, EnforceConfigurationChange enforceConfigurationChange)
 {
