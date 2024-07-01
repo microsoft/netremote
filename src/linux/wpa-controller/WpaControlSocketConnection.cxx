@@ -16,7 +16,8 @@ WpaControlSocketConnection::~WpaControlSocketConnection()
 }
 
 WpaControlSocketConnection::WpaControlSocketConnection(std::string_view interfaceName, std::filesystem::path controlSocketPathDir) :
-    m_controlSocketPath(std::move(controlSocketPathDir) / interfaceName)
+    m_controlSocketPath(std::move(controlSocketPathDir) / interfaceName),
+    m_interfaceName(interfaceName)
 {
 }
 
@@ -62,4 +63,10 @@ WpaControlSocketConnection::Disconnect() noexcept
         wpa_ctrl_close(m_controlSocket);
         m_controlSocket = nullptr;
     }
+}
+
+std::string_view
+WpaControlSocketConnection::GetInterfaceName() const noexcept
+{
+    return m_interfaceName;
 }
