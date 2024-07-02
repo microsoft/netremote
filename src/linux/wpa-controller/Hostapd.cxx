@@ -16,6 +16,7 @@
 #include <Wpa/WpaCommandSet.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaControlSocket.hxx>
+#include <Wpa/WpaControlSocketConnection.hxx>
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 #include <magic_enum.hpp>
@@ -34,8 +35,27 @@ Hostapd::IsManagingInterface(std::string_view interfaceName) noexcept
 
 Hostapd::Hostapd(std::string_view interfaceName) :
     m_interface(interfaceName),
-    m_controller(interfaceName, WpaType::Hostapd)
+    m_controller(interfaceName, WpaType::Hostapd),
+    m_eventListenerProxy(WpaEventListenerProxy::Create(*this))
 {
+    auto controlSocketConnection{ WpaControlSocketConnection::TryCreate(interfaceName, m_controller.ControlSocketPath()) };
+    if (!controlSocketConnection) {
+        throw HostapdException("Failed to create hostapd event handler control socket connection");
+    }
+
+    auto eventHandler{ std::make_unique<WpaEventHandler>(std::move(controlSocketConnection), WpaType::Hostapd) };
+    if (!eventHandler) {
+        throw HostapdException("Failed to create hostapd event handler");
+    }
+
+    m_eventHandlerRegistrationToken = eventHandler->RegisterEventListener(m_eventListenerProxy->weak_from_this());
+    m_eventHandler = std::move(eventHandler);
+    m_eventHandler->StartListening();
+}
+
+Hostapd::~Hostapd()
+{
+    m_eventHandler->UnregisterEventListener(m_eventHandlerRegistrationToken);
 }
 
 std::string_view
@@ -505,4 +525,10 @@ std::string_view
 Hostapd::GetIpAddress() const noexcept
 {
     return m_ownIpAddress;
+}
+
+void
+Hostapd::OnWpaEvent(WpaEventSender* sender, const WpaEventArgs* eventArgs)
+{
+    LOGD << std::format("Hostapd event @ {}: {:#08x} {}", eventArgs->Timestamp, reinterpret_cast<uintptr_t>(sender), eventArgs->Event.Payload);
 }
