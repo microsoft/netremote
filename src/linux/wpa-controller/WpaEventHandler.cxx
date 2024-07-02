@@ -78,8 +78,10 @@ WpaEventHandler::StopListening()
         m_fdEventFdStop = -1;
     }
 
-    m_eventListenerThread.request_stop();
-    m_eventListenerThread.join();
+    if (m_eventListenerThread.joinable()) {
+        m_eventListenerThread.request_stop();
+        m_eventListenerThread.join();
+    }
 }
 
 void
