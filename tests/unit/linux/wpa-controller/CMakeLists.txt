@@ -27,8 +27,8 @@ target_link_libraries(wpa-controller-test-unit
 )
 
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/detail/config/hostapd.conf.format.hxx.in
-    ${CMAKE_CURRENT_BINARY_DIR}/hostapd.conf.format.hxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/detail/config/HostapdBinaryInfo.hxx.in
+    ${CMAKE_CURRENT_BINARY_DIR}/HostapdBinaryInfo.hxx
     @ONLY
 )
 
