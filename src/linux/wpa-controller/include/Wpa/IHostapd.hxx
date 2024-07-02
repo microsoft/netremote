@@ -12,6 +12,7 @@
 
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/ProtocolWpa.hxx>
+#include <Wpa/WpaEventHandler.hxx>
 
 namespace Wpa
 {
@@ -89,6 +90,14 @@ struct IHostapd
      */
     virtual std::string_view
     GetInterface() = 0;
+
+    /**
+     * @brief Obtain the event handler for the interface.
+     *
+     * @return std::shared_ptr<WpaEventHandler>
+     */
+    virtual std::shared_ptr<WpaEventHandler>
+    GetEventHandler() const noexcept = 0;
 
     /**
      * @brief Get the status for the interface.
