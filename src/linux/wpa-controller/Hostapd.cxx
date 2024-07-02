@@ -530,5 +530,5 @@ Hostapd::GetIpAddress() const noexcept
 void
 Hostapd::OnWpaEvent(WpaEventSender* sender, const WpaEventArgs* eventArgs)
 {
-    LOGD << std::format("Hostapd event @ {}: {:#08x} {}", eventArgs->Timestamp, reinterpret_cast<uintptr_t>(sender), eventArgs->Event.Payload);
+    LOGD << std::format("Hostapd event @ {}: {:#08x} {}", eventArgs->Timestamp, reinterpret_cast<uintptr_t>(sender), eventArgs->Event.ToString());
 }
