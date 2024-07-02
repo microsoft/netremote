@@ -61,6 +61,12 @@ struct ProtocolWpa
     static constexpr auto ResponsePayloadPing = "PONG";
 
     /**
+     * @brief Maximum size of a WPA event. This value is used by the wpa_cli and hostapd_cli tools as an upper bound, so
+     * is used similarly here.
+     */
+    static constexpr auto EventSizeMax{ 4096 };
+
+    /**
      * @brief Determines if a response payload indicates success.
      *
      * @param response The response payload to check.

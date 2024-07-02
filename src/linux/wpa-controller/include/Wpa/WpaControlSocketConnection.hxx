@@ -4,6 +4,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #include <wpa_ctrl.h>
@@ -56,6 +57,14 @@ public:
     void
     Disconnect() noexcept;
 
+    /**
+     * @brief Get the interface name for this connection.
+     * 
+     * @return std::string_view
+     */
+    std::string_view
+    GetInterfaceName() const noexcept;
+
 protected:
     /**
      * @brief Construct a new WpaControlSocketConnection object.
@@ -67,6 +76,7 @@ protected:
 
 private:
     std::filesystem::path m_controlSocketPath;
+    std::string m_interfaceName;
     struct wpa_ctrl* m_controlSocket{ nullptr };
 };
 } // namespace Wpa
