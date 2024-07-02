@@ -50,6 +50,7 @@ Hostapd::Hostapd(std::string_view interfaceName) :
     
     m_eventHandlerRegistrationToken = eventHandler->RegisterEventListener(m_eventListenerProxy->weak_from_this());
     m_eventHandler = std::move(eventHandler);
+    m_eventHandler->StartListening();
 }
 
 Hostapd::~Hostapd()
