@@ -67,6 +67,13 @@ struct ProtocolWpa
     static constexpr auto EventSizeMax{ 4096 };
 
     /**
+     * @brief The prefix used to identify the interface name in an event payload.
+     */
+    static constexpr auto EventInterfaceNamePrefix{ "IFNAME=" };
+    static constexpr auto EventLogLevelDelimeterStart{ "<" };
+    static constexpr auto EventLogLevelDelimeterEnd{ ">" };
+
+    /**
      * @brief Determines if a response payload indicates success.
      *
      * @param response The response payload to check.

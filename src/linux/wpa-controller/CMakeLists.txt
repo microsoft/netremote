@@ -18,6 +18,7 @@ target_sources(wpa-controller
         WpaController.cxx
         WpaControlSocket.cxx
         WpaControlSocketConnection.cxx
+        WpaEvent.cxx
         WpaEventHandler.cxx
         WpaEventListenerProxy.cxx
         WpaKeyValuePair.cxx
