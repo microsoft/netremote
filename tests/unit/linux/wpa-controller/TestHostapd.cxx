@@ -200,6 +200,18 @@ TEST_CASE("Send GetProperty() command (root)", "[wpa][hostapd][client][remote]")
     }
 }
 
+TEST_CASE("Send command: GetConfiguration() (root)", "[wpa][hostapd][client][remote]")
+{
+    using namespace Wpa;
+
+    Hostapd hostapd(WpaDaemonManager::InterfaceNameDefault);
+
+    SECTION("GetConfiguration() doesn't throw")
+    {
+        REQUIRE_NOTHROW(hostapd.GetConfiguration());
+    }
+}
+
 TEST_CASE("Send SetProperty() command (root)", "[wpa][hostapd][client][remote]")
 {
     using namespace Wpa;
