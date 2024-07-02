@@ -110,12 +110,18 @@ WpaEventHandler::ProcessNextEvent(WpaControlSocketConnection& wpaControlSocketCo
     std::string wpaEventPayload{ std::data(wpaEventBuffer), wpaEventBufferSize };
 
     // Create a WPA event args object to pass to the listeners.
+    auto wpaEvent = WpaEvent::Parse(wpaEventPayload);
+    if (!wpaEvent.has_value()) {
+        LOGW << std::format("Failed to parse WPA event payload on interface '{}': payload='{}'", InterfaceName, wpaEventPayload);
+        return;
+    }
+
+    // Update the event source as this cannot be inferred/parsed from the payload.
+    wpaEvent->Source = m_wpaType;
+
     WpaEventArgs wpaEventArgs{
         .Timestamp = timestampNow,
-        .Event = {
-            .Source = m_wpaType,
-            .Payload = { std::data(wpaEventBuffer), wpaEventBufferSize },
-        },
+        .Event = std::move(wpaEvent.value()),
     };
 
     // Make a copy of the event listeners to minimuze the time we hold the state lock. This is safe since the event
