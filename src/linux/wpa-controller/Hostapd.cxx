@@ -134,7 +134,7 @@ Hostapd::GetProperty(std::string_view propertyName)
 HostapdBssConfiguration
 Hostapd::GetConfiguration()
 {
-    static constexpr WpaCommandGetConfig GetConfigCommand;
+    static constexpr WpaCommandGetConfig GetConfigCommand{};
 
     auto response = m_controller.SendCommand<WpaResponseGetConfig>(GetConfigCommand);
     if (!response) {
