@@ -49,10 +49,10 @@ TEST_CASE("Create a Hostapd instance (root)", "[wpa][hostapd][client][remote]")
         REQUIRE_NOTHROW(hostapd2.emplace(WpaDaemonManager::InterfaceNameDefault));
     }
 
-    SECTION("Sending command on invalid interface fails")
+    SECTION("Create with invalid interface name fails")
     {
-        Hostapd hostapd("invalid");
-        REQUIRE_THROWS_AS(hostapd.Ping(), HostapdException);
+        std::optional<Hostapd> hostapd;
+        REQUIRE_THROWS_AS(hostapd.emplace("invalid"), HostapdException);
     }
 
     SECTION("Create reflects correct interface name")

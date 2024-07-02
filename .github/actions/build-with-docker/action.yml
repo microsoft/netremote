@@ -1,8 +1,29 @@
 
 name: 'Build'
 description: 'Build the repository in a docker container'
+inputs:
+  cmake-preset-configure:
+    required: false
+    default: 'dev-linux'
+    description: 'The name of the preset to use for the CMake configure operation'
+  cmake-preset-build:
+    required: false
+    default: 'build-dev-linux'
+    description: 'The name of the preset to use for the CMake build operation'
+  cmake-preset-package:
+    required: false
+    default: 'packaging-dev-linux'
+    description: 'The name of the preset to use for the CMake package operation'
+  cmake-build-config:
+    required: false
+    default: 'Debug'
+    description: 'The build configuration to use for the CMake build operation'
 runs:
   using: 'docker'
   image: 'docker://abeltrano/netremote-build:latest'
   args:
     - '/github/workspace'
+    - ${{ inputs.cmake-preset-configure }}
+    - ${{ inputs.cmake-preset-build }}
+    - ${{ inputs.cmake-preset-package }}
+    - ${{ inputs.cmake-build-config }}

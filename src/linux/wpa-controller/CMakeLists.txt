@@ -19,6 +19,9 @@ target_sources(wpa-controller
         WpaController.cxx
         WpaControlSocket.cxx
         WpaControlSocketConnection.cxx
+        WpaEvent.cxx
+        WpaEventHandler.cxx
+        WpaEventListenerProxy.cxx
         WpaKeyValuePair.cxx
         WpaParsingUtilities.cxx
         WpaParsingUtilities.hxx
@@ -30,6 +33,7 @@ target_sources(wpa-controller
     FILES
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/Hostapd.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/IHostapd.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/IWpaEventListener.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolHostapd.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolWpa.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolWpaConfig.hxx
@@ -42,6 +46,9 @@ target_sources(wpa-controller
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaControlSocket.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaControlSocketConnection.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCore.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaEvent.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaEventHandler.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaEventListenerProxy.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaKeyValuePair.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaResponse.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaResponseParser.hxx

@@ -7,9 +7,23 @@
 namespace Wpa
 {
 /**
+ * @brief Log levels for WPA messages and events.
+ */
+enum class WpaLogLevel : int32_t {
+    Unknown = -1,
+    Excessive = 0,
+    MessageDump = 1,
+    Debug = 2,
+    Info = 3,
+    Warning = 4,
+    Error = 5,
+};
+
+/**
  * @brief The type of WPA daemon/service.
  */
 enum class WpaType {
+    Unknown,
     Hostapd,
     WpaSupplicant,
 };
@@ -28,6 +42,8 @@ GetWpaTypeDaemonBinaryName(WpaType type) noexcept
         return "hostapd";
     case WpaType::WpaSupplicant:
         return "wpa_supplicant";
+    case WpaType::Unknown:
+        [[fallthrough]];
     default:
         return "unknown";
     }
