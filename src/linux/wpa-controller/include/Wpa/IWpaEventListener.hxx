@@ -19,6 +19,8 @@ struct WpaEventSender
  */
 struct IWpaEventListener
 {
+    virtual ~IWpaEventListener() = default;
+
     /**
      * @brief Invoked when a WPA event is received.
      *
