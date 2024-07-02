@@ -1,6 +1,6 @@
 
-#ifndef WPA_EVENT_LISTENER_HXX
-#define WPA_EVENT_LISTENER_HXX
+#ifndef WPA_EVENT_HANDLER_HXX
+#define WPA_EVENT_HANDLER_HXX
 
 #include <cstdint>
 #include <filesystem>
@@ -99,4 +99,4 @@ private:
 };
 } // namespace Wpa
 
-#endif // WPA_EVENT_LISTENER_HXX
+#endif // WPA_EVENT_HANDLER_HXX
