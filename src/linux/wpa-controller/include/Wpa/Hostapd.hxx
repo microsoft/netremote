@@ -271,7 +271,7 @@ private:
     WpaController m_controller;
     std::unique_ptr<WpaControlSocketConnection> m_eventHandlerControlSocketConnection{ nullptr };
     std::shared_ptr<WpaEventListenerProxy> m_eventListenerProxy;
-    std::unique_ptr<WpaEventHandler> m_eventHandler{ nullptr };
+    std::shared_ptr<WpaEventHandler> m_eventHandler{ nullptr };
     WpaEventListenerRegistrationToken m_eventHandlerRegistrationToken{};
 };
 } // namespace Wpa
