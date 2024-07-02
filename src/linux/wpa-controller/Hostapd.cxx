@@ -45,7 +45,7 @@ Hostapd::Hostapd(std::string_view interfaceName) :
         throw HostapdException("Failed to create hostapd event handler control socket connection");
     }
 
-    auto eventHandler{ std::make_unique<WpaEventHandler>(std::move(controlSocketConnection), WpaType::Hostapd) };
+    auto eventHandler{ std::make_shared<WpaEventHandler>(std::move(controlSocketConnection), WpaType::Hostapd) };
     if (!eventHandler) {
         throw HostapdException("Failed to create hostapd event handler");
     }
@@ -64,6 +64,12 @@ std::string_view
 Hostapd::GetInterface()
 {
     return m_interface;
+}
+
+std::shared_ptr<WpaEventHandler>
+Hostapd::GetEventHandler() const noexcept
+{
+    return m_eventHandler;
 }
 
 void
