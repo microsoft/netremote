@@ -838,56 +838,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
  * @return WpaKeyManagement The corresponding WpaKeyManagement value.
  */
 WpaKeyManagement
-WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept
-{
-    std::string wpaKeyManagementString(wpaKeyManagementProperty);
-    std::istringstream wpaKeyManagementStream(wpaKeyManagementString);
-    WpaKeyManagement result{ WpaKeyManagement::Unknown };
-
-    for (std::string wpaKeyManagement; wpaKeyManagementStream >> wpaKeyManagement;) {
-        if (wpaKeyManagement == "WPA-EAP") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021x));
-        } else if (wpaKeyManagement == "WPA-PSK") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Psk));
-        } else if (wpaKeyManagement == "FT-EAP") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtIeee8021x));
-        } else if (wpaKeyManagement == "FT-PSK") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtPsk));
-        } else if (wpaKeyManagement == "WPA-EAP-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSha256));
-        } else if (wpaKeyManagement == "WPA-PSK-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::PskSha256));
-        } else if (wpaKeyManagement == "SAE") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Sae));
-        } else if (wpaKeyManagement == "FT-SAE") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtSae));
-        } else if (wpaKeyManagement == "OSEN") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Osen));
-        } else if (wpaKeyManagement == "WPA-EAP-SUITE-B") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSuiteB));
-        } else if (wpaKeyManagement == "WPA-EAP-SUITE-B-192") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSuiteB192));
-        } else if (wpaKeyManagement == "FILS-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FilsSha256));
-        } else if (wpaKeyManagement == "FILS-SHA384") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FilsSha384));
-        } else if (wpaKeyManagement == "FT-FILS-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtFilsSha256));
-        } else if (wpaKeyManagement == "FT-FILS-SHA384") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtFilsSha384));
-        } else if (wpaKeyManagement == "OWE") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Owe));
-        } else if (wpaKeyManagement == "DPP") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Dpp));
-        } else if (wpaKeyManagement == "FT-EAP-SHA384") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtIeee8021xSha384));
-        } else if (wpaKeyManagement == "PASN") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Pasn));
-        }
-    }
-
-    return result;
-}
+WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
 
 /**
  * @brief WpaCipher sentinel for an invalid value.
@@ -942,9 +893,9 @@ WpaCipherPropertyValue(WpaCipher wpaCipher) noexcept
  * @brief Convert a hostapd cipher property string such as 'wpa_pairwise' and 'rsn_pairwise' to the corresponding WpaCipher value.
  *
  * @param wpaCipher The hostapd property value string to convert.
- * @return WpaCipher The corresponding WpaCipher value.
+ * @return constexpr WpaCipher The corresponding WpaCipher value.
  */
-WpaCipher
+constexpr WpaCipher
 WpaCipherFromPropertyValue(std::string_view wpaCipherProperty) noexcept
 {
     if (wpaCipherProperty == "NONE") {
