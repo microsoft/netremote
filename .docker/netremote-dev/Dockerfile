@@ -2,13 +2,13 @@
 FROM ubuntu:noble as netremote-build
 
 # Set arguments used only in this Dockerfile.
-ARG BUILD_DATE="2024-06-20T16:36:23Z"
+ARG BUILD_DATE="2024-06-30T02:17:53+00:00"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG APT_ARGS_COMMON="-yqq --no-install-recommends"
 
-LABEL maintainer="Andrew Beltrano (anbeltra@microsoft.com)"
+LABEL org.opencontainers.image.authors = "netremoteowners@microsoft.com"
 LABEL org.label-schema.build-date = "${BUILD_DATE}"
-LABEL org.label-schema.name = "Microsoft NetRemote build environment"
+LABEL org.label-schema.name = "NetRemote build environment"
 LABEL org.label-schema.description = "Build environment for the NetRemote project"
 LABEL org.label-schema.vendor = "Microsoft"
 LABEL org.label-schema.version = "1.0.0"
@@ -128,7 +128,7 @@ RUN mkdir -p ${VCPKG_BINARY_CACHE}
 # Obtain vcpkg, bootstrap it, and install dependencies.
 COPY vcpkg.json .
 
-RUN git clone https://github.com/microsoft/vcpkg.git --depth 1 && \
+RUN git clone https://github.com/microsoft/vcpkg.git && \
     ./vcpkg/bootstrap-vcpkg.sh && \
     ./vcpkg/vcpkg install --clean-buildtrees-after-build --clean-downloads-after-build
 
@@ -140,7 +140,7 @@ ENTRYPOINT [ "/bin/entrypoint-build.sh" ]
 
 FROM netremote-build as netremote-dev
 
-LABEL org.label-schema.name = "Microsoft NetRemote development environment"
+LABEL org.label-schema.name = "NetRemote development environment"
 LABEL org.label-schema.description = "Development environment for the NetRemote project"
 
 # Install packages.
