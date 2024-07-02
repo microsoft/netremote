@@ -131,7 +131,6 @@ Hostapd::GetProperty(std::string_view propertyName)
     return propertyValue;
 }
 
-
 HostapdBssConfiguration
 Hostapd::GetConfiguration()
 {

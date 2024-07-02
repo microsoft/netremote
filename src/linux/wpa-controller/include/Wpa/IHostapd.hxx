@@ -109,7 +109,7 @@ struct IHostapd
 
     /**
      * @brief Get the configuration for the interface.
-     * 
+     *
      * @return HostapdBssConfiguration The configuration string value.
      */
     virtual HostapdBssConfiguration
@@ -225,7 +225,7 @@ struct IHostapd
      * @brief Add RADIUS server endpoints to the interface. This may contain multiple endpoints of various types. The
      * first endpoint configuration for each type is used as the primary server, and any following are used as fallbacks
      * in case the primary server is unreachable.
-     * 
+     *
      * @param endpointConfigurations The endpoint configurations to add.
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
      * configuration reload.

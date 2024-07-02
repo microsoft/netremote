@@ -8,8 +8,8 @@
 #include <Wpa/WpaCommandGetConfig.hxx>
 #include <Wpa/WpaKeyValuePair.hxx>
 #include <Wpa/WpaResponse.hxx>
-#include <Wpa/WpaResponseParser.hxx>
 #include <Wpa/WpaResponseGetConfig.hxx>
+#include <Wpa/WpaResponseParser.hxx>
 #include <plog/Log.h>
 
 #include "WpaParsingUtilities.hxx"

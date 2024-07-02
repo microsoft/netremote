@@ -112,7 +112,7 @@ struct Hostapd :
 
     /**
      * @brief Get the configuration for the interface.
-     * 
+     *
      * @return HostapdBssConfiguration The configuration string value.
      */
     HostapdBssConfiguration
