@@ -66,21 +66,21 @@ WpaEventHandler::StartListening()
 void
 WpaEventHandler::StopListening()
 {
+    std::shared_lock eventListenerReadLock{ m_eventListenerStateGate };
+
     // Check if the eventfd file descriptor for signaling thread stop has been created. If so, signal the thread to stop.
     if (m_fdEventFdStop != -1) {
         uint64_t value{ EventFdStopRequestValue };
         ssize_t numWritten = write(m_fdEventFdStop, &value, sizeof value);
         if (numWritten != sizeof value) {
-            LOGE << std::format("Failed to write to eventfd for interface '{}'.", m_wpaControlSocketConnection->GetInterfaceName());
+            LOGE << std::format("Failed to write eventfd stop signal value for interface '{}'.", m_wpaControlSocketConnection->GetInterfaceName());
         }
-
-        close(m_fdEventFdStop);
-        m_fdEventFdStop = -1;
     }
 
     if (m_eventListenerThread.joinable()) {
         m_eventListenerThread.request_stop();
         m_eventListenerThread.join();
+        m_eventListenerThread = {};
     }
 }
 
@@ -151,6 +151,12 @@ WpaEventHandler::ProcessNextEvent(WpaControlSocketConnection& wpaControlSocketCo
 void
 WpaEventHandler::ProcessEvents(WpaControlSocketConnection& wpaControlSocketConnection, std::stop_token stopToken)
 {
+    const auto interfaceName{ wpaControlSocketConnection.GetInterfaceName() };
+    LOGD << std::format("WPA event listener thread for interface '{}' started", interfaceName);
+    auto logOnExit = notstd::ScopeExit([&]{
+        LOGD << std::format("WPA event listener thread for interface '{}' stopped", interfaceName);
+    });
+
     // One event for eventfd stop signaling, and one for WPA control socket event signaling.
     static constexpr int EpollEventsMax{ 2 };
 
@@ -181,8 +187,11 @@ WpaEventHandler::ProcessEvents(WpaControlSocketConnection& wpaControlSocketConne
         return;
     }
 
-    auto closeEventFdStopFileDescriptorOnExit = notstd::ScopeExit([&] {
-        close(fdEventFdStop);
+    m_fdEventFdStop = fdEventFdStop;
+
+    auto closeEventFdStopFileDescriptorOnExit = notstd::ScopeExit([this] {
+        close(m_fdEventFdStop);
+        m_fdEventFdStop = -1;
     });
 
     eventEventFd->events = EPOLLIN;
@@ -216,7 +225,7 @@ WpaEventHandler::ProcessEvents(WpaControlSocketConnection& wpaControlSocketConne
         return;
     }
 
-    // Attach to WAP eventstream.
+    // Attach to WPA event stream.
     ret = wpa_ctrl_attach(wpaControlSocket);
     if (ret < 0) {
         ret = errno;
@@ -255,7 +264,7 @@ WpaEventHandler::ProcessEvents(WpaControlSocketConnection& wpaControlSocketConne
                 ssize_t numRead = read(fdEventFdStop, &value, sizeof value);
                 if (numRead != sizeof value) {
                     ret = errno;
-                    LOGE << std::format("Failed to read from eventfd for interface '{}': {}", InterfaceName, ret);
+                    LOGE << std::format("Failed to read from eventfd for interface '{}': numRead {} ({} {})", InterfaceName, numRead, ret, strerror(ret));
                     continue;
                 }
                 if (value == EventFdStopRequestValue) {
