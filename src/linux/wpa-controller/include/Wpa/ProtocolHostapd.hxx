@@ -831,6 +831,65 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
 }
 
 /**
+ * @brief Convert a hostapd 'wpa_key_mgmt' property value string to the corresponding WpaKeyManagement value.
+ * This string may have several whitespace-separated values, such as "WPA-PSK SAE".
+ *
+ * @param wpaKeyManagementProperty The hostapd property value string to convert.
+ * @return WpaKeyManagement The corresponding WpaKeyManagement value.
+ */
+WpaKeyManagement
+WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept
+{
+    std::string wpaKeyManagementString(wpaKeyManagementProperty);
+    std::istringstream wpaKeyManagementStream(wpaKeyManagementString);
+    WpaKeyManagement result{ WpaKeyManagement::Unknown };
+
+    for (std::string wpaKeyManagement; wpaKeyManagementStream >> wpaKeyManagement;) {
+        if (wpaKeyManagement == "WPA-EAP") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021x));
+        } else if (wpaKeyManagement == "WPA-PSK") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Psk));
+        } else if (wpaKeyManagement == "FT-EAP") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtIeee8021x));
+        } else if (wpaKeyManagement == "FT-PSK") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtPsk));
+        } else if (wpaKeyManagement == "WPA-EAP-SHA256") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSha256));
+        } else if (wpaKeyManagement == "WPA-PSK-SHA256") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::PskSha256));
+        } else if (wpaKeyManagement == "SAE") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Sae));
+        } else if (wpaKeyManagement == "FT-SAE") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtSae));
+        } else if (wpaKeyManagement == "OSEN") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Osen));
+        } else if (wpaKeyManagement == "WPA-EAP-SUITE-B") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSuiteB));
+        } else if (wpaKeyManagement == "WPA-EAP-SUITE-B-192") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSuiteB192));
+        } else if (wpaKeyManagement == "FILS-SHA256") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FilsSha256));
+        } else if (wpaKeyManagement == "FILS-SHA384") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FilsSha384));
+        } else if (wpaKeyManagement == "FT-FILS-SHA256") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtFilsSha256));
+        } else if (wpaKeyManagement == "FT-FILS-SHA384") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtFilsSha384));
+        } else if (wpaKeyManagement == "OWE") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Owe));
+        } else if (wpaKeyManagement == "DPP") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Dpp));
+        } else if (wpaKeyManagement == "FT-EAP-SHA384") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtIeee8021xSha384));
+        } else if (wpaKeyManagement == "PASN") {
+            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Pasn));
+        }
+    }
+
+    return result;
+}
+
+/**
  * @brief WpaCipher sentinel for an invalid value.
  */
 constexpr std::string_view WpaCipherInvalidValue = "UNKNOWN";
@@ -876,6 +935,46 @@ WpaCipherPropertyValue(WpaCipher wpaCipher) noexcept
         [[fallthrough]];
     default:
         return WpaCipherInvalidValue;
+    }
+}
+
+/**
+ * @brief Convert a hostapd cipher property string such as 'wpa_pairwise' and 'rsn_pairwise' to the corresponding WpaCipher value.
+ *
+ * @param wpaCipher The hostapd property value string to convert.
+ * @return WpaCipher The corresponding WpaCipher value.
+ */
+WpaCipher
+WpaCipherFromPropertyValue(std::string_view wpaCipherProperty) noexcept
+{
+    if (wpaCipherProperty == "NONE") {
+        return WpaCipher::None;
+    } else if (wpaCipherProperty == "WEP40") {
+        return WpaCipher::Wep40;
+    } else if (wpaCipherProperty == "WEP104") {
+        return WpaCipher::Wep104;
+    } else if (wpaCipherProperty == "TKIP") {
+        return WpaCipher::Tkip;
+    } else if (wpaCipherProperty == "CCMP") {
+        return WpaCipher::Ccmp;
+    } else if (wpaCipherProperty == "AES-128-CMAC") {
+        return WpaCipher::Aes128Cmac;
+    } else if (wpaCipherProperty == "GCMP") {
+        return WpaCipher::Gcmp;
+    } else if (wpaCipherProperty == "GCMP-256") {
+        return WpaCipher::Gcmp256;
+    } else if (wpaCipherProperty == "CCMP-256") {
+        return WpaCipher::Ccmp256;
+    } else if (wpaCipherProperty == "BIP-GMAC-128") {
+        return WpaCipher::BipGmac128;
+    } else if (wpaCipherProperty == "BIP-GMAC-256") {
+        return WpaCipher::BipGmac256;
+    } else if (wpaCipherProperty == "BIP-CMAC-256") {
+        return WpaCipher::BipCmac256;
+    } else if (wpaCipherProperty == "GTK_NOT_USED") {
+        return WpaCipher::GtkNotUsed;
+    } else {
+        return WpaCipher::Unknown;
     }
 }
 
