@@ -56,5 +56,5 @@ WpaEvent::Parse(std::string_view eventPayload)
 std::string
 WpaEvent::ToString() const
 {
-    return std::format("[{}] {}{}{}", magic_enum::enum_name(LogLevel), magic_enum::enum_name(Source), Interface.value_or(""), Payload);
+    return std::format("[{}|{}] {} {}", magic_enum::enum_name(Source), magic_enum::enum_name(LogLevel), Interface.value_or(""), Payload);
 }
