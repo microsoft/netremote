@@ -53,15 +53,25 @@ WpaGetConfigResponseParser::ParsePayload()
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeySsid) {
             configuration.Ssid = value;
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyWpa) {
-            ParseInt(value, configuration.Wpa);
+            int wpa;
+            ParseInt(value, wpa);
+            configuration.Wpa = static_cast<Wpa::WpaSecurityProtocol>(wpa);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyWpaKeyMgmt) {
-            ParseInt(value, configuration.WpaKeyMgmt);
+            int wpaKeyMgmt;
+            ParseInt(value, wpaKeyMgmt);
+            configuration.WpaKeyMgmt = static_cast<Wpa::WpaKeyManagement>(wpaKeyMgmt);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyGroupCipher) {
-            ParseInt(value, configuration.GroupCipher);
+            int groupCipher;
+            ParseInt(value, groupCipher);
+            configuration.GroupCipher = static_cast<Wpa::WpaCipher>(groupCipher);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyRsnPairwiseCipher) {
-            ParseInt(value, configuration.RsnPairwiseCipher);
+            int rsnPairwiseCipher;
+            ParseInt(value, rsnPairwiseCipher);
+            configuration.RsnPairwiseCipher = static_cast<Wpa::WpaCipher>(rsnPairwiseCipher);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyWpaPairwiseCipher) {
-            ParseInt(value, configuration.WpaPairwiseCipher);
+            int wpaPairwiseCipher;
+            ParseInt(value, wpaPairwiseCipher);
+            configuration.WpaPairwiseCipher = static_cast<Wpa::WpaCipher>(wpaPairwiseCipher);
         }
     }
 

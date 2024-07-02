@@ -13,11 +13,13 @@
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/WpaCommand.hxx>
 #include <Wpa/WpaCommandGet.hxx>
+#include <Wpa/WpaCommandGetConfig.hxx>
 #include <Wpa/WpaCommandSet.hxx>
 #include <Wpa/WpaCommandStatus.hxx>
 #include <Wpa/WpaControlSocket.hxx>
 #include <Wpa/WpaControlSocketConnection.hxx>
 #include <Wpa/WpaCore.hxx>
+#include <Wpa/WpaResponseGetConfig.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/Ieee80211.hxx>
