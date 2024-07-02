@@ -2,13 +2,17 @@
 #ifndef HOSTAPD_HXX
 #define HOSTAPD_HXX
 
+#include <memory>
 #include <string>
 #include <string_view>
 
 #include <Wpa/IHostapd.hxx>
+#include <Wpa/IWpaEventListener.hxx>
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/ProtocolWpa.hxx>
 #include <Wpa/WpaController.hxx>
+#include <Wpa/WpaEventHandler.hxx>
+#include <Wpa/WpaEventListenerProxy.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Wpa
@@ -17,7 +21,8 @@ namespace Wpa
  * @brief Concrete implementation of the IHostapd interface.
  */
 struct Hostapd :
-    public IHostapd
+    public IHostapd,
+    public IWpaEventListener
 {
     /**
      * @brief Construct a new Hostapd object.
@@ -25,6 +30,11 @@ struct Hostapd :
      * @param interfaceName The name of the intrerface to control. Eg. wlan1.
      */
     explicit Hostapd(std::string_view interfaceName);
+
+    /**
+     * @brief Destroy the Hostapd object.
+     */
+    ~Hostapd();
 
     /**
      * @brief Determines if the specified interface is being managed by hostapd.
@@ -236,19 +246,33 @@ struct Hostapd :
     SetNetworkAccessServerId(std::string_view networkAccessServiceId = GenerateNetworkAccessServerId());
 
     /**
-     * @brief Get the IP address of this access point. 
-     * 
+     * @brief Get the IP address of this access point.
+     *
      * Currently, this is non-configurable and is always set to the loopback address (127.0.0.1).
-     * 
+     *
      * @return std::string_view
      */
     std::string_view
     GetIpAddress() const noexcept;
 
 private:
+    /**
+     * @brief Invoked when a WPA event is received.
+     *
+     * @param sender The sender or source of the event.
+     * @param eventArgs The event arguments.
+     */
+    void
+    OnWpaEvent(WpaEventSender *sender, const WpaEventArgs *eventArgs) override;
+
+private:
     const std::string m_interface;
     std::string m_ownIpAddress{ "127.0.0.1" };
     WpaController m_controller;
+    std::unique_ptr<WpaControlSocketConnection> m_eventHandlerControlSocketConnection{ nullptr };
+    std::shared_ptr<WpaEventListenerProxy> m_eventListenerProxy;
+    std::unique_ptr<WpaEventHandler> m_eventHandler{ nullptr };
+    WpaEventListenerRegistrationToken m_eventHandlerRegistrationToken{};
 };
 } // namespace Wpa
 
