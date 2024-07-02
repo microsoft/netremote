@@ -16,6 +16,7 @@
 #include <plog/Log.h>
 
 #include "hostapd.conf.format.hxx"
+#include "HostapdBinaryInfo.hxx"
 
 namespace detail
 {
@@ -42,28 +43,6 @@ WriteDefaultConfigurationFileContents(Wpa::WpaType wpaType, std::string_view int
     }
 }
 } // namespace detail
-
-/* static */
-std::filesystem::path
-WpaDaemonManager::FindDaemonBinary(Wpa::WpaType wpaType, const std::filesystem::path& searchPath)
-{
-    using std::filesystem::perms;
-
-    const auto daemon = Wpa::GetWpaTypeDaemonBinaryName(wpaType);
-
-    LOGI << std::format("Searching for hostapd daemon binary '{}' in '{}'\n", daemon, searchPath.c_str());
-
-    for (const auto& directoryEntry : std::filesystem::recursive_directory_iterator(searchPath)) {
-        if (directoryEntry.is_regular_file() && directoryEntry.path().filename() == daemon) {
-            const auto permissions = directoryEntry.status().permissions();
-            if ((permissions & (perms::owner_exec | perms::group_exec | perms::others_exec)) != perms::none) {
-                return directoryEntry.path();
-            }
-        }
-    }
-
-    return {};
-}
 
 /* static */
 std::filesystem::path
@@ -147,13 +126,7 @@ WpaDaemonManager::StartDefault(Wpa::WpaType wpaType, std::string_view interfaceN
         return std::nullopt;
     }
 
-    auto daemonFilePath = FindDaemonBinary(wpaType);
-    if (daemonFilePath.empty()) {
-        LOGE << std::format("Failed to find wpa '{}' daemon binary\n", magic_enum::enum_name(wpaType));
-        return std::nullopt;
-    }
-
-    return Start(wpaType, interfaceName, daemonFilePath, configurationFilePath);
+    return Start(wpaType, interfaceName, detail::HostapdBinaryPath, configurationFilePath);
 }
 
 /* static */

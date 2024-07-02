@@ -32,4 +32,10 @@ configure_file(
     @ONLY
 )
 
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/detail/config/HostapdBinaryInfo.hxx.in
+    ${CMAKE_CURRENT_BINARY_DIR}/HostapdBinaryInfo.hxx
+    @ONLY
+)
+
 catch_discover_tests(wpa-controller-test-unit)

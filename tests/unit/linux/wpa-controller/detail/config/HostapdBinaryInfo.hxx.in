@@ -1,0 +1,23 @@
+
+#ifndef HOSTAPD_BINARY_INFO_HXX
+#define HOSTAPD_BINARY_INFO_HXX
+
+/**
+ * Note: this is a generated file. Do not attempt to change it as any changes will be lost.
+ */
+#include <filesystem>
+
+namespace detail
+{
+/**
+ * @brief The path to hostapd binaries.
+ */
+static const std::filesystem::path HostapdBinaryDirectory{ "@HOSTAP_BINARY_DIR@" };
+
+/**
+ * @brief The path to the hostapd daemon binary.
+ */
+static const std::filesystem::path HostapdBinaryPath{ HostapdBinaryDirectory / "hostapd" };
+} // namespace detail 
+
+#endif // HOSTAPD_BINARY_INFO_HXX
