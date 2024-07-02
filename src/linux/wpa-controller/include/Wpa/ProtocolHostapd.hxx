@@ -548,7 +548,7 @@ struct HostapdBssConfiguration
     // std::optional<WpaPreSharedKey> MultiApBackhaulWpaPsk;
 
     WpaSecurityProtocol Wpa;
-    WpaKeyManagement WpaKeyMgmt;
+    std::vector<WpaKeyManagement> WpaKeyMgmt;
     WpaCipher GroupCipher;
     WpaCipher RsnPairwiseCipher;
     WpaCipher WpaPairwiseCipher;
@@ -835,9 +835,9 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
  * This string may have several whitespace-separated values, such as "WPA-PSK SAE".
  *
  * @param wpaKeyManagementProperty The hostapd property value string to convert.
- * @return WpaKeyManagement The corresponding WpaKeyManagement value.
+ * @return std::vector<WpaKeyManagement> The corresponding WpaKeyManagement values.
  */
-WpaKeyManagement
+std::vector<WpaKeyManagement>
 WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
 
 /**

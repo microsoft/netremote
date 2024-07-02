@@ -87,54 +87,54 @@ Wpa::WpaPreSharedKeyPropertyKeyAndValue(const WpaPreSharedKey& wpaPreSharedKey)
     return std::make_pair(propertyName, std::move(propertyValue));
 }
 
-WpaKeyManagement
+std::vector<WpaKeyManagement>
 Wpa::WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept
 {
     std::string wpaKeyManagementString(wpaKeyManagementProperty);
     std::istringstream wpaKeyManagementStream(wpaKeyManagementString);
-    WpaKeyManagement result{ WpaKeyManagement::Unknown };
+    std::vector<WpaKeyManagement> wpaKeyManagements{};
 
     for (std::string wpaKeyManagement; wpaKeyManagementStream >> wpaKeyManagement;) {
         if (wpaKeyManagement == "WPA-EAP") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021x));
+            wpaKeyManagements.push_back(WpaKeyManagement::Ieee8021x);
         } else if (wpaKeyManagement == "WPA-PSK") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Psk));
+            wpaKeyManagements.push_back(WpaKeyManagement::Psk);
         } else if (wpaKeyManagement == "FT-EAP") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtIeee8021x));
+            wpaKeyManagements.push_back(WpaKeyManagement::FtIeee8021x);
         } else if (wpaKeyManagement == "FT-PSK") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtPsk));
+            wpaKeyManagements.push_back(WpaKeyManagement::FtPsk);
         } else if (wpaKeyManagement == "WPA-EAP-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSha256));
+            wpaKeyManagements.push_back(WpaKeyManagement::Ieee8021xSha256);
         } else if (wpaKeyManagement == "WPA-PSK-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::PskSha256));
+            wpaKeyManagements.push_back(WpaKeyManagement::PskSha256);
         } else if (wpaKeyManagement == "SAE") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Sae));
+            wpaKeyManagements.push_back(WpaKeyManagement::Sae);
         } else if (wpaKeyManagement == "FT-SAE") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtSae));
+            wpaKeyManagements.push_back(WpaKeyManagement::FtSae);
         } else if (wpaKeyManagement == "OSEN") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Osen));
+            wpaKeyManagements.push_back(WpaKeyManagement::Osen);
         } else if (wpaKeyManagement == "WPA-EAP-SUITE-B") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSuiteB));
+            wpaKeyManagements.push_back(WpaKeyManagement::Ieee8021xSuiteB);
         } else if (wpaKeyManagement == "WPA-EAP-SUITE-B-192") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Ieee8021xSuiteB192));
+            wpaKeyManagements.push_back(WpaKeyManagement::Ieee8021xSuiteB192);
         } else if (wpaKeyManagement == "FILS-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FilsSha256));
+            wpaKeyManagements.push_back(WpaKeyManagement::FilsSha256);
         } else if (wpaKeyManagement == "FILS-SHA384") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FilsSha384));
+            wpaKeyManagements.push_back(WpaKeyManagement::FilsSha384);
         } else if (wpaKeyManagement == "FT-FILS-SHA256") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtFilsSha256));
+            wpaKeyManagements.push_back(WpaKeyManagement::FtFilsSha256);
         } else if (wpaKeyManagement == "FT-FILS-SHA384") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtFilsSha384));
+            wpaKeyManagements.push_back(WpaKeyManagement::FtFilsSha384);
         } else if (wpaKeyManagement == "OWE") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Owe));
+            wpaKeyManagements.push_back(WpaKeyManagement::Owe);
         } else if (wpaKeyManagement == "DPP") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Dpp));
+            wpaKeyManagements.push_back(WpaKeyManagement::Dpp);
         } else if (wpaKeyManagement == "FT-EAP-SHA384") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::FtIeee8021xSha384));
+            wpaKeyManagements.push_back(WpaKeyManagement::FtIeee8021xSha384);
         } else if (wpaKeyManagement == "PASN") {
-            result = static_cast<WpaKeyManagement>(std::to_underlying(result) | std::to_underlying(WpaKeyManagement::Pasn));
+            wpaKeyManagements.push_back(WpaKeyManagement::Pasn);
         }
     }
 
-    return result;
+    return wpaKeyManagements;
 }
