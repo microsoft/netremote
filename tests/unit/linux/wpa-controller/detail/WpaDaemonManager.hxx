@@ -37,15 +37,6 @@ struct WpaDaemonManager
     static constexpr auto ControlSocketPathBase{ "/run/" };
 
     /**
-     * @brief Attempts to find the binary for the specified wpa daemon type.
-     *
-     * @param wpaType The type of wpa daemon to find the binary for.
-     * @return std::filesystem::path The path to the daemon binary, if found. Otherwise, an empty path.
-     */
-    static std::filesystem::path
-    FindDaemonBinary(Wpa::WpaType wpaType, const std::filesystem::path& searchPath = std::filesystem::current_path());
-
-    /**
      * @brief Create and write a default configuration file to disk for the
      * specified wpa daemon type. The configuration file will be written to the
      * system tmeporary directory, and so will not persist across reboots.
