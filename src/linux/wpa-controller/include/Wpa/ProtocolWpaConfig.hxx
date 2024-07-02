@@ -6,6 +6,8 @@
 #error "CONFIG_WPA_CONTROL_SOCKET_PATH_BASE must be defined."
 #endif
 
+#include <Wpa/WpaCore.hxx>
+
 namespace Wpa
 {
 /**
@@ -29,6 +31,27 @@ struct ProtocolWpaConfig
      * @brief The path to the control sockets used by hostapd.
      */
     static constexpr auto ControlSocketPathHostapd{ CONFIG_WPA_CONTROL_SOCKET_PATH_BASE "/hostapd" };
+
+    /**
+     * @brief Get the control socket path for the specified WPA type.
+     *
+     * @param wpaType The type of WPA daemon to get the control socket path for.
+     * @return constexpr auto The control socket path for the specified WPA type.
+     */
+    static constexpr auto
+    GetControlSocketPath(WpaType wpaType)
+    {
+        switch (wpaType) {
+        case WpaType::Hostapd:
+            return ControlSocketPathHostapd;
+        case WpaType::WpaSupplicant:
+            return ControlSocketPathWpaSupplicant;
+        case WpaType::Unknown:
+            [[fallthrough]];
+        default:
+            return ControlSocketPathBase;
+        }
+    }
 };
 } // namespace Wpa
 
