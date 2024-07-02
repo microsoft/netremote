@@ -13,6 +13,7 @@
 
 #include <Wpa/IWpaEventListener.hxx>
 #include <Wpa/WpaControlSocketConnection.hxx>
+#include <Wpa/WpaCore.hxx>
 
 namespace Wpa
 {
@@ -29,7 +30,7 @@ struct WpaEventHandler :
      *
      * @param wpaControlSocketConnection
      */
-    WpaEventHandler(std::unique_ptr<WpaControlSocketConnection> wpaControlSocketConnection);
+    WpaEventHandler(std::unique_ptr<WpaControlSocketConnection> wpaControlSocketConnection, WpaType wpaType);
 
     /**
      * @brief Destroy the WpaEventHandler object.
@@ -85,6 +86,7 @@ private:
 
 private:
     std::unique_ptr<WpaControlSocketConnection> m_wpaControlSocketConnection{ nullptr };
+    WpaType m_wpaType;
 
     // The below m_eventListenerStateGate mutex protects m_eventListeners, m_eventListenerRegistrationTokenNext, and
     // m_eventListenerThread.

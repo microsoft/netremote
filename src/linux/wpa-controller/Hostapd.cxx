@@ -43,11 +43,11 @@ Hostapd::Hostapd(std::string_view interfaceName) :
         throw HostapdException("Failed to create hostapd event handler control socket connection");
     }
 
-    auto eventHandler{ std::make_unique<WpaEventHandler>(std::move(controlSocketConnection)) };
+    auto eventHandler{ std::make_unique<WpaEventHandler>(std::move(controlSocketConnection), WpaType::Hostapd) };
     if (!eventHandler) {
         throw HostapdException("Failed to create hostapd event handler");
     }
-    
+
     m_eventHandlerRegistrationToken = eventHandler->RegisterEventListener(m_eventListenerProxy->weak_from_this());
     m_eventHandler = std::move(eventHandler);
     m_eventHandler->StartListening();

@@ -18,8 +18,9 @@
 
 using namespace Wpa;
 
-WpaEventHandler::WpaEventHandler(std::unique_ptr<WpaControlSocketConnection> wpaControlSocketConnection) :
-    m_wpaControlSocketConnection(std::move(wpaControlSocketConnection))
+WpaEventHandler::WpaEventHandler(std::unique_ptr<WpaControlSocketConnection> wpaControlSocketConnection, WpaType wpaType) :
+    m_wpaControlSocketConnection(std::move(wpaControlSocketConnection)),
+    m_wpaType(wpaType)
 {
 }
 
@@ -112,7 +113,7 @@ WpaEventHandler::ProcessNextEvent(WpaControlSocketConnection& wpaControlSocketCo
     WpaEventArgs wpaEventArgs{
         .Timestamp = timestampNow,
         .Event = {
-            .Source = WpaType::Hostapd, // TODO: determine true source of the event.
+            .Source = m_wpaType,
             .Payload = { std::data(wpaEventBuffer), wpaEventBufferSize },
         },
     };
@@ -153,7 +154,7 @@ WpaEventHandler::ProcessEvents(WpaControlSocketConnection& wpaControlSocketConne
 {
     const auto interfaceName{ wpaControlSocketConnection.GetInterfaceName() };
     LOGD << std::format("WPA event listener thread for interface '{}' started", interfaceName);
-    auto logOnExit = notstd::ScopeExit([&]{
+    auto logOnExit = notstd::ScopeExit([&] {
         LOGD << std::format("WPA event listener thread for interface '{}' stopped", interfaceName);
     });
 
