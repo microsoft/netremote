@@ -36,10 +36,20 @@ Hostapd::IsManagingInterface(std::string_view interfaceName) noexcept
 Hostapd::Hostapd(std::string_view interfaceName) :
     m_interface(interfaceName),
     m_controller(interfaceName, WpaType::Hostapd),
-    m_eventListenerProxy(WpaEventListenerProxy::Create(*this)),
-    m_eventHandler(std::make_unique<WpaEventHandler>(WpaControlSocketConnection::TryCreate(interfaceName, m_controller.ControlSocketPath()))),
-    m_eventHandlerRegistrationToken(m_eventHandler->RegisterEventListener(m_eventListenerProxy->weak_from_this()))
+    m_eventListenerProxy(WpaEventListenerProxy::Create(*this))
 {
+    auto controlSocketConnection{ WpaControlSocketConnection::TryCreate(interfaceName, m_controller.ControlSocketPath()) };
+    if (!controlSocketConnection) {
+        throw HostapdException("Failed to create hostapd event handler control socket connection");
+    }
+
+    auto eventHandler{ std::make_unique<WpaEventHandler>(std::move(controlSocketConnection)) };
+    if (!eventHandler) {
+        throw HostapdException("Failed to create hostapd event handler");
+    }
+    
+    m_eventHandlerRegistrationToken = eventHandler->RegisterEventListener(m_eventListenerProxy->weak_from_this());
+    m_eventHandler = std::move(eventHandler);
 }
 
 Hostapd::~Hostapd()
