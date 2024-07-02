@@ -25,6 +25,13 @@ struct WpaCommandGetConfig :
     }
 
 private:
+    /**
+     * @brief Create a WpaResponseParser object that is specific to the "GET_CONFIG" command.
+     * 
+     * @param command 
+     * @param responsePayload 
+     * @return std::unique_ptr<WpaResponseParser> 
+     */
     std::unique_ptr<WpaResponseParser>
     CreateResponseParser(const WpaCommand* command, std::string_view responsePayload) const override;
 };
