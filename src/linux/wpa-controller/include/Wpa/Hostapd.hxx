@@ -94,6 +94,14 @@ struct Hostapd :
     GetInterface() override;
 
     /**
+     * @brief Obtain the event handler for the interface.
+     *
+     * @return std::shared_ptr<WpaEventHandler>
+     */
+    std::shared_ptr<WpaEventHandler>
+    GetEventHandler() const noexcept override;
+
+    /**
      * @brief Get the status for the interface.
      *
      * @return HostapdStatus

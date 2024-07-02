@@ -64,6 +64,12 @@ Hostapd::GetInterface()
     return m_interface;
 }
 
+std::shared_ptr<WpaEventHandler>
+Hostapd::GetEventHandler() const noexcept
+{
+    return m_eventHandler;
+}
+
 void
 Hostapd::Ping()
 {

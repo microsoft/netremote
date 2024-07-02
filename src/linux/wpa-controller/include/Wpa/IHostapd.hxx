@@ -12,6 +12,7 @@
 
 #include <Wpa/ProtocolHostapd.hxx>
 #include <Wpa/ProtocolWpa.hxx>
+#include <Wpa/WpaEventHandler.hxx>
 
 namespace Wpa
 {
@@ -89,6 +90,14 @@ struct IHostapd
      */
     virtual std::string_view
     GetInterface() = 0;
+
+    /**
+     * @brief Obtain the event handler for the interface.
+     *
+     * @return std::shared_ptr<WpaEventHandler>
+     */
+    virtual std::shared_ptr<WpaEventHandler>
+    GetEventHandler() const noexcept = 0;
 
     /**
      * @brief Get the status for the interface.
@@ -217,7 +226,7 @@ struct IHostapd
      * @brief Add RADIUS server endpoints to the interface. This may contain multiple endpoints of various types. The
      * first endpoint configuration for each type is used as the primary server, and any following are used as fallbacks
      * in case the primary server is unreachable.
-     * 
+     *
      * @param endpointConfigurations The endpoint configurations to add.
      * @param enforceConfigurationChange When to enforce the configuration change. A value of 'Now' will trigger a
      * configuration reload.
