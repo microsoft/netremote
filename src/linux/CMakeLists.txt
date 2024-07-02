@@ -10,7 +10,6 @@ pkg_check_modules(Systemd REQUIRED IMPORTED_TARGET GLOBAL libsystemd)
 add_subdirectory(external)
 add_subdirectory(libnl-helpers)
 add_subdirectory(net)
-add_subdirectory(wifi)
 
 if (NOT NETREMOTE_EXCLUDE_TOOLS)
     add_subdirectory(tools)
