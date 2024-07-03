@@ -301,6 +301,34 @@ inline constexpr std::array<WpaKeyManagement, 27> AllWpaKeyManagements = {
 };
 
 /**
+ * @brief Array of all WpaKeyManagement values accepted by hostapd the control socket.
+ *
+ * magic_enum::enum_values() cannot be used since the enum values exceed [MAGIC_ENUM_RANGE_MIN, MAGIC_ENUM_RANGE_MAX].
+ */
+inline constexpr std::array<WpaKeyManagement, 20> AllWpaKeyManagementsValid = {
+    WpaKeyManagement::Unknown,
+    WpaKeyManagement::Ieee8021x,
+    WpaKeyManagement::Psk,
+    WpaKeyManagement::FtIeee8021x,
+    WpaKeyManagement::FtPsk,
+    WpaKeyManagement::Ieee8021xSha256,
+    WpaKeyManagement::PskSha256,
+    WpaKeyManagement::Sae,
+    WpaKeyManagement::FtSae,
+    WpaKeyManagement::Osen,
+    WpaKeyManagement::Ieee8021xSuiteB,
+    WpaKeyManagement::Ieee8021xSuiteB192,
+    WpaKeyManagement::FilsSha256,
+    WpaKeyManagement::FilsSha384,
+    WpaKeyManagement::FtFilsSha256,
+    WpaKeyManagement::FtFilsSha384,
+    WpaKeyManagement::Owe,
+    WpaKeyManagement::Dpp,
+    WpaKeyManagement::FtIeee8021xSha384,
+    WpaKeyManagement::Pasn,
+};
+
+/**
  * @brief A bitmask containing all valid WpaKeyManagement values supporting fast-transition (FT).
  */
 static constexpr std::underlying_type_t<WpaKeyManagement> WpaKeyManagementMaskFt =
@@ -831,6 +859,15 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
 }
 
 /**
+ * @brief Convert a string to a single WpaKeyManagement value.
+ *
+ * @param wpaKeyManagementProperty The hostapd property value string to convert.
+ * @return WpaKeyManagement The corresponding WpaKeyManagement value.
+ */
+WpaKeyManagement
+WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
+
+/**
  * @brief Convert a hostapd 'wpa_key_mgmt' property value string to the corresponding WpaKeyManagement value.
  * This string may have several whitespace-separated values, such as "WPA-PSK SAE".
  *
@@ -838,7 +875,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
  * @return std::vector<WpaKeyManagement> The corresponding WpaKeyManagement values.
  */
 std::vector<WpaKeyManagement>
-WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
+WpaKeyManagementsFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
 
 /**
  * @brief WpaCipher sentinel for an invalid value.

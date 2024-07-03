@@ -57,7 +57,7 @@ WpaGetConfigResponseParser::ParsePayload()
             ParseInt(value, wpa);
             configuration.Wpa = static_cast<Wpa::WpaSecurityProtocol>(wpa);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyWpaKeyMgmt) {
-            configuration.WpaKeyMgmt = WpaKeyManagementFromPropertyValue(value);
+            configuration.WpaKeyMgmt = WpaKeyManagementsFromPropertyValue(value);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyGroupCipher) {
             configuration.GroupCipher = WpaCipherFromPropertyValue(value);
         } else if (key == ProtocolHostapd::ResponseGetConfigPropertyKeyRsnPairwiseCipher) {

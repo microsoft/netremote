@@ -9,6 +9,7 @@ target_sources(wpa-controller-test-unit
         Main.cxx
         TestHostapd.cxx
         TestWpaController.cxx
+        TestWpaProtocolHostapd.cxx
 )
 
 target_include_directories(wpa-controller-test-unit
