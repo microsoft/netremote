@@ -859,6 +859,15 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
 }
 
 /**
+ * @brief Convert a string to a single WpaKeyManagement value.
+ *
+ * @param wpaKeyManagementProperty The hostapd property value string to convert.
+ * @return WpaKeyManagement The corresponding WpaKeyManagement value.
+ */
+WpaKeyManagement
+WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
+
+/**
  * @brief Convert a hostapd 'wpa_key_mgmt' property value string to the corresponding WpaKeyManagement value.
  * This string may have several whitespace-separated values, such as "WPA-PSK SAE".
  *
@@ -866,7 +875,7 @@ WpaKeyManagementPropertyValue(WpaKeyManagement wpaKeyManagement) noexcept
  * @return std::vector<WpaKeyManagement> The corresponding WpaKeyManagement values.
  */
 std::vector<WpaKeyManagement>
-WpaKeyManagementFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
+WpaKeyManagementsFromPropertyValue(std::string_view wpaKeyManagementProperty) noexcept;
 
 /**
  * @brief WpaCipher sentinel for an invalid value.
