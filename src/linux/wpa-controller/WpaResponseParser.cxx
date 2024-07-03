@@ -17,6 +17,7 @@
 #include <Wpa/WpaResponse.hxx>
 #include <Wpa/WpaResponseParser.hxx>
 #include <plog/Log.h>
+#include <strings/StringHelpers.hxx>
 
 using namespace Wpa;
 
@@ -61,10 +62,6 @@ WpaResponseParser::GetResponsePayload() const noexcept
 bool
 WpaResponseParser::TryParseProperties()
 {
-    // Convert a range to a string-view.
-    constexpr auto toStringView = [](auto&& sv) {
-        return std::string_view(sv);
-    };
     // Convert a key-value pair to its key.
     constexpr auto toKey = [](auto&& keyValuePair) {
         return keyValuePair.Key;
@@ -79,11 +76,11 @@ WpaResponseParser::TryParseProperties()
     }
 
     // Parse the payload into individual lines containing key value pairs.
-    auto lines = m_responsePayload | std::views::split(ProtocolWpa::KeyValueLineDelimeter) | std::views::transform(toStringView);
+    auto lines = m_responsePayload | std::views::split(ProtocolWpa::KeyValueLineDelimeter) | std::views::transform(Strings::ToStringView);
 
     // Parse each line into a key-value pair, and populate the property map with them.
     for (const auto line : lines) {
-        auto keyValuePair = line | std::views::split(ProtocolWpa::KeyValueDelimiter) | std::views::transform(toStringView);
+        auto keyValuePair = line | std::views::split(ProtocolWpa::KeyValueDelimiter) | std::views::transform(Strings::ToStringView);
         auto keyValuePairIterator = std::begin(keyValuePair);
 
         if (keyValuePairIterator == std::end(keyValuePair)) {
