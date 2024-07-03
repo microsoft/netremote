@@ -119,6 +119,14 @@ struct Hostapd :
     GetProperty(std::string_view propertyName) override;
 
     /**
+     * @brief Get the configuration for the interface.
+     *
+     * @return HostapdBssConfiguration The configuration string value.
+     */
+    HostapdBssConfiguration
+    GetConfiguration() override;
+
+    /**
      * @brief Set a property on the interface.
      *
      * @param propertyName The name of the property to set.

@@ -13,6 +13,7 @@ target_sources(wpa-controller
         ProtocolWpa.cxx
         WpaCommand.cxx
         WpaCommandGet.cxx
+        WpaCommandGetConfig.cxx
         WpaCommandSet.cxx
         WpaCommandStatus.cxx
         WpaController.cxx
@@ -38,6 +39,7 @@ target_sources(wpa-controller
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/ProtocolWpaConfig.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommand.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandGet.hxx
+        ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandGetConfig.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandSet.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaCommandStatus.hxx
         ${WPA_CONTROLLER_PUBLIC_INCLUDE_PREFIX}/WpaController.hxx
