@@ -2,7 +2,7 @@
 #include <Wpa/ProtocolHostapd.hxx>
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Test WpaKeyManagement conversions", "[wpa][hostapd][client]")
+TEST_CASE("Test WpaKeyManagement conversions (root)", "[wpa][hostapd][client]")
 {
     using namespace Wpa;
 
