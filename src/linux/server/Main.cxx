@@ -39,7 +39,16 @@ enum class LogInstanceId : int {
     // Default logger is 0 and is omitted from this enumeration.
     Console = 1,
     File = 2,
+    Audit = 3,
 };
+
+#define AUDIT_LOGN LOG_(static_cast<int>(LogInstanceId::Audit), plog::none)
+#define AUDIT_LOGF LOG_(static_cast<int>(LogInstanceId::Audit), plog::fatal)
+#define AUDIT_LOGE LOG_(static_cast<int>(LogInstanceId::Audit), plog::error)
+#define AUDIT_LOGW LOG_(static_cast<int>(LogInstanceId::Audit), plog::warning)
+#define AUDIT_LOGI LOG_(static_cast<int>(LogInstanceId::Audit), plog::info)
+#define AUDIT_LOGD LOG_(static_cast<int>(LogInstanceId::Audit), plog::debug)
+#define AUDIT_LOGV LOG_(static_cast<int>(LogInstanceId::Audit), plog::verbose)
 
 namespace
 {
@@ -89,7 +98,14 @@ main(int argc, char *argv[])
 
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
-    static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("server").c_str());
+    std::string logFilePath = "/usr/local/";
+    logFilePath += logging::GetLogName("server");
+    static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logFilePath.c_str());
+
+    // Create the audit log file appender.
+    std::string auditLogFilePath = "/usr/local/";
+    auditLogFilePath += logging::GetLogName("audit");
+    static plog::RollingFileAppender<plog::TxtFormatter> auditLogRollingFileAppender(auditLogFilePath.c_str());
 
     // Parse command line arguments.
     auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
@@ -102,8 +118,10 @@ main(int argc, char *argv[])
         plog::init<std::to_underlying(LogInstanceId::File)>(logSeverity, &rollingFileAppender);
         plog::init(logSeverity).addAppender(plog::get<std::to_underlying(LogInstanceId::File)>());
     }
+    plog::init<std::to_underlying(LogInstanceId::Audit)>(logSeverity, &auditLogRollingFileAppender);
 
     LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
+    AUDIT_LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
 
     // Create an access point manager and discovery agent.
     auto accessPointManager = AccessPointManager::Create();
