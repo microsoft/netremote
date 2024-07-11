@@ -35,21 +35,6 @@ using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Wifi;
 
-enum class LogInstanceId : int {
-    // Default logger is 0 and is omitted from this enumeration.
-    Console = 1,
-    File = 2,
-    Audit = 3,
-};
-
-#define AUDIT_LOGN LOG_(static_cast<int>(LogInstanceId::Audit), plog::none)
-#define AUDIT_LOGF LOG_(static_cast<int>(LogInstanceId::Audit), plog::fatal)
-#define AUDIT_LOGE LOG_(static_cast<int>(LogInstanceId::Audit), plog::error)
-#define AUDIT_LOGW LOG_(static_cast<int>(LogInstanceId::Audit), plog::warning)
-#define AUDIT_LOGI LOG_(static_cast<int>(LogInstanceId::Audit), plog::info)
-#define AUDIT_LOGD LOG_(static_cast<int>(LogInstanceId::Audit), plog::debug)
-#define AUDIT_LOGV LOG_(static_cast<int>(LogInstanceId::Audit), plog::verbose)
-
 namespace
 {
 /**
