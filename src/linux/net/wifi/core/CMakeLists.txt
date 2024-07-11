@@ -27,6 +27,7 @@ target_link_libraries(wifi-core-linux
     PUBLIC
         ${PROJECT_NAME}-net
         libnl-helpers
+        logging-utils
         wifi-core
         wpa-controller
 )
