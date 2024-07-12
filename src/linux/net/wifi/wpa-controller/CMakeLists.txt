@@ -57,6 +57,7 @@ target_sources(wpa-controller
 target_link_libraries(wpa-controller
     PUBLIC
         libwpa-client
+        logging-utils
         notstd
         wifi-core
     PRIVATE

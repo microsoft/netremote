@@ -24,6 +24,7 @@ target_link_libraries(wifi-apmanager
         plog::plog
     PUBLIC
         ${PROJECT_NAME}-protocol
+        logging-utils
         wifi-core
 )
 

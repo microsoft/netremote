@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include <logging/LogUtils.hxx>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgent.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
@@ -40,6 +41,7 @@ AccessPointManager::AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 {
     const auto interfaceName{ accessPoint->GetInterfaceName() };
     LOGI << std::format("Attempting to add access point {} to manager", interfaceName);
+    AUDIT_LOGD << std::format("Attempting to add access point {} to manager", interfaceName);
 
     {
         auto accessPointController = accessPoint->CreateController();
@@ -60,6 +62,7 @@ AccessPointManager::AddAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
     }
 
     LOGI << std::format("Adding access point {} to manager", interfaceName);
+    AUDIT_LOGI << std::format("Adding access point {} to manager", interfaceName);
 
     m_accessPoints.push_back(std::move(accessPoint));
 }
@@ -69,6 +72,7 @@ AccessPointManager::RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
 {
     const auto interfaceName{ accessPoint->GetInterfaceName() };
     LOGI << std::format("Attempting to remove access point {} from manager", interfaceName);
+    AUDIT_LOGD << std::format("Attempting to remove access point {} from manager", interfaceName);
 
     const auto accessPointsLock = std::scoped_lock{ m_accessPointGate };
     const auto accessPointToRemove = std::ranges::find_if(m_accessPoints, [&](const auto& accessPointExisting) {
@@ -81,6 +85,7 @@ AccessPointManager::RemoveAccessPoint(std::shared_ptr<IAccessPoint> accessPoint)
     }
 
     LOGI << std::format("Removing access point {} from manager", interfaceName);
+    AUDIT_LOGI << std::format("Removing access point {} from manager", interfaceName);
 
     m_accessPoints.erase(accessPointToRemove);
 }

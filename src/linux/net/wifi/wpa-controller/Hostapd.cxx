@@ -21,6 +21,7 @@
 #include <Wpa/WpaCore.hxx>
 #include <Wpa/WpaResponseGetConfig.hxx>
 #include <Wpa/WpaResponseStatus.hxx>
+#include <logging/LogUtils.hxx>
 #include <magic_enum.hpp>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <plog/Log.h>
@@ -553,4 +554,5 @@ Hostapd::OnWpaEvent(WpaEventSender* sender, const WpaEventArgs* eventArgs)
 {
     const auto& event{ eventArgs->Event };
     LOGD << std::format("> [{}-Event|{}|{}|Sender={:#08x}] {}", magic_enum::enum_name(event.Source), magic_enum::enum_name(event.LogLevel), eventArgs->Timestamp, reinterpret_cast<uintptr_t>(sender), event.Payload);
+    AUDIT_LOGI << std::format("> [{}-Event|{}|{}|Sender={:#08x}] {}", magic_enum::enum_name(event.Source), magic_enum::enum_name(event.LogLevel), eventArgs->Timestamp, reinterpret_cast<uintptr_t>(sender), event.Payload);
 }
