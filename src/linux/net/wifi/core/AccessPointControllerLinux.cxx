@@ -124,7 +124,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
 
     switch (operationalState) {
     case AccessPointOperationalState::Enabled: {
-        AUDIT_LOGD << std::format("Attempting to set operational state of AP {} to 'enabled'", status.AccessPointId);
+        AUDITD << std::format("Attempting to set operational state of AP {} to 'enabled'", status.AccessPointId);
         try {
             m_hostapd.Enable();
             status.Code = AccessPointOperationStatusCode::Succeeded;
@@ -133,7 +133,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             AccessPointOperationalState actualOperationalState{};
             auto getOperationalStateStatus = GetOperationalState(actualOperationalState);
             if (getOperationalStateStatus.Code == AccessPointOperationStatusCode::Succeeded && actualOperationalState == AccessPointOperationalState::Enabled) {
-                AUDIT_LOGI << std::format("Operational state of AP {} set to 'enabled'", status.AccessPointId);
+                AUDITI << std::format("Operational state of AP {} set to 'enabled'", status.AccessPointId);
             }
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
@@ -142,7 +142,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
         break;
     }
     case AccessPointOperationalState::Disabled: {
-        AUDIT_LOGD << std::format("Attempting to set operational state of AP {} to 'disabled'", status.AccessPointId);
+        AUDITD << std::format("Attempting to set operational state of AP {} to 'disabled'", status.AccessPointId);
         try {
             m_hostapd.Disable();
             status.Code = AccessPointOperationStatusCode::Succeeded;
@@ -151,7 +151,7 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
             AccessPointOperationalState actualOperationalState{};
             auto getOperationalStateStatus = GetOperationalState(actualOperationalState);
             if (getOperationalStateStatus.Code == AccessPointOperationStatusCode::Succeeded && actualOperationalState == AccessPointOperationalState::Disabled) {
-                AUDIT_LOGI << std::format("Operational state of AP {} set to 'disabled'", status.AccessPointId);
+                AUDITI << std::format("Operational state of AP {} set to 'disabled'", status.AccessPointId);
             }
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
@@ -176,7 +176,7 @@ AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
     AccessPointOperationStatus status{ GetInterfaceName(), std::format("SetPhyType {}", ieeePhyTypeName) };
     const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
 
-    AUDIT_LOGD << std::format("Attempting to set PHY type of AP {} to {}", status.AccessPointId, ieeePhyTypeName);
+    AUDITD << std::format("Attempting to set PHY type of AP {} to {}", status.AccessPointId, ieeePhyTypeName);
 
     // Populate a list of required properties to set.
     std::vector<std::pair<std::string_view, std::string_view>> propertiesToSet{};
@@ -237,20 +237,20 @@ AccessPointControllerLinux::SetPhyType(Ieee80211PhyType ieeePhyType) noexcept
         if (hostapdStatus.Ieee80211ax == 1 && hostapdStatus.Disable11ax == 0 &&
             hostapdStatus.Ieee80211ac == 1 && hostapdStatus.Disable11ac == 0 &&
             hostapdStatus.Ieee80211n == 1 && hostapdStatus.Disable11n == 0) {
-            AUDIT_LOGI << std::format("PHY type of AP {} set to 'AX' (HE)", status.AccessPointId);
+            AUDITI << std::format("PHY type of AP {} set to 'AX' (HE)", status.AccessPointId);
         }
         break;
     // PHY type AC requires AC and N to be enabled.
     case Ieee80211PhyType::AC:
         if (hostapdStatus.Ieee80211ac == 1 && hostapdStatus.Disable11ac == 0 &&
             hostapdStatus.Ieee80211n == 1 && hostapdStatus.Disable11n == 0) {
-            AUDIT_LOGI << std::format("PHY type of AP {} set to 'AC' (VHT)", status.AccessPointId);
+            AUDITI << std::format("PHY type of AP {} set to 'AC' (VHT)", status.AccessPointId);
         }
         break;
     // PHY type N only requires N to be enabled.
     case Ieee80211PhyType::N:
         if (hostapdStatus.Ieee80211n == 1 && hostapdStatus.Disable11n == 0) {
-            AUDIT_LOGI << std::format("PHY type of AP {} set to 'N' (HT)", status.AccessPointId);
+            AUDITI << std::format("PHY type of AP {} set to 'N' (HT)", status.AccessPointId);
         }
         break;
     default:
@@ -279,7 +279,7 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     std::string bands = std::accumulate(std::next(std::begin(frequencyBands)), std::end(frequencyBands), Ieee80211FrequencyBandToString(frequencyBands[0]), [](std::string concatenatedBands, Ieee80211FrequencyBand band) {
         return concatenatedBands + ',' + Ieee80211FrequencyBandToString(band);
     });
-    AUDIT_LOGD << std::format("Attempting to set frequency bands of AP {} to {}", status.AccessPointId, bands);
+    AUDITD << std::format("Attempting to set frequency bands of AP {} to {}", status.AccessPointId, bands);
 
     // Generate the argument for the hostapd "setband" command, which accepts a comma separated list of bands.
     std::ostringstream setBandArgumentBuilder;
@@ -321,13 +321,13 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
     /*
     auto hostapdStatus = m_hostapd.GetStatus();
     if (std::ranges::contains(frequencyBands, Ieee80211FrequencyBand::TwoPointFourGHz) && hostapdStatus.Frequency >= 2400 && hostapdStatus.Frequency < 5000) {
-        AUDIT_LOGI << std::format("AP {} is operating on frequency band 2.4GHz with frequency {}", status.AccessPointId, hostapdStatus.Frequency);
+        AUDITI << std::format("AP {} is operating on frequency band 2.4GHz with frequency {}", status.AccessPointId, hostapdStatus.Frequency);
     } else if (std::ranges::contains(frequencyBands, Ieee80211FrequencyBand::FiveGHz) && hostapdStatus.Frequency >= 5000 && hostapdStatus.Frequency < 6000) {
-        AUDIT_LOGI << std::format("AP {} is operating on frequency band 5GHz with frequency {}", status.AccessPointId, hostapdStatus.Frequency);
+        AUDITI << std::format("AP {} is operating on frequency band 5GHz with frequency {}", status.AccessPointId, hostapdStatus.Frequency);
     } else if (std::ranges::contains(frequencyBands, Ieee80211FrequencyBand::SixGHz) && hostapdStatus.Frequency >= 6000 && hostapdStatus.Frequency < 7000) {
-        AUDIT_LOGI << std::format("AP {} is operating on frequency band 6GHz with frequency {}", status.AccessPointId, hostapdStatus.Frequency);
+        AUDITI << std::format("AP {} is operating on frequency band 6GHz with frequency {}", status.AccessPointId, hostapdStatus.Frequency);
     } else {
-        AUDIT_LOGD << std::format("Frequency bands of AP {} were not set. Current frequency: {}", hostapdStatus.Frequency);
+        AUDITD << std::format("Frequency bands of AP {} were not set. Current frequency: {}", hostapdStatus.Frequency);
     }
     */
 
@@ -353,7 +353,7 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
     std::string algorithms = std::accumulate(std::next(std::begin(authenticationAlgorithms)), std::end(authenticationAlgorithms), Ieee80211AuthenticationAlgorithmToString(authenticationAlgorithms[0]), [](std::string concatenatedAlgorithms, Ieee80211AuthenticationAlgorithm algorithm) {
         return concatenatedAlgorithms + ',' + Ieee80211AuthenticationAlgorithmToString(algorithm);
     });
-    AUDIT_LOGD << std::format("Attempting to set authentication algorithms of AP {} to {}", status.AccessPointId, algorithms);
+    AUDITD << std::format("Attempting to set authentication algorithms of AP {} to {}", status.AccessPointId, algorithms);
 
     std::vector<Wpa::WpaAuthenticationAlgorithm> authenticationAlgorithmsHostapd(std::size(authenticationAlgorithms));
     std::ranges::transform(authenticationAlgorithms, std::begin(authenticationAlgorithmsHostapd), Ieee80211AuthenticationAlgorithmToWpaAuthenticationAlgorithm);
@@ -435,7 +435,7 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
     std::string akms = std::accumulate(std::next(std::begin(akmSuites)), std::end(akmSuites), Ieee80211AkmSuiteToString(akmSuites[0]), [](std::string concatenatedAkms, Ieee80211AkmSuite akm) {
         return concatenatedAkms + ',' + Ieee80211AkmSuiteToString(akm);
     });
-    AUDIT_LOGD << std::format("Attempting to set AKM suites of AP {} to {}", status.AccessPointId, akms);
+    AUDITD << std::format("Attempting to set AKM suites of AP {} to {}", status.AccessPointId, akms);
 
     std::vector<Wpa::WpaKeyManagement> wpaKeyManagements(std::size(akmSuites));
     std::ranges::transform(akmSuites, std::begin(wpaKeyManagements), Ieee80211AkmSuiteToWpaKeyManagement);
@@ -452,11 +452,11 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
     auto hostapdBssConfiguration = m_hostapd.GetConfiguration();
     auto actualKeyManagements = hostapdBssConfiguration.WpaKeyMgmt;
     if (std::equal(std::begin(wpaKeyManagements), std::end(wpaKeyManagements), std::begin(actualKeyManagements))) {
-        AUDIT_LOGI << std::format("AKM suites of AP {} set to {}", status.AccessPointId, akms);
+        AUDITI << std::format("AKM suites of AP {} set to {}", status.AccessPointId, akms);
     } else {
-        AUDIT_LOGD << std::format("AKM suites of AP {} were not set. Current key_mgmt values:", status.AccessPointId);
+        AUDITD << std::format("AKM suites of AP {} were not set. Current key_mgmt values:", status.AccessPointId);
         for (const auto& actualKeyManagement : actualKeyManagements) {
-            AUDIT_LOGD << std::format("key_mgmt: {}", std::to_underlying(actualKeyManagement));
+            AUDITD << std::format("key_mgmt: {}", std::to_underlying(actualKeyManagement));
         }
     }
 
@@ -490,7 +490,7 @@ AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211
         pairwiseCiphers += ";";
     }
     pairwiseCiphers.pop_back(); // Remove trailing semicolon
-    AUDIT_LOGD << std::format("Attempting to set pairwise cipher suites of AP {} to {}", status.AccessPointId, pairwiseCiphers);
+    AUDITD << std::format("Attempting to set pairwise cipher suites of AP {} to {}", status.AccessPointId, pairwiseCiphers);
 
     auto pairwiseCipherSuitesHostapd = Ieee80211CipherSuitesToWpaCipherSuites(pairwiseCipherSuites);
 
@@ -509,9 +509,9 @@ AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211
         return wpaCipher.first;
     });
     if (isWpaSecurityProtocolSet) {
-        AUDIT_LOGI << std::format("WPA security protocol for AP {} set to {}", status.AccessPointId, std::to_underlying(wpaSecurityProtocol));
+        AUDITI << std::format("WPA security protocol for AP {} set to {}", status.AccessPointId, std::to_underlying(wpaSecurityProtocol));
     } else {
-        AUDIT_LOGD << std::format("WPA security protocol for AP {} was not set. Current wpa value: {}", status.AccessPointId, std::to_underlying(wpaSecurityProtocol));
+        AUDITD << std::format("WPA security protocol for AP {} was not set. Current wpa value: {}", status.AccessPointId, std::to_underlying(wpaSecurityProtocol));
     }
 
     // TODO: Update HostapdBssConfiguration to accept a vector of wpa_pairwise_cipher and rsn_pairwise_cipher, as well as the following code.
@@ -522,16 +522,16 @@ AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211
     switch (wpaSecurityProtocol) {
     case Wpa::WpaSecurityProtocol::Wpa:
         if (iter != std::end(pairwiseCipherSuitesHostapd) && std::ranges::contains(iter->second, wpaPairwiseCipher)) {
-            AUDIT_LOGI << std::format("WPA pairwise cipher for AP {} set to {}", status.AccessPointId, std::to_underlying(wpaPairwiseCipher));
+            AUDITI << std::format("WPA pairwise cipher for AP {} set to {}", status.AccessPointId, std::to_underlying(wpaPairwiseCipher));
         } else {
-            AUDIT_LOGD << std::format("WPA pairwise cipher for AP {} was not set. Current wpa_pairwise_cipher value: {}", status.AccessPointId, std::to_underlying(wpaPairwiseCipher));
+            AUDITD << std::format("WPA pairwise cipher for AP {} was not set. Current wpa_pairwise_cipher value: {}", status.AccessPointId, std::to_underlying(wpaPairwiseCipher));
         }
         break;
     case Wpa::WpaSecurityProtocol::Wpa2: // Also applies to Wpa3 since they have the same value in the enum class.
         if (iter != std::end(pairwiseCipherSuitesHostapd) && std::ranges::contains(iter->second, rsnPairwiseCipher)) {
-            AUDIT_LOGI << std::format("RSN pairwise cipher for AP {} set to {}", status.AccessPointId, std::to_underlying(rsnPairwiseCipher));
+            AUDITI << std::format("RSN pairwise cipher for AP {} set to {}", status.AccessPointId, std::to_underlying(rsnPairwiseCipher));
         } else {
-            AUDIT_LOGD << std::format("RSN pairwise cipher for AP {} not set. Current rsn_pairwise_cipher value: {}", status.AccessPointId, std::to_underlying(rsnPairwiseCipher));
+            AUDITD << std::format("RSN pairwise cipher for AP {} not set. Current rsn_pairwise_cipher value: {}", status.AccessPointId, std::to_underlying(rsnPairwiseCipher));
         }
         break;
     default:
@@ -555,7 +555,7 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
         return status;
     }
 
-    AUDIT_LOGD << std::format("Attempting to set SSID for AP {} to {}", status.AccessPointId, ssid);
+    AUDITD << std::format("Attempting to set SSID for AP {} to {}", status.AccessPointId, ssid);
 
     // Attempt to set the SSID.
     try {
@@ -569,9 +569,9 @@ AccessPointControllerLinux::SetSsid(std::string_view ssid) noexcept
     // Validate that the SSID was successfully set by hostapd.
     auto hostapdBssConfiguration = m_hostapd.GetConfiguration();
     if (hostapdBssConfiguration.Ssid == ssid) {
-        AUDIT_LOGI << std::format("SSID for AP {} set to {}", status.AccessPointId, hostapdBssConfiguration.Ssid);
+        AUDITI << std::format("SSID for AP {} set to {}", status.AccessPointId, hostapdBssConfiguration.Ssid);
     } else {
-        AUDIT_LOGD << std::format("SSID for AP {} was not set. Current ssid value: {}", status.AccessPointId, hostapdBssConfiguration.Ssid);
+        AUDITD << std::format("SSID for AP {} was not set. Current ssid value: {}", status.AccessPointId, hostapdBssConfiguration.Ssid);
     }
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
