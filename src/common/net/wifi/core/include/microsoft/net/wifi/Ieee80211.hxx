@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace Microsoft::Net::Wifi
@@ -23,30 +24,12 @@ enum class Ieee80211SecurityProtocol {
     Wpa3,
 };
 
-/**
- * @brief Convert an Ieee80211SecurityProtocol to a string.
- * 
- * @param securityProtocol The security protocol to convert.
- * @return std::string
- */
-std::string
-Ieee80211SecurityProtocolToString(const Ieee80211SecurityProtocol& securityProtocol);
-
 enum class Ieee80211FrequencyBand {
     Unknown,
     TwoPointFourGHz,
     FiveGHz,
     SixGHz,
 };
-
-/**
- * @brief Convert an Ieee80211FrequencyBand to a string.
- * 
- * @param frequencyBand The frequency band to convert.
- * @return std::string
- */
-std::string
-Ieee80211FrequencyBandToString(const Ieee80211FrequencyBand& frequencyBand);
 
 namespace Literals
 {
@@ -174,9 +157,9 @@ enum class Ieee80211AuthenticationAlgorithm : uint16_t {
  * @brief Convert an Ieee80211AuthenticationAlgorithm to a string.
  * 
  * @param authenticationAlgorithm The authentication algorithm to convert.
- * @return std::string
+ * @return std::string_view
  */
-std::string
+std::string_view
 Ieee80211AuthenticationAlgorithmToString(const Ieee80211AuthenticationAlgorithm& authenticationAlgorithm);
 
 /**
@@ -319,15 +302,6 @@ WpaAkmSuites(const Ieee80211SecurityProtocol& securityProtocol)
 }
 
 /**
- * @brief Convert an Ieee80211AkmSuite to a string.
- * 
- * @param akmSuite The AKM suite to convert.
- * @return std::string
- */
-std::string
-Ieee80211AkmSuiteToString(const Ieee80211AkmSuite& akmSuite);
-
-/**
  * @brief Cipher suite identifiers or "selectors".
  *
  * Defined in IEEE 802.11-2020, Section 9.4.2.24.2, Table 9-149.
@@ -415,15 +389,6 @@ WpaCipherSuites(const Ieee80211SecurityProtocol& securityProtocol)
         return {};
     }
 }
-
-/**
- * @brief Convert an Ieee80211CipherSuite to a string.
- * 
- * @param cipherSuite The cipher suite to convert.
- * @return std::string
- */
-std::string
-Ieee80211CipherSuiteToString(const Ieee80211CipherSuite& cipherSuite);
 
 /**
  * @brief IEEE 802.11 BSS Types.

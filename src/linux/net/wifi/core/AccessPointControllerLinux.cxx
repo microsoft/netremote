@@ -128,17 +128,18 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
         try {
             m_hostapd.Enable();
             status.Code = AccessPointOperationStatusCode::Succeeded;
-
-            // Validate that enabling the operational state succeeds.
-            AccessPointOperationalState actualOperationalState{};
-            auto getOperationalStateStatus = GetOperationalState(actualOperationalState);
-            if (getOperationalStateStatus.Code == AccessPointOperationStatusCode::Succeeded && actualOperationalState == AccessPointOperationalState::Enabled) {
-                AUDITI << std::format("Operational state of AP {} set to 'enabled'", status.AccessPointId);
-            }
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
             status.Details = std::format("failed to set operational state to 'enabled' ({})", ex.what());
         }
+
+        // Validate that enabling the operational state succeeds.
+        AccessPointOperationalState actualOperationalState{};
+        auto getOperationalStateStatus = GetOperationalState(actualOperationalState);
+        if (getOperationalStateStatus.Code == AccessPointOperationStatusCode::Succeeded && actualOperationalState == AccessPointOperationalState::Enabled) {
+            AUDITI << std::format("Operational state of AP {} set to 'enabled'", status.AccessPointId);
+        }
+
         break;
     }
     case AccessPointOperationalState::Disabled: {
@@ -146,17 +147,18 @@ AccessPointControllerLinux::SetOperationalState(AccessPointOperationalState oper
         try {
             m_hostapd.Disable();
             status.Code = AccessPointOperationStatusCode::Succeeded;
-
-            // Validate that disabling the operational state succeeds.
-            AccessPointOperationalState actualOperationalState{};
-            auto getOperationalStateStatus = GetOperationalState(actualOperationalState);
-            if (getOperationalStateStatus.Code == AccessPointOperationStatusCode::Succeeded && actualOperationalState == AccessPointOperationalState::Disabled) {
-                AUDITI << std::format("Operational state of AP {} set to 'disabled'", status.AccessPointId);
-            }
         } catch (const Wpa::HostapdException& ex) {
             status.Code = AccessPointOperationStatusCode::InternalError;
             status.Details = std::format("failed to set operational state to 'disabled' ({})", ex.what());
         }
+
+        // Validate that disabling the operational state succeeds.
+        AccessPointOperationalState actualOperationalState{};
+        auto getOperationalStateStatus = GetOperationalState(actualOperationalState);
+        if (getOperationalStateStatus.Code == AccessPointOperationStatusCode::Succeeded && actualOperationalState == AccessPointOperationalState::Disabled) {
+            AUDITI << std::format("Operational state of AP {} set to 'disabled'", status.AccessPointId);
+        }
+
         break;
     }
     default: {
@@ -276,8 +278,8 @@ AccessPointControllerLinux::SetFrequencyBands(std::vector<Ieee80211FrequencyBand
         return status;
     }
 
-    std::string bands = std::accumulate(std::next(std::begin(frequencyBands)), std::end(frequencyBands), Ieee80211FrequencyBandToString(frequencyBands[0]), [](std::string concatenatedBands, Ieee80211FrequencyBand band) {
-        return concatenatedBands + ',' + Ieee80211FrequencyBandToString(band);
+    std::string bands = std::accumulate(std::next(std::begin(frequencyBands)), std::end(frequencyBands), std::string(magic_enum::enum_name(frequencyBands[0])), [](std::string concatenatedBands, Ieee80211FrequencyBand band) {
+        return concatenatedBands + ',' + std::string(magic_enum::enum_name(band));
     });
     AUDITD << std::format("Attempting to set frequency bands of AP {} to {}", status.AccessPointId, bands);
 
@@ -350,8 +352,8 @@ AccessPointControllerLinux::SetAuthenticationAlgorithms(std::vector<Ieee80211Aut
         return status;
     }
 
-    std::string algorithms = std::accumulate(std::next(std::begin(authenticationAlgorithms)), std::end(authenticationAlgorithms), Ieee80211AuthenticationAlgorithmToString(authenticationAlgorithms[0]), [](std::string concatenatedAlgorithms, Ieee80211AuthenticationAlgorithm algorithm) {
-        return concatenatedAlgorithms + ',' + Ieee80211AuthenticationAlgorithmToString(algorithm);
+    std::string algorithms = std::accumulate(std::next(std::begin(authenticationAlgorithms)), std::end(authenticationAlgorithms), std::string(Ieee80211AuthenticationAlgorithmToString(authenticationAlgorithms[0])), [](std::string concatenatedAlgorithms, Ieee80211AuthenticationAlgorithm algorithm) {
+        return concatenatedAlgorithms + ',' + std::string(Ieee80211AuthenticationAlgorithmToString(algorithm));
     });
     AUDITD << std::format("Attempting to set authentication algorithms of AP {} to {}", status.AccessPointId, algorithms);
 
@@ -432,8 +434,8 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
         return status;
     }
 
-    std::string akms = std::accumulate(std::next(std::begin(akmSuites)), std::end(akmSuites), Ieee80211AkmSuiteToString(akmSuites[0]), [](std::string concatenatedAkms, Ieee80211AkmSuite akm) {
-        return concatenatedAkms + ',' + Ieee80211AkmSuiteToString(akm);
+    std::string akms = std::accumulate(std::next(std::begin(akmSuites)), std::end(akmSuites), std::string(magic_enum::enum_name(akmSuites[0])), [](std::string concatenatedAkms, Ieee80211AkmSuite akm) {
+        return concatenatedAkms + ',' + std::string(magic_enum::enum_name(akm));
     });
     AUDITD << std::format("Attempting to set AKM suites of AP {} to {}", status.AccessPointId, akms);
 
@@ -454,10 +456,11 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
     if (std::equal(std::begin(wpaKeyManagements), std::end(wpaKeyManagements), std::begin(actualKeyManagements))) {
         AUDITI << std::format("AKM suites of AP {} set to {}", status.AccessPointId, akms);
     } else {
-        AUDITD << std::format("AKM suites of AP {} were not set. Current key_mgmt values:", status.AccessPointId);
+        std::string keyMgmtDebugLog = std::format("AKM suites of AP {} were not set. Current key_mgmt values: ", status.AccessPointId);
         for (const auto& actualKeyManagement : actualKeyManagements) {
-            AUDITD << std::format("key_mgmt: {}", std::to_underlying(actualKeyManagement));
+            keyMgmtDebugLog += std::format("{} ", std::to_underlying(actualKeyManagement));
         }
+        AUDITD << keyMgmtDebugLog;
     }
 
     status.Code = AccessPointOperationStatusCode::Succeeded;
@@ -480,14 +483,13 @@ AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211
 
     std::string pairwiseCiphers{};
     for (const auto& [securityProtocol, cipherSuites] : pairwiseCipherSuites) {
-        pairwiseCiphers += Ieee80211SecurityProtocolToString(securityProtocol);
+        pairwiseCiphers += magic_enum::enum_name(securityProtocol);
         pairwiseCiphers += ": ";
         for (const auto& cipherSuite : cipherSuites) {
-            pairwiseCiphers += Ieee80211CipherSuiteToString(cipherSuite);
+            pairwiseCiphers += magic_enum::enum_name(cipherSuite);
             pairwiseCiphers += ",";
         }
-        pairwiseCiphers.pop_back(); // Remove trailing comma
-        pairwiseCiphers += ";";
+        pairwiseCiphers.back() = ';';
     }
     pairwiseCiphers.pop_back(); // Remove trailing semicolon
     AUDITD << std::format("Attempting to set pairwise cipher suites of AP {} to {}", status.AccessPointId, pairwiseCiphers);
