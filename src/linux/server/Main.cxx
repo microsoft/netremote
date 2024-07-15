@@ -83,12 +83,12 @@ main(int argc, char *argv[])
 
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
-    std::string logFilePath = "/usr/local/";
+    std::string logFilePath = "/var/log/";
     logFilePath += logging::GetLogName("server");
     static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logFilePath.c_str());
 
     // Create the audit log file appender.
-    std::string auditLogFilePath = "/usr/local/";
+    std::string auditLogFilePath = "/var/log/";
     auditLogFilePath += logging::GetLogName("audit");
     static plog::RollingFileAppender<plog::TxtFormatter> auditLogRollingFileAppender(auditLogFilePath.c_str());
 
@@ -106,7 +106,7 @@ main(int argc, char *argv[])
     plog::init<std::to_underlying(LogInstanceId::Audit)>(logSeverity, &auditLogRollingFileAppender);
 
     LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
-    AUDIT_LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
+    AUDITN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
 
     // Create an access point manager and discovery agent.
     auto accessPointManager = AccessPointManager::Create();
