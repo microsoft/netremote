@@ -15,13 +15,13 @@ enum class LogInstanceId : int {
     Audit = 3,
 };
 
-#define AUDIT_LOGN LOG_(static_cast<int>(LogInstanceId::Audit), plog::none)
-#define AUDIT_LOGF LOG_(static_cast<int>(LogInstanceId::Audit), plog::fatal)
-#define AUDIT_LOGE LOG_(static_cast<int>(LogInstanceId::Audit), plog::error)
-#define AUDIT_LOGW LOG_(static_cast<int>(LogInstanceId::Audit), plog::warning)
-#define AUDIT_LOGI LOG_(static_cast<int>(LogInstanceId::Audit), plog::info)
-#define AUDIT_LOGD LOG_(static_cast<int>(LogInstanceId::Audit), plog::debug)
-#define AUDIT_LOGV LOG_(static_cast<int>(LogInstanceId::Audit), plog::verbose)
+#define AUDITN LOG_(static_cast<int>(LogInstanceId::Audit), plog::none)
+#define AUDITF LOG_(static_cast<int>(LogInstanceId::Audit), plog::fatal)
+#define AUDITE LOG_(static_cast<int>(LogInstanceId::Audit), plog::error)
+#define AUDITW LOG_(static_cast<int>(LogInstanceId::Audit), plog::warning)
+#define AUDITI LOG_(static_cast<int>(LogInstanceId::Audit), plog::info)
+#define AUDITD LOG_(static_cast<int>(LogInstanceId::Audit), plog::debug)
+#define AUDITV LOG_(static_cast<int>(LogInstanceId::Audit), plog::verbose)
 
 namespace logging
 {
