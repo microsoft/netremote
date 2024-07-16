@@ -458,7 +458,7 @@ AccessPointControllerLinux::SetAkmSuites(std::vector<Ieee80211AkmSuite> akmSuite
     } else {
         std::string keyMgmtDebugLog = std::format("AKM suites of AP {} were not set. Current key_mgmt values: ", status.AccessPointId);
         for (const auto& actualKeyManagement : actualKeyManagements) {
-            keyMgmtDebugLog += std::format("{} ", std::to_underlying(actualKeyManagement));
+            keyMgmtDebugLog += std::format("{} ", magic_enum::enum_name(actualKeyManagement));
         }
         AUDITD << keyMgmtDebugLog;
     }
@@ -511,9 +511,9 @@ AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211
         return wpaCipher.first;
     });
     if (isWpaSecurityProtocolSet) {
-        AUDITI << std::format("WPA security protocol for AP {} set to {}", status.AccessPointId, std::to_underlying(wpaSecurityProtocol));
+        AUDITI << std::format("WPA security protocol for AP {} set to {}", status.AccessPointId, magic_enum::enum_name(wpaSecurityProtocol));
     } else {
-        AUDITD << std::format("WPA security protocol for AP {} was not set. Current wpa value: {}", status.AccessPointId, std::to_underlying(wpaSecurityProtocol));
+        AUDITD << std::format("WPA security protocol for AP {} was not set. Current wpa value: {}", status.AccessPointId, magic_enum::enum_name(wpaSecurityProtocol));
     }
 
     // TODO: Update HostapdBssConfiguration to accept a vector of wpa_pairwise_cipher and rsn_pairwise_cipher, as well as the following code.
@@ -524,16 +524,16 @@ AccessPointControllerLinux::SetPairwiseCipherSuites(std::unordered_map<Ieee80211
     switch (wpaSecurityProtocol) {
     case Wpa::WpaSecurityProtocol::Wpa:
         if (iter != std::end(pairwiseCipherSuitesHostapd) && std::ranges::contains(iter->second, wpaPairwiseCipher)) {
-            AUDITI << std::format("WPA pairwise cipher for AP {} set to {}", status.AccessPointId, std::to_underlying(wpaPairwiseCipher));
+            AUDITI << std::format("WPA pairwise cipher for AP {} set to {}", status.AccessPointId, magic_enum::enum_name(wpaPairwiseCipher));
         } else {
-            AUDITD << std::format("WPA pairwise cipher for AP {} was not set. Current wpa_pairwise_cipher value: {}", status.AccessPointId, std::to_underlying(wpaPairwiseCipher));
+            AUDITD << std::format("WPA pairwise cipher for AP {} was not set. Current wpa_pairwise_cipher value: {}", status.AccessPointId, magic_enum::enum_name(wpaPairwiseCipher));
         }
         break;
     case Wpa::WpaSecurityProtocol::Wpa2: // Also applies to Wpa3 since they have the same value in the enum class.
         if (iter != std::end(pairwiseCipherSuitesHostapd) && std::ranges::contains(iter->second, rsnPairwiseCipher)) {
-            AUDITI << std::format("RSN pairwise cipher for AP {} set to {}", status.AccessPointId, std::to_underlying(rsnPairwiseCipher));
+            AUDITI << std::format("RSN pairwise cipher for AP {} set to {}", status.AccessPointId, magic_enum::enum_name(rsnPairwiseCipher));
         } else {
-            AUDITD << std::format("RSN pairwise cipher for AP {} not set. Current rsn_pairwise_cipher value: {}", status.AccessPointId, std::to_underlying(rsnPairwiseCipher));
+            AUDITD << std::format("RSN pairwise cipher for AP {} not set. Current rsn_pairwise_cipher value: {}", status.AccessPointId, magic_enum::enum_name(rsnPairwiseCipher));
         }
         break;
     default:
