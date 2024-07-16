@@ -9,6 +9,7 @@
 #include <initializer_list>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace Microsoft::Net::Wifi
@@ -151,6 +152,15 @@ enum class Ieee80211AuthenticationAlgorithm : uint16_t {
     FilsPublicKey = 0x0007,
     VendorSpecific = 0xFFFF,
 };
+
+/**
+ * @brief Convert an Ieee80211AuthenticationAlgorithm to a string.
+ * 
+ * @param authenticationAlgorithm The authentication algorithm to convert.
+ * @return std::string_view
+ */
+std::string_view
+Ieee80211AuthenticationAlgorithmToString(const Ieee80211AuthenticationAlgorithm& authenticationAlgorithm);
 
 /**
  * @brief AKM suite identifiers or "selectors".

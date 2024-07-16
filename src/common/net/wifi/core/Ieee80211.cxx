@@ -11,6 +11,31 @@
 
 namespace Microsoft::Net::Wifi
 {
+std::string_view
+Ieee80211AuthenticationAlgorithmToString(const Ieee80211AuthenticationAlgorithm& authenticationAlgorithm)
+{
+    switch (authenticationAlgorithm) {
+    case Ieee80211AuthenticationAlgorithm::OpenSystem:
+        return "OpenSystem";
+    case Ieee80211AuthenticationAlgorithm::SharedKey:
+        return "SharedKey";
+    case Ieee80211AuthenticationAlgorithm::FastBssTransition:
+        return "FastBssTransition";
+    case Ieee80211AuthenticationAlgorithm::Sae:
+        return "Sae";
+    case Ieee80211AuthenticationAlgorithm::Fils:
+        return "Fils";
+    case Ieee80211AuthenticationAlgorithm::FilsPfs:
+        return "FilsPfs";
+    case Ieee80211AuthenticationAlgorithm::FilsPublicKey:
+        return "FilsPublicKey";
+    case Ieee80211AuthenticationAlgorithm::VendorSpecific:
+        return "VendorSpecific";
+    default:
+        return "Unknown";
+    }
+}
+
 std::string
 Ieee80211MacAddressToString(const Ieee80211MacAddress& macAddress)
 {
