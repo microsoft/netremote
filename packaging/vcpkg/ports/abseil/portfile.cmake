@@ -8,6 +8,8 @@ vcpkg_from_github(
     REF "${VERSION}"
     SHA512 41504899ac4fd4a6eaa0a5fdf27a7765ec81962fb99b6a07982ceed32c5289e9eb12206c83a70fd44c5c3e1b96c2bfa160eb12f1dbbb45f1109d632c7690de90
     HEAD_REF master
+    PATCHES
+        0001-Mark-absl_cc_library-target-as-test-only.patch
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
@@ -28,8 +30,6 @@ vcpkg_cmake_configure(
     DISABLE_PARALLEL_CONFIGURE
     OPTIONS 
         -DABSL_PROPAGATE_CXX_STD=ON 
-        -DABSL_BUILD_TESTING=OFF
-        -DBUILD_TESTING=OFF
         ${ABSL_USE_CXX17_OPTION}
 )
 
