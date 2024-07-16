@@ -36,6 +36,11 @@
       "version": "2.3.1"
     }
   ],
+  "vcpkg-configuration": {
+    "overlay-ports": [
+      "packaging/vcpkg/ports/abseil"
+    ]
+  },
   "features": {
     "protocol": {
       "description": "Enable building the client protocol",
