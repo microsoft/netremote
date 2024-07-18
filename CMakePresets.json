@@ -63,6 +63,24 @@
             }
         },
         {
+            "name": "linux-ubuntu-23.10",
+            "hidden": true,
+            "description": "Base options for Ubuntu 23.10 (mantic) builds",
+            "inherits": [
+                "linux",
+                "linux-toolchain-llvm-17"
+            ]
+        },
+        {
+            "name": "linux-ubuntu-24.04",
+            "hidden": true,
+            "description": "Base options for Ubuntu 24.04 (noble) builds",
+            "inherits": [
+                "linux",
+                "linux-toolchain-llvm-18"
+            ]
+        },
+        {
             "name": "linux-toolchain-default",
             "hidden": true,
             "description": "Default toolchain to use for Linux builds",
@@ -201,17 +219,33 @@
             ]
         },
         {
-            "name": "dev-linux",
-            "displayName": "Development",
-            "description": "Development inner-loop on Linux",
+            "name": "dev-linux-common",
+            "hidden": true,
+            "description": "Common options for development inner-loop on Linux",
             "inherits": [
                 "dev",
                 "linux",
-                "linux-toolchain-default",
                 "packaging-linux-dev"
             ]
         },
-
+        {
+            "name": "dev-linux",
+            "displayName": "Development (Ubuntu 24.04 noble)",
+            "description": "Development inner-loop on Ubuntu 24.04 (noble)",
+            "inherits": [
+                "dev-linux-common",
+                "linux-ubuntu-24.04"
+            ]
+        },
+        {
+            "name": "dev-linux-ubuntu-23.10",
+            "displayName": "Development (Ubuntu 23.10 mantic)",
+            "description": "Development inner-loop on Ubuntu 23.10 (mantic)",
+            "inherits": [
+                "dev-linux-common",
+                "linux-ubuntu-23.10"
+            ]
+        },
         {
             "name": "dev-windows",
             "displayName": "Development",
@@ -242,18 +276,35 @@
             ]
         },
         {
-            "name": "release-linux",
-            "displayName": "Release",
-            "description": "Release for Linux",
+            "name": "release-linux-common",
+            "hidden": true,
+            "description": "Common options for release on Linux",
             "inherits": [
                 "release",
                 "linux",
-                "linux-toolchain-default",
                 "packaging-linux-release"
+            ]
+        },
+        {
+            "name": "release-linux",
+            "displayName": "Release (Ubuntu 24.04 noble)",
+            "description": "Release for Ubuntu 24.04 (noble)",
+            "inherits": [
+                "release-linux-common",
+                "linux-ubuntu-24.04"
             ],
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "/usr/local"
             }
+        },
+        {
+            "name": "release-linux-ubuntu-23.10",
+            "displayName": "Release (Ubuntu 23.10 mantic)",
+            "description": "Release for Ubuntu 23.10 (mantic)",
+            "inherits": [
+                "release-linux-common",
+                "linux-ubuntu-23.10"
+            ]
         },
         {
             "name": "release-windows",
@@ -374,8 +425,17 @@
         {
             "name": "build-dev-linux",
             "displayName": "Development",
-            "description": "Build the project for development on Linux",
+            "description": "Build the project for development on Ubuntu 24.04 (noble)",
             "configurePreset": "dev-linux",
+            "inherits": [
+                "build-dev"
+            ]
+        },
+        {
+            "name": "build-dev-linux-ubuntu-23.10",
+            "displayName": "Development (Ubuntu 23.10 mantic)",
+            "description": "Build the project for development on Ubuntu 23.10 (mantic)",
+            "configurePreset": "dev-linux-ubuntu-23.10",
             "inherits": [
                 "build-dev"
             ]
@@ -403,6 +463,15 @@
             "displayName": "Release",
             "description": "Build the project for release on Linux",
             "configurePreset": "release-linux",
+            "inherits": [
+                "build-release"
+            ]
+        },
+        {
+            "name": "build-release-linux-ubuntu-23.10",
+            "displayName": "Release (Ubuntu 23.10 mantic)",
+            "description": "Build the project for release on Ubuntu 23.10 (mantic)",
+            "configurePreset": "release-linux-ubuntu-23.10",
             "inherits": [
                 "build-release"
             ]
@@ -531,14 +600,26 @@
         {
             "name": "packaging-dev-linux",
             "displayName": "Development",
-            "description": "Development packaging for inner-loop on Linux",
+            "description": "Development packaging for inner-loop on Ubuntu 24.04 (noble)",
             "configurePreset": "dev-linux"
+        },
+        {
+            "name": "packaging-dev-linux-ubuntu-23.10",
+            "displayName": "Development (Ubuntu 23.10 mantic)",
+            "description": "Development packaging for inner-loop on Ubuntu 23.10 (mantic)",
+            "configurePreset": "dev-linux-ubuntu-23.10"
         },
         {
             "name": "packaging-release-linux",
             "displayName": "Release",
-            "description": "Release packaging for inner-loop on Linux",
+            "description": "Release packaging for inner-loop on Ubuntu 24.04 (noble)",
             "configurePreset": "release-linux"
+        },
+        {
+            "name": "packaging-release-linux-ubuntu-23.10",
+            "displayName": "Release (Ubuntu 23.10 mantic)",
+            "description": "Release packaging for inner-loop on Ubuntu 23.10 (mantic)",
+            "configurePreset": "release-linux-ubuntu-23.10"
         },
         {
             "name": "packaging-dev-windows",
