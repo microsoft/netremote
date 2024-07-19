@@ -3,29 +3,25 @@ cmake_minimum_required(VERSION 3.25)
 
 # Instruct CMake to search the cmake directory for include scripts.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+
+# Find and make git available now as many other scripts depend on it.
+find_package(Git)
+
+# Configure project version.
+include(version)
+
+# Configure vcpkg usage within the project.
 include(vcpkg)
-option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
+
+# Add options for vcpkg port file features.
 option(NETREMOTE_EXCLUDE_PROTOCOL "Disable building the protocol" OFF)
 option(NETREMOTE_EXCLUDE_SERVER "Disable building the server" OFF)
 option(NETREMOTE_EXCLUDE_TOOLS "Disable building the tools" OFF)
 option(NETREMOTE_EXCLUDE_TESTS "Disable building the tests" OFF)
 
-# vcpkg build target.
-# 
-# This controls the versioning information used when the vcpkg is built. 
-# When "development" is selected, the HEAD revision of the current branch will be used.  
-# When "release" is selected, the latest hard-coded version in packaging/vcpkg/CMakeLists.txt.
-#
-set(VCPKG_TARGET_DEVELOPMENT "development")
-set(VCPKG_TARGET_RELEASE "release")
-set(VCPKG_TARGET ${VCPKG_TARGET_DEVELOPMENT} CACHE STRING "vcpkg target: either 'development' or 'release'")
-
 # Tell vcpkg to use the submodule root directory as the vcpkg root, and then configure it.
 set(VCPKG_SUBMODULE_ROOT ${CMAKE_CURRENT_LIST_DIR}/vcpkg CACHE PATH "Location of vcpkg submodule root")
 vcpkg_configure(SUBMODULE_ROOT ${VCPKG_SUBMODULE_ROOT})
-
-find_package(Git)
-include(version)
 
 project(netremote
   LANGUAGES CXX
@@ -33,6 +29,8 @@ project(netremote
   DESCRIPTION "A framework for remotely controlling network components such as wi-fi access points."
   HOMEPAGE_URL https://github.com/microsoft/netremote
 )
+
+message(STATUS "Configuring netremote version v${CMAKE_PROJECT_VERSION}")
 
 # Conditional inclusion of OS-dependent source trees.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -65,7 +63,7 @@ include(grpc)
 include(protoc)
 
 # Enable to debug CMake issues.
-set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Verbose Makefile Generation")
+set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Verbose build system generation")
 
 # Pull in external dependencies.
 # Look for protobuf-config.cmake.
@@ -77,73 +75,8 @@ find_package(magic_enum CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(plog CONFIG REQUIRED)
 
-# Enable POSITION_INDEPENDENT_CODE variable to control passing PIE flags to the linker.
-if (POLICY CMP0083)
-  cmake_policy(SET CMP0083 NEW)
-endif()
-
-# Enable position independent executables.
-check_pie_supported(LANGUAGES CXX)
-if (CMAKE_CXX_LINK_PIE_SUPPORTED)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-endif()
-
-# Set compiler specific options
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  # Common options for both gcc and clang
-  add_compile_options(
-    -fstack-protector-all
-    -fvisibility=hidden
-    -fcf-protection
-    -fpermissive
-    -mshstk
-    -Wall 
-    -Wshadow
-    -Wformat-security
-    -Wextra
-    -Wpedantic
-    -Wconversion
-    -Walloca
-    -Wvla
-  )
-
-  # gcc specific options
-  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(
-      -fstack-clash-protection
-      -Wtrampolines
-      -Wl,-z,noexecstack
-      -Wl,-z,now
-      -Wl,-z,relro
-      -z noexecstack
-    )
-    if (NETREMOTE_CODE_COVERAGE)
-      add_compile_options(
-        -fprofile-arcs
-        -ftest-coverage
-      )
-    endif()
-  # clang specific options
-  elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    # Enable AddressSanitizer for all targets in Debug builds.
-    add_compile_options("$<$<CONFIG:Debug>:-fsanitize=address>")
-    add_compile_options("$<$<CONFIG:Debug>:-fno-omit-frame-pointer>")
-    add_link_options("$<$<CONFIG:Debug>:-fsanitize=address>")
-
-    if (NETREMOTE_CODE_COVERAGE)
-      add_compile_options(
-        -fprofile-instr-generate
-        -fcoverage-mapping
-      )
-    endif()
-  endif()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  # Nothing special needed for MSVC at the moment.
-endif()
-
-# Add conditional compile definitions based on build type.
-add_compile_definitions("$<$<CONFIG:Debug>:DEBUG>")
-add_compile_definitions("$<$<CONFIG:Release,RelWithDebInfo,MinSizeRel>:_FORTIFY_SOURCE=2>")
+# Include toolchain-specific configuration. 
+include(toolchain-config)
 
 # Common source directories
 set(NETREMOTE_DIR_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
