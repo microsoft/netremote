@@ -3,6 +3,7 @@
 set(VCPKG_PORT_FILE_OUT ${CMAKE_CURRENT_LIST_DIR}/ports/netremote/portfile.cmake)
 set(VCPKG_PORT_FILE_IN ${VCPKG_PORT_FILE_OUT}.in)
 
+# Configure variables to be substituted in the vcpkg portfile.
 set(GIT_REF_HEAD main)
 set(GIT_REF v${CMAKE_PROJECT_VERSION})
 set(GIT_REF_URL ${CMAKE_PROJECT_HOMEPAGE_URL}/archive/refs/tags/${GIT_REF}.tar.gz)
@@ -28,7 +29,7 @@ if (NOT EXISTS ${VCPKG_PORT_FILE_OUT})
     endif()
 
     message(STATUS "${GIT_REF_URL} sha512 hash='${GIT_REF_SHA512}'")
-
-    # Generate portfile.cmake with selected versioning and configuration information.
-    configure_file(${VCPKG_PORT_FILE_IN} ${VCPKG_PORT_FILE_OUT} @ONLY)
 endif()
+
+# Generate portfile.cmake with selected versioning and configuration information.
+configure_file(${VCPKG_PORT_FILE_IN} ${VCPKG_PORT_FILE_OUT} @ONLY)
