@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.25)
 
 # Instruct CMake to search the cmake directory for include scripts.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+
+# Find and make git available now as many other scripts depend on it.
+find_package(Git)
+
+# Configure project version.
+include(version)
+
 include(vcpkg)
 option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
 option(NETREMOTE_EXCLUDE_PROTOCOL "Disable building the protocol" OFF)
@@ -33,6 +40,8 @@ project(netremote
   DESCRIPTION "A framework for remotely controlling network components such as wi-fi access points."
   HOMEPAGE_URL https://github.com/microsoft/netremote
 )
+
+message(STATUS "Configuring netremote version v${CMAKE_PROJECT_VERSION}")
 
 # Conditional inclusion of OS-dependent source trees.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
