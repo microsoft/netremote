@@ -81,14 +81,6 @@
             ]
         },
         {
-            "name": "linux-toolchain-default",
-            "hidden": true,
-            "description": "Default toolchain to use for Linux builds",
-            "inherits": [
-                "linux-toolchain-llvm-17"
-            ]
-        },
-        {
             "name": "out-of-source-build",
             "hidden": true,
             "displayName": "Out of source build",
@@ -146,7 +138,6 @@
             "displayName": "Packaging Linux (base)",
             "inherits": [
                 "linux",
-                "linux-toolchain-default",
                 "packaging"
             ],
             "cacheVariables": {
