@@ -5,7 +5,7 @@ param(
 
 # Download the URI content.
 $UriOutFile = Join-Path -Path $Env:TEMP -ChildPath $(Split-Path $Uri -Leaf)
-$UriData = Invoke-WebRequest -Uri $Uri -OutFile $UriOutFile -ProgressAction SilentlyContinue
+Invoke-WebRequest -Uri $Uri -OutFile $UriOutFile
 
 # Calculate the SHA512 hash of the downloaded content.
 $HashSha512 = Get-FileHash -Path $UriOutFile -Algorithm SHA512
