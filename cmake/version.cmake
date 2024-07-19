@@ -9,6 +9,7 @@ if (NOT GIT_EXECUTABLE)
 else ()
   message(STATUS "Using git to determine version")
 
+  # Get a list of tags, reverse sorted by tag ref name such that latest tag appears first.
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" tag -l --sort=-v:refname
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -17,6 +18,7 @@ else ()
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
 
+  # Extract the version from the latest tag.
   if (GIT_TAG_RESULT EQUAL 0)
     if (GIT_TAG_OUTPUT MATCHES "^v([0-9]+)[.]([0-9]+)[.]([0-9]+)[.]*")
       set(VERSION_MAJOR ${CMAKE_MATCH_1})
@@ -28,4 +30,3 @@ else ()
     endif()
   endif()
 endif()
-
