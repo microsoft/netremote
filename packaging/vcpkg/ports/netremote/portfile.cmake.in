@@ -1,6 +1,8 @@
 
 # Note: this file is not used within the project. It exists here for when the vcpkg port for netremote needs to be updated,
-# for example, upon new releases, and will automatically be updated with the latest release version/tag.
+# for example, upon new releases, and will automatically be updated with the latest release version/tag. This file along
+# with the vcpkg.json file at the root of the project should be copied verbatim to the vcpkg registry or overlay port
+# directory being updated with a new version of netremote
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
