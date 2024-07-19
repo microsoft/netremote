@@ -1,4 +1,15 @@
 
+# Note: this file is not used within the project. It exists here for when the vcpkg port for netremote needs to be updated,
+# for example, upon new releases, and will automatically be updated with the latest release version/tag.
+
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO microsoft/netremote
+    REF v@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@
+    SHA512 76379b5d58426748558b4e13605c8f2f62797ce885ef551c93cd3241166961bc8a1bb7f1d21547cf519f4327d953f6ce8617fd69100ad2b7895c16a2096bc53f
+    HEAD_REF develop
+)
+
 vcpkg_from_git(
     OUT_SOURCE_PATH SOURCE_PATH
     URL @VCPKG_GIT_URL@
