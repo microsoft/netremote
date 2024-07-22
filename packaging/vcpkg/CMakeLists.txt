@@ -4,7 +4,7 @@ set(VCPKG_PORT_FILE_OUT ${CMAKE_CURRENT_LIST_DIR}/ports/netremote/portfile.cmake
 set(VCPKG_PORT_FILE_IN ${VCPKG_PORT_FILE_OUT}.in)
 
 # Configure variables to be substituted in the vcpkg portfile.
-set(GIT_REF_HEAD main)
+set(GIT_REF_HEAD master)
 set(GIT_REF v${CMAKE_PROJECT_VERSION})
 set(GIT_REF_URL ${CMAKE_PROJECT_HOMEPAGE_URL}/archive/refs/tags/${GIT_REF}.tar.gz)
 
