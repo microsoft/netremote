@@ -28,6 +28,7 @@ vcpkg_check_features(
 vcpkg_cmake_configure(
     SOURCE_PATH ${SOURCE_PATH}
     OPTIONS
+        -DNETREMOTE_VCPKG_BUILD_FOR_PORT=ON
         ${FEATURE_OPTIONS}
 )
 
