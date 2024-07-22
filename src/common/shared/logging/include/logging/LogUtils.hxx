@@ -8,6 +8,21 @@
 
 #include <plog/Severity.h>
 
+enum class LogInstanceId : int {
+    // Default logger is 0 and is omitted from this enumeration.
+    Console = 1,
+    File = 2,
+    Audit = 3,
+};
+
+#define AUDITN LOG_(static_cast<int>(LogInstanceId::Audit), plog::none)
+#define AUDITF LOG_(static_cast<int>(LogInstanceId::Audit), plog::fatal)
+#define AUDITE LOG_(static_cast<int>(LogInstanceId::Audit), plog::error)
+#define AUDITW LOG_(static_cast<int>(LogInstanceId::Audit), plog::warning)
+#define AUDITI LOG_(static_cast<int>(LogInstanceId::Audit), plog::info)
+#define AUDITD LOG_(static_cast<int>(LogInstanceId::Audit), plog::debug)
+#define AUDITV LOG_(static_cast<int>(LogInstanceId::Audit), plog::verbose)
+
 namespace logging
 {
 /**

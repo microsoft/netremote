@@ -32,7 +32,6 @@ target_link_libraries(${PROJECT_NAME}-test-unit
 catch_discover_tests(${PROJECT_NAME}-test-unit)
 
 add_subdirectory(net)
-add_subdirectory(wifi)
 
 if (BUILD_FOR_LINUX)
     add_subdirectory(linux)

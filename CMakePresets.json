@@ -8,6 +8,7 @@
         {
             "name": "windows",
             "hidden": true,
+            "description": "Base options for all Windows builds",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -31,18 +32,53 @@
             }
         },
         {
+            "name": "linux-toolchain-llvm-17",
+            "hidden": true,
+            "description": "LLVM 17 toolchain on Linux",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-17"
+            }
+        },
+        {
+            "name": "linux-toolchain-llvm-18",
+            "hidden": true,
+            "description": "LLVM 18 toolchain on Linux",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-18",
+                "CMAKE_C_COMPILER": "/usr/bin/clang-18"
+            }
+        },
+        {
             "name": "linux",
             "hidden": true,
+            "description": "Base options for all Linux builds",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
             },
             "cacheVariables": {
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++-17",
-                "CMAKE_C_COMPILER": "/usr/bin/clang-17",
                 "CMAKE_GENERATOR": "Ninja Multi-Config"
             }
+        },
+        {
+            "name": "linux-ubuntu-23.10",
+            "hidden": true,
+            "description": "Base options for Ubuntu 23.10 (mantic) builds",
+            "inherits": [
+                "linux",
+                "linux-toolchain-llvm-17"
+            ]
+        },
+        {
+            "name": "linux-ubuntu-24.04",
+            "hidden": true,
+            "description": "Base options for Ubuntu 24.04 (noble) builds",
+            "inherits": [
+                "linux",
+                "linux-toolchain-llvm-18"
+            ]
         },
         {
             "name": "out-of-source-build",
@@ -174,16 +210,33 @@
             ]
         },
         {
-            "name": "dev-linux",
-            "displayName": "Development",
-            "description": "Development inner-loop on Linux",
+            "name": "dev-linux-common",
+            "hidden": true,
+            "description": "Common options for development inner-loop on Linux",
             "inherits": [
                 "dev",
                 "linux",
                 "packaging-linux-dev"
             ]
         },
-
+        {
+            "name": "dev-linux",
+            "displayName": "Development (Ubuntu 24.04 noble)",
+            "description": "Development inner-loop on Ubuntu 24.04 (noble)",
+            "inherits": [
+                "dev-linux-common",
+                "linux-ubuntu-24.04"
+            ]
+        },
+        {
+            "name": "dev-linux-ubuntu-23.10",
+            "displayName": "Development (Ubuntu 23.10 mantic)",
+            "description": "Development inner-loop on Ubuntu 23.10 (mantic)",
+            "inherits": [
+                "dev-linux-common",
+                "linux-ubuntu-23.10"
+            ]
+        },
         {
             "name": "dev-windows",
             "displayName": "Development",
@@ -214,17 +267,35 @@
             ]
         },
         {
-            "name": "release-linux",
-            "displayName": "Release",
-            "description": "Release for Linux",
+            "name": "release-linux-common",
+            "hidden": true,
+            "description": "Common options for release on Linux",
             "inherits": [
                 "release",
                 "linux",
                 "packaging-linux-release"
+            ]
+        },
+        {
+            "name": "release-linux",
+            "displayName": "Release (Ubuntu 24.04 noble)",
+            "description": "Release for Ubuntu 24.04 (noble)",
+            "inherits": [
+                "release-linux-common",
+                "linux-ubuntu-24.04"
             ],
             "cacheVariables": {
                 "CMAKE_INSTALL_PREFIX": "/usr/local"
             }
+        },
+        {
+            "name": "release-linux-ubuntu-23.10",
+            "displayName": "Release (Ubuntu 23.10 mantic)",
+            "description": "Release for Ubuntu 23.10 (mantic)",
+            "inherits": [
+                "release-linux-common",
+                "linux-ubuntu-23.10"
+            ]
         },
         {
             "name": "release-windows",
@@ -242,6 +313,46 @@
             "description": "Release for Windows ARM64",
             "inherits": [
                 "release-windows",
+                "windows-arm64"
+            ]
+        },
+        {
+            "name": "cicd",
+            "hidden": true,
+            "displayName": "CI/CD (base)",
+            "description": "Base options for CI/CD builds",
+            "inherits": [
+                "out-of-source-build"
+            ]
+        },
+        {
+            "name": "cicd-linux",
+            "displayName": "CI/CD",
+            "description": "CI/CD build on Linux",
+            "inherits": [
+                "cicd",
+                "linux",
+                "linux-toolchain-llvm-18"
+            ],
+            "cacheVariables": {
+                "CMAKE_GENERATOR": "Ninja Multi-Config"
+            }
+        },
+        {
+            "name": "cicd-windows",
+            "displayName": "CI/CD",
+            "description": "CI/CD build on Windows",
+            "inherits": [
+                "cicd",
+                "windows"
+            ]
+        },
+        {
+            "name": "cicd-windows-arm64",
+            "displayName": "CI/CD (ARM64)",
+            "description": "CI/CD build on Windows ARM64",
+            "inherits": [
+                "cicd",
                 "windows-arm64"
             ]
         }
@@ -294,10 +405,28 @@
             ]
         },
         {
+            "name": "build-cicd",
+            "hidden": true,
+            "displayName": "CI/CD Build (base)",
+            "description": "Base options for CI/CD builds",
+            "inherits": [
+                "cfg-debug"
+            ]
+        },
+        {
             "name": "build-dev-linux",
             "displayName": "Development",
-            "description": "Build the project for development on Linux",
+            "description": "Build the project for development on Ubuntu 24.04 (noble)",
             "configurePreset": "dev-linux",
+            "inherits": [
+                "build-dev"
+            ]
+        },
+        {
+            "name": "build-dev-linux-ubuntu-23.10",
+            "displayName": "Development (Ubuntu 23.10 mantic)",
+            "description": "Build the project for development on Ubuntu 23.10 (mantic)",
+            "configurePreset": "dev-linux-ubuntu-23.10",
             "inherits": [
                 "build-dev"
             ]
@@ -330,6 +459,15 @@
             ]
         },
         {
+            "name": "build-release-linux-ubuntu-23.10",
+            "displayName": "Release (Ubuntu 23.10 mantic)",
+            "description": "Build the project for release on Ubuntu 23.10 (mantic)",
+            "configurePreset": "release-linux-ubuntu-23.10",
+            "inherits": [
+                "build-release"
+            ]
+        },
+        {
             "name": "build-release-windows",
             "displayName": "Release",
             "description": "Build the project for release on Windows",
@@ -346,6 +484,33 @@
             "inherits": [
                 "build-release"
             ]
+        },
+        {
+            "name": "build-cicd-linux",
+            "displayName": "CI/CD",
+            "description": "Build the project for CI/CD on Linux",
+            "configurePreset": "cicd-linux",
+            "inherits": [
+                "build-cicd"
+            ]
+        },
+        {
+            "name": "build-cicd-windows",
+            "displayName": "CI/CD",
+            "description": "Build the project for CI/CD on Windows",
+            "configurePreset": "cicd-windows",
+            "inherits": [
+                "build-cicd"
+            ]
+        },
+        {
+            "name": "build-cicd-windows-arm64",
+            "displayName": "CI/CD (ARM64)",
+            "description": "Build the project for CI/CD on Windows (ARM64)",
+            "configurePreset": "cicd-windows-arm64",
+            "inherits": [
+                "build-cicd"
+            ]
         }
     ],
     "testPresets": [
@@ -356,13 +521,6 @@
                 "outputOnFailure": true,
                 "shortProgress": true
             }
-        },
-        {
-            "name": "dev",
-            "configurePreset": "dev",
-            "inherits": [
-                "test-common"
-            ]
         },
         {
             "name": "non-root",
@@ -377,8 +535,41 @@
             }
         },
         {
-            "name": "dev-windows",
+            "name": "test-dev-linux",
+            "configurePreset": "dev-linux",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "test-dev-windows",
             "configurePreset": "dev-windows",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "test-cicd-linux",
+            "configurePreset": "cicd-linux",
+            "inherits": [
+                "test-common"
+            ],
+            "filter": {
+                "exclude": {
+                    "name": "(root|nl80211)"
+                }
+            }
+        },
+        {
+            "name": "test-cicd-windows",
+            "configurePreset": "cicd-windows",
+            "inherits": [
+                "test-common"
+            ]
+        },
+        {
+            "name": "test-cicd-windows-arm64",
+            "configurePreset": "cicd-windows-arm64",
             "inherits": [
                 "test-common"
             ]
@@ -400,14 +591,26 @@
         {
             "name": "packaging-dev-linux",
             "displayName": "Development",
-            "description": "Development packaging for inner-loop on Linux",
+            "description": "Development packaging for inner-loop on Ubuntu 24.04 (noble)",
             "configurePreset": "dev-linux"
+        },
+        {
+            "name": "packaging-dev-linux-ubuntu-23.10",
+            "displayName": "Development (Ubuntu 23.10 mantic)",
+            "description": "Development packaging for inner-loop on Ubuntu 23.10 (mantic)",
+            "configurePreset": "dev-linux-ubuntu-23.10"
         },
         {
             "name": "packaging-release-linux",
             "displayName": "Release",
-            "description": "Release packaging for inner-loop on Linux",
+            "description": "Release packaging for inner-loop on Ubuntu 24.04 (noble)",
             "configurePreset": "release-linux"
+        },
+        {
+            "name": "packaging-release-linux-ubuntu-23.10",
+            "displayName": "Release (Ubuntu 23.10 mantic)",
+            "description": "Release packaging for inner-loop on Ubuntu 23.10 (mantic)",
+            "configurePreset": "release-linux-ubuntu-23.10"
         },
         {
             "name": "packaging-dev-windows",

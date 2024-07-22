@@ -1,8 +1,6 @@
 # Network Remote Control
 
 [![CI/CD](https://github.com/microsoft/netremote/actions/workflows/cicd.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/cicd.yml)
-[![Build Linux](https://github.com/microsoft/netremote/actions/workflows/build-linux.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/build-linux.yml)
-[![Build Windows](https://github.com/microsoft/netremote/actions/workflows/build-windows.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/build-windows.yml)
 
 This project provides the ability to remotely control network components such as Wi-Fi access points typically used to test network functionality on Windows.
 
@@ -61,7 +59,7 @@ Both a compiler and standard C++ library supporting C++23 are required. The C++ 
 
 #### Linux
 
-g++ or llvm/clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 23.10 (mantic) with clang 17.0.0 and LLVM 17.0.0. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](./src/linux/README.md).
+g++ or LLVM/Clang are suitable, however, some care must be taken to obtain a compatible standard library. A known, working environment is ubuntu 24.04 (noble) with clang 18.1.3 and LLVM 18.1.3. Both are both provided by the official ubuntu package repository so can be installed using `apt`. Detailed development environment setup instructions can be found in the Linux [`README`](./src/linux/README.md).
 
 ### CMake
 

@@ -7,7 +7,7 @@
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/test/AccessPointFactoryLinuxTest.hxx>
 
-TEST_CASE("Create AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][apmanager]")
+TEST_CASE("Create AccessPointDiscoveryAgentOperationsNetlink (nl80211)", "[wifi][core][apmanager][nl80211]")
 {
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
@@ -18,7 +18,7 @@ TEST_CASE("Create AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][apm
     }
 }
 
-TEST_CASE("Destroy AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][apmanager]")
+TEST_CASE("Destroy AccessPointDiscoveryAgentOperationsNetlink (nl80211)", "[wifi][core][apmanager][nl80211]")
 {
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
@@ -30,7 +30,7 @@ TEST_CASE("Destroy AccessPointDiscoveryAgentOperationsNetlink", "[wifi][core][ap
     }
 }
 
-TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Start", "[wifi][core][apmanager]")
+TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Start (nl80211)", "[wifi][core][apmanager][nl80211]")
 {
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
@@ -55,7 +55,7 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Start", "[wifi][core][apm
     }
 }
 
-TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Stop", "[wifi][core][apmanager]")
+TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Stop (nl80211)", "[wifi][core][apmanager][nl80211]")
 {
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
@@ -89,7 +89,7 @@ TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::Stop", "[wifi][core][apma
     }
 }
 
-TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync", "[wifi][core][apmanager]")
+TEST_CASE("AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync (nl80211)", "[wifi][core][apmanager][nl80211]")
 {
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;

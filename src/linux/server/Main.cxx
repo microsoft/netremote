@@ -35,12 +35,6 @@ using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Wifi;
 
-enum class LogInstanceId : int {
-    // Default logger is 0 and is omitted from this enumeration.
-    Console = 1,
-    File = 2,
-};
-
 namespace
 {
 /**
@@ -89,7 +83,14 @@ main(int argc, char *argv[])
 
     // Create file and console log appenders.
     static plog::ColorConsoleAppender<plog::MessageOnlyFormatter> colorConsoleAppender{};
-    static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logging::GetLogName("server").c_str());
+    std::string logFilePath = "/var/log/";
+    logFilePath += logging::GetLogName("server");
+    static plog::RollingFileAppender<plog::TxtFormatter> rollingFileAppender(logFilePath.c_str());
+
+    // Create the audit log file appender.
+    std::string auditLogFilePath = "/var/log/";
+    auditLogFilePath += logging::GetLogName("audit");
+    static plog::RollingFileAppender<plog::TxtFormatter> auditLogRollingFileAppender(auditLogFilePath.c_str());
 
     // Parse command line arguments.
     auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(argc, argv);
@@ -102,8 +103,10 @@ main(int argc, char *argv[])
         plog::init<std::to_underlying(LogInstanceId::File)>(logSeverity, &rollingFileAppender);
         plog::init(logSeverity).addAppender(plog::get<std::to_underlying(LogInstanceId::File)>());
     }
+    plog::init<std::to_underlying(LogInstanceId::Audit)>(logSeverity, &auditLogRollingFileAppender);
 
     LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
+    AUDITN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
 
     // Create an access point manager and discovery agent.
     auto accessPointManager = AccessPointManager::Create();

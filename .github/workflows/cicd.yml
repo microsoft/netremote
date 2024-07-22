@@ -32,3 +32,4 @@ jobs:
     with:
       build-types: "[ 'Debug' ]"
       test: true
+      preset-name: 'cicd'

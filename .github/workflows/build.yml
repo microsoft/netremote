@@ -3,6 +3,12 @@ name: 'Build [CMake] 🛠️'
 on:
   workflow_dispatch:
     inputs:
+      build-types:
+        required: true
+        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
+        default: "[ 'Debug' ]"
+        type: string
+        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
       analyze-codeql:
         required: true
         default: true
@@ -33,12 +39,11 @@ on:
         default: false
         type: boolean
         description: 'Publish build artifacts'
-      build-types:
-        required: true
-        # Note the string here contains a JSON array. This is later converted to an array using fromJson.
-        default: "[ 'Debug' ]"
+      preset-name:
+        required: false
         type: string
-        description: 'The CMake build types (CMAKE_BUILD_TYPE) to run (must be encoded as a JSON array)'
+        default: 'dev'
+        description: 'The name of the CMake preset to use for all CMake operations (configure, build, test, install, package). Must be ''dev'', ''release'', or ''cicd''.'
 
   workflow_call:
     inputs:
@@ -52,26 +57,37 @@ on:
         required: false
         default: true
         type: boolean
+        description: 'Peform static analysis with CodeQL'
       build-arm64:
         required: false
         default: false
         type: boolean
+        description: 'Build ARM64 architecture'
       install:
         required: false
         default: false
         type: boolean
+        description: 'Invoke CMake install for the project'
       test:
         required: false
         default: true
         type: boolean
+        description: 'Invoke CMake CTest for the project'
       package:
         required: false
         default: false
         type: boolean
+        description: 'Invoke CMake CPack for the project'
       publish-artifacts:
         required: false
         default: false
         type: boolean
+        description: 'Publish build artifacts'
+      preset-name:
+        required: false
+        type: string
+        default: 'dev'
+        description: 'The name of the CMake preset to use for all CMake operations (configure, build, test, install, package). Must be ''dev'', ''release'', or ''cicd''.'
 
 jobs:
   build:
@@ -84,9 +100,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-2022 }
-          - { os: windows-2022, arch: 'ARM64' }
-          - { os: [ self-hosted, ubuntu-23.10 ] }
+          - { os: windows-2022, os-name: 'windows' }
+          - { os: windows-2022, os-name: 'windows', arch: 'ARM64' }
+          - { os: ubuntu-24.04, os-name: 'linux' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
  
@@ -100,25 +116,29 @@ jobs:
       with:
         languages: 'cpp'
 
-    - name: Build Windows
-      if: ${{ contains(matrix.config.os, 'windows') }}
+    - name: 'Build Windows 📎'
+      if: ${{ contains(matrix.config.os-name, 'windows') }}
       uses: ./.github/actions/build-with-host
       with:
+        os: ${{ matrix.config.os-name }}
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
+        preset-name: ${{ inputs.preset-name }}
 
-    - name: Build Linux
-      if: ${{ contains(matrix.config.os, 'ubuntu-23.10') }}
-      uses: ./.github/actions/build-with-selfhost
+    - name: 'Build Linux 🐧'
+      if: ${{ contains(matrix.config.os-name, 'linux') }}
+      uses: ./.github/actions/build-with-host
       with:
+        os: ${{ matrix.config.os-name }}
         build-type: ${{ matrix.build-type }}
         install: ${{ inputs.install }}
         test: ${{ inputs.test }}
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
+        preset-name: ${{ inputs.preset-name }}
 
     - name: Perform CodeQL Analysis
       if: inputs.analyze-codeql == true

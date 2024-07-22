@@ -82,6 +82,13 @@ CaseInsensitiveStringEquals(std::string_view lhs, std::string_view rhs);
 std::string
 GenerateRandomAsciiString(std::size_t length);
 
+/**
+ * @brief Helper to convert an arbitrary input to a string view.
+ */
+constexpr auto ToStringView = [](auto&& sv) {
+    return std::string_view(sv);
+};
+
 } // namespace Strings
 
 #endif // STRING_HELPERS_HXX

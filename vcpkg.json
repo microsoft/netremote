@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "netremote",
-  "version-string": "0.3.0",
+  "version-string": "0.4.0",
   "dependencies": [
     {
       "name": "sdbus-cpp",
@@ -36,6 +36,11 @@
       "version": "2.3.1"
     }
   ],
+  "vcpkg-configuration": {
+    "overlay-ports": [
+      "packaging/vcpkg/ports/abseil"
+    ]
+  },
   "features": {
     "protocol": {
       "description": "Enable building the client protocol",
