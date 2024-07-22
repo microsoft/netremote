@@ -12,6 +12,7 @@ include(version)
 
 # Configure vcpkg usage within the project.
 include(vcpkg)
+option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
 
 # Add options for vcpkg port file features.
 option(NETREMOTE_EXCLUDE_PROTOCOL "Disable building the protocol" OFF)
