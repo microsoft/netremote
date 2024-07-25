@@ -421,10 +421,28 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1x([[maybe_unused]] grpc::S
 }
 
 ::grpc::Status
-NetRemoteService::WifiAccessPointGetProperties(grpc::ServerContext* context, const WifiAccessPointGetPropertiesRequest* request, WifiAccessPointGetPropertiesResult* result)
+NetRemoteService::WifiAccessPointGetProperties([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointGetPropertiesRequest* request, WifiAccessPointGetPropertiesResult* result)
 {
-    AccessPointOperationStatus operationStatus{ request->accesspointid() };
+    WifiAccessPointOperationStatus wifiOperationStatus{};
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+    const auto accessPointId{ request->accesspointid() };
+
+    // Obtain the access point specified in the request.
+    std::shared_ptr<IAccessPoint> accessPoint{};
+    auto operationStatus = TryGetAccessPoint(accessPointId, accessPoint);
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        return grpc::Status::OK;
+    }
+
+    // Populate the result with the access point properties.
+    {
+        auto properties = accessPoint->GetProperties();
+        *result->mutable_properties() = {
+            std::make_move_iterator(std::begin(properties.Properties)),
+            std::make_move_iterator(std::end(properties.Properties)),
+        };
+    }
 
     return grpc::Status::OK;
 }
