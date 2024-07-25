@@ -28,7 +28,8 @@
     "grpc",
     "magic-enum",
     "plog",
-    "protobuf"
+    "protobuf",
+    "nlohmann-json"
   ],
   "overrides": [
     {

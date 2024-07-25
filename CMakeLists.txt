@@ -75,6 +75,7 @@ find_package(Threads REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(plog CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 # Include toolchain-specific configuration. 
 include(toolchain-config)
