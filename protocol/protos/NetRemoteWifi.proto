@@ -124,3 +124,14 @@ message WifiAccessPointSetAuthenticationDot1xResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointGetPropertiesRequest
+{
+    string AccessPointId = 1;
+}
+
+message WifiAccessPointGetPropertiesResult
+{
+    string AccessPointId = 1;
+    repeated string Properties = 2;
+}
