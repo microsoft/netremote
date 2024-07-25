@@ -133,5 +133,6 @@ message WifiAccessPointGetPropertiesRequest
 message WifiAccessPointGetPropertiesResult
 {
     string AccessPointId = 1;
-    repeated string Properties = 2;
+    WifiAccessPointOperationStatus Status = 2;
+    repeated string Properties = 3;
 }

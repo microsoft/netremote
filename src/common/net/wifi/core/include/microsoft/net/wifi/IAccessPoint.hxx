@@ -16,7 +16,7 @@ namespace Microsoft::Net::Wifi
  */
 struct AccessPointProperties
 {
-    // TODO: add properties here
+    std::vector<std::string> Properties{};
 };
 
 /**
