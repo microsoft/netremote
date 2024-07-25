@@ -1124,3 +1124,62 @@ TEST_CASE("WifiAccessPointSetAuthenticationDot1x API", "[basic][rpc][client][rem
         }
     }
 }
+
+TEST_CASE("WifiAccessPointGetProperties API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto InterfaceName{ "TestWifiAccessPointGetProperties" };
+    constexpr auto InterfaceProperty{ "TestProperty1" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
+    };
+
+    auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
+    apTest->Properties.Properties.push_back(InterfaceProperty);
+    apManagerTest->AddAccessPoint(apTest);
+
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointGetPropertiesRequest request{};
+        request.set_accesspointid(InterfaceName);
+
+        WifiAccessPointGetPropertiesResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointGetProperties(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+    }
+
+    SECTION("Properties are properly reflected")
+    {
+        WifiAccessPointGetPropertiesRequest request{};
+        request.set_accesspointid(InterfaceName);
+
+        WifiAccessPointGetPropertiesResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointGetProperties(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(std::size(result.properties()) == 1);
+        REQUIRE(result.properties()[0] == InterfaceProperty);
+    }
+}
