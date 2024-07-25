@@ -420,6 +420,15 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1x([[maybe_unused]] grpc::S
     return grpc::Status::OK;
 }
 
+::grpc::Status
+NetRemoteService::WifiAccessPointGetProperties(grpc::ServerContext* context, const WifiAccessPointGetPropertiesRequest* request, WifiAccessPointGetPropertiesResult* result)
+{
+    AccessPointOperationStatus operationStatus{ request->accesspointid() };
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+
+    return grpc::Status::OK;
+}
+
 AccessPointOperationStatus
 NetRemoteService::TryGetAccessPoint(std::string_view accessPointId, std::shared_ptr<IAccessPoint>& accessPoint)
 {
