@@ -33,6 +33,12 @@ AccessPointTest::GetMacAddress() const noexcept
     return MacAddress;
 }
 
+AccessPointProperties
+AccessPointTest::GetProperties() const noexcept
+{
+    return Properties;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPointTest::CreateController()
 {

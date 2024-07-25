@@ -10,6 +10,15 @@
 
 namespace Microsoft::Net::Wifi
 {
+
+/**
+ * @brief Container to hold static properties about an access point.
+ */
+struct AccessPointProperties
+{
+    // TODO: add properties here
+};
+
 /**
  * @brief Represents a wireless access point.
  */
@@ -50,6 +59,14 @@ struct IAccessPoint
      */
     virtual Ieee80211MacAddress
     GetMacAddress() const noexcept = 0;
+
+    /**
+     * @brief Get the static properties of an access point.
+     *
+     * @return AccessPointProperties
+     */
+    virtual AccessPointProperties
+    GetProperties() const noexcept = 0;
 
     /**
      * @brief Create a new instance that can control the access point.

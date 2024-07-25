@@ -44,6 +44,14 @@ struct AccessPoint :
     GetMacAddress() const noexcept override;
 
     /**
+     * @brief Get the static properties of an access point.
+     *
+     * @return AccessPointProperties
+     */
+    AccessPointProperties
+    GetProperties() const noexcept override;
+
+    /**
      * @brief Create a controller object.
      *
      * @return std::unique_ptr<Microsoft::Net::Wifi::IAccessPointController>
@@ -55,6 +63,7 @@ private:
     const std::string m_interfaceName;
     std::shared_ptr<IAccessPointControllerFactory> m_accessPointControllerFactory;
     std::optional<Ieee80211MacAddress> m_macAddress;
+    AccessPointProperties m_properties{};
 };
 
 /**

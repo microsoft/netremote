@@ -29,6 +29,12 @@ AccessPoint::GetMacAddress() const noexcept
     return m_macAddress.value_or(Ieee80211MacAddress{});
 }
 
+AccessPointProperties
+AccessPoint::GetProperties() const noexcept
+{
+    return m_properties;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPoint::CreateController()
 {
