@@ -427,6 +427,8 @@ NetRemoteService::WifiAccessPointGetProperties([[maybe_unused]] grpc::ServerCont
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
     const auto accessPointId{ request->accesspointid() };
 
+    *result->mutable_accesspointid() = accessPointId;
+
     // Obtain the access point specified in the request.
     std::shared_ptr<IAccessPoint> accessPoint{};
     auto operationStatus = TryGetAccessPoint(accessPointId, accessPoint);
