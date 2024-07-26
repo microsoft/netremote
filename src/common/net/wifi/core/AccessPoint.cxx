@@ -11,9 +11,10 @@
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPoint::AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, std::optional<Ieee80211MacAddress> macAddress) :
+AccessPoint::AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, AccessPointProperties properties, std::optional<Ieee80211MacAddress> macAddress) :
     m_interfaceName(interfaceName),
     m_accessPointControllerFactory(std::move(accessPointControllerFactory)),
+    m_properties(std::move(properties)),
     m_macAddress(macAddress)
 {}
 

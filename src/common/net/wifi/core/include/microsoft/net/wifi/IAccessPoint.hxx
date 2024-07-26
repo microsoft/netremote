@@ -98,6 +98,8 @@ struct IAccessPointCreateArgs
 
     IAccessPointCreateArgs&
     operator=(IAccessPointCreateArgs&&) = delete;
+
+    AccessPointProperties Properties{};
 };
 
 /**

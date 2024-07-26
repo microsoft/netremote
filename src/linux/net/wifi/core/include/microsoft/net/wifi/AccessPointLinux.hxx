@@ -26,8 +26,9 @@ struct AccessPointLinux :
      * @param interfaceName The name of the interface.
      * @param accessPointControllerFactory The access point controller factory to use for creating access point.
      * @param nl80211Interface The nl80211 interface object.
+     * @param properties The static properties of the access point.
      */
-    AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface);
+    AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Microsoft::Net::Netlink::Nl80211::Nl80211Interface nl80211Interface, AccessPointProperties properties = {});
 
     /**
      * @brief Get the mac address of the access point.

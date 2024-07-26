@@ -16,8 +16,8 @@ using Microsoft::Net::Netlink::Nl80211::Nl80211Interface;
 
 using namespace Microsoft::Net::Wifi;
 
-AccessPointLinux::AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Nl80211Interface nl80211Interface) :
-    AccessPoint(interfaceName, std::move(accessPointControllerFactory)),
+AccessPointLinux::AccessPointLinux(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, Nl80211Interface nl80211Interface, AccessPointProperties properties) :
+    AccessPoint(interfaceName, std::move(accessPointControllerFactory), std::move(properties)),
     m_nl80211Interface{ std::move(nl80211Interface) }
 {
 }
@@ -42,7 +42,7 @@ AccessPointFactoryLinux::Create(std::string_view interfaceName, std::unique_ptr<
         throw std::runtime_error("invalid arguments passed to AccessPointFactoryLinux::Create; this is a bug!");
     }
 
-    return std::make_shared<AccessPointLinux>(interfaceName, GetControllerFactory(), std::move(createArgsLinux->Interface));
+    return std::make_shared<AccessPointLinux>(interfaceName, GetControllerFactory(), std::move(createArgsLinux->Interface), std::move(createArgs->Properties));
 }
 
 AccessPointCreateArgsLinux::AccessPointCreateArgsLinux(Nl80211Interface nl80211Interface) :
