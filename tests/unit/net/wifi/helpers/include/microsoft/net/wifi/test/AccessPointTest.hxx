@@ -92,9 +92,9 @@ struct AccessPointTest final :
     /**
      * @brief Get the static properties of an access point.
      *
-     * @return AccessPointProperties
+     * @return AccessPointProperties&
      */
-    AccessPointProperties
+    const AccessPointProperties&
     GetProperties() const noexcept override;
 
     /**

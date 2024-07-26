@@ -63,9 +63,9 @@ struct IAccessPoint
     /**
      * @brief Get the static properties of an access point.
      *
-     * @return AccessPointProperties
+     * @return AccessPointProperties&
      */
-    virtual AccessPointProperties
+    virtual const AccessPointProperties&
     GetProperties() const noexcept = 0;
 
     /**

@@ -30,7 +30,7 @@ AccessPoint::GetMacAddress() const noexcept
     return m_macAddress.value_or(Ieee80211MacAddress{});
 }
 
-AccessPointProperties
+const AccessPointProperties&
 AccessPoint::GetProperties() const noexcept
 {
     return m_properties;

@@ -33,7 +33,7 @@ AccessPointTest::GetMacAddress() const noexcept
     return MacAddress;
 }
 
-AccessPointProperties
+const AccessPointProperties&
 AccessPointTest::GetProperties() const noexcept
 {
     return Properties;
