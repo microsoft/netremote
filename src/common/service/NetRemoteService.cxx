@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include <google/protobuf/repeated_ptr_field.h>
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/server_context.h>
 #include <magic_enum.hpp>
@@ -423,28 +424,11 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1x([[maybe_unused]] grpc::S
 ::grpc::Status
 NetRemoteService::WifiAccessPointGetProperties([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointGetPropertiesRequest* request, WifiAccessPointGetPropertiesResult* result)
 {
-    WifiAccessPointOperationStatus wifiOperationStatus{};
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
-    const auto accessPointId{ request->accesspointid() };
 
-    *result->mutable_accesspointid() = accessPointId;
-
-    // Obtain the access point specified in the request.
-    std::shared_ptr<IAccessPoint> accessPoint{};
-    auto operationStatus = TryGetAccessPoint(accessPointId, accessPoint);
-    if (!operationStatus.Succeeded()) {
-        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
-        return grpc::Status::OK;
-    }
-
-    // Populate the result with the access point properties.
-    {
-        auto properties = accessPoint->GetProperties();
-        *result->mutable_properties() = {
-            std::make_move_iterator(std::begin(properties.Properties)),
-            std::make_move_iterator(std::end(properties.Properties)),
-        };
-    }
+    auto wifiOperationStatus = WifiAccessPointGetPropertiesImpl(request->accesspointid(), *result->mutable_properties());
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(wifiOperationStatus);
 
     return grpc::Status::OK;
 }
@@ -1276,6 +1260,36 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1xImpl(std::string_view acc
             wifiOperationStatus.set_message(std::format("Failed to set 802.1x configuration for access point {} - {}", accessPointId, operationStatus.ToString()));
             return wifiOperationStatus;
         }
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+using google::protobuf::RepeatedPtrField;
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointGetPropertiesImpl(std::string_view accessPointId, RepeatedPtrField<std::string>& accessPointProperties)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Obtain the access point specified in the request.
+    std::shared_ptr<IAccessPoint> accessPoint{};
+    auto operationStatus = TryGetAccessPoint(accessPointId, accessPoint);
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to get access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
+    }
+
+    // Populate output argument with a copy of the access point properties.
+    {
+        auto properties = accessPoint->GetProperties();
+        accessPointProperties = {
+            std::make_move_iterator(std::begin(properties.Properties)),
+            std::make_move_iterator(std::end(properties.Properties)),
+        };
     }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
