@@ -55,12 +55,6 @@ AccessPointFactory::GetControllerFactory() const noexcept
 }
 
 std::shared_ptr<IAccessPoint>
-AccessPointFactory::Create(std::string_view interfaceName)
-{
-    return Create(interfaceName, nullptr);
-}
-
-std::shared_ptr<IAccessPoint>
 AccessPointFactory::Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> accessPointCreateArgs)
 {
     return (accessPointCreateArgs == nullptr)
