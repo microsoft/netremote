@@ -8,6 +8,9 @@ set(WIFI_CORE_PUBLIC_INCLUDE_PREFIX ${WIFI_CORE_PUBLIC_INCLUDE}/${WIFI_CORE_PUBL
 target_sources(wifi-core
     PRIVATE
         AccessPoint.cxx
+        AccessPointAttributes.cxx
+        AccessPointAttributesJsonSerialization.cxx
+        AccessPointAttributesJsonSerialization.hxx
         AccessPointController.cxx
         AccessPointOperationStatus.cxx
         AccessPointOperationStatusLogOnExit.cxx
@@ -34,6 +37,7 @@ target_sources(wifi-core
 target_link_libraries(wifi-core
     PRIVATE
         magic_enum::magic_enum
+        nlohmann_json::nlohmann_json
         notstd
         strings
     PUBLIC
