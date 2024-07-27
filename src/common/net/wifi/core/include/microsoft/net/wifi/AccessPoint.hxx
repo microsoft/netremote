@@ -24,10 +24,10 @@ struct AccessPoint :
      *
      * @param interfaceName The network interface name representing the access point.
      * @param accessPointControllerFactory The factory used to create controller objects.
-     * @param properties The static properties of the access point.
+     * @param attributes The static attributes of the access point.
      * @param macAddress The mac address of the access point.
      */
-    AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, AccessPointProperties properties = {}, std::optional<Ieee80211MacAddress> macAddress = std::nullopt);
+    AccessPoint(std::string_view interfaceName, std::shared_ptr<IAccessPointControllerFactory> accessPointControllerFactory, AccessPointAttributes attributes = {}, std::optional<Ieee80211MacAddress> macAddress = std::nullopt);
 
     /**
      * @brief Get the network interface name representing the access point.
@@ -46,12 +46,12 @@ struct AccessPoint :
     GetMacAddress() const noexcept override;
 
     /**
-     * @brief Get the static properties of an access point.
+     * @brief Get the static attributes of an access point.
      *
-     * @return AccessPointProperties&
+     * @return AccessPointAttributes&
      */
-    const AccessPointProperties&
-    GetProperties() const noexcept override;
+    const AccessPointAttributes&
+    GetAttributes() const noexcept override;
 
     /**
      * @brief Create a controller object.
@@ -64,7 +64,7 @@ struct AccessPoint :
 private:
     const std::string m_interfaceName;
     std::shared_ptr<IAccessPointControllerFactory> m_accessPointControllerFactory;
-    AccessPointProperties m_properties{};
+    AccessPointAttributes m_attributes{};
     std::optional<Ieee80211MacAddress> m_macAddress;
 };
 

@@ -40,7 +40,7 @@ struct AccessPointTest final :
     std::vector<Microsoft::Net::Wifi::Ieee80211AkmSuite> AkmSuites;
     std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> CipherSuites;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
-    AccessPointProperties Properties{};
+    AccessPointAttributes Attributes{};
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.
@@ -90,12 +90,12 @@ struct AccessPointTest final :
     GetMacAddress() const noexcept override;
 
     /**
-     * @brief Get the static properties of an access point.
+     * @brief Get the static attributes of an access point.
      *
-     * @return AccessPointProperties&
+     * @return AccessPointAttributes&
      */
-    const AccessPointProperties&
-    GetProperties() const noexcept override;
+    const AccessPointAttributes&
+    GetAttributes() const noexcept override;
 
     /**
      * @brief Create a new instance that can control the access point.

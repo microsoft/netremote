@@ -1125,7 +1125,7 @@ TEST_CASE("WifiAccessPointSetAuthenticationDot1x API", "[basic][rpc][client][rem
     }
 }
 
-TEST_CASE("WifiAccessPointGetProperties API", "[basic][rpc][client][remote]")
+TEST_CASE("WifiAccessPointGetAttributes API", "[basic][rpc][client][remote]")
 {
     using namespace Microsoft::Net::Remote;
     using namespace Microsoft::Net::Remote::Service;
@@ -1134,8 +1134,9 @@ TEST_CASE("WifiAccessPointGetProperties API", "[basic][rpc][client][remote]")
     using namespace Microsoft::Net::Wifi;
     using namespace Microsoft::Net::Wifi::Test;
 
-    constexpr auto InterfaceName{ "TestWifiAccessPointGetProperties" };
-    constexpr auto InterfaceProperty{ "TestProperty1" };
+    constexpr auto InterfaceName{ "TestWifiAccessPointGetAttributes" };
+    constexpr auto InterfaceAttributesPropertyKey{ "TestAttributePropertyKey1" };
+    constexpr auto InterfaceAttributesPropertyValue{ "TestAttributePropertyValue1" };
 
     auto apManagerTest = std::make_shared<AccessPointManagerTest>();
     const Ieee80211AccessPointCapabilities apCapabilities{
@@ -1143,7 +1144,8 @@ TEST_CASE("WifiAccessPointGetProperties API", "[basic][rpc][client][remote]")
     };
 
     auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
-    apTest->Properties.Properties.push_back(InterfaceProperty);
+    auto& apProperties = apTest->Attributes.Properties;
+    apProperties[InterfaceAttributesPropertyKey] = InterfaceAttributesPropertyValue;
     apManagerTest->AddAccessPoint(apTest);
 
     const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
@@ -1155,31 +1157,37 @@ TEST_CASE("WifiAccessPointGetProperties API", "[basic][rpc][client][remote]")
 
     SECTION("Can be called")
     {
-        WifiAccessPointGetPropertiesRequest request{};
+        WifiAccessPointGetAttributesRequest request{};
         request.set_accesspointid(InterfaceName);
 
-        WifiAccessPointGetPropertiesResult result{};
+        WifiAccessPointGetAttributesResult result{};
         grpc::ClientContext clientContext{};
 
         grpc::Status status;
-        REQUIRE_NOTHROW(status = client->WifiAccessPointGetProperties(&clientContext, request, &result));
+        REQUIRE_NOTHROW(status = client->WifiAccessPointGetAttributes(&clientContext, request, &result));
         REQUIRE(status.ok());
         REQUIRE(result.accesspointid() == request.accesspointid());
     }
 
     SECTION("Properties are properly reflected")
     {
-        WifiAccessPointGetPropertiesRequest request{};
+        WifiAccessPointGetAttributesRequest request{};
         request.set_accesspointid(InterfaceName);
 
-        WifiAccessPointGetPropertiesResult result{};
+        WifiAccessPointGetAttributesResult result{};
         grpc::ClientContext clientContext{};
 
         grpc::Status status;
-        REQUIRE_NOTHROW(status = client->WifiAccessPointGetProperties(&clientContext, request, &result));
+        REQUIRE_NOTHROW(status = client->WifiAccessPointGetAttributes(&clientContext, request, &result));
         REQUIRE(status.ok());
         REQUIRE(result.accesspointid() == request.accesspointid());
-        REQUIRE(std::size(result.properties()) == 1);
-        REQUIRE(result.properties()[0] == InterfaceProperty);
+        REQUIRE(result.has_attributes());
+
+        const auto& attributes = result.attributes();
+        const auto& properties = attributes.properties();
+
+        REQUIRE(std::size(properties) == 1);
+        REQUIRE(properties.contains(InterfaceAttributesPropertyKey));
+        REQUIRE(properties.at(InterfaceAttributesPropertyKey) == InterfaceAttributesPropertyValue);
     }
 }

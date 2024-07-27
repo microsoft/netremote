@@ -6,7 +6,7 @@
 #include <string>
 #include <string_view>
 
-#include <google/protobuf/repeated_ptr_field.h>
+#include <google/protobuf/map.h>
 #include <grpcpp/server_context.h>
 #include <grpcpp/support/status.h>
 #include <microsoft/net/NetworkManager.hxx>
@@ -157,7 +157,7 @@ private:
      * @return ::grpc::Status
      */
     ::grpc::Status
-    WifiAccessPointGetProperties(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointGetPropertiesRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointGetPropertiesResult* result) override;
+    WifiAccessPointGetAttributes(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointGetAttributesRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointGetAttributesResult* result) override;
 
 protected:
     /**
@@ -317,14 +317,14 @@ protected:
     WifiAccessPointSetAuthenticationDot1xImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AuthenticationDot1x& dot11AuthenticationDot1x, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
-     * @brief Get the properties of the specified access point.
+     * @brief Get the sttaic attributes of the specified access point.
      *
      * @param accessPointId The access point identifier.
-     * @param accessPointProperties Output variable to receive the access point properties.
+     * @param dot11AccessPointAttributes Output variable to receive the access point attributes.
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
-    WifiAccessPointGetPropertiesImpl(std::string_view accessPointId, google::protobuf::RepeatedPtrField<std::string>& accessPointProperties);
+    WifiAccessPointGetAttributesImpl(std::string_view accessPointId, Microsoft::Net::Wifi::Dot11AccessPointAttributes& dot11AccessPointAttributes);
 
 private:
     std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;

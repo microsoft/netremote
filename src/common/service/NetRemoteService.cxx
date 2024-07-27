@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include <google/protobuf/repeated_ptr_field.h>
+#include <google/protobuf/map.h>
 #include <grpcpp/impl/codegen/status.h>
 #include <grpcpp/server_context.h>
 #include <magic_enum.hpp>
@@ -422,11 +422,11 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1x([[maybe_unused]] grpc::S
 }
 
 ::grpc::Status
-NetRemoteService::WifiAccessPointGetProperties([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointGetPropertiesRequest* request, WifiAccessPointGetPropertiesResult* result)
+NetRemoteService::WifiAccessPointGetAttributes([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointGetAttributesRequest* request, WifiAccessPointGetAttributesResult* result)
 {
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
-    auto wifiOperationStatus = WifiAccessPointGetPropertiesImpl(request->accesspointid(), *result->mutable_properties());
+    auto wifiOperationStatus = WifiAccessPointGetAttributesImpl(request->accesspointid(), *result->mutable_attributes());
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(wifiOperationStatus);
 
@@ -1267,10 +1267,10 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1xImpl(std::string_view acc
     return wifiOperationStatus;
 }
 
-using google::protobuf::RepeatedPtrField;
+using google::protobuf::Map;
 
 WifiAccessPointOperationStatus
-NetRemoteService::WifiAccessPointGetPropertiesImpl(std::string_view accessPointId, RepeatedPtrField<std::string>& accessPointProperties)
+NetRemoteService::WifiAccessPointGetAttributesImpl(std::string_view accessPointId, Dot11AccessPointAttributes& dot11AccessPointAttributes)
 {
     WifiAccessPointOperationStatus wifiOperationStatus{};
 
@@ -1283,13 +1283,10 @@ NetRemoteService::WifiAccessPointGetPropertiesImpl(std::string_view accessPointI
         return wifiOperationStatus;
     }
 
-    // Populate output argument with a copy of the access point properties.
+    // Populate output argument with a copy of the access point attributes.
     {
-        auto properties = accessPoint->GetProperties();
-        accessPointProperties = {
-            std::make_move_iterator(std::begin(properties.Properties)),
-            std::make_move_iterator(std::end(properties.Properties)),
-        };
+        auto accessPointAttributes = accessPoint->GetAttributes();
+        dot11AccessPointAttributes = ToDot11AccessPointAttributes(accessPointAttributes);
     }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);

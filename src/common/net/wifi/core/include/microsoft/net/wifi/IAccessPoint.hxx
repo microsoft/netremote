@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string_view>
+#include <unordered_map>
 
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
@@ -12,11 +13,11 @@ namespace Microsoft::Net::Wifi
 {
 
 /**
- * @brief Container to hold static properties about an access point.
+ * @brief Container to hold static attributes about an access point.
  */
-struct AccessPointProperties
+struct AccessPointAttributes
 {
-    std::vector<std::string> Properties{};
+    std::unordered_map<std::string, std::string> Properties{};
 };
 
 /**
@@ -61,12 +62,12 @@ struct IAccessPoint
     GetMacAddress() const noexcept = 0;
 
     /**
-     * @brief Get the static properties of an access point.
+     * @brief Get the static attributes of an access point.
      *
-     * @return AccessPointProperties&
+     * @return AccessPointAttributes&
      */
-    virtual const AccessPointProperties&
-    GetProperties() const noexcept = 0;
+    virtual const AccessPointAttributes&
+    GetAttributes() const noexcept = 0;
 
     /**
      * @brief Create a new instance that can control the access point.
@@ -99,7 +100,7 @@ struct IAccessPointCreateArgs
     IAccessPointCreateArgs&
     operator=(IAccessPointCreateArgs&&) = delete;
 
-    AccessPointProperties Properties{};
+    AccessPointAttributes Attributes{};
 };
 
 /**
