@@ -61,7 +61,9 @@ AccessPointFactory::Create(std::string_view interfaceName)
 }
 
 std::shared_ptr<IAccessPoint>
-AccessPointFactory::Create(std::string_view interfaceName, [[maybe_unused]] std::unique_ptr<IAccessPointCreateArgs> accessPointCreateArgs)
+AccessPointFactory::Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> accessPointCreateArgs)
 {
-    return std::make_shared<AccessPoint>(interfaceName, GetControllerFactory());
+    return (accessPointCreateArgs == nullptr)
+        ? std::make_shared<AccessPoint>(interfaceName, GetControllerFactory())
+        : std::make_shared<AccessPoint>(interfaceName, GetControllerFactory(), std::move(accessPointCreateArgs->Attributes));
 }
