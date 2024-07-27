@@ -14,8 +14,6 @@ namespace Microsoft::Net::Wifi
  */
 struct AccessPointAttributes
 {
-    AccessPointAttributes() = default;
-
     /**
      * @brief Attempt to deserialize a JSON string into a map of access point attributes.
      *
