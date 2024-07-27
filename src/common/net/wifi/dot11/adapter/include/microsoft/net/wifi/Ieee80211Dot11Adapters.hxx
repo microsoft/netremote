@@ -9,6 +9,7 @@
 #include <microsoft/net/remote/protocol/Network8021x.pb.h>
 #include <microsoft/net/remote/protocol/WifiCore.pb.h>
 #include <microsoft/net/wifi/AccessPointOperationStatus.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 #include <microsoft/net/wifi/Ieee80211AccessPointCapabilities.hxx>
 #include <microsoft/net/wifi/Ieee80211Authentication.hxx>
@@ -360,21 +361,39 @@ ToDot11AuthenticationData(const Ieee80211AuthenticationData& ieee80211Authentica
 
 /**
  * @brief Convert the specified Dot11AuthenticationDot1x to the equivalent IEEE 802.1x authentication.
- * 
+ *
  * @param dot11AuthenticationDot1x The Dot11AuthenticationDot1x to convert.
- * @return Ieee80211Authentication8021x 
+ * @return Ieee80211Authentication8021x
  */
 Ieee80211Authentication8021x
 FromDot11AuthenticationDot1x(const Dot11AuthenticationDot1x& dot11AuthenticationDot1x) noexcept;
 
 /**
  * @brief Convert the specified IEEE 802.1x authentication to the equivalent Dot11AuthenticationDot1x.
- * 
+ *
  * @param ieee8021xAuthentication The IEEE 802.1x authentication to convert.
- * @return Dot11AuthenticationDot1x 
+ * @return Dot11AuthenticationDot1x
  */
 Dot11AuthenticationDot1x
 ToDot11AuthenticationDot1x(const Ieee80211Authentication8021x& ieee8021xAuthentication) noexcept;
+
+/**
+ * @brief Convert the specified Dot11AccessPointAttributes to the equivalent neutral type access point attributes.
+ *
+ * @param dot11AccessPointConfiguration The Dot11AccessPointAttributes to convert.
+ * @return AccessPointAttributes
+ */
+AccessPointAttributes
+FromDot11AccessPointAttributes(const Dot11AccessPointAttributes& dot11AccessPointConfiguration) noexcept;
+
+/**
+ * @brief Convert the specified neutral type access point attributes to the equivalent Dot11AccessPointAttributes.
+ *
+ * @param accessPointAttributes The IEEE 802.11 access point configuration to convert.
+ * @return Dot11AccessPointAttributes
+ */
+Dot11AccessPointAttributes
+ToDot11AccessPointAttributes(const AccessPointAttributes& accessPointAttributes) noexcept;
 
 } // namespace Microsoft::Net::Wifi
 

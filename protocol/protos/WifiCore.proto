@@ -224,6 +224,11 @@ message Dot11AccessPointCapabilities
     repeated Microsoft.Net.Wifi.Dot11AkmSuite AkmSuites = 5;
 }
 
+message Dot11AccessPointAttributes
+{
+    map<string, string> Properties = 1;
+}
+
 enum Dot11AccessPointState
 {
     AccessPointStateUnknown = 0;

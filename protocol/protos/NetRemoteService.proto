@@ -20,4 +20,5 @@ service NetRemote
     rpc WifiAccessPointSetSsid (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidResult);
     rpc WifiAccessPointSetNetworkBridge (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeResult);
     rpc WifiAccessPointSetAuthenticationDot1x (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationDot1xRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationDot1xResult);
+    rpc WifiAccessPointGetAttributes (Microsoft.Net.Remote.Wifi.WifiAccessPointGetAttributesRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointGetAttributesResult);
 }

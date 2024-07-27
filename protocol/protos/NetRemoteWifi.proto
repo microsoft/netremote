@@ -124,3 +124,15 @@ message WifiAccessPointSetAuthenticationDot1xResult
     string AccessPointId = 1;
     WifiAccessPointOperationStatus Status = 2;
 }
+
+message WifiAccessPointGetAttributesRequest
+{
+    string AccessPointId = 1;
+}
+
+message WifiAccessPointGetAttributesResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+    Microsoft.Net.Wifi.Dot11AccessPointAttributes Attributes = 3;
+}

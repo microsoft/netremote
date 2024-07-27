@@ -835,15 +835,41 @@ FromDot11AuthenticationDot1x(const Dot11AuthenticationDot1x& Dot11Authentication
 Dot11AuthenticationDot1x
 ToDot11AuthenticationDot1x(const Ieee80211Authentication8021x& ieee8021xAuthentication) noexcept
 {
-    Dot11AuthenticationDot1x Dot11AuthenticationDot1x{};
+    Dot11AuthenticationDot1x dot11AuthenticationDot1x{};
 
     // Convert RADIUS configuration, if present.
     if (ieee8021xAuthentication.Radius.has_value()) {
         auto dot1xRadiusConfiguration = ToServiceDot1xRadiusConfiguration(ieee8021xAuthentication.Radius.value());
-        *Dot11AuthenticationDot1x.mutable_radius() = std::move(dot1xRadiusConfiguration);
+        *dot11AuthenticationDot1x.mutable_radius() = std::move(dot1xRadiusConfiguration);
     }
 
-    return Dot11AuthenticationDot1x;
+    return dot11AuthenticationDot1x;
+}
+
+AccessPointAttributes
+FromDot11AccessPointAttributes(const Dot11AccessPointAttributes& dot11AccessPointConfiguration) noexcept
+{
+    AccessPointAttributes accessPointAttributes{};
+
+    accessPointAttributes.Properties = {
+        std::cbegin(dot11AccessPointConfiguration.properties()),
+        std::cend(dot11AccessPointConfiguration.properties()),
+    };
+
+    return accessPointAttributes;
+}
+
+Dot11AccessPointAttributes
+ToDot11AccessPointAttributes(const AccessPointAttributes& accessPointAttributes) noexcept
+{
+    Dot11AccessPointAttributes dot11AccessPointAttributes{};
+
+    *dot11AccessPointAttributes.mutable_properties() = {
+        std::make_move_iterator(std::begin(accessPointAttributes.Properties)),
+        std::make_move_iterator(std::end(accessPointAttributes.Properties)),
+    };
+
+    return dot11AccessPointAttributes;
 }
 
 } // namespace Microsoft::Net::Wifi

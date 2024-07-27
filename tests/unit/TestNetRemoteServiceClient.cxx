@@ -1124,3 +1124,70 @@ TEST_CASE("WifiAccessPointSetAuthenticationDot1x API", "[basic][rpc][client][rem
         }
     }
 }
+
+TEST_CASE("WifiAccessPointGetAttributes API", "[basic][rpc][client][remote]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto InterfaceName{ "TestWifiAccessPointGetAttributes" };
+    constexpr auto InterfaceAttributesPropertyKey{ "TestAttributePropertyKey1" };
+    constexpr auto InterfaceAttributesPropertyValue{ "TestAttributePropertyValue1" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) }
+    };
+
+    auto apTest = std::make_shared<AccessPointTest>(InterfaceName, apCapabilities);
+    auto& apProperties = apTest->Attributes.Properties;
+    apProperties[InterfaceAttributesPropertyKey] = InterfaceAttributesPropertyValue;
+    apManagerTest->AddAccessPoint(apTest);
+
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointGetAttributesRequest request{};
+        request.set_accesspointid(InterfaceName);
+
+        WifiAccessPointGetAttributesResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointGetAttributes(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+    }
+
+    SECTION("Properties are properly reflected")
+    {
+        WifiAccessPointGetAttributesRequest request{};
+        request.set_accesspointid(InterfaceName);
+
+        WifiAccessPointGetAttributesResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointGetAttributes(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_attributes());
+
+        const auto& attributes = result.attributes();
+        const auto& properties = attributes.properties();
+
+        REQUIRE(std::size(properties) == 1);
+        REQUIRE(properties.contains(InterfaceAttributesPropertyKey));
+        REQUIRE(properties.at(InterfaceAttributesPropertyKey) == InterfaceAttributesPropertyValue);
+    }
+}
