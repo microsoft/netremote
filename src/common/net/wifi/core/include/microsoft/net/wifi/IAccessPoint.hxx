@@ -6,20 +6,12 @@
 #include <string_view>
 #include <unordered_map>
 
+#include <microsoft/net/wifi/AccessPointAttributes.hxx>
 #include <microsoft/net/wifi/IAccessPointController.hxx>
 #include <microsoft/net/wifi/Ieee80211.hxx>
 
 namespace Microsoft::Net::Wifi
 {
-
-/**
- * @brief Container to hold static attributes about an access point.
- */
-struct AccessPointAttributes
-{
-    std::unordered_map<std::string, std::string> Properties{};
-};
-
 /**
  * @brief Represents a wireless access point.
  */

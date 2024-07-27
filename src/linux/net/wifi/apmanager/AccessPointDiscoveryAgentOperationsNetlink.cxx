@@ -158,8 +158,8 @@ MakeAccessPoint(const std::shared_ptr<AccessPointFactoryLinux> &accessPointFacto
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
-    const auto ToAccessPoint = [this](const Nl80211Interface &nl80211Interface) {
-        return detail::MakeAccessPoint(m_accessPointFactory, nl80211Interface);
+    const auto ToAccessPoint = [accessPointFactory = m_accessPointFactory](const Nl80211Interface &nl80211Interface) {
+        return detail::MakeAccessPoint(accessPointFactory, nl80211Interface);
     };
 
     std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
