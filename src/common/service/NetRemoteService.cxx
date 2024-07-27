@@ -209,6 +209,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     id.assign(std::cbegin(interfaceName), std::cend(interfaceName));
 
     std::string macAddress = Ieee80211MacAddressToString(accessPoint.GetMacAddress());
+    auto dot11AccessPointAttributes = ToDot11AccessPointAttributes(accessPoint.GetAttributes());
 
     auto accessPointController = accessPoint.CreateController();
     if (accessPointController == nullptr) {
@@ -242,6 +243,7 @@ IAccessPointToNetRemoteAccessPointResultItem(IAccessPoint& accessPoint)
     item.set_macaddress(std::move(macAddress));
     item.set_isenabled(isEnabled);
     *item.mutable_capabilities() = std::move(dot11AccessPointCapabilities);
+    *item.mutable_attributes() = std::move(dot11AccessPointAttributes);
 
     return item;
 }
