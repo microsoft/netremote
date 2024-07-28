@@ -14,6 +14,11 @@ namespace Microsoft::Net::Wifi
  */
 struct AccessPointAttributes
 {
+    std::unordered_map<std::string, std::string> Properties{};
+
+    bool
+    operator==(const AccessPointAttributes&) const = default;
+
     /**
      * @brief Attempt to deserialize a JSON string into a map of access point attributes.
      *
@@ -31,8 +36,6 @@ struct AccessPointAttributes
      */
     static std::optional<std::unordered_map<std::string, AccessPointAttributes>>
     TryParseJson(std::istream& json);
-
-    std::unordered_map<std::string, std::string> Properties{};
 };
 } // namespace Microsoft::Net::Wifi
 
