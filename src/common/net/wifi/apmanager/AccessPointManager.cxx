@@ -123,10 +123,16 @@ AccessPointManager::GetAllAccessPoints() const
     return accessPoints;
 }
 
-const std::unordered_map<std::string, AccessPointAttributes>&
-AccessPointManager::GetAllAccessPointAttributes() const
+std::optional<AccessPointAttributes>
+AccessPointManager::GetAccessPointAttributes(const std::string& interfaceName) const
 {
-    return m_accessPointAttributes;
+    auto accessPointAttributesIterator = m_accessPointAttributes.find(interfaceName);
+    if (accessPointAttributesIterator == std::cend(m_accessPointAttributes)) {
+        return std::nullopt;
+    }
+
+    auto [_, accessPointAttributes] = *accessPointAttributesIterator;
+    return accessPointAttributes;
 }
 
 void

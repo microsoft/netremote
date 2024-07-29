@@ -80,12 +80,13 @@ public:
     GetAllAccessPoints() const;
 
     /**
-     * @brief Get a map of all access point attributes.
+     * @brief Get the attributes of the access point with the specified interface name.
      * 
-     * @return const std::unordered_map<std::string, AccessPointAttributes>& 
+     * @param interfaceName The interface name of the access point to get attributes for.
+     * @return std::optional<AccessPointAttributes> 
      */
-    const std::unordered_map<std::string, AccessPointAttributes>&
-    GetAllAccessPointAttributes() const;
+    std::optional<AccessPointAttributes>
+    GetAccessPointAttributes(const std::string& interfaceName) const;
 
     virtual ~AccessPointManager() = default;
     AccessPointManager(const AccessPointManager&) = delete;
