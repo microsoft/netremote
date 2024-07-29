@@ -126,6 +126,7 @@ AccessPointManager::GetAllAccessPoints() const
 std::optional<AccessPointAttributes>
 AccessPointManager::GetAccessPointAttributes(const std::string& interfaceName) const
 {
+    // Note: no locks are used here because m_accessPointAttributes cannot be modified after construction.
     auto accessPointAttributesIterator = m_accessPointAttributes.find(interfaceName);
     if (accessPointAttributesIterator == std::cend(m_accessPointAttributes)) {
         return std::nullopt;
