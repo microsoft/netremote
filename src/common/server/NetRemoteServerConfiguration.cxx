@@ -8,6 +8,8 @@
 #include <CLI/Error.hpp>
 #include <CLI/Formatter.hpp>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerJsonConfiguration.hxx>
+#include <plog/Log.h>
 
 using namespace Microsoft::Net::Remote::Service;
 
@@ -58,6 +60,28 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
     } catch (const CLI::ParseError& parseError) {
         if (throwOnParseError) {
             throw parseError; // NOLINT(cert-err60-cpp)
+        }
+    }
+
+    // If optional JSON configuration was specified, parse it. While optional, if specified, it must be valid.
+    if (!std::empty(configuration.JsonConfigurationFilePath)) {
+        const auto configurationJsonObject = NetRemoteServerJsonConfiguration::ParseFromFile(configuration.JsonConfigurationFilePath);
+        if (!configurationJsonObject.has_value()) {
+            LOGF << "Failed to parse JSON configuration file";
+            // TODO: fix return value
+            return {};
+        }
+
+        const auto configurationJson = NetRemoteServerJsonConfiguration::TryParseFromJson(configurationJsonObject.value());
+        if (!configurationJsonObject.has_value()) {
+            LOGF << "Failed to parse JSON configuration";
+            // TODO: fix return value
+            return {};
+        }
+
+        // If optional fields are specified in the JSON configuration, populate the configuration object with them.
+        if (configurationJson->AccessPointAttributes.has_value()) {
+            configuration.AccessPointAttributes = std::move(configurationJson->AccessPointAttributes.value());
         }
     }
 

@@ -109,7 +109,7 @@ main(int argc, char *argv[])
     AUDITN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
 
     // Create an access point manager and discovery agent.
-    auto accessPointManager = AccessPointManager::Create();
+    auto accessPointManager = AccessPointManager::Create(std::move(configuration.AccessPointAttributes));
     auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
     auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
     auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory);
