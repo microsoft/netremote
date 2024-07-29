@@ -37,19 +37,22 @@ NetRemoteServerJsonConfiguration::TryParseFromJson(const nlohmann::json& configu
     using Microsoft::Net::Wifi::AccessPointAttributes;
 
     NetRemoteServerJsonConfiguration configuration{};
-
+    
+    // Parse access point attributes, if specified.
     if (configurationJson.contains(AccessPointAttributesKey)) {
         try {
             auto accessPointAttributesJson = configurationJson.at(AccessPointAttributesKey);
             if (!accessPointAttributesJson.is_object()) {
-                LOGW << std::format("JSON configuration '{}' is not an object; ignoring", AccessPointAttributesKey);
+                LOGE << std::format("JSON configuration '{}' is not an object", AccessPointAttributesKey);
+                return std::nullopt;
             }
 
             std::unordered_map<std::string, AccessPointAttributes> accessPointAttributes{};
             accessPointAttributesJson.get_to(accessPointAttributes);
             configuration.AccessPointAttributes = std::move(accessPointAttributes);
         } catch (const nlohmann::json::exception& jsonException) {
-            LOGW << std::format("Failed to parse JSON configuration for '{}' field: {}; ignoring", AccessPointAttributesKey, jsonException.what());
+            LOGE << std::format("Failed to parse JSON configuration for '{}' field: {}", AccessPointAttributesKey, jsonException.what());
+            return std::nullopt;
         }
     }
 

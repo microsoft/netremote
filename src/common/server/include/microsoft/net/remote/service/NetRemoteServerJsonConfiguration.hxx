@@ -24,8 +24,13 @@ struct NetRemoteServerJsonConfiguration
 
     /**
      * @brief Parse a JSON configuration file.
+     * 
+     * Parsing notes:
+     *  - The JSON configuration file is expected to be an object.
+     *  - The JSON configuration file may contain optional fields.
+     *  - The JSON configuration file may NOT contain invalid values for optional fields.
      *
-     * @param configurationFilePath
+     * @param configurationFilePath The path to the JSON configuration file to parse.
      * @return std::optional<nlohmann::json>
      */
     static std::optional<nlohmann::json>
@@ -33,7 +38,7 @@ struct NetRemoteServerJsonConfiguration
 
     /**
      * @brief Try to parse a NetRemoteServerJsonConfiguration object from a JSON object.
-     *
+     * 
      * @param configurationJson The JSON object to parse.
      * @return std::optional<NetRemoteServerJsonConfiguration>
      */

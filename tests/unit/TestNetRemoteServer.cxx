@@ -1,6 +1,8 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <optional>
 #include <ranges>
@@ -13,11 +15,160 @@
 #include <microsoft/net/remote/protocol/NetRemoteService.grpc.pb.h>
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
+#include <microsoft/net/remote/service/NetRemoteServerJsonConfiguration.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
 
 #include "TestNetRemoteCommon.hxx"
 
 using namespace Microsoft::Net::Remote::Test;
+
+namespace Microsoft::Net::Remote::Service::Test
+{
+/**
+ * @brief Create a valid JSON server configuration file.
+ *
+ * @return std::filesystem::path The path to the created JSON configuration file.
+ */
+std::filesystem::path
+CreateServerConfigurationJsonFile()
+{
+    const auto configurationFilePath{ std::filesystem::temp_directory_path() / "NetRemoteServerConfiguration.json" };
+    std::ofstream configurationFileStream{ configurationFilePath, std::ios::out | std::ios::trunc };
+
+    configurationFileStream << R"({
+    "WifiAccessPointAttributes": {
+        "wlan0": {
+            "Properties": {
+                "key0": "value0",
+                "key1": "value1",
+                "RfAttenutatorChannels": "1,2,3,4,5"
+            }
+        },
+        "wlan1": {
+            "Properties": {
+                "key0": "value0",
+                "key1": "value1",
+                "key2": "value2",
+                "RfAttenutatorChannels": "6,7,8"
+            }
+        }
+    }
+    })";
+
+    return configurationFilePath;
+}
+
+/**
+ * @brief Get the NetRemoteServerJsonConfiguration object corresponding to the JSON created by
+ * CreateServerConfigurationJsonFile().
+ *
+ * @return const NetRemoteServerJsonConfiguration&
+ */
+const NetRemoteServerJsonConfiguration&
+GetNetRemoteServerJsonConfigurationValidObject()
+{
+    using Microsoft::Net::Wifi::AccessPointAttributes;
+
+    static const NetRemoteServerJsonConfiguration netRemoteServerJsonConfiguration{
+        .AccessPointAttributes = std::unordered_map<std::string, AccessPointAttributes>{
+            { "wlan0", { .Properties = { { "key0", "value0" }, { "key1", "value1" }, { "RfAttenutatorChannels", "1,2,3,4,5" } } } },
+            { "wlan1", { .Properties = { { "key0", "value0" }, { "key1", "value1" }, { "key2", "value2" }, { "RfAttenutatorChannels", "6,7,8" } } } },
+        }
+    };
+
+    return netRemoteServerJsonConfiguration;
+}
+
+/**
+ * @brief Create an invalid JSON server configuration file.
+ *
+ * @return std::filesystem::path The path to the created JSON configuration file.
+ */
+std::filesystem::path
+CreateServerConfigurationJsonFileInvalid()
+{
+    const auto configurationFilePath{ std::filesystem::temp_directory_path() / "NetRemoteServerConfigurationInvalid.json" };
+    std::ofstream configurationFileStream{ configurationFilePath, std::ios::out | std::ios::trunc };
+
+    configurationFileStream << "This is a bunch of non-JSON content";
+
+    return configurationFilePath;
+}
+} // namespace Microsoft::Net::Remote::Service::Test
+
+TEST_CASE("Parse JSON server configuration from file", "[basic][json][config]")
+{
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Wifi;
+
+    const auto ConfigurationFileJsonValidPath{ Test::CreateServerConfigurationJsonFile() };
+    const auto ConfigurationFileJsonInvalidPath{ Test::CreateServerConfigurationJsonFileInvalid() };
+
+    SECTION("ParseFromFile doesn't cause a crash with valid JSON file")
+    {
+        REQUIRE_NOTHROW(NetRemoteServerJsonConfiguration::ParseFromFile(ConfigurationFileJsonValidPath));
+    }
+
+    SECTION("ParseFromFile doesn't cause a crash with invalid JSON file")
+    {
+        REQUIRE_NOTHROW(NetRemoteServerJsonConfiguration::ParseFromFile(ConfigurationFileJsonInvalidPath));
+    }
+
+    SECTION("TryParseFromJson doesn't cause a crash with valid JSON configuration content")
+    {
+        REQUIRE_NOTHROW(NetRemoteServerJsonConfiguration::TryParseFromJson(NetRemoteServerJsonConfiguration::ParseFromFile(ConfigurationFileJsonValidPath).value()));
+    }
+
+    SECTION("TryParseFromJson doesn't cause a crash with empty JSON configuration content")
+    {
+        REQUIRE_NOTHROW(NetRemoteServerJsonConfiguration::TryParseFromJson(nlohmann::json{}));
+    }
+
+    SECTION("TryParseFromJson parses WifiAccessPointAttributes from valid JSON configuration content")
+    {
+        const auto configurationJson{ NetRemoteServerJsonConfiguration::ParseFromFile(ConfigurationFileJsonValidPath).value() };
+        const auto configuration{ NetRemoteServerJsonConfiguration::TryParseFromJson(configurationJson).value() };
+
+        // Ensure parsing succeeded.
+        REQUIRE(configuration.AccessPointAttributes.has_value());
+
+        // Ensure Wi-Fi access point properties were parsed.
+        const auto& accessPointAttributes = configuration.AccessPointAttributes.value();
+        REQUIRE(std::size(accessPointAttributes) == 2);
+        REQUIRE(accessPointAttributes.contains("wlan0"));
+        REQUIRE(accessPointAttributes.contains("wlan1"));
+
+        // Validate the properties of each access point encoded in the JSON.
+
+        // Validate the wlan0 access point properties.
+        const auto& wlan0Attributes = configuration.AccessPointAttributes->at("wlan0");
+        const auto& wlan0Properties = wlan0Attributes.Properties;
+        REQUIRE(std::size(wlan0Properties) == 3);
+        REQUIRE(wlan0Properties.contains("key0"));
+        REQUIRE(wlan0Properties.at("key0") == "value0");
+        REQUIRE(wlan0Properties.contains("key1"));
+        REQUIRE(wlan0Properties.at("key1") == "value1");
+        REQUIRE(wlan0Properties.contains("RfAttenutatorChannels"));
+        REQUIRE(wlan0Properties.at("RfAttenutatorChannels") == "1,2,3,4,5");
+
+        // Validate the wlan1 access point properties.
+        const auto& wlan1Attributes = configuration.AccessPointAttributes->at("wlan1");
+        const auto& wlan1Properties = wlan1Attributes.Properties;
+        REQUIRE(std::size(wlan1Properties) == 4);
+        REQUIRE(wlan1Properties.contains("key0"));
+        REQUIRE(wlan1Properties.at("key0") == "value0");
+        REQUIRE(wlan1Properties.contains("key1"));
+        REQUIRE(wlan1Properties.at("key1") == "value1");
+        REQUIRE(wlan1Properties.contains("key2"));
+        REQUIRE(wlan1Properties.at("key2") == "value2");
+        REQUIRE(wlan1Properties.contains("RfAttenutatorChannels"));
+        REQUIRE(wlan1Properties.at("RfAttenutatorChannels") == "6,7,8");
+
+        // Validate the parsed object in totality.
+        const auto& netRemoteServerJsonConfigurationValid = Test::GetNetRemoteServerJsonConfigurationValidObject();
+        REQUIRE(netRemoteServerJsonConfigurationValid == configuration);
+    }
+}
 
 TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 {
