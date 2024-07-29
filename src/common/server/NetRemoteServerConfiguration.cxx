@@ -34,7 +34,7 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         "Enable logging to file (disabled by default)");
 
     app.add_option(
-        "-c,--config",
+        "-c,--config,--configuration,--configurationFile,--json,--jsonConfig,--jsonConfiguration--jsonConfigurationFile",
         config.JsonConfigurationFilePath,
         "The path to the JSON configuration file");
 
@@ -68,14 +68,12 @@ ParseCliAppOptions(bool throwOnParseError, Args&&... args)
         const auto configurationJsonObject = NetRemoteServerJsonConfiguration::ParseFromFile(configuration.JsonConfigurationFilePath);
         if (!configurationJsonObject.has_value()) {
             LOGF << "Failed to parse JSON configuration file";
-            // TODO: fix return value
             return {};
         }
 
         const auto configurationJson = NetRemoteServerJsonConfiguration::TryParseFromJson(configurationJsonObject.value());
         if (!configurationJsonObject.has_value()) {
             LOGF << "Failed to parse JSON configuration";
-            // TODO: fix return value
             return {};
         }
 
