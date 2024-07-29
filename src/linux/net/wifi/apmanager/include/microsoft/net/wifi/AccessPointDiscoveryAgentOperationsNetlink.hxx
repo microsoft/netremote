@@ -3,8 +3,10 @@
 #define ACCESS_POINT_DISCOVERY_AGENT_OPERATIONS_NETLINK_HXX
 
 #include <cstdint>
+#include <functional>
 #include <future>
 #include <memory>
+#include <optional>
 #include <stop_token>
 #include <thread>
 #include <vector>
@@ -19,6 +21,9 @@
 
 namespace Microsoft::Net::Wifi
 {
+// Prototype for obtaining access point attributes.
+using GetAccessPointAttributesFunction = std::function<std::optional<AccessPointAttributes>(const std::string &)>;
+
 /**
  * @brief Access point discovery agent operations that use netlink for
  * discovering devices and monitoring device presence.
@@ -29,11 +34,12 @@ struct AccessPointDiscoveryAgentOperationsNetlink :
     public IAccessPointDiscoveryAgentOperations
 {
     /**
-     * @brief Construct a new AccessPointDiscoveryAgentOperationsNetlink object with the specified access point factory.
+     * @brief Construct a new Access Point Discovery Agent Operations Netlink object
      *
      * @param accessPointFactory The access point factory to use for creating access points.
+     * @param getAccessPointAttributes Function to get access point attributes.
      */
-    explicit AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory);
+    AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory, GetAccessPointAttributesFunction getAccessPointAttributes = nullptr);
 
     ~AccessPointDiscoveryAgentOperationsNetlink() override;
 
@@ -111,8 +117,28 @@ private:
     int
     ProcessNetlinkMessage(struct nl_msg *netlinkMessage, AccessPointPresenceEventCallback &accessPointPresenceEventCallback);
 
+    /**
+     * @brief Create an access point object for the specified nl80211 interface.
+     *
+     * @param nl80211Interface The nl80211 interface object to create an access point instance for.
+     * @return std::shared_ptr<IAccessPoint>
+     */
+    std::shared_ptr<IAccessPoint>
+    MakeAccessPoint(const Netlink::Nl80211::Nl80211Interface &nl80211Interface);
+
+    /**
+     * @brief Find the access point attributes for the specified interface name. This is a simeple wrapper around the
+     * provided m_getAccessPointAttributes function.
+     *
+     * @param interfaceName The name of the interface.
+     * @return std::optional<AccessPointAttributes>
+     */
+    std::optional<AccessPointAttributes>
+    GetAccessPointAttributes(const std::string &interfaceName) const;
+
 private:
     std::shared_ptr<AccessPointFactoryLinux> m_accessPointFactory;
+    GetAccessPointAttributesFunction m_getAccessPointAttributes;
 
     // Cookie used to validate that the callback context is valid.
     static constexpr uint32_t CookieValid{ 0x8BADF00DU };

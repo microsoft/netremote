@@ -51,6 +51,28 @@ std::mutex TerminateGate{};
  * @brief Condition variable to signal that the termination flag 'TerminateRequested' has changed.
  */
 std::condition_variable TerminateRequstedChanged{};
+
+/**
+ * @brief Helper function to get the access point attributes for the specified interface name using a weak reference to
+ * an access point manager.
+ * 
+ * @param accessPointManagerWeak Weak reference to the access point manager.
+ * @param interfaceName The interface name of the access point.
+ * @return std::optional<Microsoft::Net::Wifi::AccessPointAttributes> 
+ */
+std::optional<Microsoft::Net::Wifi::AccessPointAttributes>
+GetAccessPointAttributes(std::weak_ptr<AccessPointManager> accessPointManagerWeak, const std::string &interfaceName)
+{
+    // Attempt to resolve the weak reference to a strong one.
+    auto accessPointManager{ accessPointManagerWeak.lock() };
+    if (!accessPointManager) {
+        LOGW << std::format("Access point manager has been destroyed; cannot get access point attributes for interface '{}'", interfaceName);
+        return std::nullopt;
+    }
+
+    // Get the access point attributes for the specified interface name.
+    return accessPointManager->GetAccessPointAttributes(interfaceName);
+}
 } // namespace
 
 /**
@@ -108,14 +130,24 @@ main(int argc, char *argv[])
     LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
     AUDITN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
 
-    // Create an access point manager and discovery agent.
+    // Create an access point manager.
     auto accessPointManager = AccessPointManager::Create(std::move(configuration.AccessPointAttributes));
-    auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
-    auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
-    auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory);
-    auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));
 
-    accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+    // Configure access point discovery agent operations.
+    {
+        // Create function to look up access point attributes, to be used by discovery agent operations.
+        auto getAccessPointAttributes = [accessPointManagerWeak = accessPointManager->weak_from_this()](const std::string &interfaceName) -> std::optional<AccessPointAttributes> {
+            return GetAccessPointAttributes(std::move(accessPointManagerWeak), interfaceName);
+        };
+
+        auto accessPointControllerFactory = std::make_unique<AccessPointControllerLinuxFactory>();
+        auto accessPointFactory = std::make_shared<AccessPointFactoryLinux>(std::move(accessPointControllerFactory));
+        auto accessPointDiscoveryAgentOperationsNetlink = std::make_unique<AccessPointDiscoveryAgentOperationsNetlink>(accessPointFactory, std::move(getAccessPointAttributes));
+        auto accessPointDiscoveryAgent = AccessPointDiscoveryAgent::Create(std::move(accessPointDiscoveryAgentOperationsNetlink));
+
+        // Add discovery agent to the access point manager. 
+        accessPointManager->AddDiscoveryAgent(std::move(accessPointDiscoveryAgent));
+    }
 
     // Create a network manager.
     {

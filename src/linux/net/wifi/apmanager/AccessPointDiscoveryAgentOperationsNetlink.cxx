@@ -6,6 +6,7 @@
 #include <future>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <stdexcept>
 #include <stop_token>
@@ -23,6 +24,7 @@
 #include <microsoft/net/netlink/nl80211/Netlink80211.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211Interface.hxx>
 #include <microsoft/net/netlink/nl80211/Netlink80211ProtocolState.hxx>
+#include <microsoft/net/wifi/AccessPointAttributes.hxx>
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/IAccessPoint.hxx>
@@ -49,8 +51,9 @@ using Microsoft::Net::Netlink::Nl80211::Nl80211ProtocolState;
 
 // NOLINTBEGIN(concurrency-mt-unsafe)
 
-AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory) :
+AccessPointDiscoveryAgentOperationsNetlink::AccessPointDiscoveryAgentOperationsNetlink(std::shared_ptr<AccessPointFactoryLinux> accessPointFactory, GetAccessPointAttributesFunction getAccessPointAttributes) :
     m_accessPointFactory(std::move(accessPointFactory)),
+    m_getAccessPointAttributes(std::move(getAccessPointAttributes)),
     m_cookie(CookieValid),
     m_netlink80211ProtocolState(Nl80211ProtocolState::Instance())
 {}
@@ -139,27 +142,28 @@ InterfaceSupportsAccessPointMode(const Nl80211Interface &nl80211Interface)
 {
     return nl80211Interface.SupportsAccessPointMode();
 }
+} // namespace detail
 
-/**
- * @brief Helper function to create an access point instance from an nl80211 interface. To be used in range expressions.
- *
- * @param accessPointFactory The factory to use for creating the access point instance.
- * @param nl80211Interface The nl80211 interface to create the access point instance from.
- * @return std::shared_ptr<IAccessPoint>
- */
 std::shared_ptr<IAccessPoint>
-MakeAccessPoint(const std::shared_ptr<AccessPointFactoryLinux> &accessPointFactory, const Nl80211Interface &nl80211Interface)
+AccessPointDiscoveryAgentOperationsNetlink::MakeAccessPoint(const Nl80211Interface &nl80211Interface)
 {
     auto createArgs = std::make_unique<AccessPointCreateArgsLinux>(nl80211Interface);
-    return accessPointFactory->Create(nl80211Interface.Name, std::move(createArgs));
+
+    // Obtain the static attributes of the access point, if available.
+    auto accessPointAttributes = GetAccessPointAttributes(nl80211Interface.Name);
+    if (accessPointAttributes.has_value()) {
+        createArgs->Attributes = std::move(accessPointAttributes.value());
+    }
+
+    auto accessPoint = m_accessPointFactory->Create(nl80211Interface.Name, std::move(createArgs));
+    return accessPoint;
 }
-} // namespace detail
 
 std::future<std::vector<std::shared_ptr<IAccessPoint>>>
 AccessPointDiscoveryAgentOperationsNetlink::ProbeAsync()
 {
-    const auto ToAccessPoint = [accessPointFactory = m_accessPointFactory](const Nl80211Interface &nl80211Interface) {
-        return detail::MakeAccessPoint(accessPointFactory, nl80211Interface);
+    const auto ToAccessPoint = [this](const Nl80211Interface &nl80211Interface) {
+        return MakeAccessPoint(nl80211Interface);
     };
 
     std::promise<std::vector<std::shared_ptr<IAccessPoint>>> probePromise{};
@@ -233,8 +237,7 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessage(struct nl_msg 
     if (accessPointPresenceEventCallback != nullptr) {
         const auto interfaceName{ nl80211Interface->Name };
         LOGD << std::format("Invoking access point presence event callback with event args 'interface={}, presence={}'", interfaceName, magic_enum::enum_name(accessPointPresenceEvent));
-        auto accessPointCreateArgs = std::make_unique<AccessPointCreateArgsLinux>(std::move(nl80211Interface.value()));
-        auto accessPoint = m_accessPointFactory->Create(interfaceName, std::move(accessPointCreateArgs));
+        auto accessPoint = MakeAccessPoint(nl80211Interface.value());
 
         accessPointPresenceEventCallback(accessPointPresenceEvent, accessPoint);
     }
@@ -398,7 +401,6 @@ AccessPointDiscoveryAgentOperationsNetlink::ProcessNetlinkMessagesThread(Netlink
             }
         }
     }
-
 }
 
 /* static */
@@ -427,3 +429,11 @@ AccessPointDiscoveryAgentOperationsNetlink::HandleNetlinkSocketReady(NetlinkSock
 }
 
 // NOLINTEND(concurrency-mt-unsafe)
+
+std::optional<AccessPointAttributes>
+AccessPointDiscoveryAgentOperationsNetlink::GetAccessPointAttributes(const std::string &interfaceName) const
+{
+    return (m_getAccessPointAttributes != nullptr)
+        ? m_getAccessPointAttributes(interfaceName)
+        : std::nullopt;
+}
