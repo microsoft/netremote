@@ -27,15 +27,20 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         "The address to listen on for incoming connections");
 
     app.add_flag(
+        "--enable-file-logging",
+        config.EnableFileLogging,
+        "Enable logging to file (disabled by default)");
+
+    app.add_option(
+        "-c,--config",
+        config.JsonConfigurationFilePath,
+        "The path to the JSON configuration file");
+
+    app.add_flag(
            "-v,--verbosity",
            config.LogVerbosity,
            "The log verbosity level. Supply multiple times to increase verbosity (0=fatal, 1=errors, 2=warnings, 3=info, 4=debug, 5+=verbose)")
         ->default_val(NetRemoteServerConfiguration::LogVerbosityDefault);
-
-    app.add_flag(
-        "--enable-file-logging",
-        config.EnableFileLogging,
-        "Enable logging to file (disabled by default)");
 
     return app;
 }

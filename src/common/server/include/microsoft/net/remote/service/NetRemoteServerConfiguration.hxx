@@ -3,6 +3,7 @@
 #define NET_REMOTE_SERVER_CONFIGURATION_HXX
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -87,6 +88,11 @@ struct NetRemoteServerConfiguration
      * @brief Factory to use to create the discovery service.
      */
     std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory{};
+
+    /**
+     * @brief Path to the JSON configuration file.
+     */
+    std::filesystem::path JsonConfigurationFilePath{};
 };
 
 } // namespace Microsoft::Net::Remote::Service
