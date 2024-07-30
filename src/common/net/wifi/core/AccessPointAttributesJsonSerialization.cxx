@@ -1,8 +1,7 @@
 
 #include <microsoft/net/wifi/AccessPointAttributes.hxx>
+#include <microsoft/net/wifi/AccessPointAttributesJsonSerialization.hxx>
 #include <nlohmann/json.hpp>
-
-#include "AccessPointAttributesJsonSerialization.hxx"
 
 namespace Microsoft::Net::Wifi
 {

@@ -53,7 +53,7 @@ struct AccessPointDiscoveryAgent :
     RegisterDiscoveryEventCallback(AccessPointPresenceEventCallback onDevicePresenceChanged);
 
     /**
-     * @brief indicates the started/running state.
+     * @brief Indicates the started/running state.
      *
      * @return true
      * @return false

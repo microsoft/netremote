@@ -5,8 +5,7 @@
 #include <unordered_map>
 
 #include <microsoft/net/wifi/AccessPointAttributes.hxx>
-
-#include "AccessPointAttributesJsonSerialization.hxx"
+#include <microsoft/net/wifi/AccessPointAttributesJsonSerialization.hxx>
 
 using namespace Microsoft::Net::Wifi;
 

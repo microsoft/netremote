@@ -23,11 +23,15 @@
 
 using namespace Microsoft::Net::Wifi;
 
+AccessPointManager::AccessPointManager(std::unordered_map<std::string, AccessPointAttributes> accessPointAttributes) :
+    m_accessPointAttributes{ std::move(accessPointAttributes) }
+{}
+
 /* static */
 std::shared_ptr<AccessPointManager>
-AccessPointManager::Create()
+AccessPointManager::Create(std::unordered_map<std::string, AccessPointAttributes> accessPointAttributes)
 {
-    return std::make_shared<notstd::enable_make_protected<AccessPointManager>>();
+    return std::make_shared<notstd::enable_make_protected<AccessPointManager>>(std::move(accessPointAttributes));
 }
 
 std::shared_ptr<AccessPointManager>
@@ -117,6 +121,18 @@ AccessPointManager::GetAllAccessPoints() const
     });
 
     return accessPoints;
+}
+
+std::optional<AccessPointAttributes>
+AccessPointManager::GetAccessPointAttributes(const std::string& interfaceName) const
+{
+    auto accessPointAttributesIterator = m_accessPointAttributes.find(interfaceName);
+    if (accessPointAttributesIterator == std::cend(m_accessPointAttributes)) {
+        return std::nullopt;
+    }
+
+    auto [_, accessPointAttributes] = *accessPointAttributesIterator;
+    return accessPointAttributes;
 }
 
 void

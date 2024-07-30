@@ -10,7 +10,6 @@ target_sources(wifi-core
         AccessPoint.cxx
         AccessPointAttributes.cxx
         AccessPointAttributesJsonSerialization.cxx
-        AccessPointAttributesJsonSerialization.hxx
         AccessPointController.cxx
         AccessPointOperationStatus.cxx
         AccessPointOperationStatusLogOnExit.cxx
@@ -23,6 +22,7 @@ target_sources(wifi-core
     FILES
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPoint.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointAttributes.hxx
+        ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointAttributesJsonSerialization.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointController.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointOperationStatus.hxx
         ${WIFI_CORE_PUBLIC_INCLUDE_PREFIX}/AccessPointOperationStatusLogOnExit.hxx
@@ -37,11 +37,11 @@ target_sources(wifi-core
 target_link_libraries(wifi-core
     PRIVATE
         magic_enum::magic_enum
-        nlohmann_json::nlohmann_json
         notstd
         strings
     PUBLIC
         ${PROJECT_NAME}-net
+        nlohmann_json::nlohmann_json
         plog::plog
 )
 

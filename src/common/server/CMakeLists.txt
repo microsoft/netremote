@@ -9,12 +9,14 @@ target_sources(${PROJECT_NAME}-server
     PRIVATE
         NetRemoteServer.cxx
         NetRemoteServerConfiguration.cxx
+        NetRemoteServerJsonConfiguration.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_SERVER_PUBLIC_INCLUDE}
     FILES
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServer.hxx
         ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServerConfiguration.hxx
+        ${NET_REMOTE_SERVER_PUBLIC_INCLUDE_PREFIX}/NetRemoteServerJsonConfiguration.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-server
@@ -23,6 +25,7 @@ target_link_libraries(${PROJECT_NAME}-server
         ${PROJECT_NAME}-service
     PRIVATE
         CLI11::CLI11
+        nlohmann_json::nlohmann_json
         plog::plog
 )
 

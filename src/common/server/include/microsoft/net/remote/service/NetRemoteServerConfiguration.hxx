@@ -3,13 +3,16 @@
 #define NET_REMOTE_SERVER_CONFIGURATION_HXX
 
 #include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
+#include <microsoft/net/wifi/AccessPointAttributes.hxx>
 
 namespace Microsoft::Net::Remote::Service
 {
@@ -87,6 +90,16 @@ struct NetRemoteServerConfiguration
      * @brief Factory to use to create the discovery service.
      */
     std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory{};
+
+    /**
+     * @brief Path to the JSON configuration file.
+     */
+    std::filesystem::path JsonConfigurationFilePath{};
+
+    /**
+     * @brief Access point attributes.
+     */
+    std::unordered_map<std::string, Microsoft::Net::Wifi::AccessPointAttributes> AccessPointAttributes{};
 };
 
 } // namespace Microsoft::Net::Remote::Service

@@ -51,15 +51,6 @@ struct AccessPointFactoryLinux :
     using AccessPointFactory::AccessPointFactory;
 
     /**
-     * @brief Create a new access point object for the given network interface.
-     *
-     * @param interfaceName The name of the interface.
-     * @return std::shared_ptr<IAccessPoint>
-     */
-    std::shared_ptr<IAccessPoint>
-    Create(std::string_view interfaceName) override;
-
-    /**
      * @brief Create a new access point object for the given network interface with the specified creation arguments.
      *
      * @param interfaceName The name of the interface.
@@ -67,7 +58,7 @@ struct AccessPointFactoryLinux :
      * @return std::shared_ptr<IAccessPoint>
      */
     std::shared_ptr<IAccessPoint>
-    Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
+    Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs = nullptr) override;
 };
 
 /**

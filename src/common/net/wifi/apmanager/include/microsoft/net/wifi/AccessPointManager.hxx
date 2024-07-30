@@ -6,7 +6,11 @@
 #include <mutex>
 #include <optional>
 #include <shared_mutex>
+#include <string>
+#include <unordered_map>
 #include <vector>
+
+#include <microsoft/net/wifi/AccessPointAttributes.hxx>
 
 namespace Microsoft::Net::Wifi
 {
@@ -30,11 +34,11 @@ public:
     /**
      * @brief Safely create an instance of the access point manager.
      *
-     * @param accessPointFactory
+     * @param accessPointAttributes The static attributes of the access points to manage.
      * @return std::shared_ptr<AccessPointManager>
      */
     [[nodiscard]] static std::shared_ptr<AccessPointManager>
-    Create();
+    Create(std::unordered_map<std::string, AccessPointAttributes> accessPointAttributes = {});
 
     /**
      * @brief Get an instance of this access point manager.
@@ -75,6 +79,15 @@ public:
     std::vector<std::weak_ptr<IAccessPoint>>
     GetAllAccessPoints() const;
 
+    /**
+     * @brief Get the attributes of the access point with the specified interface name.
+     * 
+     * @param interfaceName The interface name of the access point to get attributes for.
+     * @return std::optional<AccessPointAttributes> 
+     */
+    std::optional<AccessPointAttributes>
+    GetAccessPointAttributes(const std::string& interfaceName) const;
+
     virtual ~AccessPointManager() = default;
     AccessPointManager(const AccessPointManager&) = delete;
     AccessPointManager(AccessPointManager&&) = delete;
@@ -86,8 +99,10 @@ public:
 protected:
     /**
      * @brief Construct a new AccessPointManager object.
+     * 
+     * @param accessPointAttributes The static attributes of the access points to manage.
      */
-    AccessPointManager() = default;
+    AccessPointManager(std::unordered_map<std::string, AccessPointAttributes> accessPointAttributes = {});
 
     /**
      * @brief Callback function for all access point agent presence change events.
@@ -123,6 +138,7 @@ private:
 
     mutable std::shared_mutex m_discoveryAgentsGate;
     std::vector<std::shared_ptr<AccessPointDiscoveryAgent>> m_discoveryAgents;
+    std::unordered_map<std::string, AccessPointAttributes> m_accessPointAttributes{};
 };
 
 } // namespace Microsoft::Net::Wifi

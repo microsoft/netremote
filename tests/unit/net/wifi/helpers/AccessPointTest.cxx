@@ -12,13 +12,10 @@
 using namespace Microsoft::Net::Wifi;
 using namespace Microsoft::Net::Wifi::Test;
 
-AccessPointTest::AccessPointTest(std::string_view interfaceName) :
-    AccessPointTest(interfaceName, Ieee80211AccessPointCapabilities{})
-{}
-
-AccessPointTest::AccessPointTest(std::string_view interfaceName, Ieee80211AccessPointCapabilities capabilities) :
+AccessPointTest::AccessPointTest(std::string_view interfaceName, Ieee80211AccessPointCapabilities capabilities, AccessPointAttributes attributes) :
     InterfaceName(interfaceName),
-    Capabilities(std::move(capabilities))
+    Capabilities(std::move(capabilities)),
+    Attributes(std::move(attributes))
 {}
 
 std::string_view
@@ -43,12 +40,6 @@ std::unique_ptr<IAccessPointController>
 AccessPointTest::CreateController()
 {
     return std::make_unique<AccessPointControllerTest>(this);
-}
-
-std::shared_ptr<IAccessPoint>
-AccessPointFactoryTest::Create(std::string_view interfaceName)
-{
-    return Create(interfaceName, nullptr);
 }
 
 std::shared_ptr<IAccessPoint>

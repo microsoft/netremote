@@ -43,19 +43,13 @@ struct AccessPointTest final :
     AccessPointAttributes Attributes{};
 
     /**
-     * @brief Construct a new AccessPointTest object with the given interface name and default capabilities.
-     *
-     * @param interfaceName The interface name to use for the access point.
-     */
-    explicit AccessPointTest(std::string_view interfaceName);
-
-    /**
      * @brief Construct a new AccessPointTest object with the given interface name and capabilities.
      *
      * @param interfaceName The interface name to use for the access point.
      * @param capabilities The capabilities to use for the access point.
+     * @param attributes The static attributes of the access point.
      */
-    AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities);
+    AccessPointTest(std::string_view interfaceName, Microsoft::Net::Wifi::Ieee80211AccessPointCapabilities capabilities = {}, AccessPointAttributes attributes = {});
 
     AccessPointTest() = delete;
     ~AccessPointTest() override = default;
@@ -131,23 +125,12 @@ struct AccessPointFactoryTest :
      *
      * @param interface The interface to create the AccessPoint for. This can be
      * any string and does not have to correspond to a real device interface.
-     *
-     * @return std::shared_ptr<IAccessPoint>
-     */
-    std::shared_ptr<IAccessPoint>
-    Create(std::string_view interface) override;
-
-    /**
-     * @brief Create an AccessPoint for testing purposes.
-     *
-     * @param interface The interface to create the AccessPoint for. This can be
-     * any string and does not have to correspond to a real device interface.
      * @param createArgs Arguments to be passed to the access point during creation.
      *
      * @return std::shared_ptr<IAccessPoint>
      */
     std::shared_ptr<IAccessPoint>
-    Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs) override;
+    Create(std::string_view interfaceName, std::unique_ptr<IAccessPointCreateArgs> createArgs = nullptr) override;
 };
 } // namespace Microsoft::Net::Wifi::Test
 
