@@ -1,0 +1,32 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/microsoft/netremote/tree/develop/config/netremote-server-config-schema.json",
+    "$title": "NetRemote Server",
+    "description": "NetRemote Server Configuration Schema",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "The schema version"
+        },
+        "WifiAccessPointAttributes": {
+            "type": "object",
+            "description": "Wifi Access Point Attributes",
+            "additionalProperties": false,
+            "properties": {
+                "Properties": {
+                    "type": "object",
+                    "description": "Unstructured (string) Wifi Access Point Properties",
+                    "additionalProperties": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string",
+                            "description": "Additional properties"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

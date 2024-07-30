@@ -1,0 +1,16 @@
+{
+    "$schema": "../../../../config/netremote-server-config-schema.json",
+    "WifiAccessPointAttributes": {
+        "Properties": {
+            "wlan0": {
+                "MacAddress": "00:11:22:33:44:55",
+                "RfAttenuatorChannelsAttached": "1,3"
+            },
+            "wlp0s3": {
+                "MacAddress": "AA:BB:CC:DD:EE:FF",
+                "RfAttenuatorChannelsAttached": "2,4,6",
+                "Another": "String value"
+            }
+        }
+    }
+}
