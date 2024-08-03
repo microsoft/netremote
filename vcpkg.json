@@ -4,32 +4,13 @@
   "version-string": "0.4.1",
   "dependencies": [
     {
-      "name": "sdbus-cpp",
-      "platform": "linux"
-    },
-    {
-      "name": "libsystemd",
-      "platform": "linux"
-    },
-    {
       "name": "vcpkg-cmake",
       "host": true
     },
     {
       "name": "vcpkg-cmake-config",
       "host": true
-    },
-    {
-      "name": "wil",
-      "platform": "windows"
-    },
-    "catch2",
-    "cli11",
-    "grpc",
-    "magic-enum",
-    "plog",
-    "protobuf",
-    "nlohmann-json"
+    }
   ],
   "overrides": [
     {
@@ -43,34 +24,80 @@
     ]
   },
   "features": {
-    "protocol": {
-      "description": "Enable building the client protocol",
+    "api": {
+      "description": "Provide the API protocol buffers + gRPC .proto source files"
+    },
+    "api-bindings": {
+      "description": "Provide the API protocol buffers + gRPC library bindings",
       "dependencies": [
         "grpc",
-        "protobuf"
+        "protobuf",
+        {
+          "name": "netremote",
+          "features": [
+            "api"
+          ]
+        }
       ]
     },
     "server":{
-      "description": "Enable building the server",
+      "description": "Provide the server binary",
       "dependencies": [
-        "netremote"
+        {
+          "name": "netremote",
+          "features": [
+            "api-bindings"
+          ]
+        },
+        {
+          "name": "sdbus-cpp",
+          "platform": "linux"
+        },
+        {
+          "name": "libsystemd",
+          "platform": "linux"
+        },
+        "cli11",
+        "magic-enum",
+        "plog",
+        "nlohmann-json"
       ]
     },
     "tests":{
       "description": "Enable building the tests",
       "dependencies": [
-        "netremote"
+        "catch2",
+        "magic-enum",
+        "nlohmann-json",
+        "plog",
+        {
+          "name": "netremote",
+          "features": [
+            "api-bindings",
+            "server"
+          ]
+        }
       ]
     },
     "tools":{
       "description": "Enable building the tools",
       "dependencies": [
-        "netremote"
+        {
+          "name": "netremote",
+          "features": [
+            "api-bindings",
+            "server"
+          ]
+        }
       ]
     }
   },
   "default-features": [
-    "protocol"
+    "api",
+    "api-bindings",
+    "server",
+    "tests",
+    "tools"
   ],
   "builtin-baseline": "9224b3bbd8df24999d85720b1d005dd6f969ade0"
 }

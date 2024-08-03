@@ -19,7 +19,8 @@ vcpkg_find_acquire_program(
 vcpkg_check_features(
     OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     INVERTED_FEATURES
-        protocol NETREMOTE_EXCLUDE_PROTOCOL
+        api NETREMOTE_EXCLUDE_API
+        api-bindings NETREMOTE_EXCLUDE_API_BINDINGS
         server NETREMOTE_EXCLUDE_SERVER
         tests NETREMOTE_EXCLUDE_TESTS
         tools NETREMOTE_EXCLUDE_TOOLS

@@ -16,6 +16,16 @@ set(PROTO_FILES
     ${PROTO_DIR}/WifiCore.proto
 )
 
+add_library(${PROJECT_NAME}-api INTERFACE "")
+target_sources(${PROJECT_NAME}-api
+    PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS 
+        ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}
+    FILES
+        ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX}/NetRemoteProtocol.hxx
+)
+
 # Create a list of the generated headers. The below code isn't used because
 # we've encountered intermittent errors when building with external vcpkg (eg.
 # via port) which results in empty file lists and thus, the generated headers
@@ -86,11 +96,28 @@ protobuf_generate(TARGET ${PROJECT_NAME}-protocol
     PROTOC_OUT_DIR ${PROTO_DIR_BINARY}
 )
 
-install(
-    TARGETS ${PROJECT_NAME}-protocol
-    EXPORT ${PROJECT_NAME}
-    COMPONENT dev
-    FILE_SET HEADERS
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${PROTO_DIR_BINARY_SUFFIX}"
-)
+if (NOT NETREMOTE_EXCLUDE_API)
+    install(
+        FILES
+        ${PROTO_FILES}
+        DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/api"
+    )
+    install(
+        TARGETS ${PROJECT_NAME}-api
+        EXPORT ${PROJECT_NAME}
+        COMPONENT dev
+        FILE_SET HEADERS
+        PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}"
+    )
+endif()
+
+if (NOT NETREMOTE_EXCLUDE_API_BINDINGS)
+    install(
+        TARGETS ${PROJECT_NAME}-protocol
+        EXPORT ${PROJECT_NAME}
+        COMPONENT dev
+        FILE_SET HEADERS
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}"
+    )
+endif()

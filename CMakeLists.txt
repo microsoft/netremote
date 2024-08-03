@@ -15,7 +15,8 @@ include(vcpkg)
 option(NETREMOTE_VCPKG_BUILD_FOR_PORT "Enable building the project via a vcpkg port" OFF)
 
 # Add options for vcpkg port file features.
-option(NETREMOTE_EXCLUDE_PROTOCOL "Disable building the protocol" OFF)
+option(NETREMOTE_EXCLUDE_API "Disable providing the protocol buffers + gRPC API source files" OFF)
+option(NETREMOTE_EXCLUDE_API_BINDINGS "Disable building the API protocol buffers + gRPC bindings" OFF)
 option(NETREMOTE_EXCLUDE_SERVER "Disable building the server" OFF)
 option(NETREMOTE_EXCLUDE_TOOLS "Disable building the tools" OFF)
 option(NETREMOTE_EXCLUDE_TESTS "Disable building the tests" OFF)
@@ -100,7 +101,7 @@ add_subdirectory(config)
 add_subdirectory(packaging)
 add_subdirectory(src)
 
-if (NOT NETREMOTE_EXCLUDE_PROTOCOL)
+if (NOT NETREMOTE_EXCLUDE_API)
   add_subdirectory(protocol)
 endif()
 
