@@ -102,7 +102,7 @@ add_subdirectory(packaging)
 add_subdirectory(src)
 
 if (NOT NETREMOTE_EXCLUDE_API)
-  add_subdirectory(protocol)
+  add_subdirectory(api)
 endif()
 
 if (NOT NETREMOTE_EXCLUDE_TESTS)
