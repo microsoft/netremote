@@ -3,18 +3,7 @@ set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote/protocol)
 set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 
-set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/protos)
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
-set(PROTO_FILES
-    ${PROTO_DIR}/NetRemoteDataStream.proto
-    ${PROTO_DIR}/NetRemoteDataStreamingService.proto
-    ${PROTO_DIR}/NetRemoteNetwork.proto
-    ${PROTO_DIR}/NetRemoteService.proto
-    ${PROTO_DIR}/NetRemoteWifi.proto
-    ${PROTO_DIR}/Network8021x.proto
-    ${PROTO_DIR}/NetworkCore.proto
-    ${PROTO_DIR}/WifiCore.proto
-)
 
 # Create a list of the generated headers. The below code isn't used because
 # we've encountered intermittent errors when building with external vcpkg (eg.
@@ -48,7 +37,9 @@ set(PROTO_HEADERS_GENERATED_GRPC
     ${PROTO_DIR_BINARY}/WifiCore.grpc.pb.h
 )
 
+# Define a static library containing pre-built protocol buffer and gRPC bindings.
 add_library(${PROJECT_NAME}-protocol STATIC "")
+add_library(${PROJECT_NAME}-api-bindings ALIAS ${PROJECT_NAME}-protocol)
 
 target_sources(${PROJECT_NAME}-protocol
     PRIVATE
@@ -71,6 +62,7 @@ target_link_libraries(${PROJECT_NAME}-protocol
         gRPC::grpc++_unsecure
 )
 
+# Generate C++ headers and sources (<source>.pb.[h|cc]) of the protocol buffer data types.
 protobuf_generate(TARGET ${PROJECT_NAME}-protocol
     LANGUAGE cpp
     IMPORT_DIRS ${PROTO_DIR}
@@ -78,6 +70,7 @@ protobuf_generate(TARGET ${PROJECT_NAME}-protocol
     PROTOC_OUT_FILES ${PROTO_FILES}
 )
 
+# Generate C++ headers and sources with gRPC support (<source>.grpc.pb.[h|cc]) of the protocol buffer data types.
 protobuf_generate(TARGET ${PROJECT_NAME}-protocol
     LANGUAGE grpc
     GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
@@ -92,5 +85,25 @@ install(
     COMPONENT dev
     FILE_SET HEADERS
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}/${PROTO_DIR_BINARY_SUFFIX}"
+    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}"
+)
+
+# Define a header-only (interface) library containing public protocol information.
+add_library(${PROJECT_NAME}-api INTERFACE "")
+
+target_sources(${PROJECT_NAME}-api
+    PUBLIC
+    FILE_SET HEADERS
+    BASE_DIRS 
+        ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}
+    FILES
+        ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX}/NetRemoteProtocol.hxx
+)
+
+install(
+    TARGETS ${PROJECT_NAME}-api
+    EXPORT ${PROJECT_NAME}
+    COMPONENT dev
+    FILE_SET HEADERS
+    PUBLIC_HEADER DESTINATION "${NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE}"
 )
