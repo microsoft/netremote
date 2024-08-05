@@ -1,8 +1,3 @@
-# Make public version of wil available.
-set(WIL_BUILD_TESTS OFF CACHE INTERNAL "Turn off wil tests")
-set(WIL_BUILD_PACKAGING OFF CACHE INTERNAL "Turn off wil packaging")
-
-find_package(wil CONFIG REQUIRED)
 
 # Add Windows-specific global compile definitions.
 add_compile_definitions(
