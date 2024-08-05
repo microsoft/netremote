@@ -1,6 +1,9 @@
 
 cmake_minimum_required(VERSION 3.25)
 
+# Enable to debug CMake issues.
+set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Verbose build system generation")
+
 # Instruct CMake to search the cmake directory for include scripts.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
@@ -54,44 +57,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Don't add CTest targets
-set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
-
 include(CheckPIESupported)
-include(CTest)
 include(ExternalProject)
 include(GNUInstallDirs)
-include(grpc)
-include(protoc)
 
-# Enable to debug CMake issues.
-set(CMAKE_VERBOSE_MAKEFILE OFF CACHE BOOL "Verbose build system generation")
+# Configure dependencies.
+include(config-dependencies)
 
-# Pull in external dependencies.
-# Look for protobuf-config.cmake.
-set(protobuf_MODULE_COMPATIBLE TRUE)
-find_package(gRPC CONFIG REQUIRED)
-find_package(Protobuf CONFIG REQUIRED)
-find_package(Threads REQUIRED)
-find_package(magic_enum CONFIG REQUIRED)
-find_package(CLI11 CONFIG REQUIRED)
-find_package(plog CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-
-# Include toolchain-specific configuration. 
-include(toolchain-config)
+# Configure toolchain.
+include(config-toolchain)
 
 # Common source directories
 set(NETREMOTE_DIR_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
 set(NETREMOTE_DIR_LINUX ${NETREMOTE_DIR_SRC}/linux)
 set(NETREMOTE_DIR_WINDOWS ${NETREMOTE_DIR_SRC}/windows)
 set(NETREMOTE_DIR_INSTALL_PUBLIC_HEADER_BASE ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-
-# Add common, global compile definitions.
-add_compile_definitions(
-    MAGIC_ENUM_RANGE_MIN=0
-    MAGIC_ENUM_RANGE_MAX=255
-)
 
 if (WERROR)
   add_compile_options(-Werror)
