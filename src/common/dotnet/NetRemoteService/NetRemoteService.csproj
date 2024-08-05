@@ -16,13 +16,28 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\..\..\protocol\protos\NetRemoteService.proto" GprcServices="Server">
+    <Protobuf Include="..\..\..\..\api\protos\NetRemoteDataStream.proto" GrpcServices="None">
+      <Link>Protos\NetRemoteDataStream.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\..\api\protos\NetRemoteDataStreamingService.proto" GrpcServices="Server">
+      <Link>Protos\NetRemoteDataStreamingService.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\..\api\protos\NetRemoteNetwork.proto" GrpcServices="None">
+      <Link>Protos\NetRemoteNetwork.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\..\api\protos\NetRemoteService.proto" GprcServices="Server">
       <Link>Protos\NetRemoteService.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\NetRemoteWifi.proto" GrpcServices="None">
+    <Protobuf Include="..\..\..\..\api\protos\NetRemoteWifi.proto" GrpcServices="None">
       <Link>Protos\NetRemoteWifi.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\..\..\protocol\protos\WifiCore.proto" GrpcServices="None">
+    <Protobuf Include="..\..\..\..\api\protos\Network8021x.proto" GrpcServices="None">
+      <Link>Protos\Network8021x.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\..\api\protos\NetworkCore.proto" GrpcServices="None">
+      <Link>Protos\NetworkCore.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\..\api\protos\WifiCore.proto" GrpcServices="None">
       <Link>Protos\WifiCore.proto</Link>
     </Protobuf>
   </ItemGroup>
