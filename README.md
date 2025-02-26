@@ -1,3 +1,4 @@
+# This is a test change of the GitHub process and won't be merged
 # Network Remote Control
 
 [![CI/CD](https://github.com/microsoft/netremote/actions/workflows/cicd.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/cicd.yml)
