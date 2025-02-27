@@ -1,0 +1,63 @@
+
+syntax = "proto3";
+
+package Microsoft.Net.Remote.RfAttenuator;
+
+
+enum RfAttenuatorOperationStatusCode
+{
+    RfAttenuatorOperationStatusCodeUnknown = 0;
+    RfAttenuatorOperationStatusCodeSucceeded = 1;
+    RfAttenuatorOperationStatusCodeFailed = 2;
+}
+
+message RfAttenuatorOperationStatus
+{
+    RfAttenuatorOperationStatusCode Code = 1;
+    optional string Message = 2;
+}
+
+message ResetResult
+{
+    RfAttenuatorOperationStatus Status = 1;
+}
+
+message GetPropertiesResult
+{
+    RfAttenuatorOperationStatus Status = 1;
+    repeated uint32 Channels = 2;
+    double AttenuationRangeDbmMin = 3;
+    double AttenuationRangeDbmMax = 4;
+    double AttenuationStepDbmMin = 5;
+    double AttenuationStepDbmMax = 6;
+    double AttenuationAccuracyDbmMin = 7;
+    double AttenuationAccuracyDbmMax = 8;
+
+    uint32_t FrequencyBandwidthMHzMin = 9;
+    uint32_t FrequencyBandwidthMHzMax = 10;
+
+    bool SupportsSweep = 11;
+
+    string Identification = 12;
+}
+
+message GetAttenuationRequest
+{
+    uint32 Channel = 1;
+}
+
+message GetAttenuationResult
+{
+    RfAttenuatorOperationStatus Status = 1;
+    double AttenuationDbm = 2;
+}
+
+message SetAttenuationRequest
+{
+    uint32 Channel = 1;
+    double AttenuationDbm = 2;
+}
+message SetAttenuationResult
+{
+    RfAttenuatorOperationStatus Status = 1;
+}

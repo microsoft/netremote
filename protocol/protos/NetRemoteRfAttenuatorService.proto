@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package Microsoft.Net.Remote.Service;
+
+import "RfAttenuator.proto";
+
+service NetRemoteRfAttenuator
+{
+    rpc IsEnabled (google.protobuf.Empty) returns (google.protobuf.BoolValue);
+    rpc Reset(google.protobuf.Empty) returns (Microsoft.Net.Remote.RfAttenuator.ResetResult);
+    rpc GetProperties (google.protobuf.Empty) returns (Microsoft.Net.Remote.RfAttenuator.GetPropertiesResult);
+    rpc GetAttenuationForChannel (Microsoft.Net.Remote.RfAttenuator.GetAttenuationRequest) returns (Microsoft.Net.Remote.RfAttenuator.GetAttenuationResult);
+    rpc SetAttenuationForChannel (Microsoft.Net.Remote.RfAttenuator.SetAttenuationRequest) returns (Microsoft.Net.Remote.RfAttenuator.SetAttenuationResult);
+}
