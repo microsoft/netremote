@@ -1,3 +1,4 @@
+test2
 # Network Remote Control
 
 [![CI/CD](https://github.com/microsoft/netremote/actions/workflows/cicd.yml/badge.svg)](https://github.com/microsoft/netremote/actions/workflows/cicd.yml)
