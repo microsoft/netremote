@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package Microsoft.Net.Remote.Service;
 
-import "RfAttenuator.proto";
+import "NetRemoteRfAttenuator.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 service NetRemoteRfAttenuator
 {

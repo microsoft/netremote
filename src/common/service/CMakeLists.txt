@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME}-service
         NetRemoteDataStreamingReactors.hxx
         NetRemoteDataStreamingService.cxx
         NetRemoteDiscoveryService.cxx
+        NetRemoteRfAttenuatorService.cxx
         NetRemoteService.cxx
         NetRemoteWifiApiTrace.cxx
         NetRemoteWifiApiTrace.hxx
