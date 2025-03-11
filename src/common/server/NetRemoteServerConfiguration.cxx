@@ -37,6 +37,20 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         config.EnableFileLogging,
         "Enable logging to file (disabled by default)");
 
+    app.add_option(
+        "-at, --att-type",
+        config.RfAttenuatorConfiguration.Type,
+        "The type of RF attenuator to use. Supported types: 'none', 'software', 'socket' (default: 'none')");
+
+    app.add_option(
+        "-aa, --att-address",
+        config.RfAttenuatorConfiguration.Address,
+        "The address of the RF attenuator. This is only used if the type is 'socket'");
+
+    app.add_option(
+        "-ap, --att-port",
+        config.RfAttenuatorConfiguration.Port,
+        "The port of the RF attenuator. This is only used if the type is 'socket'");
     return app;
 }
 

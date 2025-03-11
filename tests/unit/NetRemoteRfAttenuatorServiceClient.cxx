@@ -21,17 +21,18 @@ TEST_CASE("RfAttenuator IsEnabled API", "[basic][rpc][client][remote][rfAttenuat
     using namespace Microsoft::Net::Remote::Wifi;
     using namespace Microsoft::Net::Wifi;
 
-    const auto serverConfiguration = CreateServerConfiguration();
-    NetRemoteServer server{ serverConfiguration };
-    server.Run();
-
-    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
-    auto client = NetRemoteRfAttenuator::NewStub(channel);
-
-    LOGI << "gRPC initialized";
-
     SECTION("IsEnabled is true")
     {
+        auto serverConfiguration = CreateServerConfiguration();
+        serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
+        NetRemoteServer server{ serverConfiguration };
+        server.Run();
+
+        auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+        auto client = NetRemoteRfAttenuator::NewStub(channel);
+
+        LOGI << "gRPC initialized";
+
         const google::protobuf::Empty request{};
         google::protobuf::BoolValue result{};
         grpc::ClientContext clientContext{};
@@ -43,6 +44,16 @@ TEST_CASE("RfAttenuator IsEnabled API", "[basic][rpc][client][remote][rfAttenuat
 
     SECTION("IsEnabled is false")
     {
+        // serverConfiguration.RfAttenuatorConfiguration.Type is RfAttenuatorType::None by default
+        auto serverConfiguration = CreateServerConfiguration();
+        NetRemoteServer server{ serverConfiguration };
+        server.Run();
+
+        auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+        auto client = NetRemoteRfAttenuator::NewStub(channel);
+
+        LOGI << "gRPC initialized";
+
         const google::protobuf::Empty request{};
         google::protobuf::BoolValue result{};
         grpc::ClientContext clientContext{};

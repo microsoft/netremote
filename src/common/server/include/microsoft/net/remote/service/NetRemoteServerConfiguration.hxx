@@ -10,6 +10,7 @@
 #include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
+#include <microsoft/net/remote/service/NetRemoteRfAttenuatorService.hxx>
 
 namespace Microsoft::Net::Remote::Service
 {
@@ -87,6 +88,11 @@ struct NetRemoteServerConfiguration
      * @brief Factory to use to create the discovery service.
      */
     std::shared_ptr<INetRemoteDiscoveryServiceFactory> DiscoveryServiceFactory{};
+
+    /**
+     * @brief RF attenuator configuration.
+     */
+    NetRemoteRfAttenuatorConfiguration RfAttenuatorConfiguration{};
 };
 
 } // namespace Microsoft::Net::Remote::Service

@@ -105,8 +105,8 @@ main(int argc, char *argv[])
     }
     plog::init<std::to_underlying(LogInstanceId::Audit)>(logSeverity, &auditLogRollingFileAppender);
 
-    LOGN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
-    AUDITN << std::format("Netremote server starting (log level={})", magic_enum::enum_name(logSeverity));
+    LOGN << std::format("Netremote server starting (log level={}, rfAttenuatorType={})", magic_enum::enum_name(logSeverity), magic_enum::enum_name(configuration.RfAttenuatorConfiguration.Type));
+    AUDITN << std::format("Netremote server starting (log level={}, rfAttenuatorType={})", magic_enum::enum_name(logSeverity), magic_enum::enum_name(configuration.RfAttenuatorConfiguration.Type));
 
     // Create an access point manager and discovery agent.
     auto accessPointManager = AccessPointManager::Create();

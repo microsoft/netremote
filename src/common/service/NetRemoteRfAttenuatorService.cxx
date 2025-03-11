@@ -7,12 +7,28 @@ using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Service::Tracing;
 using namespace Microsoft::Net::Remote::RfAttenuator;
 
+NetRemoteRfAttenuatorService::NetRemoteRfAttenuatorService(const NetRemoteRfAttenuatorConfiguration& configuration) :
+    m_configuration(configuration)
+{
+    const NetRemoteApiTrace traceMe{};
+    LOGI << std::format("NetRemoteRfAttenuatorService created with configuration: Type={}, Address={}, Port={}",
+        static_cast<int>(configuration.Type),
+        configuration.Address,
+        configuration.Port);
+}
+
 grpc::Status
 NetRemoteRfAttenuatorService::IsEnabled([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::google::protobuf::Empty* request, ::google::protobuf::BoolValue* response)
 {
     const NetRemoteApiTrace traceMe{};
     // Implementation of IsEnabled
     response->set_value(true);
+
+    if (m_configuration.Type == RfAttenuatorType::None) {
+        response->set_value(false);
+    }
+
+    LOGI << std::format("IsEnabled: {}", response->value());
     return grpc::Status::OK;
 }
 
