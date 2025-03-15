@@ -27,6 +27,6 @@ struct RfAttenuatorFactory
      * @param args The arguments needed to establish a TCP connection with the attenuator.
      * @return std::unique_ptr<IRfAttenuatorController>
      */
-    // static std::unique_ptr<IRfAttenuatorController>
-    // TryCreateWithTcpConnection(std::string attenuatorName, RfAttenuatorConnectionArgumentsTcp args);
+    static std::unique_ptr<IRfAttenuatorController>
+    TryCreateWithTcpConnection(std::string attenuatorName, RfAttenuatorConnectionArgumentsTcp args);
 };
