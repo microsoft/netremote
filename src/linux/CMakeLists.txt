@@ -13,6 +13,7 @@ add_subdirectory(net)
 
 if (NOT NETREMOTE_EXCLUDE_TOOLS)
     add_subdirectory(tools)
+    add_subdirectory(rfattenuator)
 endif()
 
 if (NOT NETREMOTE_EXCLUDE_SERVER)
