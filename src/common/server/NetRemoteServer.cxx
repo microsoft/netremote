@@ -80,7 +80,9 @@ NetRemoteServer::Run()
     builder.AddListeningPort(m_serverAddress, grpc::InsecureServerCredentials());
     builder.RegisterService(&m_service);
     builder.RegisterService(&m_dataStreamingService);
-    builder.RegisterService(&m_rfAttenuatorService);
+    if (m_rfAttenuatorService.GetNetRemoteRfAttenuatorConfiguration().Type != RfAttenuatorType::None) {
+        builder.RegisterService(&m_rfAttenuatorService);
+    }
 
     m_server = builder.BuildAndStart();
     LOGI << std::format("Netremote server started listening on {}", m_serverAddress);

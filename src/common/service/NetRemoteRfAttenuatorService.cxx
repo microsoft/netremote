@@ -11,6 +11,7 @@ NetRemoteRfAttenuatorService::NetRemoteRfAttenuatorService(const NetRemoteRfAtte
     m_configuration(configuration)
 {
     const NetRemoteApiTrace traceMe{};
+
     LOGI << std::format("NetRemoteRfAttenuatorService created with configuration: Type={}, Address={}, Port={}",
         static_cast<int>(configuration.Type),
         configuration.Address,
@@ -29,7 +30,7 @@ grpc::Status
 NetRemoteRfAttenuatorService::IsEnabled([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::google::protobuf::Empty* request, ::google::protobuf::BoolValue* response)
 {
     const NetRemoteApiTrace traceMe{};
-    // Implementation of IsEnabled
+
     response->set_value(true);
 
     if (m_configuration.Type == RfAttenuatorType::None) {
@@ -43,11 +44,12 @@ NetRemoteRfAttenuatorService::IsEnabled([[maybe_unused]] ::grpc::ServerContext* 
 grpc::Status NetRemoteRfAttenuatorService::Reset([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::google::protobuf::Empty* request, ResetResult* response)
 {
     const NetRemoteApiTrace traceMe{};
+
     std::scoped_lock attenuatorLock{ m_mutex };
     try {
         m_attenuator->Reset();
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeSucceeded);
-    } catch (const RfAttenuatorException& e) {
+    } catch (const std::exception& e) {
         LOGE << std::format("Failed to reset RF attenuator: {}", e.what());
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeFailed);
         response->mutable_status()->set_message(e.what());
@@ -58,6 +60,7 @@ grpc::Status NetRemoteRfAttenuatorService::Reset([[maybe_unused]] ::grpc::Server
 grpc::Status NetRemoteRfAttenuatorService::GetProperties([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::google::protobuf::Empty* request, GetPropertiesResult* response)
 {
     const NetRemoteApiTrace traceMe{};
+
     std::scoped_lock attenuatorLock{ m_mutex };
     try {
         auto properties = m_attenuator->GetProperties();
@@ -79,7 +82,7 @@ grpc::Status NetRemoteRfAttenuatorService::GetProperties([[maybe_unused]] ::grpc
         }
 
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeSucceeded);
-    } catch (const RfAttenuatorException& e) {
+    } catch (const std::exception& e) {
         LOGE << std::format("Failed to get RF attenuator properties: {}", e.what());
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeFailed);
     }
@@ -89,13 +92,14 @@ grpc::Status NetRemoteRfAttenuatorService::GetProperties([[maybe_unused]] ::grpc
 grpc::Status NetRemoteRfAttenuatorService::GetAttenuationForChannel([[maybe_unused]] ::grpc::ServerContext* context, const GetAttenuationRequest* request, GetAttenuationResult* response)
 {
     const NetRemoteApiTrace traceMe{};
+
     std::scoped_lock attenuatorLock{ m_mutex };
     try {
         auto attenuation = m_attenuator->GetAttenuationForChannel(request->channel());
         response->set_attenuationdbm(attenuation);
 
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeSucceeded);
-    } catch (const RfAttenuatorException& e) {
+    } catch (const std::exception& e) {
         LOGE << std::format("Failed to get RF attenuator channel {} attenuation: {}", request->channel(), e.what());
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeFailed);
         response->mutable_status()->set_message(e.what());
@@ -106,9 +110,11 @@ grpc::Status NetRemoteRfAttenuatorService::GetAttenuationForChannel([[maybe_unus
 grpc::Status NetRemoteRfAttenuatorService::SetAttenuationForChannel([[maybe_unused]] ::grpc::ServerContext* context, const SetAttenuationRequest* request, SetAttenuationResult* response)
 {
     const NetRemoteApiTrace traceMe{};
+
     std::scoped_lock attenuatorLock{ m_mutex };
     try {
         auto result = m_attenuator->SetAttenuationForChannel(request->channel(), request->attenuationdbm());
+
         if (result) {
             response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeSucceeded);
         } else {
@@ -116,7 +122,7 @@ grpc::Status NetRemoteRfAttenuatorService::SetAttenuationForChannel([[maybe_unus
             response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeFailed);
             response->mutable_status()->set_message("False is returned when set RF attenuator channel attenuation");
         }
-    } catch (const RfAttenuatorException& e) {
+    } catch (const std::exception& e) {
         LOGE << std::format("Failed to set RF attenuator channel {} attenuation: {}", request->channel(), e.what());
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeFailed);
         response->mutable_status()->set_message(e.what());

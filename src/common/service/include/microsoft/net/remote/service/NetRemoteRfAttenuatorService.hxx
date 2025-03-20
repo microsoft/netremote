@@ -48,6 +48,12 @@ public:
      */
     NetRemoteRfAttenuatorService(const NetRemoteRfAttenuatorConfiguration& configuration);
 
+    const NetRemoteRfAttenuatorConfiguration&
+    GetNetRemoteRfAttenuatorConfiguration() const noexcept
+    {
+        return m_configuration;
+    }
+
 private:
     grpc::Status
     IsEnabled(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::BoolValue* response) override;
