@@ -4,6 +4,9 @@
 #include <grpcpp/support/status.h>
 #include <microsoft/net/remote/protocol/NetRemoteRfAttenuator.grpc.pb.h>
 #include <microsoft/net/remote/protocol/NetRemoteRfAttenuatorService.grpc.pb.h>
+
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
+#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 namespace Microsoft::Net::Remote::Service
 {
 /**
@@ -61,11 +64,24 @@ private:
     grpc::Status
     SetAttenuationForChannel(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::RfAttenuator::SetAttenuationRequest* request, ::Microsoft::Net::Remote::RfAttenuator::SetAttenuationResult* response) override;
 
+    std::unique_ptr<IRfAttenuatorController>
+    CreateSimulatedAttenuator();
+
 private:
     /**
      * @brief RF attenuator configuration.
      */
     NetRemoteRfAttenuatorConfiguration m_configuration;
+
+    /**
+     * @brief Mutex for thread safety.
+     */
+    std::mutex m_mutex{};
+
+    /**
+     * @brief RF attenuator controller.
+     */
+    std::unique_ptr<IRfAttenuatorController> m_attenuator = nullptr;
 };
 } // namespace Microsoft::Net::Remote::Service
 #endif // NET_REMOTE_RFATTENUATOR_SERVICE_HXX

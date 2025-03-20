@@ -7,9 +7,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "RfAttenuator.hxx"
 #include "RfAttenuatorProtocol.hxx"
 #include "RfAttenuatorTransport.hxx"
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
 
 /**
  * @brief Generic base class that implements the primary IRfAttenuatorController

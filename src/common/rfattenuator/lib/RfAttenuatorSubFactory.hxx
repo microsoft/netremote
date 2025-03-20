@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "include/RfAttenuator.hxx"
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
 //#include "RfAttenuatorTransportSocket.h"
 #include "RfAttenuatorTransportSocketLinux.hxx"
 

@@ -8,9 +8,9 @@
 #include <string_view>
 #include <vector>
 
-#include "RfAttenuatorFactory.hxx"
 #include "RfAttenuatorSubFactory.hxx"
 #include "RfAttenuatorTransportSocketLinux.hxx"
+#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 
 using namespace std::chrono_literals;
 

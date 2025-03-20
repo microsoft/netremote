@@ -9,8 +9,6 @@
 
 #include <experimental/scope>
 
-#include "StringHelpers.hxx"
-
 namespace LogHelpers
 {
 enum class LogLevel : uint8_t {

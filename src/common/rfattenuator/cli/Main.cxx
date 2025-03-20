@@ -10,8 +10,8 @@
 #include <string>
 #include <tuple>
 
-#include "RfAttenuator.hxx"
-#include "RfAttenuatorFactory.hxx"
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
+#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 //#include "RfAttenuatorSoftwareSimulated.hxx"
 
 namespace detail

@@ -6,8 +6,8 @@
 #include <optional>
 #include <string>
 
-#include "RfAttenuator.hxx"
 #include "RfAttenuatorExceptionImpl.hxx"
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
 
 /**
  * @brief The status of an attenuator request operation.

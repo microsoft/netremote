@@ -15,9 +15,3 @@ set_target_properties(${PROJECT_NAME}-rfattenuator-cli-linux
     PROPERTIES
         OUTPUT_NAME rfattenuator-cli
 )
-
-install(
-    TARGETS ${PROJECT_NAME}-rfattenuator-cli-linux
-    EXPORT ${PROJECT_NAME}
-    COMPONENT server
-)
