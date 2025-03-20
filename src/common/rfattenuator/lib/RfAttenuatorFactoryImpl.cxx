@@ -2,9 +2,9 @@
 #include <format>
 
 #include "RfAttenuatorExceptionImpl.hxx"
-#include "RfAttenuatorFactory.hxx"
 #include "RfAttenuatorSoftwareSimulated.hxx"
-#include "StringHelpers.hxx"
+#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
+#include <strings/StringHelpers.hxx>
 
 /* static */
 std::unique_ptr<IRfAttenuatorController>
@@ -12,8 +12,8 @@ RfAttenuatorFactory::TryCreateBasic(std::string attenuatorName, RfAttenuatorProp
 {
     // Try to find a supported factory based on the requested attenuator name.
     std::unique_ptr<IRfAttenuatorBasicFactory> factory = nullptr;
-    if (Strings::IEquals(attenuatorName, "noop") || Strings::IEquals(attenuatorName, "test") ||
-        Strings::IEquals(attenuatorName, "software") || Strings::IEquals(attenuatorName, "simulated")) {
+    if (Strings::CaseInsensitiveStringEquals(attenuatorName, "noop") || Strings::CaseInsensitiveStringEquals(attenuatorName, "test") ||
+        Strings::CaseInsensitiveStringEquals(attenuatorName, "software") || Strings::CaseInsensitiveStringEquals(attenuatorName, "simulated")) {
         factory = std::make_unique<RfAttenuatorSoftwareSimulatedFactory>();
     }
 

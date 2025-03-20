@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "include/RfAttenuator.hxx"
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
 
 /**
  * @brief Primary base implementation of RfAttenuatorException. Sub-classing of

@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "include/RfAttenuatorFactory.hxx"
+#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 #include "RfAttenuatorSubFactory.hxx"
 
 /**
