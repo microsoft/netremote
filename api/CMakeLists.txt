@@ -1,11 +1,12 @@
 
 set(PROTO_DIR ${CMAKE_CURRENT_LIST_DIR}/protos)
 
-# List of all protocol buffer files defining the API.
 set(PROTO_FILES
     ${PROTO_DIR}/NetRemoteDataStream.proto
     ${PROTO_DIR}/NetRemoteDataStreamingService.proto
     ${PROTO_DIR}/NetRemoteNetwork.proto
+    ${PROTO_DIR}/NetRemoteRfAttenuator.proto
+    ${PROTO_DIR}/NetRemoteRfAttenuatorService.proto
     ${PROTO_DIR}/NetRemoteService.proto
     ${PROTO_DIR}/NetRemoteWifi.proto
     ${PROTO_DIR}/Network8021x.proto

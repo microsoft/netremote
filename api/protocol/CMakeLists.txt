@@ -4,18 +4,6 @@ set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote/protocol)
 set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
-set(PROTO_FILES
-    ${PROTO_DIR}/NetRemoteDataStream.proto
-    ${PROTO_DIR}/NetRemoteDataStreamingService.proto
-    ${PROTO_DIR}/NetRemoteNetwork.proto
-    ${PROTO_DIR}/NetRemoteRfAttenuator.proto
-    ${PROTO_DIR}/NetRemoteRfAttenuatorService.proto
-    ${PROTO_DIR}/NetRemoteService.proto
-    ${PROTO_DIR}/NetRemoteWifi.proto
-    ${PROTO_DIR}/Network8021x.proto
-    ${PROTO_DIR}/NetworkCore.proto
-    ${PROTO_DIR}/WifiCore.proto
-)
 
 # Create a list of the generated headers. The below code isn't used because
 # we've encountered intermittent errors when building with external vcpkg (eg.
@@ -31,6 +19,8 @@ set(PROTO_HEADERS_GENERATED
     ${PROTO_DIR_BINARY}/NetRemoteDataStream.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuator.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuatorService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.pb.h
     ${PROTO_DIR_BINARY}/Network8021x.pb.h
@@ -42,6 +32,8 @@ set(PROTO_HEADERS_GENERATED_GRPC
     ${PROTO_DIR_BINARY}/NetRemoteDataStream.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuator.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuatorService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.grpc.pb.h
     ${PROTO_DIR_BINARY}/Network8021x.grpc.pb.h
