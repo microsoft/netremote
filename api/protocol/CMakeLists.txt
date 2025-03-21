@@ -4,6 +4,18 @@ set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote/protocol)
 set(NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_PREFIX ${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
 
 set(PROTO_DIR_BINARY ${CMAKE_CURRENT_BINARY_DIR}/${NETREMOTE_PROTOCOL_PUBLIC_INCLUDE_SUFFIX})
+set(PROTO_FILES
+    ${PROTO_DIR}/NetRemoteDataStream.proto
+    ${PROTO_DIR}/NetRemoteDataStreamingService.proto
+    ${PROTO_DIR}/NetRemoteNetwork.proto
+    ${PROTO_DIR}/NetRemoteRfAttenuator.proto
+    ${PROTO_DIR}/NetRemoteRfAttenuatorService.proto
+    ${PROTO_DIR}/NetRemoteService.proto
+    ${PROTO_DIR}/NetRemoteWifi.proto
+    ${PROTO_DIR}/Network8021x.proto
+    ${PROTO_DIR}/NetworkCore.proto
+    ${PROTO_DIR}/WifiCore.proto
+)
 
 # Create a list of the generated headers. The below code isn't used because
 # we've encountered intermittent errors when building with external vcpkg (eg.

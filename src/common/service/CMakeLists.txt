@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME}-service
         NetRemoteDataStreamingReactors.hxx
         NetRemoteDataStreamingService.cxx
         NetRemoteDiscoveryService.cxx
+        NetRemoteRfAttenuatorService.cxx
         NetRemoteService.cxx
         NetRemoteWifiApiTrace.cxx
         NetRemoteWifiApiTrace.hxx
@@ -23,6 +24,7 @@ target_sources(${PROJECT_NAME}-service
         ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteDataStreamingService.hxx
         ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteDiscoveryService.hxx
         ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteService.hxx
+        ${NET_REMOTE_SERVICE_PUBLIC_INCLUDE_PREFIX}/NetRemoteRfAttenuatorService.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-service
@@ -30,6 +32,7 @@ target_link_libraries(${PROJECT_NAME}-service
         ${PROJECT_NAME}-network-manager
         ${PROJECT_NAME}-protocol
         wifi-apmanager
+        ${PROJECT_NAME}-rfattenuator
     PRIVATE
         ${PROJECT_NAME}-net-adapter-service-api
         logging-utils

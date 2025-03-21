@@ -16,7 +16,8 @@ NetRemoteServer::NetRemoteServer(const NetRemoteServerConfiguration& configurati
     m_serverAddress(configuration.ServerAddress),
     m_networkManager(configuration.NetworkManager),
     m_discoveryServiceFactory(std::move(configuration.DiscoveryServiceFactory)),
-    m_service(configuration.NetworkManager)
+    m_service(configuration.NetworkManager),
+    m_rfAttenuatorService(configuration.RfAttenuatorConfiguration)
 {
     InitializeDiscoveryService();
 }
@@ -79,6 +80,9 @@ NetRemoteServer::Run()
     builder.AddListeningPort(m_serverAddress, grpc::InsecureServerCredentials());
     builder.RegisterService(&m_service);
     builder.RegisterService(&m_dataStreamingService);
+    if (m_rfAttenuatorService.GetNetRemoteRfAttenuatorConfiguration().Type != RfAttenuatorType::None) {
+        builder.RegisterService(&m_rfAttenuatorService);
+    }
 
     m_server = builder.BuildAndStart();
     LOGI << std::format("Netremote server started listening on {}", m_serverAddress);

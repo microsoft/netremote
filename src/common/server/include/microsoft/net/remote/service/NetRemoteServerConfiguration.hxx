@@ -13,6 +13,7 @@
 #include <microsoft/net/remote/protocol/NetRemoteProtocol.hxx>
 #include <microsoft/net/remote/service/NetRemoteDiscoveryService.hxx>
 #include <microsoft/net/wifi/AccessPointAttributes.hxx>
+#include <microsoft/net/remote/service/NetRemoteRfAttenuatorService.hxx>
 
 namespace Microsoft::Net::Remote::Service
 {
@@ -100,6 +101,11 @@ struct NetRemoteServerConfiguration
      * @brief Access point attributes.
      */
     std::unordered_map<std::string, Microsoft::Net::Wifi::AccessPointAttributes> AccessPointAttributes{};
+    
+    /**
+    * @brief RF attenuator configuration.
+    */
+    NetRemoteRfAttenuatorConfiguration RfAttenuatorConfiguration{};
 };
 
 } // namespace Microsoft::Net::Remote::Service
