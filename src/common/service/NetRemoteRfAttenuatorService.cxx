@@ -43,9 +43,9 @@ NetRemoteRfAttenuatorService::IsEnabled([[maybe_unused]] ::grpc::ServerContext* 
 
 grpc::Status NetRemoteRfAttenuatorService::Reset([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::google::protobuf::Empty* request, ResetResult* response)
 {
+    std::scoped_lock attenuatorLock{ m_mutex };
     const NetRemoteApiTrace traceMe{};
 
-    std::scoped_lock attenuatorLock{ m_mutex };
     try {
         m_attenuator->Reset();
         response->mutable_status()->set_code(RfAttenuatorOperationStatusCode::RfAttenuatorOperationStatusCodeSucceeded);
@@ -59,9 +59,9 @@ grpc::Status NetRemoteRfAttenuatorService::Reset([[maybe_unused]] ::grpc::Server
 
 grpc::Status NetRemoteRfAttenuatorService::GetProperties([[maybe_unused]] ::grpc::ServerContext* context, [[maybe_unused]] const ::google::protobuf::Empty* request, GetPropertiesResult* response)
 {
+    std::scoped_lock attenuatorLock{ m_mutex };
     const NetRemoteApiTrace traceMe{};
 
-    std::scoped_lock attenuatorLock{ m_mutex };
     try {
         auto properties = m_attenuator->GetProperties();
         *response->mutable_channels() = {
@@ -91,9 +91,9 @@ grpc::Status NetRemoteRfAttenuatorService::GetProperties([[maybe_unused]] ::grpc
 
 grpc::Status NetRemoteRfAttenuatorService::GetAttenuationForChannel([[maybe_unused]] ::grpc::ServerContext* context, const GetAttenuationRequest* request, GetAttenuationResult* response)
 {
+    std::scoped_lock attenuatorLock{ m_mutex };
     const NetRemoteApiTrace traceMe{};
 
-    std::scoped_lock attenuatorLock{ m_mutex };
     try {
         auto attenuation = m_attenuator->GetAttenuationForChannel(request->channel());
         response->set_attenuationdbm(attenuation);
@@ -109,9 +109,9 @@ grpc::Status NetRemoteRfAttenuatorService::GetAttenuationForChannel([[maybe_unus
 
 grpc::Status NetRemoteRfAttenuatorService::SetAttenuationForChannel([[maybe_unused]] ::grpc::ServerContext* context, const SetAttenuationRequest* request, SetAttenuationResult* response)
 {
+    std::scoped_lock attenuatorLock{ m_mutex };
     const NetRemoteApiTrace traceMe{};
 
-    std::scoped_lock attenuatorLock{ m_mutex };
     try {
         auto result = m_attenuator->SetAttenuationForChannel(request->channel(), request->attenuationdbm());
 

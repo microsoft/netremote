@@ -1,6 +1,7 @@
 
 set(PROTO_DIR ${CMAKE_CURRENT_LIST_DIR}/protos)
 
+# List of all protocol buffer files defining the API.
 set(PROTO_FILES
     ${PROTO_DIR}/NetRemoteDataStream.proto
     ${PROTO_DIR}/NetRemoteDataStreamingService.proto
