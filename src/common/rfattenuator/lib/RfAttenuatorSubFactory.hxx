@@ -5,8 +5,6 @@
 #include <memory>
 
 #include <microsoft/net/remote/service/RfAttenuator.hxx>
-//#include "RfAttenuatorTransportSocket.h"
-//#include "RfAttenuatorTransportSocketWin32.h"
 
 /**
  * @brief Private interface for attenuator implementations that support
