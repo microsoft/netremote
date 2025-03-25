@@ -8,6 +8,7 @@
 #include <grpcpp/server.h>
 #include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/remote/service/NetRemoteDataStreamingService.hxx>
+#include <microsoft/net/remote/service/NetRemoteRfAttenuatorService.hxx>
 #include <microsoft/net/remote/service/NetRemoteServerConfiguration.hxx>
 #include <microsoft/net/remote/service/NetRemoteService.hxx>
 
@@ -94,6 +95,7 @@ private:
 
     NetRemoteService m_service;
     NetRemoteDataStreamingService m_dataStreamingService;
+    NetRemoteRfAttenuatorService m_rfAttenuatorService;
 };
 } // namespace Microsoft::Net::Remote::Service
 

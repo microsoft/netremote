@@ -19,6 +19,8 @@ set(PROTO_HEADERS_GENERATED
     ${PROTO_DIR_BINARY}/NetRemoteDataStream.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuator.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuatorService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.pb.h
     ${PROTO_DIR_BINARY}/Network8021x.pb.h
@@ -30,6 +32,8 @@ set(PROTO_HEADERS_GENERATED_GRPC
     ${PROTO_DIR_BINARY}/NetRemoteDataStream.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteDataStreamingService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteNetwork.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuator.grpc.pb.h
+    ${PROTO_DIR_BINARY}/NetRemoteRfAttenuatorService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteService.grpc.pb.h
     ${PROTO_DIR_BINARY}/NetRemoteWifi.grpc.pb.h
     ${PROTO_DIR_BINARY}/Network8021x.grpc.pb.h

@@ -54,7 +54,7 @@ bool RfAttenuatorSoftwareSimulated::SetAttenuationForChannel(uint32_t channel, d
     if (attenuation < m_properties.AttenuationRangeDbmMin || attenuation > m_properties.AttenuationRangeDbmMax)
     {
         throw std::invalid_argument(std::format(
-            "attenuation value out of range; expected range {}-{}", m_properties.AttenuationRangeDbmMin, m_properties.AttenuationRangeDbmMax));
+            "attenuation value {} out of range; expected range {}-{}", attenuation, m_properties.AttenuationRangeDbmMin, m_properties.AttenuationRangeDbmMax));
     }
 
     const std::scoped_lock channelsLock{m_channelsGate};
