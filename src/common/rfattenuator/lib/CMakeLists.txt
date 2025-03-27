@@ -7,9 +7,14 @@ set(NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_RFATTENUATO
 
 target_sources(${PROJECT_NAME}-rfattenuator
     PRIVATE
+        RfAttenuatorAeroflexWeinschle83XX.cxx
         RfAttenuatorExceptionImpl.cxx
         RfAttenuatorFactoryImpl.cxx
+        RfAttenuatorProtocol.cxx
         RfAttenuatorSoftwareSimulated.cxx
+        RfAttenuatorTransport.cxx
+        RfAttenuatorTransportSocketLinux.cxx
+        SocketHelpers.cxx
     PUBLIC
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE}

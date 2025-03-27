@@ -36,7 +36,7 @@ struct RfAttenuatorProperties
  */
 struct RfAttenuatorConnectionArgumentsTcp
 {
-    std::wstring IpAddress;
+    std::string IpAddress;
     uint16_t Port;
 };
 
