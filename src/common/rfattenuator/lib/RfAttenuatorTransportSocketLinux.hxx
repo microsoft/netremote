@@ -6,13 +6,6 @@
 #include <span>
 #include <vector>
 
-// #include <WinSock2.h>
-// #include <wil/resource.h>
-
-//#include <ppltasks.h>
-// #include <winrt/windows.foundation.collections.h>
-// #include <winrt/windows.foundation.h>
-
 #include "RfAttenuatorTransport.hxx"
 #include "SocketHelpers.hxx"
 
@@ -30,9 +23,6 @@ struct RfAttenuatorTransportSocketLinux : public RfAttenuatorTransport<std::vect
     ~RfAttenuatorTransportSocketLinux() override;
     std::vector<uint8_t>
     SendRequest(std::vector<uint8_t> request) override;
-
-    // concurrency::task<std::vector<uint8_t>>
-    // SendRequestAsync(std::vector<uint8_t> request) override;
 
 private:
     static int

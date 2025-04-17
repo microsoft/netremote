@@ -5,8 +5,6 @@
 #include <memory>
 #include <string>
 
-//#include <ppltasks.h>
-
 #include "RfAttenuatorExceptionImpl.hxx"
 #include "RfAttenuatorProtocol.hxx"
 
@@ -51,19 +49,6 @@ struct RfAttenuatorTransport
      */
     virtual MessageType
     SendRequest(MessageType request) =0;
-
-    // /**
-    //  * @brief Send an asynchronous request to the attenuator.
-    //  *
-    //  * @param request The request for the attenuator to execute.
-    //  * @return concurrency::task<MessageType> A task which returns the response
-    //  * from the attenuator upon completion.
-    //  */
-    // virtual concurrency::task<MessageType>
-    // SendRequestAsync(MessageType request)
-    // {
-    //     throw std::runtime_error("implementation for SendRequestAsync not implemented");
-    // }
 
     /**
      * @brief Protocol message adapter.

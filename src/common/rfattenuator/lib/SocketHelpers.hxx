@@ -8,11 +8,6 @@
 #include <unistd.h>
 
 #include "RfAttenuatorExceptionImpl.hxx"
-//#include <WinSock2.h>
-
-// #include <windows.h>
-
-// #include <wil/resource.h>
 
 using namespace std::chrono_literals;
 

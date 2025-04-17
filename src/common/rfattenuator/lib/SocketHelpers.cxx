@@ -6,10 +6,6 @@
 #include "LogHelpers.hxx"
 #include "SocketHelpers.hxx"
 
-// #include <wil/result.h>
-
-// #include <WS2tcpip.h>
-
 namespace detail
 {
 // Timeout to wait for a socket to become ready for Transmit (send()) operation.

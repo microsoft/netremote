@@ -3,14 +3,6 @@
 
 #include "LogHelpers.hxx"
 #include "RfAttenuatorTransportSocketLinux.hxx"
-//#include <pplawait.h>
-
-// namespace winrt
-// {
-// using winrt::Windows::Foundation::IAsyncAction;
-// using winrt::Windows::Foundation::IAsyncOperation;
-// using winrt::Windows::Foundation::Collections::IVector;
-// } // namespace winrt
 
 /* static */
 std::unique_ptr<RfAttenuatorTransportSocketLinux>
@@ -106,16 +98,6 @@ RfAttenuatorTransportSocketLinux::SendRequest(std::vector<uint8_t> request)
     // Return the response buffer.
     return response;
 }
-
-// concurrency::task<std::vector<uint8_t>>
-// RfAttenuatorTransportSocketLinux::SendRequestAsync(std::vector<uint8_t> request)
-// {
-//     auto traceMe{ LogHelpers::TraceFunction() };
-
-//     return concurrency::create_task([=, request = std::move(request)] {
-//         return SendRequest(std::move(request));
-//     });
-// }
 
 void
 RfAttenuatorTransportSocketLinux::TransmitRequest(std::span<uint8_t> requestBuffer)
