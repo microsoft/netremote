@@ -18,13 +18,6 @@ NetRemoteRfAttenuatorService::NetRemoteRfAttenuatorService(const NetRemoteRfAtte
         configuration.Port);
 
     m_attenuator = attenuator;
-    // if (configuration.Type == RfAttenuatorType::Software) {
-    //     m_attenuator = CreateSimulatedAttenuator();
-    //     if (m_attenuator == nullptr) {
-    //         LOGE << "Failed to create simulated RF attenuator";
-    //         throw std::runtime_error("Failed to create simulated RF attenuator");
-    //     }
-    // }
 }
 
 grpc::Status

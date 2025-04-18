@@ -69,9 +69,6 @@ private:
     grpc::Status
     SetAttenuationForChannel(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::RfAttenuator::SetAttenuationRequest* request, ::Microsoft::Net::Remote::RfAttenuator::SetAttenuationResult* response) override;
 
-    // std::unique_ptr<IRfAttenuatorController>
-    // CreateSimulatedAttenuator();
-
 private:
     /**
      * @brief RF attenuator configuration.
