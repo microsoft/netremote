@@ -6,7 +6,6 @@
 #include <microsoft/net/remote/protocol/NetRemoteRfAttenuatorService.grpc.pb.h>
 
 #include <microsoft/net/remote/service/RfAttenuator.hxx>
-#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 namespace Microsoft::Net::Remote::Service
 {
 /**
@@ -33,7 +32,7 @@ struct NetRemoteRfAttenuatorConfiguration
     /**
      * @brief RF attenuator port.
      */
-    uint32_t Port{ 0 };
+    uint16_t Port{ 0 };
 };
 
 /**
@@ -46,7 +45,7 @@ public:
     /**
      * @brief Construct a new NetRemoteRfAttenuatorService object.
      */
-    NetRemoteRfAttenuatorService(const NetRemoteRfAttenuatorConfiguration& configuration);
+    NetRemoteRfAttenuatorService(const NetRemoteRfAttenuatorConfiguration& configuration, std::shared_ptr<IRfAttenuatorController> attenuator);
 
     const NetRemoteRfAttenuatorConfiguration&
     GetNetRemoteRfAttenuatorConfiguration() const noexcept
@@ -70,8 +69,8 @@ private:
     grpc::Status
     SetAttenuationForChannel(::grpc::ServerContext* context, const ::Microsoft::Net::Remote::RfAttenuator::SetAttenuationRequest* request, ::Microsoft::Net::Remote::RfAttenuator::SetAttenuationResult* response) override;
 
-    std::unique_ptr<IRfAttenuatorController>
-    CreateSimulatedAttenuator();
+    // std::unique_ptr<IRfAttenuatorController>
+    // CreateSimulatedAttenuator();
 
 private:
     /**
@@ -87,7 +86,7 @@ private:
     /**
      * @brief RF attenuator controller.
      */
-    std::unique_ptr<IRfAttenuatorController> m_attenuator = nullptr;
+    std::shared_ptr<IRfAttenuatorController> m_attenuator = nullptr;
 };
 } // namespace Microsoft::Net::Remote::Service
 #endif // NET_REMOTE_RFATTENUATOR_SERVICE_HXX

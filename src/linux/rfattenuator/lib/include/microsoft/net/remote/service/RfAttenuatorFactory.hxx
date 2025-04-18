@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RfAttenuator.hxx"
+#include <microsoft/net/remote/service/RfAttenuator.hxx>
 
 #include <memory>
 #include <string>
