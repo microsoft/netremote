@@ -1,10 +1,11 @@
-
 #include <format>
 
+#include "RfAttenuatorAeroflexWeinschle83XX.hxx"
 #include "RfAttenuatorExceptionImpl.hxx"
 #include "RfAttenuatorSoftwareSimulated.hxx"
-#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
+#include "RfAttenuatorTransportSocketLinux.hxx"
 #include <strings/StringHelpers.hxx>
+#include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 
 /* static */
 std::unique_ptr<IRfAttenuatorController>
@@ -24,6 +25,39 @@ RfAttenuatorFactory::TryCreateBasic(std::string attenuatorName, RfAttenuatorProp
     auto instance = factory->Create(std::move(properties));
     if (instance == nullptr) {
         throw RfAttenuatorExceptionImpl(std::format("failed to create {} basic attenuator", attenuatorName));
+    }
+
+    return instance;
+}
+
+/* static */
+std::unique_ptr<IRfAttenuatorController>
+RfAttenuatorFactory::TryCreateWithTcpConnection(std::string attenuatorName, RfAttenuatorConnectionArgumentsTcp args)
+{
+    // Try to find a supported factory based on the requested attenuator name.
+    std::unique_ptr<IRfAttenuatorWithTcpConnectionFactory> factory = nullptr;
+    for (const auto& prefix : RfAttenuatorAeroflexWeinschle83XXFactory::SupportedNamePrefixes) {
+        if (attenuatorName.starts_with(prefix)) {
+            factory = std::make_unique<RfAttenuatorAeroflexWeinschle83XXFactory>();
+            break;
+        }
+    }
+
+    if (factory == nullptr) {
+        throw RfAttenuatorExceptionImpl(std::format("failed to find supported {} attenuator with TCP transport", attenuatorName));
+    }
+
+    // Create TCP transport based on the specified arguments.
+    auto configuration = factory->GetTransportConfiguration();
+    auto transport{
+        RfAttenuatorTransportSocketLinux::CreateWithTcpConnection(
+            args.IpAddress, args.Port, configuration.ReceiveSize, configuration.ReceiveDelay, configuration.SettlingTime)
+    };
+
+    // Invoke attenuator-specific factory, passing the TCP transport.
+    auto instance = factory->Create(std::move(transport));
+    if (instance == nullptr) {
+        throw RfAttenuatorExceptionImpl(std::format("failed to create {} attenuator with TCP transport", attenuatorName));
     }
 
     return instance;
