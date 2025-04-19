@@ -11,7 +11,7 @@
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
 #include <microsoft/net/remote/service/RfAttenuatorFactory.hxx>
 
-#include "TestNetRemoteCommon.hxx"
+#include "../../TestNetRemoteCommon.hxx"
 
 using namespace Microsoft::Net::Remote::Test;
 using namespace Microsoft::Net::Remote::Service;
