@@ -17,4 +17,5 @@ endif()
 
 if (NOT NETREMOTE_EXCLUDE_SERVER)
     add_subdirectory(server)
+    add_subdirectory(rfattenuator)
 endif()

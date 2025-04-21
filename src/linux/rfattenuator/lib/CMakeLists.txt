@@ -19,11 +19,12 @@ target_sources(${PROJECT_NAME}-rfattenuator
     FILE_SET HEADERS
     BASE_DIRS ${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE}
     FILES
-        ${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_PREFIX}/RfAttenuator.hxx
         ${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_PREFIX}/RfAttenuatorFactory.hxx
 )
 
 target_link_libraries(${PROJECT_NAME}-rfattenuator
+    PUBLIC
+        ${PROJECT_NAME}-rfattenuator-interface
     PRIVATE
         strings
 )

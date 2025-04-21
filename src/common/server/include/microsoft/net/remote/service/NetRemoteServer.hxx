@@ -28,7 +28,7 @@ struct NetRemoteServer
      *
      * @param configuration
      */
-    explicit NetRemoteServer(const NetRemoteServerConfiguration& configuration);
+    explicit NetRemoteServer(const NetRemoteServerConfiguration& configuration, std::shared_ptr<IRfAttenuatorController> attenuator = nullptr);
 
     /**
      * Prevent copying and moving of this object.

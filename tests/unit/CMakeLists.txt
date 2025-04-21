@@ -10,7 +10,6 @@ add_executable(${PROJECT_NAME}-test-unit)
 target_sources(${PROJECT_NAME}-test-unit
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/Main.cxx
-        ${CMAKE_CURRENT_LIST_DIR}/NetRemoteRfAttenuatorServiceClient.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteCommon.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServer.cxx
         ${CMAKE_CURRENT_LIST_DIR}/TestNetRemoteServiceClient.cxx

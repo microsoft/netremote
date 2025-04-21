@@ -7,7 +7,7 @@ using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote::Service::Tracing;
 using namespace Microsoft::Net::Remote::RfAttenuator;
 
-NetRemoteRfAttenuatorService::NetRemoteRfAttenuatorService(const NetRemoteRfAttenuatorConfiguration& configuration) :
+NetRemoteRfAttenuatorService::NetRemoteRfAttenuatorService(const NetRemoteRfAttenuatorConfiguration& configuration, std::shared_ptr<IRfAttenuatorController> attenuator) :
     m_configuration(configuration)
 {
     const NetRemoteApiTrace traceMe{};
@@ -17,13 +17,7 @@ NetRemoteRfAttenuatorService::NetRemoteRfAttenuatorService(const NetRemoteRfAtte
         configuration.Address,
         configuration.Port);
 
-    if (configuration.Type == RfAttenuatorType::Software) {
-        m_attenuator = CreateSimulatedAttenuator();
-        if (m_attenuator == nullptr) {
-            LOGE << "Failed to create simulated RF attenuator";
-            throw std::runtime_error("Failed to create simulated RF attenuator");
-        }
-    }
+    m_attenuator = attenuator;
 }
 
 grpc::Status
@@ -129,34 +123,4 @@ grpc::Status NetRemoteRfAttenuatorService::SetAttenuationForChannel([[maybe_unus
     }
 
     return grpc::Status::OK;
-}
-
-std::unique_ptr<IRfAttenuatorController>
-NetRemoteRfAttenuatorService::CreateSimulatedAttenuator()
-{
-    // Implementation of CreateSimulatedAttenuator
-    RfAttenuatorProperties properties{
-        .Channels{ 1, 2, 3, 4 },
-        .AttenuationRangeDbmMin = 0,
-        .AttenuationRangeDbmMax = 100,
-        .AttenuationStepDbmMin = 1,
-        .AttenuationStepDbmMax = 5,
-        .AttenuationAccuracyDbmMin = 1,
-        .AttenuationAccuracyDbmMax = 1,
-        .FrequencyBandwidthMHzMin = 0,
-        .FrequencyBandwidthMHzMax = 6000,
-        .SupportsSweep = false,
-        .Identification = "Simulated Attenuator",
-    };
-
-    std::cout << "Creating software-based attenuator ... ";
-
-    try {
-        auto attenuator = RfAttenuatorFactory::TryCreateBasic("software", std::move(properties));
-        std::cout << "succeeded" << std::endl;
-        return attenuator;
-    } catch (const RfAttenuatorException& e) {
-        std::cout << "failed (" << e.what() << ")" << std::endl;
-        return nullptr;
-    }
 }

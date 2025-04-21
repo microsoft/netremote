@@ -12,12 +12,12 @@
 
 using namespace Microsoft::Net::Remote::Service;
 
-NetRemoteServer::NetRemoteServer(const NetRemoteServerConfiguration& configuration) :
+NetRemoteServer::NetRemoteServer(const NetRemoteServerConfiguration& configuration, std::shared_ptr<IRfAttenuatorController> attenuator) :
     m_serverAddress(configuration.ServerAddress),
     m_networkManager(configuration.NetworkManager),
     m_discoveryServiceFactory(std::move(configuration.DiscoveryServiceFactory)),
     m_service(configuration.NetworkManager),
-    m_rfAttenuatorService(configuration.RfAttenuatorConfiguration)
+    m_rfAttenuatorService(configuration.RfAttenuatorConfiguration, attenuator)
 {
     InitializeDiscoveryService();
 }

@@ -32,7 +32,7 @@ target_link_libraries(${PROJECT_NAME}-service
         ${PROJECT_NAME}-network-manager
         ${PROJECT_NAME}-protocol
         wifi-apmanager
-        ${PROJECT_NAME}-rfattenuator
+        ${PROJECT_NAME}-rfattenuator-interface
     PRIVATE
         ${PROJECT_NAME}-net-adapter-service-api
         logging-utils
