@@ -22,7 +22,6 @@ target_link_libraries(${PROJECT_NAME}-test-unit
         ${PROJECT_NAME}-net
         ${PROJECT_NAME}-net-test-helpers
         ${PROJECT_NAME}-server
-        ${PROJECT_NAME}-rfattenuator
         Catch2::Catch2
         gRPC::grpc++
         magic_enum::magic_enum
