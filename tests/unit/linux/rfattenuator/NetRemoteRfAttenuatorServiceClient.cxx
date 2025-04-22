@@ -18,43 +18,13 @@ using namespace Microsoft::Net::Remote::Service;
 using namespace Microsoft::Net::Remote;
 using namespace Microsoft::Net::Remote::RfAttenuator;
 
-std::unique_ptr<IRfAttenuatorController>
-CreateSimulatedAttenuator()
-{
-    // Implementation of CreateSimulatedAttenuator
-    RfAttenuatorProperties properties{
-        .Channels{ 1, 2, 3, 4 },
-        .AttenuationRangeDbmMin = 0,
-        .AttenuationRangeDbmMax = 100,
-        .AttenuationStepDbmMin = 1,
-        .AttenuationStepDbmMax = 5,
-        .AttenuationAccuracyDbmMin = 1,
-        .AttenuationAccuracyDbmMax = 1,
-        .FrequencyBandwidthMHzMin = 0,
-        .FrequencyBandwidthMHzMax = 6000,
-        .SupportsSweep = false,
-        .Identification = "Simulated Attenuator",
-    };
-
-    LOGI << "Creating software-based attenuator ... ";
-
-    try {
-        auto attenuator = RfAttenuatorFactory::TryCreateBasic("software", std::move(properties));
-        LOGI << "succeeded" << std::endl;
-        return attenuator;
-    } catch (const RfAttenuatorException &e) {
-        LOGE << "failed (" << e.what() << ")" << std::endl;
-        return nullptr;
-    }
-}
-
 TEST_CASE("RfAttenuator IsEnabled API", "[basic][rpc][client][remote][rfAttenuator]")
 {
     SECTION("IsEnabled is true")
     {
         auto serverConfiguration = CreateServerConfiguration();
         serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
-        auto attenuator = CreateSimulatedAttenuator();
+        auto attenuator = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
         NetRemoteServer server{ serverConfiguration, std::move(attenuator) };
         server.Run();
 
@@ -101,7 +71,7 @@ TEST_CASE("RfAttenuator Reset API", "[basic][rpc][client][remote][rfAttenuator]"
     {
         auto serverConfiguration = CreateServerConfiguration();
         serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
-        auto attenuator = CreateSimulatedAttenuator();
+        auto attenuator = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
         NetRemoteServer server{ serverConfiguration, std::move(attenuator) };
         server.Run();
 
@@ -148,7 +118,7 @@ TEST_CASE("RfAttenuator GetProperties API", "[basic][rpc][client][remote][rfAtte
     {
         auto serverConfiguration = CreateServerConfiguration();
         serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
-        auto attenuator = CreateSimulatedAttenuator();
+        auto attenuator = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
         NetRemoteServer server{ serverConfiguration, std::move(attenuator) };
         server.Run();
 
@@ -196,7 +166,7 @@ TEST_CASE("RfAttenuator GetAttenuationForChannel and SetAttenuationForChannel AP
     {
         auto serverConfiguration = CreateServerConfiguration();
         serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
-        auto attenuator = CreateSimulatedAttenuator();
+        auto attenuator = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
         NetRemoteServer server{ serverConfiguration, std::move(attenuator) };
         server.Run();
 
@@ -268,7 +238,7 @@ TEST_CASE("RfAttenuator GetAttenuationForChannel and SetAttenuationForChannel AP
     {
         auto serverConfiguration = CreateServerConfiguration();
         serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
-        auto attenuator = CreateSimulatedAttenuator();
+        auto attenuator = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
         NetRemoteServer server{ serverConfiguration, std::move(attenuator) };
         server.Run();
 
@@ -303,7 +273,7 @@ TEST_CASE("RfAttenuator GetAttenuationForChannel and SetAttenuationForChannel AP
     {
         auto serverConfiguration = CreateServerConfiguration();
         serverConfiguration.RfAttenuatorConfiguration.Type = RfAttenuatorType::Software;
-        auto attenuator = CreateSimulatedAttenuator();
+        auto attenuator = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
         NetRemoteServer server{ serverConfiguration, std::move(attenuator) };
         server.Run();
 
