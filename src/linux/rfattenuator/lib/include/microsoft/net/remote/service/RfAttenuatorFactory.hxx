@@ -29,4 +29,22 @@ struct RfAttenuatorFactory
      */
     static std::unique_ptr<IRfAttenuatorController>
     TryCreateWithTcpConnection(std::string attenuatorName, RfAttenuatorConnectionArgumentsTcp args);
+
+    /**
+     * @brief Create a simulated software attenuator.
+     *
+     * @return std::unique_ptr<IRfAttenuatorController>
+     */
+    static std::unique_ptr<IRfAttenuatorController>
+    CreateSimulatedSoftwareAttenuator();
+
+    /**
+     * @brief Create a socket-based AFW83 attenuator.
+     *
+     * @param ipAddress The IP address of the attenuator.
+     * @param port The port of the attenuator.
+     * @return std::unique_ptr<IRfAttenuatorController>
+     */
+    static std::unique_ptr<IRfAttenuatorController>
+    CreateSocketAfw83Attenuator(std::string ipAddress, uint16_t port);
 };

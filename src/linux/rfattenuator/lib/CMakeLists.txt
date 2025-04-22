@@ -1,11 +1,11 @@
 
-add_library(${PROJECT_NAME}-rfattenuator STATIC "")
+add_library(${PROJECT_NAME}-rfattenuator-linux STATIC "")
 
 set(NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE ${CMAKE_CURRENT_LIST_DIR}/include)
 set(NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_SUFFIX microsoft/net/remote/service)
 set(NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_PREFIX ${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE}/${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_SUFFIX})
 
-target_sources(${PROJECT_NAME}-rfattenuator
+target_sources(${PROJECT_NAME}-rfattenuator-linux
     PRIVATE
         RfAttenuatorAeroflexWeinschle83XX.cxx
         RfAttenuatorExceptionImpl.cxx
@@ -22,7 +22,7 @@ target_sources(${PROJECT_NAME}-rfattenuator
         ${NET_REMOTE_RFATTENUATOR_LINUX_PUBLIC_INCLUDE_PREFIX}/RfAttenuatorFactory.hxx
 )
 
-target_link_libraries(${PROJECT_NAME}-rfattenuator
+target_link_libraries(${PROJECT_NAME}-rfattenuator-linux
     PUBLIC
         ${PROJECT_NAME}-rfattenuator-interface
     PRIVATE
@@ -30,7 +30,7 @@ target_link_libraries(${PROJECT_NAME}-rfattenuator
 )
 
 install(
-    TARGETS ${PROJECT_NAME}-rfattenuator
+    TARGETS ${PROJECT_NAME}-rfattenuator-linux
     EXPORT ${PROJECT_NAME}
     COMPONENT dev
     FILE_SET HEADERS

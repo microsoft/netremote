@@ -106,6 +106,9 @@ grpc::Status NetRemoteRfAttenuatorService::SetAttenuationForChannel([[maybe_unus
     std::scoped_lock attenuatorLock{ m_mutex };
     const NetRemoteApiTrace traceMe{};
 
+    auto clientAddress = context->peer();
+    LOGI << std::format("SetAttenuationForChannel: client-id: {}, channel: {}, attenuationdbm: {}", clientAddress, request->channel(), request->attenuationdbm());
+
     try {
         auto result = m_attenuator->SetAttenuationForChannel(request->channel(), request->attenuationdbm());
 

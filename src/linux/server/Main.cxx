@@ -98,64 +98,6 @@ OnSignal(int signal)
     TerminateRequstedChanged.notify_one();
 }
 
-std::unique_ptr<IRfAttenuatorController>
-CreateSimulatedAttenuator()
-{
-    // Implementation of CreateSimulatedAttenuator
-    RfAttenuatorProperties properties{
-        .Channels{ 1, 2, 3, 4 },
-        .AttenuationRangeDbmMin = 0,
-        .AttenuationRangeDbmMax = 100,
-        .AttenuationStepDbmMin = 1,
-        .AttenuationStepDbmMax = 5,
-        .AttenuationAccuracyDbmMin = 1,
-        .AttenuationAccuracyDbmMax = 1,
-        .FrequencyBandwidthMHzMin = 0,
-        .FrequencyBandwidthMHzMax = 6000,
-        .SupportsSweep = false,
-        .Identification = "Simulated Attenuator",
-    };
-
-    LOGI << "Creating software-based attenuator ... ";
-
-    try {
-        auto attenuator = RfAttenuatorFactory::TryCreateBasic("software", std::move(properties));
-        LOGI << "succeeded" << std::endl;
-        return attenuator;
-    } catch (const RfAttenuatorException &e) {
-        LOGE << "failed (" << e.what() << ")" << std::endl;
-        return nullptr;
-    }
-}
-
-std::unique_ptr<IRfAttenuatorController>
-CreateSocketAttenuator(std::string attenuatorName, std::string ipAddress, uint16_t port)
-{
-    RfAttenuatorConnectionArgumentsTcp args{
-        .IpAddress = std::move(ipAddress),
-        .Port = port,
-    };
-
-    LOGI << std::format(
-                "Creating socket-based attenuator {} @ {}:{}",
-                attenuatorName,
-                args.IpAddress,
-                args.Port)
-         << " ... ";
-
-    try {
-        auto attenuator = RfAttenuatorFactory::TryCreateWithTcpConnection(attenuatorName, std::move(args));
-        LOGI << "succeeded" << std::endl;
-        return attenuator;
-    } catch (RfAttenuatorException &e) {
-        LOGE << "failed (" << e.what() << ")" << std::endl;
-        return nullptr;
-    } catch (std::exception &e) {
-        LOGE << "failed (" << e.what() << ")" << std::endl;
-        return nullptr;
-    }
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -221,9 +163,17 @@ main(int argc, char *argv[])
     // Create attenuator controller.
     std::shared_ptr<IRfAttenuatorController> rfAttenuatorController = nullptr;
     if (configuration.RfAttenuatorConfiguration.Type == RfAttenuatorType::Software) {
-        rfAttenuatorController = CreateSimulatedAttenuator();
+        rfAttenuatorController = RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator();
+        if (rfAttenuatorController == nullptr) {
+            LOGE << "Failed to create software-based attenuator";
+            return -1;
+        }
     } else if (configuration.RfAttenuatorConfiguration.Type == RfAttenuatorType::Socket) {
-        rfAttenuatorController = CreateSocketAttenuator("AeroflexWeinschle83", configuration.RfAttenuatorConfiguration.Address, configuration.RfAttenuatorConfiguration.Port);
+        rfAttenuatorController = RfAttenuatorFactory::CreateSocketAfw83Attenuator(configuration.RfAttenuatorConfiguration.Address, configuration.RfAttenuatorConfiguration.Port);
+        if (rfAttenuatorController == nullptr) {
+            LOGE << "Failed to create socket-based attenuator";
+            return -1;
+        }
     } else {
         LOGN << "No RF attenuator controller created";
     }

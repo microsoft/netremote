@@ -1,4 +1,5 @@
 #include <format>
+#include <iostream>
 
 #include "RfAttenuatorAeroflexWeinschle83XX.hxx"
 #include "RfAttenuatorExceptionImpl.hxx"
@@ -61,4 +62,62 @@ RfAttenuatorFactory::TryCreateWithTcpConnection(std::string attenuatorName, RfAt
     }
 
     return instance;
+}
+
+std::unique_ptr<IRfAttenuatorController>
+RfAttenuatorFactory::CreateSimulatedSoftwareAttenuator()
+{
+    RfAttenuatorProperties properties{
+        .Channels{ 1, 2, 3, 4 },
+        .AttenuationRangeDbmMin = 0,
+        .AttenuationRangeDbmMax = 100,
+        .AttenuationStepDbmMin = 1,
+        .AttenuationStepDbmMax = 5,
+        .AttenuationAccuracyDbmMin = 1,
+        .AttenuationAccuracyDbmMax = 1,
+        .FrequencyBandwidthMHzMin = 0,
+        .FrequencyBandwidthMHzMax = 6000,
+        .SupportsSweep = false,
+        .Identification = "Simulated Attenuator",
+    };
+
+    std::cout << "Creating software-based attenuator ... ";
+
+    try {
+        auto attenuator = TryCreateBasic("software", std::move(properties));
+        std::cout << "succeeded" << std::endl;
+        return attenuator;
+    } catch (const RfAttenuatorException& e) {
+        std::cout << "failed (" << e.what() << ")" << std::endl;
+        return nullptr;
+    }
+}
+
+std::unique_ptr<IRfAttenuatorController>
+RfAttenuatorFactory::CreateSocketAfw83Attenuator(std::string ipAddress, uint16_t port)
+{
+    RfAttenuatorConnectionArgumentsTcp args{
+        .IpAddress = std::move(ipAddress),
+        .Port = port,
+    };
+
+    const auto attenuatorName = "AFW83";
+    std::cout << std::format(
+                     "Creating socket-based attenuator {} @ {}:{}",
+                     attenuatorName,
+                     args.IpAddress,
+                     args.Port)
+              << " ... ";
+
+    try {
+        auto attenuator = TryCreateWithTcpConnection(attenuatorName, std::move(args));
+        std::cout << "succeeded" << std::endl;
+        return attenuator;
+    } catch (RfAttenuatorException& e) {
+        std::cout << "failed (" << e.what() << ")" << std::endl;
+        return nullptr;
+    } catch (std::exception& e) {
+        std::cout << "failed (" << e.what() << ")" << std::endl;
+        return nullptr;
+    }
 }

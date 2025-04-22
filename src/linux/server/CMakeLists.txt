@@ -14,7 +14,7 @@ target_link_libraries(${PROJECT_NAME}-server-linux
     PRIVATE
         ${PROJECT_NAME}-net-linux
         ${PROJECT_NAME}-server
-        ${PROJECT_NAME}-rfattenuator
+        ${PROJECT_NAME}-rfattenuator-linux
         logging-utils
         notstd
         plog::plog
