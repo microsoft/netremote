@@ -9,13 +9,26 @@
 namespace detail
 {
 // Timeout to wait for a socket to become ready for Transmit (send()) operation.
+//
+// On Linux, the network takes longer time to receive the response from the AFW83 attenuator.
+// Tested, it take 3 seconds to receive the response after sending the GetProperties request.
+// If SettingTime is set to 1, then after GetProperties request, the response is partially received (Only the first line, *IDN?).
+// After this, if we send another request, then the rest of GetProperties will be received along with the response of the second request.
+// Like below
+//  Request: *IDN?
+//  AdaptResponse: *IDN?
+//  Request: CHAN 1; ATTN? <-- The second request is sent before all reponse of the first request is received.
+//  AdaptResponse: CHAN 1; ATTN?
+//                 Weinschel, 8311-352-9-TN, 386, V2.98 <-- this is the rest of GetProperties response
+//                 103.00
+//
+// GetAttenuation takes 2 seconds to receive the response.
+//
+// 3 seconds is a good value to ensure that the response for different type of request is fully received.
 timeval TransmitReadyTimeout{
-    .tv_sec = 1, // 1 second
+    .tv_sec = 3, // 3 seconds
     .tv_usec = 0
 };
-
-// Timeout to wait for a socket to become ready for Receive (recv()) operation.
-timeval ReceiveReadyTimeout = TransmitReadyTimeout;
 } // namespace detail
 
 namespace SocketHelpers
@@ -91,7 +104,8 @@ Transmit(const int& socket, std::span<uint8_t> buffer)
         FD_SET(socket, &writeSet);
 
         // Wait for socket write buffer to become ready for data.
-        const auto numSocketsReady = select(0, nullptr, &writeSet, nullptr, &detail::TransmitReadyTimeout);
+        auto readyTimeout = detail::TransmitReadyTimeout;
+        const auto numSocketsReady = select(socket + 1, nullptr, &writeSet, nullptr, &readyTimeout);
         if (numSocketsReady < 0) {
             throw SocketHelperException(std::format("Error while waiting for socket write buffer to become ready for data with errno=0x{:08x}", errno).c_str(), errno);
         } else if (numSocketsReady == 0) {
@@ -128,7 +142,22 @@ Receive(const int& socket, std::span<uint8_t> buffer, std::chrono::milliseconds 
         FD_SET(socket, &readSet);
 
         // Wait for data to become available for reading on the socket.
-        const auto numSocketsReady = select(0, &readSet, nullptr, nullptr, &detail::ReceiveReadyTimeout);
+        //
+        // On Linux, select() modifies timeout to reflect the amount of time not slept; most other implementations do not do this.  (POSIX.1
+        // permits either behavior.)  This causes problems both when Linux
+        // code which reads timeout is ported to other operating systems, and
+        // when code is ported to Linux that reuses a struct timeval for
+        // multiple select()s in a loop without reinitializing it.  Consider
+        // timeout to be undefined after select() returns.
+        //
+        // So, we need to reinitialize the timeout value for each select() call. Tested on Ubuntu 24.10, readyTimeout will be changed to 0.
+        // After the select() call, the next select will return immediately if reuse the variable without reinitializing it.
+        //
+        // SettlingTime and ReceiveDelay may be originally introduced to mitigate this issue without reinitializing the timeout value.
+        // With this change, we can techinically remove the SettlingTime and ReceiveDelay. I will keep them in case we need tune them in the future.
+        // But I set both of them to 0s for now to avoid unnecessary delay.
+        auto readyTimeout = detail::TransmitReadyTimeout;
+        const auto numSocketsReady = select(socket + 1, &readSet, nullptr, nullptr, &readyTimeout);
         if (numSocketsReady < 0) {
             throw SocketHelperException(std::format("Error while waiting for data to become available with errno=0x{:08x}", errno).c_str(), errno);
         } else if (numSocketsReady == 0) {

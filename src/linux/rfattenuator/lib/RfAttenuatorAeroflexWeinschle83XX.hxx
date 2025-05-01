@@ -66,8 +66,9 @@ struct RfAttenuatorAeroflexWeinschle83XXFactory : public IRfAttenuatorWithTcpCon
 
     // These values have been determined from experimentation.
     static constexpr uint32_t ReceiveSize{ 1024 };
-    static constexpr auto ReceiveDelay{ 1s };
-    static constexpr auto SettlingTime{ 1s };
+    // We don't need extra delay for receiving data, the delay is handled by select timeout argument.
+    static constexpr auto ReceiveDelay{ 0s };
+    static constexpr auto SettlingTime{ 0s };
 
     static constexpr TcpTransportConfiguration TransportConfiguration{
         .ReceiveSize = ReceiveSize,
