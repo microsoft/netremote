@@ -41,7 +41,7 @@ set(HOSTAPD_PREFIX ${HOSTAP_SOURCE_DIR}/${HOSTAPD_DIR_NAME})
 # Pull in hostap project with a tagged release.
 ExternalProject_Add(hostap
     GIT_REPOSITORY "http://w1.fi/hostap.git"
-    GIT_TAG "hostap_2_10"
+    GIT_TAG "hostap_2_11"
     GIT_SHALLOW TRUE
     CONFIGURE_COMMAND
         # Copy local build configuration files for libwpa_client.so and hostapd builds.
