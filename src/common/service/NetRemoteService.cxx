@@ -1,12 +1,15 @@
 
 #include <algorithm>
+#include <chrono>
 #include <cstddef>
 #include <format>
+#include <future>
 #include <iterator>
 #include <memory>
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -279,6 +282,18 @@ NetRemoteService::NetRemoteService(std::shared_ptr<NetworkManager> networkManage
 {
 }
 
+NetRemoteService::~NetRemoteService()
+{
+    // Wait for all timer threads to complete naturally
+    std::lock_guard<std::mutex> lock(m_threadsMutex);
+    if (m_timedEnableThread && m_timedEnableThread->joinable()) {
+        m_timedEnableThread->join();
+    }
+    if (m_timedDisableThread && m_timedDisableThread->joinable()) {
+        m_timedDisableThread->join();
+    }
+}
+
 std::shared_ptr<AccessPointManager>
 NetRemoteService::GetAccessPointManager() noexcept
 {
@@ -429,6 +444,31 @@ NetRemoteService::WifiAccessPointGetAttributes([[maybe_unused]] grpc::ServerCont
     const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
 
     auto wifiOperationStatus = WifiAccessPointGetAttributesImpl(request->accesspointid(), *result->mutable_attributes());
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(wifiOperationStatus);
+
+    return grpc::Status::OK;
+}
+
+grpc::Status
+NetRemoteService::WifiAccessPointTimedEnable([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointTimedEnableRequest* request, WifiAccessPointTimedEnableResult* result)
+{
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+
+    const auto* dot11AccessPointConfiguration{ request->has_configuration() ? &request->configuration() : nullptr };
+    auto wifiOperationStatus = WifiAccessPointTimedEnableImpl(request->accesspointid(), dot11AccessPointConfiguration, request->durationseconds());
+    result->set_accesspointid(request->accesspointid());
+    *result->mutable_status() = std::move(wifiOperationStatus);
+
+    return grpc::Status::OK;
+}
+
+grpc::Status
+NetRemoteService::WifiAccessPointTimedDisable([[maybe_unused]] grpc::ServerContext* context, const WifiAccessPointTimedDisableRequest* request, WifiAccessPointTimedDisableResult* result)
+{
+    const NetRemoteWifiApiTrace traceMe{ request->accesspointid(), result->mutable_status() };
+
+    auto wifiOperationStatus = WifiAccessPointTimedDisableImpl(request->accesspointid(), request->durationseconds());
     result->set_accesspointid(request->accesspointid());
     *result->mutable_status() = std::move(wifiOperationStatus);
 
@@ -639,6 +679,120 @@ NetRemoteService::WifiAccessPointDisableImpl(std::string_view accessPointId, std
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
 
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId, const Dot11AccessPointConfiguration* dot11AccessPointConfiguration, uint32_t durationSeconds, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate duration - must be greater than 0 and cannot exceed 10 minutes (600 seconds)
+    constexpr uint32_t MaxDurationSeconds = 600;
+    if (durationSeconds == 0) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Duration must be greater than 0 seconds");
+        return wifiOperationStatus;
+    }
+    if (durationSeconds > MaxDurationSeconds) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message(std::format("Duration {} seconds exceeds maximum allowed duration of {} seconds", durationSeconds, MaxDurationSeconds));
+        return wifiOperationStatus;
+    }
+
+    // Check if a timed enable operation is already running
+    {
+        std::lock_guard<std::mutex> lock(m_threadsMutex);
+        if (m_timedEnableThread && m_timedEnableThread->joinable()) {
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+            wifiOperationStatus.set_message("A timed enable operation is already in progress");
+            return wifiOperationStatus;
+        }
+    }
+
+    // Create and store the timer thread
+    auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), dot11AccessPointConfiguration, accessPointController, durationSeconds]() {
+        std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
+
+        // Enable the access point after the duration expires
+        auto result = WifiAccessPointEnableImpl(accessPointId, dot11AccessPointConfiguration, accessPointController);
+        if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+            LOGW << std::format("Failed to automatically enable access point {} after {} seconds: {}",
+                accessPointId,
+                durationSeconds,
+                result.message());
+        } else {
+            LOGI << std::format("Successfully automatically enabled access point {} after {} seconds",
+                accessPointId,
+                durationSeconds);
+        }
+    });
+
+    // Store the thread for management
+    {
+        std::lock_guard<std::mutex> lock(m_threadsMutex);
+        m_timedEnableThread = timerThread;
+    }
+
+    LOGI << std::format("Access point {} will be automatically enabled after {} seconds", accessPointId, durationSeconds);
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId, uint32_t durationSeconds, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    // Validate duration - must be greater than 0 and cannot exceed 10 minutes (600 seconds)
+    constexpr uint32_t MaxDurationSeconds = 600;
+    if (durationSeconds == 0) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message("Duration must be greater than 0 seconds");
+        return wifiOperationStatus;
+    }
+    if (durationSeconds > MaxDurationSeconds) {
+        wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        wifiOperationStatus.set_message(std::format("Duration {} seconds exceeds maximum allowed duration of {} seconds", durationSeconds, MaxDurationSeconds));
+        return wifiOperationStatus;
+    }
+
+    // Check if a timed disable operation is already running
+    {
+        std::lock_guard<std::mutex> lock(m_threadsMutex);
+        if (m_timedDisableThread && m_timedDisableThread->joinable()) {
+            wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+            wifiOperationStatus.set_message("A timed disable operation is already in progress");
+            return wifiOperationStatus;
+        }
+    }
+
+    // Create and store the timer thread
+    auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), accessPointController, durationSeconds]() {
+        std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
+
+        // Disable the access point using the existing implementation
+        auto result = WifiAccessPointDisableImpl(accessPointId, accessPointController);
+        if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+            LOGW << std::format("Failed to automatically disable access point {} after {} seconds: {}",
+                accessPointId,
+                durationSeconds,
+                result.message());
+        } else {
+            LOGI << std::format("Successfully automatically disabled access point {} after {} seconds",
+                accessPointId,
+                durationSeconds);
+        }
+    });
+
+    // Store the thread for management
+    {
+        std::lock_guard<std::mutex> lock(m_threadsMutex);
+        m_timedDisableThread = timerThread;
+    }
+
+    LOGI << std::format("Access point {} will be automatically disabled after {} seconds", accessPointId, durationSeconds);
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     return wifiOperationStatus;
 }
 

@@ -15,10 +15,13 @@ service NetRemote
     rpc WifiAccessPointsEnumerate (Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointsEnumerateResult);
     rpc WifiAccessPointEnable (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointEnableResult);
     rpc WifiAccessPointDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointDisableResult);
+    rpc WifiAccessPointTimedEnable (Microsoft.Net.Remote.Wifi.WifiAccessPointTimedEnableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointTimedEnableResult);
+    rpc WifiAccessPointTimedDisable (Microsoft.Net.Remote.Wifi.WifiAccessPointTimedDisableRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointTimedDisableResult);
     rpc WifiAccessPointSetPhyType (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetPhyTypeResult);
     rpc WifiAccessPointSetFrequencyBands (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetFrequencyBandsResult);
     rpc WifiAccessPointSetSsid (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetSsidResult);
     rpc WifiAccessPointSetNetworkBridge (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetNetworkBridgeResult);
     rpc WifiAccessPointSetAuthenticationDot1x (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationDot1xRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointSetAuthenticationDot1xResult);
     rpc WifiAccessPointGetAttributes (Microsoft.Net.Remote.Wifi.WifiAccessPointGetAttributesRequest) returns (Microsoft.Net.Remote.Wifi.WifiAccessPointGetAttributesResult);
+    
 }

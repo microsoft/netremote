@@ -1191,3 +1191,295 @@ TEST_CASE("WifiAccessPointGetAttributes API", "[basic][rpc][client][remote]")
         REQUIRE(properties.at(InterfaceAttributesPropertyKey) == InterfaceAttributesPropertyValue);
     }
 }
+
+TEST_CASE("WifiAccessPointTimedEnable API", "[basic][rpc][client][remote][timed]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto SsidName{ "TestWifiAccessPointTimedEnable" };
+    constexpr auto InterfaceName1{ "TestWifiAccessPointTimedEnable1" };
+    constexpr auto InterfaceName2{ "TestWifiAccessPointTimedEnable2" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) },
+        .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
+    };
+
+    auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
+    auto apTest2 = std::make_shared<AccessPointTest>(InterfaceName2, apCapabilities);
+    apManagerTest->AddAccessPoint(apTest1);
+    apManagerTest->AddAccessPoint(apTest2);
+
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called with minimal configuration")
+    {
+        WifiAccessPointTimedEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(1); // 1 second duration for quick test
+
+        WifiAccessPointTimedEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointTimedEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(result.status().message().empty());
+        REQUIRE(result.status().has_details() == false);
+    }
+
+    SECTION("Can be called with full configuration")
+    {
+        Dot11CipherSuiteConfiguration dot11CipherSuiteConfigurationWpa1{};
+        dot11CipherSuiteConfigurationWpa1.set_securityprotocol(Dot11SecurityProtocol::Dot11SecurityProtocolWpa);
+        dot11CipherSuiteConfigurationWpa1.mutable_ciphersuites()->Add(Dot11CipherSuite::Dot11CipherSuiteCcmp256);
+
+        Dot11AccessPointConfiguration apConfiguration{};
+        apConfiguration.set_phytype(Dot11PhyType::Dot11PhyTypeA);
+        apConfiguration.mutable_ssid()->set_name(SsidName);
+        apConfiguration.mutable_pairwiseciphersuites()->Add(std::move(dot11CipherSuiteConfigurationWpa1));
+        apConfiguration.mutable_authenticationalgorithms()->Add(Dot11AuthenticationAlgorithm::Dot11AuthenticationAlgorithmSharedKey);
+        apConfiguration.mutable_frequencybands()->Add(Dot11FrequencyBand::Dot11FrequencyBand2_4GHz);
+        *apConfiguration.mutable_authenticationdata()->mutable_psk()->mutable_psk()->mutable_passphrase() = AsciiPassword;
+
+        WifiAccessPointTimedEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(2); // 2 seconds duration
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointTimedEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointTimedEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Fails with zero duration")
+    {
+        WifiAccessPointTimedEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(0); // Zero duration should fail
+
+        WifiAccessPointTimedEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointTimedEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        REQUIRE(result.status().message() == "Duration must be greater than 0 seconds");
+    }
+
+    SECTION("Fails with duration exceeding maximum")
+    {
+        WifiAccessPointTimedEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(601); // Exceeds 10 minutes (600 seconds)
+
+        WifiAccessPointTimedEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointTimedEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        REQUIRE(result.status().message() == "Duration 601 seconds exceeds maximum allowed duration of 600 seconds");
+    }
+
+    SECTION("Succeeds with allowed duration")
+    {
+        WifiAccessPointTimedEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(60); // 1 minute
+
+        WifiAccessPointTimedEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointTimedEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Fails when a timed enable operation is already in progress")
+    {
+        // Start first timed enable operation
+        WifiAccessPointTimedEnableRequest request1{};
+        request1.set_accesspointid(InterfaceName1);
+        request1.set_durationseconds(5); // 5 seconds duration
+
+        WifiAccessPointTimedEnableResult result1{};
+        grpc::ClientContext clientContext1{};
+
+        auto status1 = client->WifiAccessPointTimedEnable(&clientContext1, request1, &result1);
+        REQUIRE(status1.ok());
+        REQUIRE(result1.has_status());
+        REQUIRE(result1.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+        // Attempt second timed enable operation immediately
+        WifiAccessPointTimedEnableRequest request2{};
+        request2.set_accesspointid(InterfaceName2);
+        request2.set_durationseconds(2); // 2 seconds duration
+
+        WifiAccessPointTimedEnableResult result2{};
+        grpc::ClientContext clientContext2{};
+
+        auto status2 = client->WifiAccessPointTimedEnable(&clientContext2, request2, &result2);
+        REQUIRE(status2.ok());
+        REQUIRE(result2.has_status());
+        REQUIRE(result2.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+        REQUIRE(result2.status().message() == "A timed enable operation is already in progress");
+    }
+}
+
+TEST_CASE("WifiAccessPointTimedDisable API", "[basic][rpc][client][remote][timed]")
+{
+    using namespace Microsoft::Net::Remote;
+    using namespace Microsoft::Net::Remote::Service;
+    using namespace Microsoft::Net::Remote::Test;
+    using namespace Microsoft::Net::Remote::Wifi;
+    using namespace Microsoft::Net::Wifi;
+    using namespace Microsoft::Net::Wifi::Test;
+
+    constexpr auto InterfaceName1{ "TestWifiAccessPointTimedDisable1" };
+    constexpr auto InterfaceName2{ "TestWifiAccessPointTimedDisable2" };
+
+    auto apManagerTest = std::make_shared<AccessPointManagerTest>();
+    const Ieee80211AccessPointCapabilities apCapabilities{
+        .PhyTypes{ std::cbegin(AllPhyTypes), std::cend(AllPhyTypes) },
+        .FrequencyBands{ std::cbegin(AllBands), std::cend(AllBands) }
+    };
+
+    auto apTest1 = std::make_shared<AccessPointTest>(InterfaceName1, apCapabilities);
+    auto apTest2 = std::make_shared<AccessPointTest>(InterfaceName2, apCapabilities);
+    apManagerTest->AddAccessPoint(apTest1);
+    apManagerTest->AddAccessPoint(apTest2);
+
+    const auto serverConfiguration = CreateServerConfiguration(apManagerTest);
+    NetRemoteServer server{ serverConfiguration };
+    server.Run();
+
+    auto channel = grpc::CreateChannel(RemoteServiceAddressHttp, grpc::InsecureChannelCredentials());
+    auto client = NetRemote::NewStub(channel);
+
+    SECTION("Can be called")
+    {
+        WifiAccessPointTimedDisableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(1); // 1 second duration for quick test
+
+        WifiAccessPointTimedDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointTimedDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Fails with zero duration")
+    {
+        WifiAccessPointTimedDisableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(0); // Zero duration should fail
+
+        WifiAccessPointTimedDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointTimedDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        REQUIRE(result.status().message() == "Duration must be greater than 0 seconds");
+    }
+
+    SECTION("Fails with duration exceeding maximum")
+    {
+        WifiAccessPointTimedDisableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(601); // Exceeds 10 minutes (600 seconds)
+
+        WifiAccessPointTimedDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointTimedDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeInvalidParameter);
+        REQUIRE(result.status().message() == "Duration 601 seconds exceeds maximum allowed duration of 600 seconds");
+    }
+
+    SECTION("Succeeds with allowed duration")
+    {
+        WifiAccessPointTimedDisableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        request.set_durationseconds(60); // 1 minute
+
+        WifiAccessPointTimedDisableResult result{};
+        grpc::ClientContext clientContext{};
+
+        grpc::Status status;
+        REQUIRE_NOTHROW(status = client->WifiAccessPointTimedDisable(&clientContext, request, &result));
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+    }
+
+    SECTION("Fails when a timed disable operation is already in progress")
+    {
+        // Start first timed disable operation
+        WifiAccessPointTimedDisableRequest request1{};
+        request1.set_accesspointid(InterfaceName1);
+        request1.set_durationseconds(5); // 5 seconds duration
+
+        WifiAccessPointTimedDisableResult result1{};
+        grpc::ClientContext clientContext1{};
+
+        grpc::Status status1;
+        REQUIRE_NOTHROW(status1 = client->WifiAccessPointTimedDisable(&clientContext1, request1, &result1));
+        REQUIRE(status1.ok());
+        REQUIRE(result1.has_status());
+        REQUIRE(result1.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+        // Attempt second timed disable operation immediately
+        WifiAccessPointTimedDisableRequest request2{};
+        request2.set_accesspointid(InterfaceName2);
+        request2.set_durationseconds(2); // 2 seconds duration
+
+        WifiAccessPointTimedDisableResult result2{};
+        grpc::ClientContext clientContext2{};
+
+        grpc::Status status2;
+        REQUIRE_NOTHROW(status2 = client->WifiAccessPointTimedDisable(&clientContext2, request2, &result2));
+        REQUIRE(status2.ok());
+        REQUIRE(result2.has_status());
+        REQUIRE(result2.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
+        REQUIRE(result2.status().message() == "A timed disable operation is already in progress");
+    }
+}

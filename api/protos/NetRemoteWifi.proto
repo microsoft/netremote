@@ -137,3 +137,28 @@ message WifiAccessPointGetAttributesResult
     WifiAccessPointOperationStatus Status = 2;
     Microsoft.Net.Wifi.Dot11AccessPointAttributes Attributes = 3;
 }
+
+message WifiAccessPointTimedEnableRequest
+{
+    string AccessPointId = 1;
+    Microsoft.Net.Wifi.Dot11AccessPointConfiguration Configuration = 2;
+    uint32 DurationSeconds = 3; // Duration in seconds to keep the access point enabled
+}
+
+message WifiAccessPointTimedEnableResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
+
+message WifiAccessPointTimedDisableRequest
+{
+    string AccessPointId = 1;
+    uint32 DurationSeconds = 2; // Duration in seconds to keep the access point disabled
+}
+
+message WifiAccessPointTimedDisableResult
+{
+    string AccessPointId = 1;
+    WifiAccessPointOperationStatus Status = 2;
+}
