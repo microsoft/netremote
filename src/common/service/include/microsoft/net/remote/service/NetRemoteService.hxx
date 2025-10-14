@@ -168,7 +168,7 @@ private:
     WifiAccessPointGetAttributes(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointGetAttributesRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointGetAttributesResult* result) override;
 
     /**
-     * @brief Enable an access point for a specified duration. This brings the access point online for the specified time.
+     * @brief Enable an access point after a specified duration.
      *
      * @param context
      * @param request
@@ -179,7 +179,7 @@ private:
     WifiAccessPointTimedEnable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointTimedEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointTimedEnableResult* result) override;
 
     /**
-     * @brief Disable an access point for a specified duration. This takes the access point offline for the specified time.
+     * @brief Disable an access point after a specified duration.
      *
      * @param context
      * @param request
@@ -242,11 +242,11 @@ protected:
     WifiAccessPointDisableImpl(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
-     * @brief Enable an access point for a specified duration. This brings the access point online temporarily.
+     * @brief Enable an access point after a specified duration.
      *
      * @param accessPointId The access point identifier.
      * @param dot11AccessPointConfiguration The access point configuration to apply (optional).
-     * @param durationSeconds The duration in seconds to keep the access point enabled.
+     * @param durationSeconds The duration in seconds to enable the access point.
      * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
@@ -254,10 +254,10 @@ protected:
     WifiAccessPointTimedEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration, uint32_t durationSeconds, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
-     * @brief Disable an access point for a specified duration. This takes the access point offline temporarily.
+     * @brief Disable an access point after a specified duration.
      *
      * @param accessPointId The access point identifier.
-     * @param durationSeconds The duration in seconds to keep the access point disabled.
+     * @param durationSeconds The duration in seconds to disable the access point.
      * @param accessPointController The access point controller for the specified access point (optional).
      * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
      */
