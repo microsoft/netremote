@@ -711,11 +711,12 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
     }
 
     // Create and store the timer thread
-    auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), dot11AccessPointConfiguration, accessPointController, durationSeconds]() {
+    auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), hasConfiguration = (dot11AccessPointConfiguration != nullptr), configurationCopy = dot11AccessPointConfiguration ? *dot11AccessPointConfiguration : Dot11AccessPointConfiguration{}, accessPointController, durationSeconds]() {
         std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
 
         // Enable the access point after the duration expires
-        auto result = WifiAccessPointEnableImpl(accessPointId, dot11AccessPointConfiguration, accessPointController);
+        const auto* configPtr = hasConfiguration ? &configurationCopy : nullptr;
+        auto result = WifiAccessPointEnableImpl(accessPointId, configPtr, accessPointController);
         if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
             LOGW << std::format("Failed to automatically enable access point {} after {} seconds: {}",
                 accessPointId,
