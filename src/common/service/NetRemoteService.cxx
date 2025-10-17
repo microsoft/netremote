@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <format>
@@ -284,8 +285,10 @@ NetRemoteService::NetRemoteService(std::shared_ptr<NetworkManager> networkManage
 
 NetRemoteService::~NetRemoteService()
 {
-    // Wait for all timer threads to complete naturally
-    std::lock_guard<std::mutex> lock(m_threadsMutex);
+    // Signal shutdown to all timer threads
+    m_shutdown = true;
+
+    // Wait for threads to complete outside of the lock
     if (m_timedEnableThread && m_timedEnableThread->joinable()) {
         m_timedEnableThread->join();
     }
@@ -700,7 +703,8 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
         return wifiOperationStatus;
     }
 
-    // Check if a timed enable operation is already running, create and store the timer thread
+    // Check if a timed enable operation is already running, create and store the timer thread.
+    // Right now, this service only supports managing singale access point.
     {
         std::lock_guard<std::mutex> lock(m_threadsMutex);
         if (m_timedEnableThread && m_timedEnableThread->joinable()) {
@@ -711,7 +715,18 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
 
         // Create and store the timer thread
         auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), hasConfiguration = (dot11AccessPointConfiguration != nullptr), configurationCopy = dot11AccessPointConfiguration ? *dot11AccessPointConfiguration : Dot11AccessPointConfiguration{}, accessPointController, durationSeconds]() {
-            std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
+            // Sleep for the specified duration, checking every second for shutdown signal
+            uint32_t secondsElapsed = 0;
+            while (secondsElapsed < durationSeconds && !m_shutdown.load()) {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                secondsElapsed++;
+            }
+
+            // If we were shutdown, exit early
+            if (m_shutdown.load()) {
+                LOGI << std::format("Timed enable operation for access point {} was cancelled due to service shutdown", accessPointId);
+                return;
+            }
 
             // Enable the access point after the duration expires
             const auto* configPtr = hasConfiguration ? &configurationCopy : nullptr;
@@ -754,7 +769,8 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
         return wifiOperationStatus;
     }
 
-    // Check if a timed disable operation is already running, if not, create and store the timer thread
+    // Check if a timed disable operation is already running, if not, create and store the timer thread.
+    // Right now, this service only supports managing singale access point.
     {
         std::lock_guard<std::mutex> lock(m_threadsMutex);
         if (m_timedDisableThread && m_timedDisableThread->joinable()) {
@@ -765,7 +781,18 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
 
         // Create and store the timer thread
         auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), accessPointController, durationSeconds]() {
-            std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
+            // Sleep for the specified duration, checking every second for shutdown signal
+            uint32_t secondsElapsed = 0;
+            while (secondsElapsed < durationSeconds && !m_shutdown.load()) {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                secondsElapsed++;
+            }
+
+            // If we were shutdown, exit early
+            if (m_shutdown.load()) {
+                LOGI << std::format("Timed disable operation for access point {} was cancelled due to service shutdown", accessPointId);
+                return;
+            }
 
             // Disable the access point using the existing implementation
             auto result = WifiAccessPointDisableImpl(accessPointId, accessPointController);

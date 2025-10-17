@@ -2,6 +2,7 @@
 #ifndef NET_REMOTE_SERVICE_HXX
 #define NET_REMOTE_SERVICE_HXX
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -385,6 +386,7 @@ private:
 
     // Thread management for timed operations
     std::mutex m_threadsMutex;
+    std::atomic<bool> m_shutdown{ false };
     std::shared_ptr<std::thread> m_timedEnableThread;
     std::shared_ptr<std::thread> m_timedDisableThread;
 };
