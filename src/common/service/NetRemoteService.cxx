@@ -700,7 +700,7 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
         return wifiOperationStatus;
     }
 
-    // Check if a timed enable operation is already running
+    // Check if a timed enable operation is already running, create and store the timer thread
     {
         std::lock_guard<std::mutex> lock(m_threadsMutex);
         if (m_timedEnableThread && m_timedEnableThread->joinable()) {
@@ -708,30 +708,26 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
             wifiOperationStatus.set_message("A timed enable operation is already in progress");
             return wifiOperationStatus;
         }
-    }
 
-    // Create and store the timer thread
-    auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), hasConfiguration = (dot11AccessPointConfiguration != nullptr), configurationCopy = dot11AccessPointConfiguration ? *dot11AccessPointConfiguration : Dot11AccessPointConfiguration{}, accessPointController, durationSeconds]() {
-        std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
+        // Create and store the timer thread
+        auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), hasConfiguration = (dot11AccessPointConfiguration != nullptr), configurationCopy = dot11AccessPointConfiguration ? *dot11AccessPointConfiguration : Dot11AccessPointConfiguration{}, accessPointController, durationSeconds]() {
+            std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
 
-        // Enable the access point after the duration expires
-        const auto* configPtr = hasConfiguration ? &configurationCopy : nullptr;
-        auto result = WifiAccessPointEnableImpl(accessPointId, configPtr, accessPointController);
-        if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-            LOGW << std::format("Failed to automatically enable access point {} after {} seconds: {}",
-                accessPointId,
-                durationSeconds,
-                result.message());
-        } else {
-            LOGI << std::format("Successfully automatically enabled access point {} after {} seconds",
-                accessPointId,
-                durationSeconds);
-        }
-    });
+            // Enable the access point after the duration expires
+            const auto* configPtr = hasConfiguration ? &configurationCopy : nullptr;
+            auto result = WifiAccessPointEnableImpl(accessPointId, configPtr, accessPointController);
+            if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                LOGW << std::format("Failed to automatically enable access point {} after {} seconds: {}",
+                    accessPointId,
+                    durationSeconds,
+                    result.message());
+            } else {
+                LOGI << std::format("Successfully automatically enabled access point {} after {} seconds",
+                    accessPointId,
+                    durationSeconds);
+            }
+        });
 
-    // Store the thread for management
-    {
-        std::lock_guard<std::mutex> lock(m_threadsMutex);
         m_timedEnableThread = timerThread;
     }
 
@@ -758,7 +754,7 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
         return wifiOperationStatus;
     }
 
-    // Check if a timed disable operation is already running
+    // Check if a timed disable operation is already running, if not, create and store the timer thread
     {
         std::lock_guard<std::mutex> lock(m_threadsMutex);
         if (m_timedDisableThread && m_timedDisableThread->joinable()) {
@@ -766,29 +762,25 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
             wifiOperationStatus.set_message("A timed disable operation is already in progress");
             return wifiOperationStatus;
         }
-    }
 
-    // Create and store the timer thread
-    auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), accessPointController, durationSeconds]() {
-        std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
+        // Create and store the timer thread
+        auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), accessPointController, durationSeconds]() {
+            std::this_thread::sleep_for(std::chrono::seconds(durationSeconds));
 
-        // Disable the access point using the existing implementation
-        auto result = WifiAccessPointDisableImpl(accessPointId, accessPointController);
-        if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-            LOGW << std::format("Failed to automatically disable access point {} after {} seconds: {}",
-                accessPointId,
-                durationSeconds,
-                result.message());
-        } else {
-            LOGI << std::format("Successfully automatically disabled access point {} after {} seconds",
-                accessPointId,
-                durationSeconds);
-        }
-    });
+            // Disable the access point using the existing implementation
+            auto result = WifiAccessPointDisableImpl(accessPointId, accessPointController);
+            if (result.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                LOGW << std::format("Failed to automatically disable access point {} after {} seconds: {}",
+                    accessPointId,
+                    durationSeconds,
+                    result.message());
+            } else {
+                LOGI << std::format("Successfully automatically disabled access point {} after {} seconds",
+                    accessPointId,
+                    durationSeconds);
+            }
+        });
 
-    // Store the thread for management
-    {
-        std::lock_guard<std::mutex> lock(m_threadsMutex);
         m_timedDisableThread = timerThread;
     }
 
