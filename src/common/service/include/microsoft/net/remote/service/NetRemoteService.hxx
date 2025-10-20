@@ -2,9 +2,13 @@
 #ifndef NET_REMOTE_SERVICE_HXX
 #define NET_REMOTE_SERVICE_HXX
 
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
+#include <thread>
+#include <unordered_map>
 
 #include <google/protobuf/map.h>
 #include <grpcpp/server_context.h>
@@ -36,6 +40,11 @@ public:
      * @param networkManager The network manager to use.
      */
     explicit NetRemoteService(std::shared_ptr<Microsoft::Net::NetworkManager> networkManager) noexcept;
+
+    /**
+     * @brief Destructor that waits for all timer threads to complete.
+     */
+    ~NetRemoteService();
 
     /**
      * @brief Get the AccessPointManager object for this service.
@@ -159,6 +168,28 @@ private:
     ::grpc::Status
     WifiAccessPointGetAttributes(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointGetAttributesRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointGetAttributesResult* result) override;
 
+    /**
+     * @brief Enable an access point after a specified duration.
+     *
+     * @param context
+     * @param request
+     * @param result
+     * @return ::grpc::Status
+     */
+    ::grpc::Status
+    WifiAccessPointTimedEnable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointTimedEnableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointTimedEnableResult* result) override;
+
+    /**
+     * @brief Disable an access point after a specified duration.
+     *
+     * @param context
+     * @param request
+     * @param result
+     * @return ::grpc::Status
+     */
+    ::grpc::Status
+    WifiAccessPointTimedDisable(grpc::ServerContext* context, const Microsoft::Net::Remote::Wifi::WifiAccessPointTimedDisableRequest* request, Microsoft::Net::Remote::Wifi::WifiAccessPointTimedDisableResult* result) override;
+
 protected:
     /**
      * @brief Attempt to obtain an IAccessPoint instance for the specified access point identifier.
@@ -210,6 +241,29 @@ protected:
      */
     Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
     WifiAccessPointDisableImpl(std::string_view accessPointId, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
+     * @brief Enable an access point after a specified duration.
+     *
+     * @param accessPointId The access point identifier.
+     * @param dot11AccessPointConfiguration The access point configuration to apply (optional).
+     * @param durationSeconds The duration in seconds to enable the access point.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointTimedEnableImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AccessPointConfiguration* dot11AccessPointConfiguration, uint32_t durationSeconds, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
+     * @brief Disable an access point after a specified duration.
+     *
+     * @param accessPointId The access point identifier.
+     * @param durationSeconds The duration in seconds to disable the access point.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointTimedDisableImpl(std::string_view accessPointId, uint32_t durationSeconds, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
      * @brief Set the active PHY type of the access point. The access point must be enabled. This will cause
@@ -329,6 +383,12 @@ protected:
 private:
     std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;
     std::shared_ptr<Microsoft::Net::Wifi::AccessPointManager> m_accessPointManager;
+
+    // Thread management for timed operations
+    std::mutex m_threadsMutex;
+    std::atomic<bool> m_shutdown{ false };
+    std::shared_ptr<std::thread> m_timedEnableThread;
+    std::shared_ptr<std::thread> m_timedDisableThread;
 };
 } // namespace Microsoft::Net::Remote::Service
 
