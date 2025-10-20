@@ -2,7 +2,7 @@
 # Default version values in case we can't get them from git.
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 5)
-set(VERSION_PATCH 2)
+set(VERSION_PATCH 3)
 
 if (NOT GIT_EXECUTABLE)
   message(WARNING "Git not found; falling back to hard-coded version")
