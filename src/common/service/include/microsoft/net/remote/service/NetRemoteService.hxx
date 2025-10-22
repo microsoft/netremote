@@ -387,6 +387,8 @@ private:
     // Thread management for timed operations
     std::mutex m_threadsMutex;
     std::atomic<bool> m_shutdown{ false };
+    std::atomic<bool> m_timedEnableRunning{ false };
+    std::atomic<bool> m_timedDisableRunning{ false };
     std::shared_ptr<std::thread> m_timedEnableThread;
     std::shared_ptr<std::thread> m_timedDisableThread;
 };
