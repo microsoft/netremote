@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 
 #include <catch2/catch_test_macros.hpp>
@@ -1349,6 +1350,39 @@ TEST_CASE("WifiAccessPointTimedEnable API", "[basic][rpc][client][remote][timed]
         REQUIRE(result2.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
         REQUIRE(result2.status().message() == "A timed enable operation is already in progress");
     }
+
+    SECTION("Succeeds when a timed enable operation is finished")
+    {
+        // Start first timed enable operation with short duration
+        WifiAccessPointTimedEnableRequest request1{};
+        request1.set_accesspointid(InterfaceName1);
+        request1.set_durationseconds(1); // 1 second duration
+
+        WifiAccessPointTimedEnableResult result1{};
+        grpc::ClientContext clientContext1{};
+
+        auto status1 = client->WifiAccessPointTimedEnable(&clientContext1, request1, &result1);
+        REQUIRE(status1.ok());
+        REQUIRE(result1.has_status());
+        REQUIRE(result1.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+        // Wait for the first operation to complete
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        // Start second timed enable operation after the first has finished
+        WifiAccessPointTimedEnableRequest request2{};
+        request2.set_accesspointid(InterfaceName2);
+        request2.set_durationseconds(1); // 1 second duration
+
+        WifiAccessPointTimedEnableResult result2{};
+        grpc::ClientContext clientContext2{};
+
+        auto status2 = client->WifiAccessPointTimedEnable(&clientContext2, request2, &result2);
+        REQUIRE(status2.ok());
+        REQUIRE(result2.has_status());
+        REQUIRE(result2.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(result2.status().message().empty());
+    }
 }
 
 TEST_CASE("WifiAccessPointTimedDisable API", "[basic][rpc][client][remote][timed]")
@@ -1481,5 +1515,40 @@ TEST_CASE("WifiAccessPointTimedDisable API", "[basic][rpc][client][remote][timed
         REQUIRE(result2.has_status());
         REQUIRE(result2.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
         REQUIRE(result2.status().message() == "A timed disable operation is already in progress");
+    }
+
+    SECTION("Succeeds when a timed disable operation is finished")
+    {
+        // Start first timed disable operation with short duration
+        WifiAccessPointTimedDisableRequest request1{};
+        request1.set_accesspointid(InterfaceName1);
+        request1.set_durationseconds(1); // 1 second duration
+
+        WifiAccessPointTimedDisableResult result1{};
+        grpc::ClientContext clientContext1{};
+
+        grpc::Status status1;
+        REQUIRE_NOTHROW(status1 = client->WifiAccessPointTimedDisable(&clientContext1, request1, &result1));
+        REQUIRE(status1.ok());
+        REQUIRE(result1.has_status());
+        REQUIRE(result1.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+        // Wait for the first operation to complete
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        // Start second timed disable operation after the first has finished
+        WifiAccessPointTimedDisableRequest request2{};
+        request2.set_accesspointid(InterfaceName2);
+        request2.set_durationseconds(1); // 1 second duration
+
+        WifiAccessPointTimedDisableResult result2{};
+        grpc::ClientContext clientContext2{};
+
+        grpc::Status status2;
+        REQUIRE_NOTHROW(status2 = client->WifiAccessPointTimedDisable(&clientContext2, request2, &result2));
+        REQUIRE(status2.ok());
+        REQUIRE(result2.has_status());
+        REQUIRE(result2.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(result2.status().message().empty());
     }
 }

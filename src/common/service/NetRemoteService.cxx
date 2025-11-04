@@ -707,11 +707,19 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
     // Right now, this service only supports managing singale access point.
     {
         std::lock_guard<std::mutex> lock(m_threadsMutex);
-        if (m_timedEnableThread && m_timedEnableThread->joinable()) {
+        if (m_timedEnableRunning.load()) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
             wifiOperationStatus.set_message("A timed enable operation is already in progress");
             return wifiOperationStatus;
         }
+
+        // Join previous thread if it exists and is joinable
+        if (m_timedEnableThread && m_timedEnableThread->joinable()) {
+            m_timedEnableThread->join();
+        }
+
+        // Set the running flag before creating the thread
+        m_timedEnableRunning = true;
 
         // Create and store the timer thread
         auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), hasConfiguration = (dot11AccessPointConfiguration != nullptr), configurationCopy = dot11AccessPointConfiguration ? *dot11AccessPointConfiguration : Dot11AccessPointConfiguration{}, accessPointController, durationSeconds]() {
@@ -725,6 +733,7 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
             // If we were shutdown, exit early
             if (m_shutdown.load()) {
                 LOGI << std::format("Timed enable operation for access point {} was cancelled due to service shutdown", accessPointId);
+                m_timedEnableRunning = false;
                 return;
             }
 
@@ -741,6 +750,9 @@ NetRemoteService::WifiAccessPointTimedEnableImpl(std::string_view accessPointId,
                     accessPointId,
                     durationSeconds);
             }
+
+            // Clear the running flag when the operation completes
+            m_timedEnableRunning = false;
         });
 
         m_timedEnableThread = timerThread;
@@ -773,11 +785,19 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
     // Right now, this service only supports managing singale access point.
     {
         std::lock_guard<std::mutex> lock(m_threadsMutex);
-        if (m_timedDisableThread && m_timedDisableThread->joinable()) {
+        if (m_timedDisableRunning.load()) {
             wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeOperationNotSupported);
             wifiOperationStatus.set_message("A timed disable operation is already in progress");
             return wifiOperationStatus;
         }
+
+        // Join previous thread if it exists and is joinable
+        if (m_timedDisableThread && m_timedDisableThread->joinable()) {
+            m_timedDisableThread->join();
+        }
+
+        // Set the running flag before creating the thread
+        m_timedDisableRunning = true;
 
         // Create and store the timer thread
         auto timerThread = std::make_shared<std::thread>([this, accessPointId = std::string(accessPointId), accessPointController, durationSeconds]() {
@@ -791,6 +811,7 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
             // If we were shutdown, exit early
             if (m_shutdown.load()) {
                 LOGI << std::format("Timed disable operation for access point {} was cancelled due to service shutdown", accessPointId);
+                m_timedDisableRunning = false;
                 return;
             }
 
@@ -806,6 +827,9 @@ NetRemoteService::WifiAccessPointTimedDisableImpl(std::string_view accessPointId
                     accessPointId,
                     durationSeconds);
             }
+
+            // Clear the running flag when the operation completes
+            m_timedDisableRunning = false;
         });
 
         m_timedDisableThread = timerThread;
