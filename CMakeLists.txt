@@ -100,9 +100,8 @@ endif()
 if (BUILD_FOR_LINUX)
   add_subdirectory(config)
   add_subdirectory(packaging)
+  add_subdirectory(src)
 endif()
-
-add_subdirectory(src)
 
 if (NOT NETREMOTE_EXCLUDE_API OR NOT NETREMOTE_EXCLUDE_API_BINDINGS)
   add_subdirectory(api)
