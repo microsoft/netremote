@@ -97,8 +97,11 @@ if (WERROR)
   add_compile_options(-Werror)
 endif()
 
-add_subdirectory(config)
-add_subdirectory(packaging)
+if (BUILD_FOR_LINUX)
+  add_subdirectory(config)
+  add_subdirectory(packaging)
+endif()
+
 add_subdirectory(src)
 
 if (NOT NETREMOTE_EXCLUDE_API OR NOT NETREMOTE_EXCLUDE_API_BINDINGS)
