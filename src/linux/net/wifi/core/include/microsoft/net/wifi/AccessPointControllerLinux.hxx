@@ -156,6 +156,15 @@ struct AccessPointControllerLinux :
     AccessPointOperationStatus
     SetRadiusConfiguration(Microsoft::Net::Ieee8021xRadiusConfiguration radiusConfiguration) noexcept override;
 
+    /**
+     * @brief Set whether the access point is a Multi-Link Device (MLD) AP.
+     *
+     * @param mldAp True if the access point is an MLD AP, false otherwise.
+     * @return AccessPointOperationStatus
+     */
+    AccessPointOperationStatus
+    SetMldAp(bool mldAp) noexcept override;
+
 private:
     Wpa::Hostapd m_hostapd;
 };

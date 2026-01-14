@@ -684,6 +684,9 @@ struct ProtocolHostapd :
     static constexpr auto PropertyValueSaePasswordClearAll = "";
     static constexpr auto PropertyValueSaeKeyValueSeparator = "|";
 
+    // Wi-Fi 7 (IEEE 802.11be) properties.
+    static constexpr auto PropertyNameMldAp = "mld_ap";
+
     // Property names for "GET_CONFIG" command.
     static constexpr auto PropertyNameKeyManagement = "key_mgmt";
     static constexpr auto PropertyNameGroupCipher = "group_cipher";

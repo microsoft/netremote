@@ -613,6 +613,12 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
                 return wifiOperationStatus;
             }
         }
+
+        bool mldAp = dot11AccessPointConfiguration->mldap();
+        wifiOperationStatus = WifiAccessPointSetMldApImpl(accessPointId, mldAp, accessPointController);
+        if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+            return wifiOperationStatus;
+        }
     }
 
     // Obtain current operational state.
@@ -1460,6 +1466,36 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1xImpl(std::string_view acc
             wifiOperationStatus.set_message(std::format("Failed to set 802.1x configuration for access point {} - {}", accessPointId, operationStatus.ToString()));
             return wifiOperationStatus;
         }
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetMldApImpl(std::string_view accessPointId, bool mldAp, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Attempt to set the MLD AP setting.
+    operationStatus = accessPointController->SetMldAp(mldAp);
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set MLD AP setting for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
     }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);

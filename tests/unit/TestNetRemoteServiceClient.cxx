@@ -314,6 +314,48 @@ TEST_CASE("WifiAccessPointEnable API", "[basic][rpc][client][remote]")
         REQUIRE(result.has_status());
         REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
     }
+
+    SECTION("Enable MLD AP")
+    {
+        // Enable the MLD AP flag via the configuration and verify it sticks.
+        Dot11AccessPointConfiguration apConfiguration{};
+        apConfiguration.set_mldap(true);
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName1);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(apTest1->MldAp == true);
+    }
+
+    SECTION("Disable MLD AP")
+    {
+        // Disable the MLD AP flag via the configuration and verify it sticks.
+        Dot11AccessPointConfiguration apConfiguration{};
+        apConfiguration.set_mldap(false);
+
+        WifiAccessPointEnableRequest request{};
+        request.set_accesspointid(InterfaceName2);
+        *request.mutable_configuration() = std::move(apConfiguration);
+
+        WifiAccessPointEnableResult result{};
+        grpc::ClientContext clientContext{};
+
+        auto status = client->WifiAccessPointEnable(&clientContext, request, &result);
+        REQUIRE(status.ok());
+        REQUIRE(result.accesspointid() == request.accesspointid());
+        REQUIRE(result.has_status());
+        REQUIRE(result.status().code() == WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+        REQUIRE(apTest2->MldAp == false);
+    }
 }
 
 TEST_CASE("WifiAccessPointDisable API", "[basic][rpc][client][remote]")
