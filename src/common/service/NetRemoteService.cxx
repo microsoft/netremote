@@ -10,6 +10,7 @@
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <sys/utsname.h>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -614,10 +615,30 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             }
         }
 
-        bool mldAp = dot11AccessPointConfiguration->mldap();
-        wifiOperationStatus = WifiAccessPointSetMldApImpl(accessPointId, mldAp, accessPointController);
-        if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
-            return wifiOperationStatus;
+        // Check Linux kernel version before setting MLD AP
+        bool shouldSetMldAp = false;
+        struct utsname buffer;
+        if (uname(&buffer) == 0) {
+            std::string release(buffer.release);
+            std::smatch match;
+            std::regex versionRegex(R"((\d+)\.(\d+))");
+            if (std::regex_search(release, match, versionRegex) && match.size() >= 3) {
+                int major = std::stoi(match[1]);
+                int minor = std::stoi(match[2]);
+                if (major > 6 || (major == 6 && minor >= 11)) {
+                    shouldSetMldAp = true;
+                }
+            }
+        }
+
+        if (shouldSetMldAp) {
+            bool mldAp = dot11AccessPointConfiguration->mldap();
+            wifiOperationStatus = WifiAccessPointSetMldApImpl(accessPointId, mldAp, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        } else {
+            LOGW << "Skipping setting MLD AP configuration due to unsupported kernel version";
         }
     }
 
