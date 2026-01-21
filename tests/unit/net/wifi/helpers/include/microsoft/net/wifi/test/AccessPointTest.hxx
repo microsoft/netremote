@@ -41,6 +41,7 @@ struct AccessPointTest final :
     std::unordered_map<Ieee80211SecurityProtocol, std::vector<Ieee80211CipherSuite>> CipherSuites;
     AccessPointOperationalState OperationalState{ AccessPointOperationalState::Disabled };
     AccessPointAttributes Attributes{};
+    bool MldAp{ false };
 
     /**
      * @brief Construct a new AccessPointTest object with the given interface name and capabilities.

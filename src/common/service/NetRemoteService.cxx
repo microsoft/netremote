@@ -10,6 +10,7 @@
 #include <ranges>
 #include <string>
 #include <string_view>
+#include <sys/utsname.h>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -612,6 +613,32 @@ NetRemoteService::WifiAccessPointEnableImpl(std::string_view accessPointId, cons
             if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
                 return wifiOperationStatus;
             }
+        }
+
+        // Check Linux kernel version before setting MLD AP
+        bool shouldSetMldAp = false;
+        struct utsname buffer;
+        if (uname(&buffer) == 0) {
+            std::string release(buffer.release);
+            std::smatch match;
+            std::regex versionRegex(R"((\d+)\.(\d+))");
+            if (std::regex_search(release, match, versionRegex) && match.size() >= 3) {
+                int major = std::stoi(match[1]);
+                int minor = std::stoi(match[2]);
+                if (major > 6 || (major == 6 && minor >= 11)) {
+                    shouldSetMldAp = true;
+                }
+            }
+        }
+
+        if (shouldSetMldAp) {
+            bool mldAp = dot11AccessPointConfiguration->mldap();
+            wifiOperationStatus = WifiAccessPointSetMldApImpl(accessPointId, mldAp, accessPointController);
+            if (wifiOperationStatus.code() != WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded) {
+                return wifiOperationStatus;
+            }
+        } else {
+            LOGW << "Skipping setting MLD AP configuration due to unsupported kernel version";
         }
     }
 
@@ -1460,6 +1487,36 @@ NetRemoteService::WifiAccessPointSetAuthenticationDot1xImpl(std::string_view acc
             wifiOperationStatus.set_message(std::format("Failed to set 802.1x configuration for access point {} - {}", accessPointId, operationStatus.ToString()));
             return wifiOperationStatus;
         }
+    }
+
+    wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);
+
+    return wifiOperationStatus;
+}
+
+WifiAccessPointOperationStatus
+NetRemoteService::WifiAccessPointSetMldApImpl(std::string_view accessPointId, bool mldAp, std::shared_ptr<IAccessPointController> accessPointController)
+{
+    WifiAccessPointOperationStatus wifiOperationStatus{};
+
+    AccessPointOperationStatus operationStatus{ accessPointId };
+
+    // Create an AP controller for the requested AP if one wasn't specified.
+    if (accessPointController == nullptr) {
+        operationStatus = TryGetAccessPointController(accessPointId, accessPointController);
+        if (!operationStatus.Succeeded() || accessPointController == nullptr) {
+            wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+            wifiOperationStatus.set_message(std::format("Failed to create access point controller for access point {} - {}", accessPointId, operationStatus.ToString()));
+            return wifiOperationStatus;
+        }
+    }
+
+    // Attempt to set the MLD AP setting.
+    operationStatus = accessPointController->SetMldAp(mldAp);
+    if (!operationStatus.Succeeded()) {
+        wifiOperationStatus.set_code(ToDot11AccessPointOperationStatusCode(operationStatus.Code));
+        wifiOperationStatus.set_message(std::format("Failed to set MLD AP setting for access point {} - {}", accessPointId, operationStatus.ToString()));
+        return wifiOperationStatus;
     }
 
     wifiOperationStatus.set_code(WifiAccessPointOperationStatusCode::WifiAccessPointOperationStatusCodeSucceeded);

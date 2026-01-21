@@ -371,6 +371,17 @@ protected:
     WifiAccessPointSetAuthenticationDot1xImpl(std::string_view accessPointId, const Microsoft::Net::Wifi::Dot11AuthenticationDot1x& dot11AuthenticationDot1x, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
 
     /**
+     * @brief Set whether the access point is a Multi-Link Device Access Point (MLD AP).
+     *
+     * @param accessPointId The access point identifier.
+     * @param mldAp True to configure the access point as an MLD AP, false otherwise.
+     * @param accessPointController The access point controller for the specified access point (optional).
+     * @return Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+     */
+    Microsoft::Net::Remote::Wifi::WifiAccessPointOperationStatus
+    WifiAccessPointSetMldApImpl(std::string_view accessPointId, bool mldAp, std::shared_ptr<Microsoft::Net::Wifi::IAccessPointController> accessPointController = nullptr);
+
+    /**
      * @brief Get the sttaic attributes of the specified access point.
      *
      * @param accessPointId The access point identifier.

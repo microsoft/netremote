@@ -664,6 +664,29 @@ AccessPointControllerLinux::SetRadiusConfiguration(Ieee8021xRadiusConfiguration 
     return status;
 }
 
+AccessPointOperationStatus
+AccessPointControllerLinux::SetMldAp(bool mldAp) noexcept
+{
+    AccessPointOperationStatus status{ GetInterfaceName() };
+    const AccessPointOperationStatusLogOnExit logStatusOnExit(&status);
+
+    AUDITD << std::format("Attempting to set MLD AP for AP {} to {}", status.AccessPointId, mldAp ? "enabled" : "disabled");
+
+    std::string_view propertyValueToSet = mldAp ? Wpa::ProtocolHostapd::PropertyEnabled : Wpa::ProtocolHostapd::PropertyDisabled;
+
+    // Set the hostapd "mld_ap" property.
+    try {
+        m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameMldAp, propertyValueToSet, EnforceConfigurationChange::Now);
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", Wpa::ProtocolHostapd::PropertyNameMldAp, propertyValueToSet, ex.what());
+        return status;
+    }
+
+    status.Code = AccessPointOperationStatusCode::Succeeded;
+    return status;
+}
+
 std::unique_ptr<IAccessPointController>
 AccessPointControllerLinuxFactory::Create(std::string_view interfaceName)
 {

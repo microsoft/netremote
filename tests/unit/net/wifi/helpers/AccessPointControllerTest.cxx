@@ -203,6 +203,18 @@ AccessPointControllerTest::SetRadiusConfiguration(Ieee8021xRadiusConfiguration r
     return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
 }
 
+AccessPointOperationStatus
+AccessPointControllerTest::SetMldAp(bool mldAp) noexcept
+{
+    assert(AccessPoint != nullptr);
+    if (AccessPoint == nullptr) {
+        return AccessPointOperationStatus::InvalidAccessPoint("null AccessPoint");
+    }
+
+    AccessPoint->MldAp = mldAp;
+    return AccessPointOperationStatus::MakeSucceeded(AccessPoint->InterfaceName);
+}
+
 AccessPointControllerFactoryTest::AccessPointControllerFactoryTest(AccessPointTest *accessPoint) :
     AccessPoint(accessPoint)
 {}
