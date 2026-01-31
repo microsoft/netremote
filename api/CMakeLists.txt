@@ -26,3 +26,6 @@ install(
 if (NOT NETREMOTE_EXCLUDE_API_BINDINGS)
     add_subdirectory(protocol)
 endif()
+
+# .NET API bindings (NuGet package)
+add_subdirectory(dotnet)

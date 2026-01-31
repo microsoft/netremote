@@ -1,0 +1,100 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Package metadata -->
+    <PackageId>Microsoft.Net.Remote.Client</PackageId>
+    <Version>0.5.2</Version>
+    <Authors>Microsoft</Authors>
+    <Company>Microsoft</Company>
+    <Product>NetRemote</Product>
+    <Description>NetRemote client library providing gRPC service bindings and protobuf definitions for remote network management operations.</Description>
+    <PackageTags>netremote;grpc;protobuf;network;wifi;remote</PackageTags>
+    <PackageProjectUrl>https://github.com/microsoft/netremote</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/microsoft/netremote</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright (c) Microsoft Corporation. All rights reserved.</Copyright>
+
+    <!-- Build settings -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Output settings -->
+    <PackageOutputPath>$(MSBuildThisFileDirectory)../../out/nuget</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.25.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.59.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.59.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!--
+    Proto files for code generation.
+    These are compiled at build time by Grpc.Tools using the Google.Protobuf and Grpc.Net.Client
+    versions specified above. The generated C# stubs are included in the final package DLL.
+
+    GrpcServices options:
+    - None: Generate only protobuf message types (no gRPC service client/server)
+    - Client: Generate protobuf messages + gRPC client stubs
+    - Server: Generate protobuf messages + gRPC server stubs
+    - Both: Generate protobuf messages + both client and server stubs
+  -->
+  <ItemGroup>
+    <Protobuf Include="../protos/NetworkCore.proto" GrpcServices="None">
+      <Link>Protos/NetworkCore.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/Network8021x.proto" GrpcServices="None">
+      <Link>Protos/Network8021x.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/WifiCore.proto" GrpcServices="None">
+      <Link>Protos/WifiCore.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteDataStream.proto" GrpcServices="None">
+      <Link>Protos/NetRemoteDataStream.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteDataStreamingService.proto" GrpcServices="Client">
+      <Link>Protos/NetRemoteDataStreamingService.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteNetwork.proto" GrpcServices="None">
+      <Link>Protos/NetRemoteNetwork.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteRfAttenuator.proto" GrpcServices="None">
+      <Link>Protos/NetRemoteRfAttenuator.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteRfAttenuatorService.proto" GrpcServices="Client">
+      <Link>Protos/NetRemoteRfAttenuatorService.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteService.proto" GrpcServices="Client">
+      <Link>Protos/NetRemoteService.proto</Link>
+    </Protobuf>
+    <Protobuf Include="../protos/NetRemoteWifi.proto" GrpcServices="None">
+      <Link>Protos/NetRemoteWifi.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+  <!--
+    Include raw proto files in package for consumers who want to:
+    - Generate bindings for other languages
+    - Use custom code generation options
+    - Reference the proto definitions directly
+
+    PackagePath locations:
+    - contentFiles/any/any/Protos: Modern SDK-style projects (any language, any framework)
+    - content/Protos: Legacy packages.config projects
+  -->
+  <ItemGroup>
+    <None Include="../protos/*.proto" Pack="true" PackagePath="contentFiles/any/any/Protos;content/Protos" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>
