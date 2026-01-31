@@ -40,7 +40,7 @@
         }
       ]
     },
-    "server":{
+    "server": {
       "description": "Provide the server binary",
       "dependencies": [
         {
@@ -63,7 +63,7 @@
         "nlohmann-json"
       ]
     },
-    "tests":{
+    "tests": {
       "description": "Enable building the tests",
       "dependencies": [
         "catch2",
@@ -79,7 +79,7 @@
         }
       ]
     },
-    "tools":{
+    "tools": {
       "description": "Enable building the tools",
       "dependencies": [
         {
@@ -99,5 +99,5 @@
     "tests",
     "tools"
   ],
-  "builtin-baseline": "9224b3bbd8df24999d85720b1d005dd6f969ade0"
+  "builtin-baseline": "6d7bf7ef2193e2d1c5798a5ff8811d533104c861"
 }
