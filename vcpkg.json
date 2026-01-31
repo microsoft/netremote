@@ -18,11 +18,6 @@
       "version": "2.3.1"
     }
   ],
-  "vcpkg-configuration": {
-    "overlay-ports": [
-      "packaging/vcpkg/ports/abseil"
-    ]
-  },
   "features": {
     "api": {
       "description": "Provide the API protocol buffers + gRPC .proto source files"
@@ -99,5 +94,5 @@
     "tests",
     "tools"
   ],
-  "builtin-baseline": "6d7bf7ef2193e2d1c5798a5ff8811d533104c861"
+  "builtin-baseline": "76a382b7b8ce7ed30bbf976aa9aecae868594d5e"
 }
