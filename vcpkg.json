@@ -2,6 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "netremote",
   "version-string": "0.5.2",
+  "builtin-baseline": "9224b3bbd8df24999d85720b1d005dd6f969ade0",
   "dependencies": [
     {
       "name": "vcpkg-cmake",
@@ -12,11 +13,12 @@
       "host": true
     }
   ],
-  "overrides": [
-    {
-      "name": "cli11",
-      "version": "2.3.1"
-    }
+  "default-features": [
+    "api",
+    "api-bindings",
+    "server",
+    "tests",
+    "tools"
   ],
   "features": {
     "api": {
@@ -26,36 +28,36 @@
       "description": "Provide the API protocol buffers + gRPC library bindings",
       "dependencies": [
         "grpc",
-        "protobuf",
         {
           "name": "netremote",
           "features": [
             "api"
           ]
-        }
+        },
+        "protobuf"
       ]
     },
     "server": {
       "description": "Provide the server binary",
       "dependencies": [
+        "cli11",
+        {
+          "name": "libsystemd",
+          "platform": "linux"
+        },
+        "magic-enum",
         {
           "name": "netremote",
           "features": [
             "api-bindings"
           ]
         },
+        "nlohmann-json",
+        "plog",
         {
           "name": "sdbus-cpp",
           "platform": "linux"
-        },
-        {
-          "name": "libsystemd",
-          "platform": "linux"
-        },
-        "cli11",
-        "magic-enum",
-        "plog",
-        "nlohmann-json"
+        }
       ]
     },
     "tests": {
@@ -63,15 +65,15 @@
       "dependencies": [
         "catch2",
         "magic-enum",
-        "nlohmann-json",
-        "plog",
         {
           "name": "netremote",
           "features": [
             "api-bindings",
             "server"
           ]
-        }
+        },
+        "nlohmann-json",
+        "plog"
       ]
     },
     "tools": {
@@ -87,12 +89,10 @@
       ]
     }
   },
-  "default-features": [
-    "api",
-    "api-bindings",
-    "server",
-    "tests",
-    "tools"
-  ],
-  "builtin-baseline": "76a382b7b8ce7ed30bbf976aa9aecae868594d5e"
+  "overrides": [
+    {
+      "name": "cli11",
+      "version": "2.3.1"
+    }
+  ]
 }
