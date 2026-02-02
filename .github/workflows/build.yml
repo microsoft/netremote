@@ -96,6 +96,7 @@ jobs:
       contents: read
       actions: read
       security-events: write
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -105,7 +106,7 @@ jobs:
           - { os: ubuntu-24.04, os-name: 'linux' }
         build-type: ${{ fromJson(inputs.build-types) }}
     runs-on: ${{ matrix.config.os }}
- 
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -127,6 +128,7 @@ jobs:
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
         preset-name: ${{ inputs.preset-name }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 'Build Linux 🐧'
       if: ${{ contains(matrix.config.os-name, 'linux') }}
@@ -139,6 +141,7 @@ jobs:
         package: ${{ inputs.package }}
         publish-artifacts: ${{ inputs.publish-artifacts }}
         preset-name: ${{ inputs.preset-name }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Perform CodeQL Analysis
       if: inputs.analyze-codeql == true
