@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "netremote",
   "version-string": "0.5.2",
-  "builtin-baseline": "9224b3bbd8df24999d85720b1d005dd6f969ade0",
+  "builtin-baseline": "588319964489874699b378e3a94b4285126e112e",
   "dependencies": [
     {
       "name": "vcpkg-cmake",
@@ -28,12 +28,6 @@
       "description": "Provide the API protocol buffers + gRPC library bindings",
       "dependencies": [
         "grpc",
-        {
-          "name": "netremote",
-          "features": [
-            "api"
-          ]
-        },
         "protobuf"
       ]
     },
@@ -41,19 +35,15 @@
       "description": "Provide the server binary",
       "dependencies": [
         "cli11",
+        "grpc",
         {
           "name": "libsystemd",
           "platform": "linux"
         },
         "magic-enum",
-        {
-          "name": "netremote",
-          "features": [
-            "api-bindings"
-          ]
-        },
         "nlohmann-json",
         "plog",
+        "protobuf",
         {
           "name": "sdbus-cpp",
           "platform": "linux"
@@ -64,27 +54,38 @@
       "description": "Enable building the tests",
       "dependencies": [
         "catch2",
-        "magic-enum",
+        "cli11",
+        "grpc",
         {
-          "name": "netremote",
-          "features": [
-            "api-bindings",
-            "server"
-          ]
+          "name": "libsystemd",
+          "platform": "linux"
         },
+        "magic-enum",
         "nlohmann-json",
-        "plog"
+        "plog",
+        "protobuf",
+        {
+          "name": "sdbus-cpp",
+          "platform": "linux"
+        }
       ]
     },
     "tools": {
       "description": "Enable building the tools",
       "dependencies": [
+        "cli11",
+        "grpc",
         {
-          "name": "netremote",
-          "features": [
-            "api-bindings",
-            "server"
-          ]
+          "name": "libsystemd",
+          "platform": "linux"
+        },
+        "magic-enum",
+        "nlohmann-json",
+        "plog",
+        "protobuf",
+        {
+          "name": "sdbus-cpp",
+          "platform": "linux"
         }
       ]
     }
