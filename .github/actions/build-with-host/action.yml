@@ -40,7 +40,6 @@ runs:
         core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
         core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
         core.exportVariable('VCPKG_BINARY_SOURCES', 'clear;x-gha,readwrite');
-        core.exportVariable('VCPKG_FORCE_SYSTEM_BINARIES', '1');
 
   - name: Install Linux build dependencies
     if: ${{ inputs.os == 'linux' }}
