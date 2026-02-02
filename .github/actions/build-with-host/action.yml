@@ -49,15 +49,6 @@ runs:
       sudo -E apt-get install -qq --no-install-recommends libnl-3-200-dbg libnl-3-dev libssl-dev libnl-genl-3-dev libdbus-c++-dev libnl-route-3-dev
     shell: bash
 
-  - name: Bootstrap vcpkg
-    shell: pwsh
-    run: |
-      if ($IsWindows) {
-        & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
-      } else {
-        & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
-      }
-
   - name: Configure vcpkg binary caching with GitHub Packages
     shell: pwsh
     env:
