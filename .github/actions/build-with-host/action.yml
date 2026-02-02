@@ -42,8 +42,8 @@ runs:
       export DEBIAN_FRONTEND=noninteractive
       sudo -E apt-get update
       sudo -E apt-get upgrade
-      # Install core build dependencies (including mono for NuGet)
-      sudo -E apt-get install -qq --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev libstdc++-14-dev mono-complete ninja-build pkg-config python3-jinja2 tar unzip zip
+      # Install core build dependencies
+      sudo -E apt-get install -qq --no-install-recommends autoconf automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev libstdc++-14-dev ninja-build pkg-config python3-jinja2 tar unzip zip
       # Install LLVM 18 toolchain
       sudo -E apt-get install -qq --no-install-recommends libllvm-18-ocaml-dev libllvm18 llvm-18 llvm-18-dev llvm-18-doc llvm-18-examples llvm-18-runtime clang-18 clang-tools-18 clang-18-doc libclang-common-18-dev libclang-18-dev libclang1-18 clang-format-18 python3-clang-18 clangd-18 clang-tidy-18 libclang-rt-18-dev libpolly-18-dev  libfuzzer-18-dev lldb-18 libc++-18-dev libc++abi-18-dev libomp-18-dev libclc-18-dev libunwind-18-dev libmlir-18-dev mlir-18-tools libbolt-18-dev bolt-18 flang-18 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libc++-18-dev-wasm32 libc++abi-18-dev-wasm32 libclang-rt-18-dev-wasm32 libclang-rt-18-dev-wasm64 libllvmlibc-18-dev
       # Install hostapd dependencies
@@ -59,25 +59,16 @@ runs:
         & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
       }
 
-  - name: Configure vcpkg binary caching with GitHub Packages (Windows)
-    if: runner.os == 'Windows'
+  - name: Configure vcpkg binary caching with GitHub Packages
     shell: pwsh
     env:
       GITHUB_TOKEN: ${{ inputs.github-token }}
     run: |
-      $nuget = & "${{ github.workspace }}/vcpkg/vcpkg" fetch nuget | Select-Object -Last 1
-      & $nuget sources add -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -StorePasswordInClearText -Name "GitHubPackages" -UserName "${{ github.repository_owner }}" -Password "$env:GITHUB_TOKEN" -NonInteractive 2>$null
-      & $nuget setapikey "$env:GITHUB_TOKEN" -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -NonInteractive
-
-  - name: Configure vcpkg binary caching with GitHub Packages (Linux/macOS)
-    if: runner.os != 'Windows'
-    shell: bash
-    env:
-      GITHUB_TOKEN: ${{ inputs.github-token }}
-    run: |
-      nuget=$("${{ github.workspace }}/vcpkg/vcpkg" fetch nuget | tail -n 1)
-      mono "$nuget" sources add -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -StorePasswordInClearText -Name "GitHubPackages" -UserName "${{ github.repository_owner }}" -Password "$GITHUB_TOKEN" -NonInteractive 2>/dev/null || true
-      mono "$nuget" setapikey "$GITHUB_TOKEN" -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -NonInteractive
+      dotnet nuget add source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --name "GitHubPackages" --username "${{ github.repository_owner }}" --password "$env:GITHUB_TOKEN" --store-password-in-clear-text 2>$null
+      if ($LASTEXITCODE -ne 0) {
+        # Source may already exist, try updating instead
+        dotnet nuget update source "GitHubPackages" --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" --username "${{ github.repository_owner }}" --password "$env:GITHUB_TOKEN" --store-password-in-clear-text
+      }
 
   - name: Set vcpkg environment variables
     uses: actions/github-script@v7
