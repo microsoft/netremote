@@ -16,3 +16,7 @@ vcpkg_installed*/
 
 # Debug logs.
 *-LogNetRemote*.txt
+
+# Act (local GitHub Actions testing)
+.secrets
+.github/workflows/act-test.yml

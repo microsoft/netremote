@@ -41,7 +41,6 @@ runs:
     run: |
       export DEBIAN_FRONTEND=noninteractive
       sudo -E apt-get update
-      sudo -E apt-get upgrade -y
       # Install core build dependencies
       sudo -E apt-get install -qq --no-install-recommends autoconf autoconf-archive automake autopoint build-essential ca-certificates cmake curl git gnupg libltdl-dev libmount-dev libtool linux-libc-dev libstdc++-14-dev ninja-build pkg-config python3-jinja2 tar unzip zip
       # Install LLVM 18 toolchain
