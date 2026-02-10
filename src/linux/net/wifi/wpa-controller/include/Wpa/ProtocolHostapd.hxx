@@ -476,6 +476,7 @@ struct HostapdStatus
     int Disable11n{ 0 };
     int Disable11ac{ 0 };
     int Disable11ax{ 0 };
+    int Ieee80211be{ 0 };
     // int Ieee80211be{ 0 };
     // uint16_t BeaconInterval{ 0 };
     // int DtimPeriod{ 0 };
@@ -635,6 +636,7 @@ struct ProtocolHostapd :
     static constexpr auto PropertyNameDisable11AC = "disable_11ac";
     static constexpr auto PropertyNameIeee80211AX = "ieee80211ax";
     static constexpr auto PropertyNameDisable11AX = "disable_11ax";
+    static constexpr auto PropertyNameIeee80211BE = "ieee80211be";
     static constexpr auto PropertyNameWmmEnabled = "wmm_enabled";
     static constexpr auto PropertyNameState = "state";
 
@@ -702,6 +704,7 @@ struct ProtocolHostapd :
     static constexpr auto ResponseStatusPropertyKeyDisableAC = PropertyNameDisable11AC;
     static constexpr auto ResponseStatusPropertyKeyIeee80211AX = PropertyNameIeee80211AX;
     static constexpr auto ResponseStatusPropertyKeyDisableAX = PropertyNameDisable11AX;
+    static constexpr auto ResponseStatusPropertyKeyIeee80211BE = PropertyNameIeee80211BE;
 
     // Response properties for the "GET_CONFIG" command.
     // Note: all properties must be terminated with the key-value delimeter (=).

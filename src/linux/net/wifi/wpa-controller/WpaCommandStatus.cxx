@@ -69,6 +69,8 @@ WpaStatusResponseParser::ParsePayload()
             ParseInt(value, status.Ieee80211ax);
         } else if (key == ProtocolHostapd::ResponseStatusPropertyKeyDisableAX) {
             ParseInt(value, status.Disable11ax);
+        } else if (key == ProtocolHostapd::ResponseStatusPropertyKeyIeee80211BE) {
+            ParseInt(value, status.Ieee80211be);
         } else if (key == ProtocolHostapd::PropertyNameBss) {
             enforceRequiredBssInfoSize(index.value() + 1);
             status.Bss[index.value()].Interface = value;
