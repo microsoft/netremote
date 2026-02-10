@@ -683,6 +683,16 @@ AccessPointControllerLinux::SetMldAp(bool mldAp) noexcept
         return status;
     }
 
+    // Set the hostapd "ieee80211be" property.
+    try {
+        propertyValueToSet = mldAp ? Wpa::ProtocolHostapd::PropertyEnabled : Wpa::ProtocolHostapd::PropertyDisabled;
+        m_hostapd.SetProperty(Wpa::ProtocolHostapd::PropertyNameIeee80211BE, propertyValueToSet, EnforceConfigurationChange::Now);
+    } catch (const Wpa::HostapdException& ex) {
+        status.Code = AccessPointOperationStatusCode::InternalError;
+        status.Details = std::format("failed to set hostapd property '{}' to '{}' - {}", Wpa::ProtocolHostapd::PropertyNameIeee80211BE, propertyValueToSet, ex.what());
+        return status;
+    }
+
     status.Code = AccessPointOperationStatusCode::Succeeded;
     return status;
 }
