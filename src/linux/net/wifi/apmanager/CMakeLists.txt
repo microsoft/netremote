@@ -17,8 +17,8 @@ target_sources(wifi-apmanager-linux
 
 target_link_libraries(wifi-apmanager-linux
     PRIVATE
-        nl
-        nl-genl
+        nl-3
+        nl-genl-3
         notstd
         plog::plog
     PUBLIC

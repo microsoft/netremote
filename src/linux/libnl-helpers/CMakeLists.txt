@@ -41,8 +41,8 @@ target_link_libraries(libnl-helpers
         plog::plog
         wifi-core
     PUBLIC
-        nl
-        nl-genl
+        nl-3
+        nl-genl-3
         nl-route-3
 )
 
