@@ -33,3 +33,12 @@ jobs:
       build-types: "[ 'Debug' ]"
       test: true
       preset-name: 'cicd'
+
+  dotnet-tests:
+    name: .NET Tests
+    permissions:
+      contents: read
+    concurrency:
+      group: ${{ github.workflow }}-dotnet-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    uses: ./.github/workflows/dotnet-tests.yml
