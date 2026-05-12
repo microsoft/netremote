@@ -8,6 +8,7 @@ target_sources(${PROJECT_NAME}-rfattenuator-cli-linux
 target_link_libraries(${PROJECT_NAME}-rfattenuator-cli-linux
     PRIVATE
         ${PROJECT_NAME}-rfattenuator-linux
+        ${PROJECT_NAME}-protocol
 )
 
 set_target_properties(${PROJECT_NAME}-rfattenuator-cli-linux
