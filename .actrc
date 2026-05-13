@@ -1,0 +1,12 @@
+# Act configuration for netremote
+# Use full Ubuntu image (includes PowerShell, .NET, and other tools)
+# Note: This image is large (~15GB) but matches GitHub runners more closely
+-P ubuntu-latest=catthehacker/ubuntu:full-latest
+-P ubuntu-24.04=catthehacker/ubuntu:full-24.04
+-P ubuntu-22.04=catthehacker/ubuntu:full-22.04
+
+# Reuse containers between runs for faster iteration
+--reuse
+
+# Set artifact server path
+--artifact-server-path /tmp/act-artifacts
