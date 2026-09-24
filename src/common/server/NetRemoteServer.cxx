@@ -12,10 +12,14 @@
 
 using namespace Microsoft::Net::Remote::Service;
 
-NetRemoteServer::NetRemoteServer(const NetRemoteServerConfiguration& configuration, std::shared_ptr<IRfAttenuatorController> attenuator) :
+NetRemoteServer::NetRemoteServer(
+    const NetRemoteServerConfiguration& configuration,
+    std::shared_ptr<IRfAttenuatorController> attenuator,
+    std::unordered_map<std::string, std::string> discoveryServiceTxtData) :
     m_serverAddress(configuration.ServerAddress),
     m_networkManager(configuration.NetworkManager),
     m_discoveryServiceFactory(std::move(configuration.DiscoveryServiceFactory)),
+    m_discoveryServiceTxtData(std::move(discoveryServiceTxtData)),
     m_service(configuration.NetworkManager),
     m_rfAttenuatorService(configuration.RfAttenuatorConfiguration, attenuator)
 {
@@ -36,6 +40,7 @@ NetRemoteServer::InitializeDiscoveryService()
 
     NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration{};
     discoveryServiceConfiguration.IpAddresses = m_networkManager->GetLocalIpAddressInformation(m_serverAddress);
+    discoveryServiceConfiguration.TxtData = m_discoveryServiceTxtData;
     auto discoveryService = m_discoveryServiceFactory->Create(std::move(discoveryServiceConfiguration));
     if (discoveryService == nullptr) {
         LOGE << "Failed to create discovery service; server will not be discoverable";

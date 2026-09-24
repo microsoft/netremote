@@ -15,9 +15,12 @@ using Microsoft::Net::Systemd::ResolvedDnssd;
 } // namespace Systemd
 
 NetRemoteDiscoveryServiceLinuxDnssd::NetRemoteDiscoveryServiceLinuxDnssd(NetRemoteDiscoveryServiceConfiguration discoveryServiceConfiguration) :
-    NetRemoteDiscoveryService(std::move(discoveryServiceConfiguration)),
-    m_txtDataRecord(Systemd::ResolvedDnssd::BuildTxtDataRecord(GetIpAddresses()))
-{}
+    NetRemoteDiscoveryService(std::move(discoveryServiceConfiguration))
+{
+    for (const auto& [key, value] : GetTxtData()) {
+        m_txtDataRecord.insert_or_assign(key, std::vector<uint8_t>(std::cbegin(value), std::cend(value)));
+    }
+}
 
 void
 NetRemoteDiscoveryServiceLinuxDnssd::Start()

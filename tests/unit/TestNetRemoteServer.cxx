@@ -170,6 +170,16 @@ TEST_CASE("Parse JSON server configuration from file", "[basic][json][config]")
     }
 }
 
+TEST_CASE("Parse RF attenuator channels from command line", "[basic][cli][config]")
+{
+    using namespace Microsoft::Net::Remote::Service;
+
+    std::vector<std::string> arguments{ "1,3", "--ac" };
+    const auto configuration = NetRemoteServerConfiguration::FromCommandLineArguments(arguments, true);
+
+    REQUIRE(configuration.RfAttenuatorConfiguration.Channels == "1,3");
+}
+
 TEST_CASE("Create a NetRemoteServer instance", "[basic][rpc][remote]")
 {
     using namespace Microsoft::Net::Remote::Service;
