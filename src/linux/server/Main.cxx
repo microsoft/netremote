@@ -1,15 +1,24 @@
 
+#include <algorithm>
+#include <array>
 #include <cerrno>
 #include <condition_variable>
 #include <csignal>
 #include <format>
 #include <memory>
 #include <mutex>
+#include <ranges>
 #include <stdexcept>
+#include <string>
+#include <tuple>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include <logging/LogUtils.hxx>
 #include <magic_enum.hpp>
+#include <microsoft/net/NetworkInterface.hxx>
+#include <microsoft/net/NetworkIpAddress.hxx>
 #include <microsoft/net/NetworkManager.hxx>
 #include <microsoft/net/NetworkOperationsLinux.hxx>
 #include <microsoft/net/remote/service/NetRemoteServer.hxx>
@@ -20,6 +29,8 @@
 #include <microsoft/net/wifi/AccessPointDiscoveryAgentOperationsNetlink.hxx>
 #include <microsoft/net/wifi/AccessPointLinux.hxx>
 #include <microsoft/net/wifi/AccessPointManager.hxx>
+#include <microsoft/net/wifi/IAccessPoint.hxx>
+#include <microsoft/net/wifi/Ieee80211.hxx>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/MessageOnlyFormatter.h>
@@ -73,6 +84,68 @@ GetAccessPointAttributes(std::weak_ptr<AccessPointManager> accessPointManagerWea
 
     // Get the access point attributes for the specified interface name.
     return accessPointManager->GetAccessPointAttributes(interfaceName);
+}
+
+std::string
+GetMachineName()
+{
+    std::array<char, 256> hostName{ };
+    if (gethostname(std::data(hostName), std::size(hostName) - 1) != 0) {
+        LOGE << std::format("Failed to get machine name (error={})", errno);
+        return { };
+    }
+
+    return std::data(hostName);
+}
+
+std::string
+BuildDiscoveryServiceSettings(const NetworkManager& networkManager, const AccessPointManager& accessPointManager, std::string_view channels)
+{
+    std::string settings = std::format("ssid={};", GetMachineName());
+    if (!std::empty(channels)) {
+        settings += std::format("channels={};", channels);
+    }
+
+    auto accessPointsWeak = accessPointManager.GetAllAccessPoints();
+    std::vector<std::shared_ptr<IAccessPoint>> accessPoints{ };
+    for (const auto& accessPointWeak : accessPointsWeak) {
+        if (auto accessPoint = accessPointWeak.lock()) {
+            accessPoints.push_back(std::move(accessPoint));
+        }
+    }
+    std::ranges::sort(accessPoints, { }, [](const auto& accessPoint) {
+        return accessPoint->GetInterfaceName();
+    });
+
+    if (!std::empty(accessPoints)) {
+        const auto& accessPoint = accessPoints.front();
+        settings += std::format("mac={};apId={};", Ieee80211MacAddressToString(accessPoint->GetMacAddress()), accessPoint->GetInterfaceName());
+    }
+
+    auto networkInterfaces = networkManager.GetNetworkInterfaceInformation();
+    std::vector<std::pair<NetworkInterfaceId, NetworkIpAddress>> bridgeAddresses{ };
+    for (const auto& [networkInterface, ipAddresses] : networkInterfaces) {
+        if (networkInterface.Type != NetworkInterfaceType::Bridge) {
+            continue;
+        }
+
+        for (const auto& ipAddress : ipAddresses) {
+            if (ipAddress.Family == NetworkIpFamily::Ipv4) {
+                bridgeAddresses.emplace_back(networkInterface, ipAddress);
+            }
+        }
+    }
+    std::ranges::sort(bridgeAddresses, { }, [](const auto& bridgeAddress) {
+        const auto& [networkInterface, ipAddress] = bridgeAddress;
+        return std::tie(networkInterface.Name, ipAddress.Address);
+    });
+
+    for (const auto& [networkInterface, ipAddress] : bridgeAddresses) {
+        settings += std::format("bridge={};bridgeIp={};", networkInterface.Name, ipAddress.Address);
+    }
+
+    LOGI << std::format("Discovery service settings: {}", settings);
+    return settings;
 }
 } // namespace
 
@@ -159,6 +232,9 @@ main(int argc, char *argv[])
 
     // Configure service discovery to use DNS-SD.
     configuration.DiscoveryServiceFactory = std::make_shared<NetRemoteDiscoveryServiceLinuxDnssdFactory>();
+    std::unordered_map<std::string, std::string> discoveryServiceTxtData{
+        { "settings", BuildDiscoveryServiceSettings(*configuration.NetworkManager, *accessPointManager, configuration.RfAttenuatorConfiguration.Channels) },
+    };
 
     // Create attenuator controller.
     std::shared_ptr<IRfAttenuatorController> rfAttenuatorController = nullptr;
@@ -179,7 +255,7 @@ main(int argc, char *argv[])
     }
 
     // Create the server.
-    NetRemoteServer server{ configuration, rfAttenuatorController };
+    NetRemoteServer server{ configuration, rfAttenuatorController, std::move(discoveryServiceTxtData) };
 
     // Start the server.
     server.Run();

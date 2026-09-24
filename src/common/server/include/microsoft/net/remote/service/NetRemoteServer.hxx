@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <grpcpp/server.h>
 #include <microsoft/net/NetworkManager.hxx>
@@ -28,7 +29,10 @@ struct NetRemoteServer
      *
      * @param configuration
      */
-    explicit NetRemoteServer(const NetRemoteServerConfiguration& configuration, std::shared_ptr<IRfAttenuatorController> attenuator = nullptr);
+    explicit NetRemoteServer(
+        const NetRemoteServerConfiguration& configuration,
+        std::shared_ptr<IRfAttenuatorController> attenuator = nullptr,
+        std::unordered_map<std::string, std::string> discoveryServiceTxtData = { });
 
     /**
      * Prevent copying and moving of this object.
@@ -90,6 +94,7 @@ private:
     std::string m_serverAddress;
     std::shared_ptr<Microsoft::Net::NetworkManager> m_networkManager;
     std::shared_ptr<INetRemoteDiscoveryServiceFactory> m_discoveryServiceFactory;
+    std::unordered_map<std::string, std::string> m_discoveryServiceTxtData;
     std::shared_ptr<NetRemoteDiscoveryService> m_discoveryService;
     std::unique_ptr<grpc::Server> m_server;
 

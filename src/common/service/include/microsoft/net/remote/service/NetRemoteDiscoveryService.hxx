@@ -23,6 +23,7 @@ struct NetRemoteDiscoveryServiceConfiguration
     std::string Name{ Protocol::NetRemoteProtocol::DnssdServiceName };
     std::string Protocol{ Protocol::NetRemoteProtocol::DnssdServiceProtocol };
     std::unordered_map<std::string, Microsoft::Net::IpAddressInformation> IpAddresses{};
+    std::unordered_map<std::string, std::string> TxtData{ };
 };
 
 /**
@@ -93,6 +94,14 @@ struct NetRemoteDiscoveryService
      */
     const std::unordered_map<std::string, Microsoft::Net::IpAddressInformation>&
     GetIpAddresses() const noexcept;
+
+    /**
+     * @brief Get additional DNS-SD TXT key-value data advertised by the service.
+     *
+     * @return const std::unordered_map<std::string, std::string>&
+     */
+    const std::unordered_map<std::string, std::string>&
+    GetTxtData() const noexcept;
 
 private:
     NetRemoteDiscoveryServiceConfiguration m_configuration;

@@ -33,6 +33,11 @@ struct NetRemoteRfAttenuatorConfiguration
      * @brief RF attenuator port.
      */
     uint16_t Port{ 0 };
+
+    /**
+     * @brief Comma-separated RF attenuator channels advertised through service discovery.
+     */
+    std::string Channels{ };
 };
 
 /**

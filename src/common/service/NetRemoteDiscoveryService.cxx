@@ -44,3 +44,9 @@ NetRemoteDiscoveryService::GetIpAddresses() const noexcept
 {
     return m_configuration.IpAddresses;
 }
+
+const std::unordered_map<std::string, std::string>&
+NetRemoteDiscoveryService::GetTxtData() const noexcept
+{
+    return m_configuration.TxtData;
+}

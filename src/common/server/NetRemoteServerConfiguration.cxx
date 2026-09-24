@@ -58,6 +58,11 @@ ConfigureCliAppOptions(CLI::App& app, NetRemoteServerConfiguration& config)
         "-p,--att-port",
         config.RfAttenuatorConfiguration.Port,
         "The port of the RF attenuator. This is only used if the type is 'socket'");
+
+    app.add_option(
+        "--ac,--att-channels",
+        config.RfAttenuatorConfiguration.Channels,
+        "Comma-separated RF attenuator channels to advertise through service discovery");
     return app;
 }
 
